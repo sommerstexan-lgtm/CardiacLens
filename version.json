@@ -1,5 +1,5 @@
 {
-  "version": "9.10.222",
+  "version": "9.10.223",
   "date": "2026-06-13",
-  "notes": "Fixed Send Feedback button not opening on iOS Safari. Root cause: iOS ignores flex layout set while display:none. Fixed using visibility:hidden/visible with pointer-events management."
+  "notes": "Send Feedback button root cause fix: openFeedbackFlow promoted to window.openFeedbackFlow in earliest script block, guaranteeing availability on first tap."
 }
