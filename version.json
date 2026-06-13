@@ -1,5 +1,5 @@
 {
-  "version": "9.10.221",
+  "version": "9.10.222",
   "date": "2026-06-13",
-  "notes": "Send Feedback button added to main screen. Standard users can report issues or enroll as beta testers. Beta enrollment is one-way: 2 consecutive skips = graduated, no re-enrollment. Active beta testers go directly to weekly feedback email."
+  "notes": "Fixed Send Feedback button not opening on iOS Safari. Root cause: iOS ignores flex layout set while display:none. Fixed using visibility:hidden/visible with pointer-events management."
 }
