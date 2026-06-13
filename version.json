@@ -1,5 +1,5 @@
 {
-  "version": "9.10.219",
+  "version": "9.10.220",
   "date": "2026-06-13",
-  "notes": "App header icon updated: replaced generic bar-chart emoji with CardiacLens heart+magnifying glass icon matching the PWA install icon."
+  "notes": "QR code in Welcome tab updated to encode https://cardiaclens.com correctly."
 }
