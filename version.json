@@ -1,5 +1,5 @@
 {
-  "version": "9.10.220",
+  "version": "9.10.221",
   "date": "2026-06-13",
-  "notes": "QR code in Welcome tab updated to encode https://cardiaclens.com correctly."
+  "notes": "Send Feedback button added to main screen. Standard users can report issues or enroll as beta testers. Beta enrollment is one-way: 2 consecutive skips = graduated, no re-enrollment. Active beta testers go directly to weekly feedback email."
 }
