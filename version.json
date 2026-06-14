@@ -1,5 +1,5 @@
 {
-  "version": "v9.10.228",
+  "version": "v9.10.229",
   "date": "2026-06-14",
-  "notes": "BP save validation: replaced all native alert() dialogs in saveBP() with inline red error banner above Save button. iOS alert Close button no longer leaves user stuck. Modal stays open, error is visible, user can fix and retry."
+  "notes": "Full alert() audit: 102 critical blocking alert() calls across all features replaced with _showInlineError() inline banner. No more silent failures on iOS Save. Covers BP, weight, fluid, meals, medicines, activities, notes, procedures, appointments, breathing logger, morning check-in, MIP, pins, doctor report, analytics, import, food check, meal builder, Ask attachments."
 }
