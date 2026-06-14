@@ -1,5 +1,5 @@
 {
-  "version": "v9.10.229",
+  "version": "v9.10.230",
   "date": "2026-06-14",
-  "notes": "Full alert() audit: 102 critical blocking alert() calls across all features replaced with _showInlineError() inline banner. No more silent failures on iOS Save. Covers BP, weight, fluid, meals, medicines, activities, notes, procedures, appointments, breathing logger, morning check-in, MIP, pins, doctor report, analytics, import, food check, meal builder, Ask attachments."
+  "notes": "Guard Dog: embedded crash reporter and health watchdog. Global error trap, 10-report localStorage queue, non-alarming banner (Your data is safe), pre-filled email to support@cardiaclens.com. Health assertions run 8s after load then every 5 minutes: 10 core functions, 3 in-memory arrays, localStorage r/w, version key, migration guard, MCI and pinned events parse as arrays."
 }
