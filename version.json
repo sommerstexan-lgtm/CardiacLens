@@ -1,5 +1,5 @@
 {
-  "version": "v9.10.226",
+  "version": "v9.10.227",
   "date": "2026-06-14",
-  "notes": "ClinBridge to CardiacLens one-time data migration. All pre-rebrand user data (pinned events, breathing sessions, saved meals, morning check-ins, sentinel events, ask history, and 12+ other keys) now automatically visible on first load. CB_PINNED_EVENTS legacy pins merged. Post-import restore also re-runs migration."
+  "notes": "Morning check-in merge fix: date-keyed union preserves all check-ins from both ClinBridge and CardiacLens eras. Analytics badges now appear at startup (~100ms) instead of after a 5-second delay."
 }
