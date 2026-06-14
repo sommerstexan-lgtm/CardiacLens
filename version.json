@@ -1,5 +1,5 @@
 {
-  "version": "9.10.225",
-  "date": "2026-06-13",
-  "notes": "Beta flow polished: Got It button fixed, beta active modal added with Send Feedback Now and Leave Beta Program options. All 10 feedback functions verified in headless browser before release."
+  "version": "v9.10.226",
+  "date": "2026-06-14",
+  "notes": "ClinBridge to CardiacLens one-time data migration. All pre-rebrand user data (pinned events, breathing sessions, saved meals, morning check-ins, sentinel events, ask history, and 12+ other keys) now automatically visible on first load. CB_PINNED_EVENTS legacy pins merged. Post-import restore also re-runs migration."
 }
