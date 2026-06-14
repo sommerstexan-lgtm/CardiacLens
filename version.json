@@ -1,5 +1,5 @@
 {
-  "version": "9.10.224",
+  "version": "9.10.225",
   "date": "2026-06-13",
-  "notes": "Send Feedback fully fixed: all modal functions moved to window.* in first-executing script block. Verified with headless browser functional tests — all buttons confirmed working."
+  "notes": "Beta flow polished: Got It button fixed, beta active modal added with Send Feedback Now and Leave Beta Program options. All 10 feedback functions verified in headless browser before release."
 }
