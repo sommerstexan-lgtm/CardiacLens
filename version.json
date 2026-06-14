@@ -1,5 +1,5 @@
 {
-  "version": "9.10.223",
+  "version": "9.10.224",
   "date": "2026-06-13",
-  "notes": "Send Feedback button root cause fix: openFeedbackFlow promoted to window.openFeedbackFlow in earliest script block, guaranteeing availability on first tap."
+  "notes": "Send Feedback fully fixed: all modal functions moved to window.* in first-executing script block. Verified with headless browser functional tests — all buttons confirmed working."
 }
