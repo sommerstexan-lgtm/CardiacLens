@@ -1,5 +1,5 @@
 {
-  "version": "v9.10.234",
+  "version": "v9.10.235",
   "date": "2026-06-14",
-  "notes": "Guard Dog staleness detection: heartbeat shows three states - normal time, -- (never run), or 'Guard Dog fell asleep' in red when last check was >10 minutes ago. Independent 2-minute staleness poll catches a stopped health check even if _gdHealthCheck itself has stopped running."
+  "notes": "Guard Dog false alarm fix: sw.js load failed rejections suppressed (network transient on deploy, not app bug). sw.js CACHE_NAME corrected to v9.10.235 -- was stuck at v9.10.225 for 9 versions. sw.js runtime errors still reported."
 }
