@@ -1,5 +1,5 @@
 {
-  "version": "v9.10.227",
+  "version": "v9.10.228",
   "date": "2026-06-14",
-  "notes": "Morning check-in merge fix: date-keyed union preserves all check-ins from both ClinBridge and CardiacLens eras. Analytics badges now appear at startup (~100ms) instead of after a 5-second delay."
+  "notes": "BP save validation: replaced all native alert() dialogs in saveBP() with inline red error banner above Save button. iOS alert Close button no longer leaves user stuck. Modal stays open, error is visible, user can fix and retry."
 }
