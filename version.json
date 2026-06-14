@@ -1,5 +1,5 @@
 {
-  "version": "v9.10.235",
+  "version": "v9.10.236",
   "date": "2026-06-14",
-  "notes": "Guard Dog false alarm fix: sw.js load failed rejections suppressed (network transient on deploy, not app bug). sw.js CACHE_NAME corrected to v9.10.235 -- was stuck at v9.10.225 for 9 versions. sw.js runtime errors still reported."
+  "notes": "Guard Dog personality: four distinct states -- Eyes open... (fresh install), On patrol... (starting up, first check in 8s), H:MM AM/PM (all clear), Guard Dog fell asleep (genuinely broken, 30min no verified check). False fell-asleep-on-resume eliminated. sw.js updated to v9.10.236."
 }
