@@ -1,5 +1,5 @@
 {
-  "version": "v9.10.237",
+  "version": "v9.10.238",
   "date": "2026-06-15",
-  "notes": "Medication adherence active-period fix; Ask offline banner"
+  "notes": "Med adherence name normalization fix; Prior dose badge direction fix"
 }
