@@ -1,5 +1,5 @@
 {
-  "version": "v9.10.238",
+  "version": "v9.10.239",
   "date": "2026-06-15",
-  "notes": "Med adherence name normalization fix; Prior dose badge direction fix"
+  "notes": "Ask worker URL fix — restored"
 }
