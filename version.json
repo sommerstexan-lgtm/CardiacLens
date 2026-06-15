@@ -1,5 +1,5 @@
 {
-  "version": "v9.10.239",
+  "version": "v9.10.240",
   "date": "2026-06-15",
-  "notes": "Ask worker URL fix — restored"
+  "notes": "Universal back-to-top button on all long data pages"
 }
