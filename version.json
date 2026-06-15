@@ -1,5 +1,5 @@
 {
-  "version": "v9.10.240",
+  "version": "v9.10.260",
   "date": "2026-06-15",
-  "notes": "Universal back-to-top button on all long data pages"
+  "notes": "Security Help tab — case insensitive clarified, unlock steps corrected"
 }
