@@ -1,5 +1,5 @@
 {
-  "version": "v9.10.236",
-  "date": "2026-06-14",
-  "notes": "Guard Dog personality: four distinct states -- Eyes open... (fresh install), On patrol... (starting up, first check in 8s), H:MM AM/PM (all clear), Guard Dog fell asleep (genuinely broken, 30min no verified check). False fell-asleep-on-resume eliminated. sw.js updated to v9.10.236."
+  "version": "v9.10.237",
+  "date": "2026-06-15",
+  "notes": "Medication adherence active-period fix; Ask offline banner"
 }
