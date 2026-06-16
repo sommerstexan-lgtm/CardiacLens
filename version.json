@@ -1,5 +1,5 @@
 {
-  "version": "v9.10.263",
-  "date": "2026-06-15",
-  "notes": "Guard Dog — duplicate report suppression"
+  "version": "v9.10.264",
+  "date": "2026-06-16",
+  "notes": "Guard Dog beta-friendly overhaul — dismiss clears queue, iOS audio errors suppressed"
 }
