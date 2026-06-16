@@ -1,5 +1,5 @@
 {
-  "version": "v9.10.261",
+  "version": "v9.10.263",
   "date": "2026-06-15",
-  "notes": "Secure Access — iOS readiness: safe-area, keychain suppression, tap-to-focus"
+  "notes": "Guard Dog — duplicate report suppression"
 }
