@@ -1064,8 +1064,20 @@
       } catch(e) {} // watchdog must never throw
     }
 
-    setTimeout(_gdHealthCheck, 8000);
-    setInterval(_gdHealthCheck, 5 * 60 * 1000);
+    // Guard Dog health check must wait until the whole app has finished loading.
+    // On iPhone/Safari the app script can still be parsing when the old 8-second
+    // check fires, which creates false "Missing function" reports even though the
+    // functions are defined later in the page.
+    function _gdStartHealthChecksAfterLoad() {
+      setTimeout(_gdHealthCheck, 25000);
+      setInterval(_gdHealthCheck, 5 * 60 * 1000);
+    }
+
+    if (document.readyState === 'complete') {
+      _gdStartHealthChecksAfterLoad();
+    } else {
+      window.addEventListener('load', _gdStartHealthChecksAfterLoad, { once: true });
+    }
 
     // Independent staleness poll: re-evaluates the heartbeat display every 2 minutes
     // so the "Guard Dog fell asleep" message appears even if _gdHealthCheck itself
