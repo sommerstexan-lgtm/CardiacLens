@@ -1,5 +1,5 @@
 {
-  "version": "9.10.268",
+  "version": "9.10.269",
   "date": "June 17, 2026",
-  "notes": "Service worker registration uses versioned URL to bypass GitHub Pages CDN cache on every update"
+  "notes": "Service worker registration uses updateViaCache:none to bypass GitHub Pages CDN cache"
 }

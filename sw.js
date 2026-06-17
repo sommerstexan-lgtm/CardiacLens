@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.268';
+const CACHE_NAME = 'cardiaclens-v9.10.269';
 const urlsToCache = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './favicon-32.png', './favicon-16.png'];
 
 self.addEventListener('install', event => {
