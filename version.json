@@ -1,7 +1,6 @@
 {
-  "version": "9.10.276",
-  "date": "June 17, 2026",
-  "label": "v9.10.276",
-  "build": "secure-access-takeover-final",
-  "notes": "Final Secure Access takeover: keypad appears from the update and enforces letter plus three color taps."
+  "version": "9.10.277",
+  "label": "v9.10.277",
+  "build": "security-hardening",
+  "notes": "Guard Dog self-heal, cooldown protection, hidden recovery."
 }
