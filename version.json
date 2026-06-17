@@ -1,5 +1,5 @@
 {
-  "version": "9.10.265",
-  "date": "2026-06-16",
-  "notes": "Secure Access replaced: randomized color-letter keyboard. User picks a letter and a color during setup. Unlock by tapping letter first then any 3 of 4 target-color keys."
+  "version": "9.10.266",
+  "date": "June 17, 2026",
+  "notes": "Secure Access: migration guard, grid state fix, setup screen spacing"
 }
