@@ -1,7 +1,7 @@
 {
-  "version": "9.10.270",
+  "version": "9.10.271",
   "date": "June 17, 2026",
-  "notes": "Service worker registration uses updateViaCache:none to bypass GitHub Pages CDN cache",
-  "label": "v9.10.270",
-  "build": "secure-access-enforced"
+  "notes": "Secure Access hardlock: requires key letter plus three correct color taps; status active when letter and color are set.",
+  "label": "v9.10.271",
+  "build": "secure-access-hardlock"
 }
