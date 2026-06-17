@@ -1,5 +1,5 @@
 {
-  "version": "v9.10.264",
+  "version": "9.10.265",
   "date": "2026-06-16",
-  "notes": "Guard Dog beta-friendly overhaul — dismiss clears queue, iOS audio errors suppressed"
+  "notes": "Secure Access replaced: randomized color-letter keyboard. User picks a letter and a color during setup. Unlock by tapping letter first then any 3 of 4 target-color keys."
 }
