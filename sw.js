@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.269-ios-cache-repair';
+const CACHE_NAME = 'cardiaclens-v9.10.270-secure-access-enforced';
 const PRECACHE_URLS = [
   './manifest.json',
   './icon-192.png',
@@ -12,9 +12,7 @@ self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache =>
-      Promise.all(PRECACHE_URLS.map(url =>
-        cache.add(url).catch(() => null)
-      ))
+      Promise.all(PRECACHE_URLS.map(url => cache.add(url).catch(() => null)))
     )
   );
 });
@@ -23,9 +21,8 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
       .then(keys => Promise.all(
-        keys
-          .filter(key => key.indexOf('cardiaclens-') === 0 && key !== CACHE_NAME)
-          .map(key => caches.delete(key))
+        keys.filter(key => key.indexOf('cardiaclens-') === 0 && key !== CACHE_NAME)
+            .map(key => caches.delete(key))
       ))
       .then(() => self.clients.claim())
   );
@@ -33,7 +30,6 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('message', event => {
   if (!event || !event.data) return;
-
   if (event.data.type === 'CARDIACLENS_CLEAR_CACHES') {
     event.waitUntil(
       caches.keys()
@@ -41,21 +37,16 @@ self.addEventListener('message', event => {
         .then(() => self.clients.claim())
     );
   }
-
-  if (event.data.type === 'CARDIACLENS_SKIP_WAITING') {
-    self.skipWaiting();
-  }
+  if (event.data.type === 'CARDIACLENS_SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('fetch', event => {
   const req = event.request;
   if (!req || req.method !== 'GET') return;
-
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
 
-  const isDocument =
-    req.mode === 'navigate' ||
+  const isDocument = req.mode === 'navigate' ||
     req.destination === 'document' ||
     url.pathname === '/' ||
     url.pathname.endsWith('/') ||
