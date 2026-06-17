@@ -1,7 +1,7 @@
 {
-  "version": "9.10.271",
+  "version": "9.10.274",
   "date": "June 17, 2026",
-  "notes": "Secure Access hardlock: requires key letter plus three correct color taps; status active when letter and color are set.",
-  "label": "v9.10.271",
-  "build": "secure-access-hardlock"
+  "notes": "Secure Access rewrite: letter alone blocked; letter plus 3 color taps unlocks; recovery answer unlocks after failed attempts; settings save persists secure access.",
+  "label": "v9.10.274",
+  "build": "secure-access-rewrite"
 }

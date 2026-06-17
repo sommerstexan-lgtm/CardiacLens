@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.271-secure-access-hardlock';
+const CACHE_NAME = 'cardiaclens-v9.10.274-secure-access-rewrite';
 const PRECACHE_URLS = [
   './manifest.json',
   './icon-192.png',
