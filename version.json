@@ -1,5 +1,5 @@
 {
   "version": "9.10.268",
   "date": "June 17, 2026",
-  "notes": "Version bump"
+  "notes": "Service worker registration uses versioned URL to bypass GitHub Pages CDN cache on every update"
 }
