@@ -1,5 +1,5 @@
 {
-  "version": "9.10.266",
+  "version": "9.10.267",
   "date": "June 17, 2026",
-  "notes": "Secure Access: migration guard, grid state fix, setup screen spacing"
+  "notes": "Secure Access: fix lock data loss from two-finger swipe gesture destroying CL_SEC_* keys; migration guard sentinel"
 }
