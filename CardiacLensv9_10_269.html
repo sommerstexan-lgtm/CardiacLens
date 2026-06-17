@@ -207,6 +207,24 @@
 
   // ── SECURE ACCESS (v9.10.269 — Color-Letter Keyboard) ───────────────────
   var _CL_SEC = { KEY:'CL_SEC_KEY', Q:'CL_SEC_Q', A:'CL_SEC_A', DONE:'CL_SEC_DONE', COLOR:'CL_SEC_COLOR', FIRST:'CL_SEC_FIRST' };
+  function _clSecIsConfigured(){
+    try {
+      var hasAll = !!(
+        localStorage.getItem(_CL_SEC.KEY) &&
+        localStorage.getItem(_CL_SEC.COLOR) &&
+        localStorage.getItem(_CL_SEC.Q) &&
+        localStorage.getItem(_CL_SEC.A)
+      );
+      if(hasAll && localStorage.getItem(_CL_SEC.DONE) !== '1'){
+        localStorage.setItem(_CL_SEC.DONE, '1');
+        localStorage.setItem('CL_SEC_MODE', 'color-letter-v2');
+        localStorage.setItem('CL_SEC_UPDATED_AT', new Date().toISOString());
+      }
+      return hasAll;
+    } catch(e) {
+      return !!localStorage.getItem(_CL_SEC.DONE);
+    }
+  }
   var _CL_QUESTIONS = {
     pet:    "What was the name of your first pet?",
     city:   "What city were you born in?",
@@ -320,7 +338,7 @@
     if(!lock) return;
     lock.style.display = 'flex';
     var done = localStorage.getItem(_CL_SEC.DONE);
-    if(!done || !localStorage.getItem(_CL_SEC.COLOR)){
+    if(!_clSecIsConfigured()){
       localStorage.setItem(_CL_SEC.FIRST,'seen');
       document.getElementById('clFirstTimePrompt').style.display='block';
       document.getElementById('clForgotHint').style.display='none';
@@ -350,7 +368,7 @@
 
   // ── handle key tap ──
   window._clKeyTap = function(key, idx){
-    if(!localStorage.getItem(_CL_SEC.DONE)) return;
+    if(!_clSecIsConfigured()) return;
     // cooldown?
     var now = Date.now();
     if(_clKbState.coolUntil > now){
@@ -437,7 +455,7 @@
   function _clSyncLockBtn(){
     var pill = document.getElementById('clPrivacyLockPill');
     if(!pill) return;
-    var done = localStorage.getItem(_CL_SEC.DONE);
+    var done = _clSecIsConfigured();
     if(done){
       pill.style.cssText = 'background:rgba(59,130,246,0.35)!important;border:2px solid rgba(255,255,255,0.7)!important;border-radius:999px!important;padding:5px 14px!important;font-size:13px!important;font-weight:700!important;color:#fff!important;cursor:pointer!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important;font-family:inherit!important;box-shadow:0 0 10px rgba(96,165,250,0.5)!important;pointer-events:auto!important;';
     } else {
@@ -447,7 +465,7 @@
   window._clSyncLockBtn = _clSyncLockBtn;
 
   window._clLockFromBtn = function(){
-    if(!localStorage.getItem('CL_SEC_DONE')) return;
+    if(!_clSecIsConfigured()) return;
     var lock = document.getElementById('clSecureLock');
     if(!lock) return;
     lock.style.display='flex';
@@ -22454,9 +22472,18 @@ if (window._isBetaBuild && window._isBetaBuild()) {
 }
 
 // ── SECURE ACCESS SETTINGS SECTION ───────────────────────────────────────────
-var _clSetupDone = localStorage.getItem('CL_SEC_DONE');
 var _clCurLetter = localStorage.getItem('CL_SEC_KEY')||'';
 var _clCurColor  = localStorage.getItem('CL_SEC_COLOR')||'';
+var _clCurQ      = localStorage.getItem('CL_SEC_Q')||'';
+var _clCurA      = localStorage.getItem('CL_SEC_A')||'';
+var _clSetupDone = !!(_clCurLetter && _clCurColor && _clCurQ && _clCurA);
+if(_clSetupDone && localStorage.getItem('CL_SEC_DONE')!=='1'){
+  try{
+    localStorage.setItem('CL_SEC_DONE','1');
+    localStorage.setItem('CL_SEC_MODE','color-letter-v2');
+    localStorage.setItem('CL_SEC_UPDATED_AT',new Date().toISOString());
+  }catch(e){}
+}
 var _clColorHexMap = {red:'#e53935',blue:'#1565c0',green:'#2e7d32',orange:'#e65100',purple:'#6a1b9a',teal:'#00695c',pink:'#c2185b',gold:'#f57f17'};
 var _clColorLblMap = {red:'Red',blue:'Blue',green:'Green',orange:'Orange',purple:'Purple',teal:'Teal',pink:'Pink',gold:'Gold'};
 var _clSecStatus = _clSetupDone
@@ -22705,6 +22732,8 @@ showModal(html);
       localStorage.setItem('CL_SEC_Q',     q);
       localStorage.setItem('CL_SEC_A',     a);
       localStorage.setItem('CL_SEC_DONE',  '1');
+      localStorage.setItem('CL_SEC_MODE',  'color-letter-v2');
+      localStorage.setItem('CL_SEC_UPDATED_AT', new Date().toISOString());
       // Verify write succeeded by reading back
       var verify = localStorage.getItem('CL_SEC_DONE');
       if(verify === '1'){
