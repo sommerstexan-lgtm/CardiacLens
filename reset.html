@@ -14,38 +14,4 @@ log('DONE. Opening fresh CardiacLens...');setTimeout(function(){location.href='/
 }catch(err){log('ERROR: '+(err&&err.message?err.message:String(err)));}}
 document.getElementById('runBtn').addEventListener('click',repair);
 })();
-</script>
-<script>
-(function(){
- const FAIL='CL_SEC_FAILS',LOCK='CL_SEC_LOCK_UNTIL';
- function lockRemaining(){try{return Math.max(0,(+localStorage.getItem(LOCK)||0)-Date.now())}catch(e){return 0}}
- window.CL_SEC_RegisterFail=function(){
-   try{
-    let f=(+localStorage.getItem(FAIL)||0)+1;
-    localStorage.setItem(FAIL,f);
-    if(f>=5){
-      localStorage.setItem(LOCK,String(Date.now()+5*60*1000));
-      localStorage.setItem(FAIL,'0');
-    }
-   }catch(e){}
- };
- window.CL_SEC_ClearFails=function(){try{localStorage.setItem(FAIL,'0');localStorage.removeItem(LOCK);}catch(e){}};
- setInterval(function(){
-   var rem=lockRemaining();
-   var s=document.getElementById('clTakeoverStatus');
-   if(rem>0 && s){
-      s.textContent='Too many unsuccessful attempts. Please wait before trying again. ('+Math.ceil(rem/1000)+'s)';
-   }
- },1000);
- document.addEventListener('pointerdown',function(e){
-   var t=e.target;
-   if(!t || !t.classList || !t.classList.contains('clToKey')) return;
-   window.__holdTimer=setTimeout(function(){
-      var rec=document.getElementById('clTakeoverRecovery');
-      if(rec) rec.style.display='block';
-   },5000);
- },true);
- document.addEventListener('pointerup',function(){clearTimeout(window.__holdTimer)},true);
-})();
-</script>
-</body></html>
+</script></body></html>

@@ -1057,7 +1057,10 @@
         // 4. Version key must match current version
         try {
           var sv = localStorage.getItem('CARDIACLENS_APP_VERSION');
-          if (sv && sv !== GD_VERSION){ try{localStorage.setItem('CARDIACLENS_APP_VERSION',GD_VERSION);}catch(_e){} }
+          if (sv !== GD_VERSION) {
+            localStorage.setItem('CARDIACLENS_APP_VERSION', GD_VERSION);
+            localStorage.setItem('CARDIACLENS_APP_VERSION_REPAIRED_AT', new Date().toISOString());
+          }
         } catch(e) {}
 
         // 5. Migration guard must be in a valid state
@@ -29842,40 +29845,6 @@ pre{white-space:pre-wrap;line-height:1.5;}
 </head>
 <body>
 <pre>${report}</pre>
-
-<script>
-(function(){
- const FAIL='CL_SEC_FAILS',LOCK='CL_SEC_LOCK_UNTIL';
- function lockRemaining(){try{return Math.max(0,(+localStorage.getItem(LOCK)||0)-Date.now())}catch(e){return 0}}
- window.CL_SEC_RegisterFail=function(){
-   try{
-    let f=(+localStorage.getItem(FAIL)||0)+1;
-    localStorage.setItem(FAIL,f);
-    if(f>=5){
-      localStorage.setItem(LOCK,String(Date.now()+5*60*1000));
-      localStorage.setItem(FAIL,'0');
-    }
-   }catch(e){}
- };
- window.CL_SEC_ClearFails=function(){try{localStorage.setItem(FAIL,'0');localStorage.removeItem(LOCK);}catch(e){}};
- setInterval(function(){
-   var rem=lockRemaining();
-   var s=document.getElementById('clTakeoverStatus');
-   if(rem>0 && s){
-      s.textContent='Too many unsuccessful attempts. Please wait before trying again. ('+Math.ceil(rem/1000)+'s)';
-   }
- },1000);
- document.addEventListener('pointerdown',function(e){
-   var t=e.target;
-   if(!t || !t.classList || !t.classList.contains('clToKey')) return;
-   window.__holdTimer=setTimeout(function(){
-      var rec=document.getElementById('clTakeoverRecovery');
-      if(rec) rec.style.display='block';
-   },5000);
- },true);
- document.addEventListener('pointerup',function(){clearTimeout(window.__holdTimer)},true);
-})();
-</script>
 </body>
 </html>
 `);
@@ -34495,41 +34464,7 @@ body{font-family:Arial,sans-serif;max-width:900px;margin:40px auto;padding:20px;
 table{width:100%;border-collapse:collapse}
 td,th{padding:8px;border:1px solid #e5e7eb}
 </style>`;
-const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>CardiacLens Doctor Report - ${dateStr}</title>${css}</head><body>${content}
-<script>
-(function(){
- const FAIL='CL_SEC_FAILS',LOCK='CL_SEC_LOCK_UNTIL';
- function lockRemaining(){try{return Math.max(0,(+localStorage.getItem(LOCK)||0)-Date.now())}catch(e){return 0}}
- window.CL_SEC_RegisterFail=function(){
-   try{
-    let f=(+localStorage.getItem(FAIL)||0)+1;
-    localStorage.setItem(FAIL,f);
-    if(f>=5){
-      localStorage.setItem(LOCK,String(Date.now()+5*60*1000));
-      localStorage.setItem(FAIL,'0');
-    }
-   }catch(e){}
- };
- window.CL_SEC_ClearFails=function(){try{localStorage.setItem(FAIL,'0');localStorage.removeItem(LOCK);}catch(e){}};
- setInterval(function(){
-   var rem=lockRemaining();
-   var s=document.getElementById('clTakeoverStatus');
-   if(rem>0 && s){
-      s.textContent='Too many unsuccessful attempts. Please wait before trying again. ('+Math.ceil(rem/1000)+'s)';
-   }
- },1000);
- document.addEventListener('pointerdown',function(e){
-   var t=e.target;
-   if(!t || !t.classList || !t.classList.contains('clToKey')) return;
-   window.__holdTimer=setTimeout(function(){
-      var rec=document.getElementById('clTakeoverRecovery');
-      if(rec) rec.style.display='block';
-   },5000);
- },true);
- document.addEventListener('pointerup',function(){clearTimeout(window.__holdTimer)},true);
-})();
-</script>
-</body></html>`;
+const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>CardiacLens Doctor Report - ${dateStr}</title>${css}</head><body>${content}</body></html>`;
 const blob=new Blob([html],{type:'text/html'});
 const a=document.createElement('a');
 a.href=URL.createObjectURL(blob);
@@ -38715,40 +38650,6 @@ ${insightsHTML}
 <strong>CardiacLens v9.10.277 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
 This report is not a substitute for professional medical advice.
 </div>
-
-<script>
-(function(){
- const FAIL='CL_SEC_FAILS',LOCK='CL_SEC_LOCK_UNTIL';
- function lockRemaining(){try{return Math.max(0,(+localStorage.getItem(LOCK)||0)-Date.now())}catch(e){return 0}}
- window.CL_SEC_RegisterFail=function(){
-   try{
-    let f=(+localStorage.getItem(FAIL)||0)+1;
-    localStorage.setItem(FAIL,f);
-    if(f>=5){
-      localStorage.setItem(LOCK,String(Date.now()+5*60*1000));
-      localStorage.setItem(FAIL,'0');
-    }
-   }catch(e){}
- };
- window.CL_SEC_ClearFails=function(){try{localStorage.setItem(FAIL,'0');localStorage.removeItem(LOCK);}catch(e){}};
- setInterval(function(){
-   var rem=lockRemaining();
-   var s=document.getElementById('clTakeoverStatus');
-   if(rem>0 && s){
-      s.textContent='Too many unsuccessful attempts. Please wait before trying again. ('+Math.ceil(rem/1000)+'s)';
-   }
- },1000);
- document.addEventListener('pointerdown',function(e){
-   var t=e.target;
-   if(!t || !t.classList || !t.classList.contains('clToKey')) return;
-   window.__holdTimer=setTimeout(function(){
-      var rec=document.getElementById('clTakeoverRecovery');
-      if(rec) rec.style.display='block';
-   },5000);
- },true);
- document.addEventListener('pointerup',function(){clearTimeout(window.__holdTimer)},true);
-})();
-</script>
 </body>
 </html>
 `);
@@ -40306,41 +40207,7 @@ html+=createDoctorNotesSection();
 }
 html+='</div>';
 }
-html+='
-<script>
-(function(){
- const FAIL='CL_SEC_FAILS',LOCK='CL_SEC_LOCK_UNTIL';
- function lockRemaining(){try{return Math.max(0,(+localStorage.getItem(LOCK)||0)-Date.now())}catch(e){return 0}}
- window.CL_SEC_RegisterFail=function(){
-   try{
-    let f=(+localStorage.getItem(FAIL)||0)+1;
-    localStorage.setItem(FAIL,f);
-    if(f>=5){
-      localStorage.setItem(LOCK,String(Date.now()+5*60*1000));
-      localStorage.setItem(FAIL,'0');
-    }
-   }catch(e){}
- };
- window.CL_SEC_ClearFails=function(){try{localStorage.setItem(FAIL,'0');localStorage.removeItem(LOCK);}catch(e){}};
- setInterval(function(){
-   var rem=lockRemaining();
-   var s=document.getElementById('clTakeoverStatus');
-   if(rem>0 && s){
-      s.textContent='Too many unsuccessful attempts. Please wait before trying again. ('+Math.ceil(rem/1000)+'s)';
-   }
- },1000);
- document.addEventListener('pointerdown',function(e){
-   var t=e.target;
-   if(!t || !t.classList || !t.classList.contains('clToKey')) return;
-   window.__holdTimer=setTimeout(function(){
-      var rec=document.getElementById('clTakeoverRecovery');
-      if(rec) rec.style.display='block';
-   },5000);
- },true);
- document.addEventListener('pointerup',function(){clearTimeout(window.__holdTimer)},true);
-})();
-</script>
-</body></html>';
+html+='</body></html>';
 return html;
 }
 
@@ -49554,40 +49421,6 @@ function _showAskClarifyChips(options) {
 </div><!-- /#clSecureLock -->
 <!-- ── END SECURE ACCESS LOCK SCREEN ─────────────────────────────────── -->
 
-
-<script>
-(function(){
- const FAIL='CL_SEC_FAILS',LOCK='CL_SEC_LOCK_UNTIL';
- function lockRemaining(){try{return Math.max(0,(+localStorage.getItem(LOCK)||0)-Date.now())}catch(e){return 0}}
- window.CL_SEC_RegisterFail=function(){
-   try{
-    let f=(+localStorage.getItem(FAIL)||0)+1;
-    localStorage.setItem(FAIL,f);
-    if(f>=5){
-      localStorage.setItem(LOCK,String(Date.now()+5*60*1000));
-      localStorage.setItem(FAIL,'0');
-    }
-   }catch(e){}
- };
- window.CL_SEC_ClearFails=function(){try{localStorage.setItem(FAIL,'0');localStorage.removeItem(LOCK);}catch(e){}};
- setInterval(function(){
-   var rem=lockRemaining();
-   var s=document.getElementById('clTakeoverStatus');
-   if(rem>0 && s){
-      s.textContent='Too many unsuccessful attempts. Please wait before trying again. ('+Math.ceil(rem/1000)+'s)';
-   }
- },1000);
- document.addEventListener('pointerdown',function(e){
-   var t=e.target;
-   if(!t || !t.classList || !t.classList.contains('clToKey')) return;
-   window.__holdTimer=setTimeout(function(){
-      var rec=document.getElementById('clTakeoverRecovery');
-      if(rec) rec.style.display='block';
-   },5000);
- },true);
- document.addEventListener('pointerup',function(){clearTimeout(window.__holdTimer)},true);
-})();
-</script>
 </body>
 
 <button id="cl-back-to-top"
@@ -49847,39 +49680,5 @@ function _showAskClarifyChips(options) {
 })();
 </script>
 
-
-<script>
-(function(){
- const FAIL='CL_SEC_FAILS',LOCK='CL_SEC_LOCK_UNTIL';
- function lockRemaining(){try{return Math.max(0,(+localStorage.getItem(LOCK)||0)-Date.now())}catch(e){return 0}}
- window.CL_SEC_RegisterFail=function(){
-   try{
-    let f=(+localStorage.getItem(FAIL)||0)+1;
-    localStorage.setItem(FAIL,f);
-    if(f>=5){
-      localStorage.setItem(LOCK,String(Date.now()+5*60*1000));
-      localStorage.setItem(FAIL,'0');
-    }
-   }catch(e){}
- };
- window.CL_SEC_ClearFails=function(){try{localStorage.setItem(FAIL,'0');localStorage.removeItem(LOCK);}catch(e){}};
- setInterval(function(){
-   var rem=lockRemaining();
-   var s=document.getElementById('clTakeoverStatus');
-   if(rem>0 && s){
-      s.textContent='Too many unsuccessful attempts. Please wait before trying again. ('+Math.ceil(rem/1000)+'s)';
-   }
- },1000);
- document.addEventListener('pointerdown',function(e){
-   var t=e.target;
-   if(!t || !t.classList || !t.classList.contains('clToKey')) return;
-   window.__holdTimer=setTimeout(function(){
-      var rec=document.getElementById('clTakeoverRecovery');
-      if(rec) rec.style.display='block';
-   },5000);
- },true);
- document.addEventListener('pointerup',function(){clearTimeout(window.__holdTimer)},true);
-})();
-</script>
 </body>
 </html>

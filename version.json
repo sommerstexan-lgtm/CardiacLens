@@ -1,6 +1,7 @@
 {
   "version": "9.10.277",
+  "date": "June 17, 2026",
   "label": "v9.10.277",
-  "build": "security-hardening",
-  "notes": "Guard Dog self-heal, cooldown protection, hidden recovery."
+  "build": "guarddog-cleanup-safe",
+  "notes": "Safe cleanup release from working v276 baseline: Secure Access takeover preserved; Guard Dog self-heals stale app-version storage."
 }
