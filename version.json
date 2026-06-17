@@ -1,7 +1,7 @@
 {
   "version": "9.10.276",
   "date": "June 17, 2026",
-  "notes": "Secure Access takeover diagnostic: final override of unlock functions; records exact unlock path; blocks legacy letter-only unlock.",
   "label": "v9.10.276",
-  "build": "secure-access-takeover-diag"
+  "build": "secure-access-takeover-final",
+  "notes": "Final Secure Access takeover: keypad appears from the update and enforces letter plus three color taps."
 }

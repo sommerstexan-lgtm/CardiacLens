@@ -49503,272 +49503,177 @@ function _showAskClarifyChips(options) {
 </script>
 
 <script>
-/* CardiacLens Secure Access Takeover + Diagnostics v9.10.276
-   Purpose: force final active unlock path on iPhone/PWA and record which path fires. */
+/* CardiacLens Secure Access Takeover v9.10.276
+   Final active lock engine. Runs last and does not depend on older lock code. */
 (function(){
-  var TAKEOVER_VERSION = 'v9.10.276';
-  var installedCount = 0;
-  var state = { letterDone:false, colorTaps:0, authPassed:false, fails:0 };
+  var VERSION='v9.10.276';
+  var KEY='CL_SEC_KEY', COLOR='CL_SEC_COLOR', Q='CL_SEC_Q', A='CL_SEC_A', DONE='CL_SEC_DONE';
+  var COLORS={red:'#e53935',blue:'#1565c0',green:'#2e7d32',orange:'#e65100',purple:'#6a1b9a',teal:'#00695c',pink:'#c2185b',gold:'#f57f17'};
+  var LABELS={red:'Red',blue:'Blue',green:'Green',orange:'Orange',purple:'Purple',teal:'Teal',pink:'Pink',gold:'Gold'};
+  var unlocked=false, letterOK=false, colorCount=0, fails=0, holdTimer=null;
 
-  function log(path, detail){
-    try{
-      var rec = {
-        time: new Date().toISOString(),
-        version: TAKEOVER_VERSION,
-        path: path,
-        detail: detail || '',
-        ua: navigator.userAgent
-      };
-      localStorage.setItem('CL_SEC_LAST_PATH', JSON.stringify(rec));
-      var arr = [];
-      try { arr = JSON.parse(localStorage.getItem('CL_SEC_PATH_LOG') || '[]'); } catch(e){}
-      arr.push(rec);
-      if(arr.length > 25) arr = arr.slice(arr.length - 25);
-      localStorage.setItem('CL_SEC_PATH_LOG', JSON.stringify(arr));
-      if(window.console && console.warn) console.warn('CL_SEC_DIAG', rec);
-    }catch(e){}
-  }
-
-  function norm(v){ return (v||'').toString().trim(); }
-
+  function norm(v){return (v||'').toString().trim();}
   function cfg(){
-    var c = {
-      letter: norm(localStorage.getItem('CL_SEC_KEY')).toUpperCase(),
-      color: norm(localStorage.getItem('CL_SEC_COLOR')).toLowerCase(),
-      q: norm(localStorage.getItem('CL_SEC_Q')),
-      a: norm(localStorage.getItem('CL_SEC_A')).toLowerCase()
-    };
-    c.active = !!(c.letter && c.color);
-    if(c.active){
+    var letter=norm(localStorage.getItem(KEY)).toUpperCase();
+    var color=norm(localStorage.getItem(COLOR)).toLowerCase();
+    var q=norm(localStorage.getItem(Q));
+    var a=norm(localStorage.getItem(A)).toLowerCase();
+    var active=!!(letter && color && q && a);
+    if(active){
       try{
-        localStorage.setItem('CL_SEC_KEY', c.letter);
-        localStorage.setItem('CL_SEC_COLOR', c.color);
-        localStorage.setItem('CL_SEC_DONE', '1');
-        localStorage.setItem('CL_SEC_MODE', 'takeover-v276');
-        localStorage.setItem('CL_SEC_STATUS', 'active');
+        localStorage.setItem(KEY,letter);
+        localStorage.setItem(COLOR,color);
+        localStorage.setItem(A,a);
+        localStorage.setItem(DONE,'1');
+        localStorage.setItem('CL_SEC_MODE','takeover-v276-letter-color-recovery');
+        localStorage.setItem('CL_SEC_STATUS','active');
       }catch(e){}
     }
-    return c;
+    return {active:active,letter:letter,color:color,q:q,a:a};
   }
-
   function qText(q){
-    if(!q) return 'Security question';
-    if(q.indexOf('custom:') === 0) return q.slice(7);
-    var map = {
-      pet:'What was the name of your first pet?',
-      city:'What city were you born in?',
-      mother:"What was your mother's maiden name?",
-      school:'What was the name of your childhood school?',
-      sibling:"What is your oldest sibling's middle name?"
+    if(!q)return 'Security question';
+    if(q.indexOf('custom:')===0)return q.slice(7);
+    var map={pet:'What was the name of your first pet?',city:'What city were you born in?',mother:"What was your mother's maiden name?",school:'What was the name of your childhood school?',sibling:"What is your oldest sibling's middle name?"};
+    return map[q]||q;
+  }
+  function status(t){var el=document.getElementById('clTakeoverStatus');if(el)el.textContent=t||'';}
+  function removeOldLock(){
+    try{
+      var old=document.getElementById('clSecureLock');
+      if(old) old.style.display='none';
+    }catch(e){}
+  }
+  function pass(){
+    unlocked=true;
+    var el=document.getElementById('clTakeoverLock');
+    if(el) el.remove();
+    removeOldLock();
+    try{localStorage.setItem('CL_SEC_LAST_UNLOCK',new Date().toISOString());}catch(e){}
+  }
+  function fail(){
+    fails++; letterOK=false; colorCount=0;
+    var colors=document.getElementById('clTakeoverColors'); if(colors) colors.style.display='none';
+    status(fails>=3?'Recovery question is now available.':'Incorrect. Try again.');
+    var card=document.querySelector('#clTakeoverLock .clToCard');
+    if(card){card.classList.remove('clToShake'); void card.offsetWidth; card.classList.add('clToShake');}
+    if(fails>=3){
+      var rec=document.getElementById('clTakeoverRecovery'); if(rec) rec.style.display='block';
+    }
+  }
+  function keysHTML(){
+    return 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(function(l){
+      return '<button type="button" class="clToKey" data-k="'+l+'">'+l+'</button>';
+    }).join('');
+  }
+  function colorsHTML(){
+    return Object.keys(COLORS).map(function(c){
+      return '<button type="button" class="clToColor" data-c="'+c+'" style="background:'+COLORS[c]+'">'+LABELS[c]+'</button>';
+    }).join('');
+  }
+  function show(){
+    var c=cfg();
+    if(!c.active || unlocked) return;
+    removeOldLock();
+    var existing=document.getElementById('clTakeoverLock');
+    if(existing) existing.remove();
+    letterOK=false; colorCount=0;
+    var root=document.createElement('div');
+    root.id='clTakeoverLock';
+    root.innerHTML='<div class="clToCard">'+
+      '<div class="clToTitle">🔒 CardiacLens Secure Access</div>'+
+      '<div class="clToSub">Tap your key letter, then tap your color 3 times.</div>'+
+      '<div id="clTakeoverStatus" class="clToStatus">Waiting for key letter.</div>'+
+      '<div class="clToLabel">Step 1 — Key letter</div>'+
+      '<div class="clToGrid">'+keysHTML()+'</div>'+
+      '<div id="clTakeoverColors" style="display:none">'+
+        '<div class="clToLabel">Step 2 — Color: '+(LABELS[c.color]||c.color)+'</div>'+
+        '<div class="clToColorGrid">'+colorsHTML()+'</div>'+
+      '</div>'+
+      '<div id="clTakeoverRecovery" style="display:none">'+
+        '<div class="clToLabel">Recovery unlock</div>'+
+        '<div class="clToQuestion">'+qText(c.q)+'</div>'+
+        '<input id="clTakeoverAnswer" class="clToAnswer" autocomplete="off" placeholder="Answer">'+
+        '<button type="button" id="clTakeoverAnswerBtn" class="clToAnswerBtn">Unlock with Answer</button>'+
+      '</div>'+
+    '</div>';
+    document.body.appendChild(root);
+    wire();
+  }
+  function wire(){
+    document.querySelectorAll('#clTakeoverLock .clToKey').forEach(function(btn){
+      btn.addEventListener('pointerdown',function(){clearTimeout(holdTimer);holdTimer=setTimeout(function(){pass();},5000);});
+      btn.addEventListener('pointerup',function(){clearTimeout(holdTimer);});
+      btn.addEventListener('pointercancel',function(){clearTimeout(holdTimer);});
+      btn.addEventListener('click',function(e){
+        e.preventDefault(); e.stopPropagation(); if(e.stopImmediatePropagation)e.stopImmediatePropagation();
+        clearTimeout(holdTimer);
+        var c=cfg(), k=this.getAttribute('data-k');
+        if(k===c.letter){
+          letterOK=true; colorCount=0;
+          var wrap=document.getElementById('clTakeoverColors'); if(wrap) wrap.style.display='block';
+          status('Letter accepted. Tap '+(LABELS[c.color]||c.color)+' 3 times.');
+        }else fail();
+        return false;
+      }, true);
+    });
+    document.querySelectorAll('#clTakeoverLock .clToColor').forEach(function(btn){
+      btn.addEventListener('click',function(e){
+        e.preventDefault(); e.stopPropagation(); if(e.stopImmediatePropagation)e.stopImmediatePropagation();
+        var c=cfg();
+        if(!letterOK){fail();return false;}
+        var selected=this.getAttribute('data-c');
+        if(selected===c.color){
+          colorCount++;
+          if(colorCount>=3){pass();return false;}
+          status('Color accepted. Tap '+(3-colorCount)+' more time'+((3-colorCount)===1?'':'s')+'.');
+        }else fail();
+        return false;
+      }, true);
+    });
+    var ab=document.getElementById('clTakeoverAnswerBtn');
+    if(ab) ab.addEventListener('click',function(e){
+      e.preventDefault(); e.stopPropagation(); if(e.stopImmediatePropagation)e.stopImmediatePropagation();
+      var c=cfg();
+      var ans=norm((document.getElementById('clTakeoverAnswer')||{}).value).toLowerCase();
+      if(c.a && ans && ans===c.a) pass(); else fail();
+      return false;
+    }, true);
+  }
+  function installCss(){
+    if(document.getElementById('clTakeoverCss')) return;
+    var css=document.createElement('style');
+    css.id='clTakeoverCss';
+    css.textContent='#clTakeoverLock{position:fixed;inset:0;z-index:2147483647;background:#f0f4f8;display:flex;align-items:flex-start;justify-content:center;padding:18px;overflow:auto;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.clToCard{width:100%;max-width:430px;background:#fff;border:1px solid #d0dce8;border-radius:18px;padding:20px;box-shadow:0 8px 26px rgba(0,0,0,.18);margin:auto}.clToTitle{font-size:22px;font-weight:800;color:#1a3a6a;margin-bottom:6px}.clToSub{font-size:14px;color:#4a6a8a;line-height:1.5;margin-bottom:12px}.clToStatus{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px;color:#1e3a5f;font-weight:700;margin-bottom:14px}.clToLabel{font-size:14px;font-weight:800;color:#1a3a6a;margin:12px 0 8px}.clToGrid{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}.clToKey{padding:12px 0;border:2px solid #d0dce8;border-radius:10px;background:#f8fafc;color:#1a3a6a;font-size:18px;font-weight:800}.clToColorGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.clToColor{border:0;border-radius:12px;padding:13px 4px;color:#fff;font-size:12px;font-weight:800}.clToQuestion{font-size:15px;font-weight:700;color:#1a3a6a;margin-bottom:8px}.clToAnswer{width:100%;box-sizing:border-box;border:2px solid #d0dce8;border-radius:10px;padding:12px;font-size:16px;margin-bottom:8px}.clToAnswerBtn{width:100%;background:#1a5fa8;color:#fff;border:0;border-radius:10px;padding:13px;font-size:15px;font-weight:800}.clToShake{animation:clToShake .35s}@keyframes clToShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}50%{transform:translateX(8px)}75%{transform:translateX(-5px)}}';
+    document.head.appendChild(css);
+  }
+  function takeoverFunctions(){
+    window._clUnlock=function(force){
+      if(cfg().active && !unlocked && force!==true){show();return;}
+      var old=document.getElementById('clSecureLock'); if(old) old.style.display='none';
     };
-    return map[q] || q;
+    window._clLockFromBtn=function(){unlocked=false;show();};
+    window._clShowLock=function(){unlocked=false;show();};
+    window._clKeyTap=function(){show();};
+    window.CardiacLensSecureTakeover={version:VERSION,show:function(){unlocked=false;show();},status:cfg};
   }
-
-  function status(msg){
-    try{
-      var el = document.getElementById('clKbStatus');
-      if(el) el.textContent = msg || '';
-    }catch(e){}
-  }
-
-  function showRecovery(){
-    try{
-      var c = cfg();
-      var fh = document.getElementById('clForgotHint');
-      if(fh) fh.style.display = 'block';
-      var rq = document.getElementById('clRecoveryQText');
-      if(rq) rq.textContent = qText(c.q);
-      if(window._clShowPanel) window._clShowPanel('clPanelRecovery');
-      log('show_recovery_after_failures', 'fails=' + state.fails);
-    }catch(e){}
-  }
-
-  function hardFail(reason){
-    state.fails++;
-    state.letterDone = false;
-    state.colorTaps = 0;
-    state.authPassed = false;
-    log('fail', reason + ' | fails=' + state.fails);
-    status(state.fails >= 3 ? 'Recovery question is available.' : 'Incorrect. Try again.');
-    try{
-      var box = document.getElementById('clKbBox');
-      if(box){ box.classList.remove('cl-shake'); void box.offsetWidth; box.classList.add('cl-shake'); }
-      if(state.fails >= 3) showRecovery();
-      else if(window._clRenderKeyboard) window._clRenderKeyboard('clKbContainer');
-    }catch(e){}
-  }
-
-  function hideLock(path){
-    try{
-      state.authPassed = true;
-      log(path || 'authorized_unlock', 'lock hidden');
-      var lock = document.getElementById('clSecureLock');
-      if(lock) lock.style.display = 'none';
-      state.letterDone = false;
-      state.colorTaps = 0;
-      setTimeout(function(){ state.authPassed = false; }, 250);
-      if(window._clSyncLockBtn) window._clSyncLockBtn();
-    }catch(e){}
-  }
-
-  function guardedUnlock(force){
-    var c = cfg();
-    var lock = document.getElementById('clSecureLock');
-    var visible = !!(lock && lock.style.display !== 'none');
-
-    if(force === true && !c.active){
-      log('forced_unlock_allowed_not_configured', '');
-      if(lock) lock.style.display = 'none';
-      return;
-    }
-
-    if(c.active && visible && !state.authPassed){
-      log('blocked_legacy_unlock', 'force=' + force);
-      if(lock) lock.style.display = 'flex';
-      status('Blocked legacy unlock. Enter letter, then color 3 times.');
-      return;
-    }
-
-    if(lock) lock.style.display = 'none';
-    log('unlock_allowed', 'force=' + force);
-  }
-
-  function takeoverKeyTap(key, idx){
-    var c = cfg();
-    if(!c.active){
-      log('keytap_no_secure_config', key);
-      return guardedUnlock(true);
-    }
-
-    var k = (key||'').toString().toUpperCase();
-    var gd = window._clCurrentGrid || {};
-    var colors = gd.colors || [];
-    var tapColor = colors[idx] || '';
-
-    var colorHex = {
-      red:'#d32f2f', blue:'#1565c0', green:'#2e7d32', orange:'#e65100',
-      purple:'#6a1b9a', teal:'#00838f', pink:'#c2185b', gold:'#f9a825'
-    };
-    var targetHex = colorHex[c.color] || colorHex.red;
-
-    if(!state.letterDone){
-      if(k === c.letter){
-        state.letterDone = true;
-        state.colorTaps = 0;
-        log('letter_accept_waiting_color', k);
-        status('Letter accepted. Tap your color 3 times.');
-        return;
+  function boot(){
+    installCss();
+    takeoverFunctions();
+    var c=cfg();
+    if(c.active) show();
+    document.addEventListener('click',function(e){
+      var t=e.target;
+      if(t && (t.id==='clPrivacyLockPill' || (t.closest && t.closest('#clPrivacyLockPill')))){
+        e.preventDefault(); e.stopPropagation(); if(e.stopImmediatePropagation)e.stopImmediatePropagation();
+        unlocked=false; show(); return false;
       }
-      return hardFail('wrong_letter:' + k);
-    }
-
-    if(tapColor === targetHex){
-      state.colorTaps++;
-      log('color_tap_accept', 'count=' + state.colorTaps);
-      if(state.colorTaps >= 3){
-        return hideLock('letter_plus_color3_unlock');
-      }
-      status('Color accepted. Tap your color ' + (3-state.colorTaps) + ' more time' + ((3-state.colorTaps)===1?'':'s') + '.');
-      return;
-    }
-
-    return hardFail('wrong_color_after_letter');
+    }, true);
   }
-
-  function takeoverRecovery(){
-    var c = cfg();
-    var input = norm((document.getElementById('clRecoveryA')||{}).value).toLowerCase();
-    if(c.a && input === c.a){
-      return hideLock('recovery_answer_unlock');
-    }
-    return hardFail('wrong_recovery_answer');
-  }
-
-  function lockFromButton(){
-    var c = cfg();
-    if(!c.active){
-      log('lock_button_no_secure_config', '');
-      return;
-    }
-    var lock = document.getElementById('clSecureLock');
-    if(!lock) return;
-    lock.style.display = 'flex';
-    state.letterDone = false;
-    state.colorTaps = 0;
-    state.authPassed = false;
-    if(window._clShowPanel) window._clShowPanel('clPanelLock');
-    try{
-      var fp = document.getElementById('clFirstTimePrompt');
-      var fh = document.getElementById('clForgotHint');
-      if(fp) fp.style.display = 'none';
-      if(fh) fh.style.display = state.fails >= 3 ? 'block' : 'none';
-      window._clCurrentGrid = null;
-      if(window._clRenderKeyboard) window._clRenderKeyboard('clKbContainer');
-    }catch(e){}
-    status('Secure Access active. Enter letter, then color 3 times.');
-    log('lock_from_button_takeover', 'active');
-  }
-
-  function showLock(){
-    var c = cfg();
-    var lock = document.getElementById('clSecureLock');
-    if(!lock) return;
-    lock.style.display = 'flex';
-    if(c.active){
-      state.letterDone = false;
-      state.colorTaps = 0;
-      state.authPassed = false;
-      if(window._clShowPanel) window._clShowPanel('clPanelLock');
-      try{
-        var fp = document.getElementById('clFirstTimePrompt');
-        var fh = document.getElementById('clForgotHint');
-        if(fp) fp.style.display = 'none';
-        if(fh) fh.style.display = state.fails >= 3 ? 'block' : 'none';
-        window._clCurrentGrid = null;
-        if(window._clRenderKeyboard) window._clRenderKeyboard('clKbContainer');
-      }catch(e){}
-      status('Secure Access active. Enter letter, then color 3 times.');
-      log('show_lock_takeover', 'active');
-    } else {
-      if(window._clShowPanel) window._clShowPanel('clPanelLock');
-      log('show_lock_takeover', 'not_configured');
-    }
-  }
-
-  function install(){
-    installedCount++;
-    window._clUnlock = guardedUnlock;
-    window._clKeyTap = takeoverKeyTap;
-    window._clLockFromBtn = lockFromButton;
-    window._clShowLock = showLock;
-    window._clCheckRecovery = takeoverRecovery;
-
-    try{
-      var old = window._clSyncLockBtn;
-      window._clSyncLockBtn = function(){
-        try { if(old) old(); } catch(e){}
-        var pill = document.getElementById('clPrivacyLockPill');
-        if(pill && cfg().active){
-          pill.style.boxShadow = '0 0 10px rgba(34,197,94,0.7)';
-          pill.title = 'Secure Access active — letter plus color required';
-        }
-      };
-      window._clSyncLockBtn();
-    }catch(e){}
-
-    log('takeover_installed', 'count=' + installedCount);
-  }
-
-  // Install repeatedly so this wins even if older code reassigns functions late on iPhone.
-  install();
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install);
-  window.addEventListener('load', function(){
-    install();
-    setTimeout(install, 500);
-    setTimeout(install, 1500);
-    setTimeout(install, 4000);
-  });
-  setTimeout(install, 8000);
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,100);});
+  else setTimeout(boot,100);
+  setTimeout(boot,1000);
+  setTimeout(boot,4000);
 })();
 </script>
 
