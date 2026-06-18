@@ -1,7 +1,7 @@
 {
-  "version": "9.10.277",
+  "version": "9.10.280",
   "date": "June 17, 2026",
-  "label": "v9.10.277",
-  "build": "guarddog-cleanup-safe",
-  "notes": "Safe cleanup release from working v276 baseline: Secure Access takeover preserved; Guard Dog self-heals stale app-version storage."
+  "label": "v9.10.280",
+  "build": "secure-access-full-sequence",
+  "notes": "Secure Access full-sequence validation: failed attempt is 1 letter plus 3 symbols; cooldown milestones at 5/10/15 full failures; recovery appears after extended failure."
 }
