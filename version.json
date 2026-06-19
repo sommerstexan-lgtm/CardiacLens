@@ -1,7 +1,7 @@
 {
-  "version": "9.10.280",
-  "date": "June 17, 2026",
-  "label": "v9.10.280",
-  "build": "secure-access-full-sequence",
-  "notes": "Secure Access full-sequence validation: failed attempt is 1 letter plus 3 symbols; cooldown milestones at 5/10/15 full failures; recovery appears after extended failure."
+  "version": "9.10.296",
+  "date": "2026-06-19",
+  "label": "v9.10.296",
+  "build": "v9.10.296",
+  "notes": "Feedback/contact flow corrected: robert@cardiaclens.com is now a real tappable mailto link and Open Email App button, with Copy Email Address as fallback. No auto attachments, no prebuilt Gmail drafts, and no support@ or betatesting@ destination. Secure keyboard/cooldown fixes, pointer tap handling, and centered Z row retained."
 }
