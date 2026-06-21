@@ -1,6 +1,1 @@
-{
-  "version": "v9.10.320",
-  "build": "Secure Access + Weekly Review Persistence Fix",
-  "updated": "2026-06-21T19:30:00Z",
-  "files": ["index.html", "CardiacLensv9_10_320.html", "manifest.json", "reset.html", "sw.js"]
-}
+{"version":"v9.10.322","build":"Persistence Audit: Med Intel canonical storage + split-brain prevention","updated":"2026-06-21T20:30:00Z"}
