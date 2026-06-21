@@ -1,8 +1,8 @@
 {
-  "version": "v9.10.313",
+  "version": "v9.10.314",
   "date": "2026-06-21",
-  "label": "v9.10.313",
-  "build": "weather-source-settings",
-  "notes": "Adds Weather Source settings with Saved ZIP Code recommended and Current Location for special events/travel; Help text updated.",
+  "label": "v9.10.314",
+  "build": "weather-source-settings-visible",
+  "notes": "Makes Weather Source and Saved ZIP Code highly visible at the top of Activity & Today\u2019s Weather settings.",
   "timestamp": "2026-06-21T12:45:00Z"
 }
