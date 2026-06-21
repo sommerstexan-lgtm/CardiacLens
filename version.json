@@ -1,8 +1,8 @@
 {
-  "version": "v9.10.312",
+  "version": "v9.10.313",
   "date": "2026-06-21",
-  "label": "v9.10.312",
-  "build": "weather-saved-zip-mobile-polish",
-  "notes": "Adds Saved ZIP Code weather option, friendly no-weather flow, Use My Location option, Help updates, and mobile polish checks.",
+  "label": "v9.10.313",
+  "build": "weather-source-settings",
+  "notes": "Adds Weather Source settings with Saved ZIP Code recommended and Current Location for special events/travel; Help text updated.",
   "timestamp": "2026-06-21T12:45:00Z"
 }
