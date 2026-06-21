@@ -1986,7 +1986,7 @@ activityWeatherStoreCoordinates:false,
 todayWeatherPillEnabled:true,
 todayWeatherCacheMinutes:20,
 todayWeatherSource:'zip',
-todayWeatherSavedZip:'',
+todayWeatherSavedZip:'77340',
 pickupPlannerDefaultDate:'tomorrow',
 activityWindows:[
   {label:'Quick — 15 min',minutes:15},
@@ -2244,7 +2244,7 @@ function setHelpSection(section) {
   if (body) body.scrollTop = 0;
 
   // Update tab active states — inline styles override all CSS specificity issues
-  var tabKeys = ['welcome','getting-started','how-to-use','med-intel','deep-dive','pinned-events','sentinel','ask','morning-checkin','breathing-logger','heat-advisory','pph','faq',
+  var tabKeys = ['welcome','getting-started','how-to-use','med-intel','deep-dive','pinned-events','sentinel','ask','morning-checkin','breathing-logger','heat-advisory','weather','pph','faq',
                  'privacy','data-management','known-issues','planned-features','support','glossary'];
   tabKeys.forEach(function(key) {
     var btn = document.getElementById('htab-'+key);
@@ -2299,7 +2299,7 @@ function helpSearch(query) {
     'welcome':'Welcome','getting-started':'Getting Started','how-to-use':'How to Use','med-intel':'🧠 Med Intelligence','deep-dive':'🔍 Deep Dive',
     'pinned-events':'\u{1F4CC} Pinned Events','morning-checkin':'\u{1F305} Morning Check-In',
     'breathing-logger':'\u{1FAC1} Breathing Logger',
-    'heat-advisory':'\u{1F321}\uFE0F Heat Advisory','faq':'FAQ','privacy':'Privacy',
+    'heat-advisory':'\u{1F321}\uFE0F Heat Advisory','weather':'🌤️ Weather','faq':'FAQ','privacy':'Privacy',
     'data-management':'Data Mgmt','known-issues':'Known Issues',
     'planned-features':'Planned Features','sentinel':'\uD83D\uDEE1\uFE0F Sentinel','support':'\u2615 Support','glossary':'\u{1F4D6} Glossary'
   };
@@ -2356,7 +2356,7 @@ function helpGoToResult(section) {
   // Show sticky nav bar
   _helpShowNavBar(count, section);
   // Update tab button styles
-  var tabKeys = ['welcome','getting-started','how-to-use','med-intel','deep-dive','pinned-events','sentinel','ask','morning-checkin','breathing-logger','heat-advisory','pph','faq',
+  var tabKeys = ['welcome','getting-started','how-to-use','med-intel','deep-dive','pinned-events','sentinel','ask','morning-checkin','breathing-logger','heat-advisory','weather','pph','faq',
                  'privacy','data-management','known-issues','planned-features','support','glossary'];
   tabKeys.forEach(function(key) {
     var btn = document.getElementById('htab-'+key);
@@ -8096,7 +8096,111 @@ function getJourneyFormData(activityName){
   return {role:role,journeyId:id,journeyName:name,active:(role!=='complete')};
 }
 
+
+// Weather settings persistence guard (v9.10.335)
+var CARDIACLENS_WEATHER_SETTINGS_KEY='CARDIACLENS_WEATHER_SETTINGS';
+function _clMergeDestinations(a,b){
+  var out=[],seen={};
+  function add(d){
+    if(!d||!String(d.label||'').trim())return;
+    var label=String(d.label).trim();
+    var key=label.toLowerCase();
+    if(seen[key]){
+      if(!seen[key].minutes&&d.minutes)seen[key].minutes=d.minutes;
+      return;
+    }
+    var item={label:label};
+    var mins=parseInt(d.minutes,10);
+    if(mins&&mins>0)item.minutes=mins;
+    out.push(item);seen[key]=item;
+  }
+  (a||[]).forEach(add);
+  (b||[]).forEach(add);
+  return out;
+}
+function _clSaveAllSettings(){
+  try{localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
+  try{if(typeof _clSaveWeatherSettingsBackup==='function')_clSaveWeatherSettingsBackup();}catch(e){}
+}
+function _clWeatherSettingsSnapshot(){
+  try{return {
+    activityWeatherMode:settings.activityWeatherMode,
+    activityEnvironmentalMode:settings.activityEnvironmentalMode||settings.activityWeatherMode,
+    activityWeatherStoreSnapshot:settings.activityWeatherStoreSnapshot,
+    activityWeatherRainThresholdPct:settings.activityWeatherRainThresholdPct,
+    activityWeatherDefaultWindowMin:settings.activityWeatherDefaultWindowMin,
+    activityWeatherAskOnOutdoor:settings.activityWeatherAskOnOutdoor,
+    activityWeatherStoreCoordinates:settings.activityWeatherStoreCoordinates,
+    todayWeatherPillEnabled:settings.todayWeatherPillEnabled,
+    todayWeatherCacheMinutes:settings.todayWeatherCacheMinutes,
+    todayWeatherSource:settings.todayWeatherSource,
+    todayWeatherSavedZip:settings.todayWeatherSavedZip,
+    pickupPlannerDefaultDate:settings.pickupPlannerDefaultDate,
+    activityWindows:settings.activityWindows,
+    activityDestinations:settings.activityDestinations,
+    savedAt:new Date().toISOString()
+  };}catch(e){return null;}
+}
+function _clSaveWeatherSettingsBackup(){
+  // v9.10.335: current saved settings win; backup only fills missing weather fields.
+  try{
+    var snap=_clWeatherSettingsSnapshot(); if(!snap)return;
+    var prior=null;
+    try{var raw=localStorage.getItem(CARDIACLENS_WEATHER_SETTINGS_KEY);prior=raw?JSON.parse(raw):null;}catch(e){}
+    if(prior&&typeof prior==='object'){
+      if(!snap.todayWeatherSavedZip&&prior.todayWeatherSavedZip)snap.todayWeatherSavedZip=prior.todayWeatherSavedZip;
+      if(!snap.todayWeatherSource&&prior.todayWeatherSource)snap.todayWeatherSource=prior.todayWeatherSource;
+      if((!snap.activityWeatherMode||snap.activityWeatherMode==='manual')&&prior.activityWeatherMode==='internet'){
+        // Do not downgrade Automatic weather to Manual during startup/default rendering.
+        snap.activityWeatherMode='internet';snap.activityEnvironmentalMode='internet';
+      }
+      if((!snap.activityEnvironmentalMode||snap.activityEnvironmentalMode==='manual')&&prior.activityEnvironmentalMode==='internet')snap.activityEnvironmentalMode='internet';
+      if((snap.todayWeatherCacheMinutes===undefined||snap.todayWeatherCacheMinutes===null)&&prior.todayWeatherCacheMinutes)snap.todayWeatherCacheMinutes=prior.todayWeatherCacheMinutes;
+      if((snap.todayWeatherPillEnabled===undefined||snap.todayWeatherPillEnabled===null)&&prior.todayWeatherPillEnabled!==undefined)snap.todayWeatherPillEnabled=prior.todayWeatherPillEnabled;
+      snap.activityDestinations=_clMergeDestinations(snap.activityDestinations,prior.activityDestinations);
+      if((!snap.activityWindows||!snap.activityWindows.length)&&prior.activityWindows)snap.activityWindows=prior.activityWindows;
+    }
+    localStorage.setItem(CARDIACLENS_WEATHER_SETTINGS_KEY,JSON.stringify(snap));
+  }catch(e){}
+}
+function _clRestoreWeatherSettingsBackup(){
+  // v9.10.335: restore defensively. Blank/default backup fields must not erase current settings.
+  try{
+    var raw=localStorage.getItem(CARDIACLENS_WEATHER_SETTINGS_KEY); if(!raw)return;
+    var w=JSON.parse(raw); if(!w||typeof w!=='object')return;
+    var fields=['activityWeatherMode','activityEnvironmentalMode','activityWeatherStoreSnapshot','activityWeatherRainThresholdPct','activityWeatherDefaultWindowMin','activityWeatherAskOnOutdoor','activityWeatherStoreCoordinates','todayWeatherPillEnabled','todayWeatherCacheMinutes','todayWeatherSavedZip','todayWeatherSource','pickupPlannerDefaultDate','activityWindows','activityDestinations'];
+    fields.forEach(function(k){
+      if(w[k]===undefined||w[k]===null)return;
+      // v9.10.335: current Saved ZIP settings must not be overwritten by older backup values.
+      // Backup is only a fill-in source, not the authority when current settings are explicit.
+      if(k==='todayWeatherSource'){
+        var curSource=settings&&settings.todayWeatherSource;
+        var curZip=settings&&String(settings.todayWeatherSavedZip||'').trim();
+        if(curSource==='zip'&&(curZip||String(w.todayWeatherSavedZip||'').trim()))return;
+        if(curSource==='location')return;
+        settings[k]=w[k];
+        return;
+      }
+      if(k==='todayWeatherSavedZip'){
+        var existingZip=settings&&String(settings.todayWeatherSavedZip||'').trim();
+        var backupZip=String(w[k]||'').trim();
+        if(existingZip)return;
+        if(!backupZip)return;
+        settings[k]=backupZip;
+        return;
+      }
+      if((k==='activityWeatherMode'||k==='activityEnvironmentalMode')&&w[k]==='manual'&&settings&&(settings[k]==='internet'||settings.activityWeatherMode==='internet'||settings.activityEnvironmentalMode==='internet'))return;
+      if(k==='activityDestinations'){settings.activityDestinations=_clMergeDestinations(settings.activityDestinations,w.activityDestinations);return;}
+      if(k==='activityWindows'&&settings.activityWindows&&settings.activityWindows.length)return;
+      settings[k]=w[k];
+    });
+    if(settings.activityEnvironmentalMode&&!settings.activityWeatherMode)settings.activityWeatherMode=settings.activityEnvironmentalMode;
+    if(settings.activityWeatherMode)settings.activityEnvironmentalMode=settings.activityWeatherMode;
+  }catch(e){}
+}
+
 function _ensureActivityEnvSettings(){
+  _clRestoreWeatherSettingsBackup();
   if(!settings.activityWindows){settings.activityWindows=[
     {label:'Quick — 15 min',minutes:15},{label:'Short — 30 min',minutes:30},
     {label:'Medium — 1 hr',minutes:60},{label:'Long — 2 hr',minutes:120}
@@ -8107,7 +8211,8 @@ function _ensureActivityEnvSettings(){
     var legacyNames={'Doctor':true,'Store':true,'Church':true,'Aggarwala':true,'HEB':true};
     settings.activityDestinations=(settings.activityDestinations||[]).filter(function(d){return d&&d.label&&!legacyNames[d.label];});
     settings.activityDestinationLegacyCleanupV309=true;
-    try{localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
+    // v9.10.335: do not write defaults from _ensureActivityEnvSettings().
+    // This function may run during startup before saved settings are loaded.
   }
   // v9.10.321: no baked-in destinations. Users add their own.
   if(settings.activityEnvironmentalMode&&!settings.activityWeatherMode)settings.activityWeatherMode=settings.activityEnvironmentalMode;
@@ -8121,8 +8226,9 @@ function _ensureActivityEnvSettings(){
   if(settings.todayWeatherPillEnabled===undefined)settings.todayWeatherPillEnabled=true;
   if(settings.todayWeatherCacheMinutes===undefined)settings.todayWeatherCacheMinutes=20;
   if(!settings.todayWeatherSource)settings.todayWeatherSource='zip'; // zip | location
-  if(settings.todayWeatherSavedZip===undefined)settings.todayWeatherSavedZip='';
+  if(settings.todayWeatherSavedZip===undefined||!String(settings.todayWeatherSavedZip||'').trim())settings.todayWeatherSavedZip='77340';
   if(!settings.pickupPlannerDefaultDate)settings.pickupPlannerDefaultDate='tomorrow';
+  try{_clNormalizeTodayWeatherModeFromCache();}catch(e){}
 }
 function buildActivityWindowHTML(){
   _ensureActivityEnvSettings();
@@ -8252,25 +8358,17 @@ function fetchActivityEnvironmentSnapshot(force){
     stat.style.display='block';
     return;
   }
-  if(!navigator.geolocation){stat.innerHTML='<div style="background:#f3f4f6;border-radius:8px;padding:10px;font-size:13px;color:#475569">Location is not available. Use Manual or No.</div>';stat.style.display='block';return;}
   activityEnvironmentFetchInFlight=true;
   activityEnvironmentFetchKey=key;
   stat.style.display='block';
-  stat.innerHTML='<div style="background:#eff6ff;border-radius:8px;padding:10px;font-size:13px;color:#1e40af">Checking local rain/heat…</div>';
-  navigator.geolocation.getCurrentPosition(function(pos){
-    var lat=pos.coords.latitude, lon=pos.coords.longitude;
-    var url='https://api.open-meteo.com/v1/forecast?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+
-      '&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m'+
-      '&minutely_15=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m'+
-      '&hourly=precipitation_probability,precipitation,rain,temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m'+
-      '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=1';
-    fetch(url).then(function(r){return r.json();}).then(function(data){
-      activityEnvironmentSnapshot=buildActivityEnvironmentSnapshot(data,lat,lon);
-      activityEnvironmentFetchInFlight=false;
-      activityEnvironmentFetchFailedKey='';
-      renderActivityEnvironmentStatus();
-    }).catch(function(){activityEnvironmentFetchInFlight=false;activityEnvironmentFetchFailedKey=key;stat.innerHTML='<div style="background:#fff7ed;border-radius:8px;padding:10px;font-size:13px;color:#9a3412">Weather unavailable. Activity can still be logged.</div>';});
-  },function(){activityEnvironmentFetchInFlight=false;activityEnvironmentFetchFailedKey=key;stat.innerHTML='<div style="background:#fff7ed;border-radius:8px;padding:10px;font-size:13px;color:#9a3412">Location not allowed. You can still use Manual or No. To use Automatic later, turn location back on in your browser/site settings.</div>';stat.style.display='block';},{enableHighAccuracy:false,timeout:8000,maximumAge:300000});
+  stat.innerHTML='<div style="background:#eff6ff;border-radius:8px;padding:10px;font-size:13px;color:#1e40af">Checking rain/heat using your Weather Source…</div>';
+  _clFetchWeatherForConfiguredSource(false,function(c,err){
+    activityEnvironmentFetchInFlight=false;
+    if(err&&!c){activityEnvironmentFetchFailedKey=key;stat.innerHTML='<div style="background:#fff7ed;border-radius:8px;padding:10px;font-size:13px;color:#9a3412">Weather unavailable. Activity can still be logged.</div>';stat.style.display='block';return;}
+    activityEnvironmentSnapshot=_clActivitySnapshotFromWeatherCache(c);
+    activityEnvironmentFetchFailedKey='';
+    renderActivityEnvironmentStatus();
+  });
 }
 function buildActivityEnvironmentSnapshot(data,lat,lon){
   var now=new Date();
@@ -15762,39 +15860,106 @@ function _clWindCompass(deg){
 }
 function _clGetWeatherCache(){try{var raw=localStorage.getItem(TODAY_WEATHER_CACHE_KEY);return raw?JSON.parse(raw):null;}catch(e){return null;}}
 function _clSetWeatherCache(obj){try{localStorage.setItem(TODAY_WEATHER_CACHE_KEY,JSON.stringify(obj));}catch(e){}}
+function _clResolveSavedWeatherZip(){
+  // v9.10.335: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
+  // Today Weather must not fall back to GPS unless the user explicitly taps Use My Location.
+  try{
+    var z=String((settings&&settings.todayWeatherSavedZip)||'').trim();
+    if(z)return z;
+    var raw=localStorage.getItem(CARDIACLENS_WEATHER_SETTINGS_KEY);
+    var w=raw?JSON.parse(raw):null;
+    z=String((w&&w.todayWeatherSavedZip)||'').trim();
+    if(!z){var c=_clGetWeatherCache();z=String((c&&(c.zip||c.savedZip))||'').trim();}
+    if(!z)z='77340';
+    if(settings){
+      settings.todayWeatherSavedZip=z;
+      settings.todayWeatherSource='zip';
+      settings.todayWeatherPillEnabled=true;
+      try{localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
+      try{if(typeof _clSaveWeatherSettingsBackup==='function')_clSaveWeatherSettingsBackup();}catch(e){}
+    }
+    return z;
+  }catch(e){return '77340';}
+}
 function _clWeatherAgeMinutes(c){if(!c||!c.fetchedAt)return 999999;return Math.max(0,Math.round((Date.now()-new Date(c.fetchedAt).getTime())/60000));}
 function _clWeatherIsFresh(c){var max=(settings&&settings.todayWeatherCacheMinutes)?settings.todayWeatherCacheMinutes:20;return c&&_clWeatherAgeMinutes(c)<=max;}
+function _clWeatherUpdatedLabel(c){
+  if(!c||!c.fetchedAt)return 'not yet';
+  var d=new Date(c.fetchedAt);
+  var age=_clWeatherAgeMinutes(c);
+  var ageText=age<60?(age+'m ago'):(Math.floor(age/60)+'h '+(age%60)+'m ago');
+  return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+' ('+ageText+')';
+}
 function _clBuildWeatherUrl(lat,lon){
+  // v9.10.335: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
+  // The app only needs current conditions + hourly forecast for rain/heat/wind guidance.
   return 'https://api.open-meteo.com/v1/forecast?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+
     '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=2'+
     '&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m'+
-    '&minutely_15=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m'+
     '&hourly=precipitation_probability,precipitation,rain,temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m';
 }
+
+// v9.10.335: Saved ZIP uses a direct local coordinate table first.
+// For Robert's normal area, 77340 always resolves directly to Huntsville coordinates.
+var CL_ZIP_COORDS={
+  '77340':{lat:30.7235,lon:-95.5508,label:'Huntsville'},
+  '77320':{lat:30.7235,lon:-95.5508,label:'Huntsville'}
+};
 function _clBuildZipLookupUrl(zip){
-  return 'https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(zip)+'&count=1&language=en&format=json&countryCode=US';
+  return 'https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(zip)+'&count=1&language=en&format=json&country_code=US';
 }
+function _clLookupZipCoordinates(zip){
+  zip=String(zip||'').trim();
+  if(CL_ZIP_COORDS[zip])return Promise.resolve(CL_ZIP_COORDS[zip]);
+  // Fallback only for other ZIP codes. Normal 77340 use never touches this path.
+  return fetch(_clBuildZipLookupUrl(zip),{cache:'no-store'}).then(function(r){
+    if(!r.ok)throw new Error('ZIP lookup failed: HTTP '+r.status);
+    return r.json();
+  }).then(function(geo){
+    var item=geo&&geo.results&&geo.results[0];
+    if(!item)throw new Error('ZIP Code not found');
+    return {lat:item.latitude,lon:item.longitude,label:(item.name||zip)};
+  });
+}
+
 function _clWeatherObjectFromOpenMeteo(data,lat,lon,label){
   var cur=data.current||{};
   return {fetchedAt:new Date().toISOString(),source:'Open-Meteo'+(label?' · '+label:''),timezone:data.timezone||'',latitude:settings.activityWeatherStoreCoordinates===true?Math.round(lat*10000)/10000:undefined,longitude:settings.activityWeatherStoreCoordinates===true?Math.round(lon*10000)/10000:undefined,current:{temperature:cur.temperature_2m,feelsLike:cur.apparent_temperature,humidity:cur.relative_humidity_2m,rain:cur.rain,precipitation:cur.precipitation,windSpeed:cur.wind_speed_10m,windGusts:cur.wind_gusts_10m,windDirection:cur.wind_direction_10m,windCompass:_clWindCompass(cur.wind_direction_10m),weatherCode:cur.weather_code},minutely_15:data.minutely_15||null,hourly:data.hourly||null};
 }
 function fetchTodayWeatherByZip(zip,cb,onStage){
   _ensureActivityEnvSettings();
-  zip=String(zip||settings.todayWeatherSavedZip||'').trim();
+  zip=String(zip||_clResolveSavedWeatherZip()||'').trim();
   var cached=_clGetWeatherCache();
-  if(!zip){if(cb)cb(cached,new Error('Enter a ZIP Code first'));return;}
+  if(!zip){zip='77340';}
+  if(todayWeatherFetchInFlight){
+    setTimeout(function(){fetchTodayWeatherByZip(zip,cb,onStage);},600);
+    return;
+  }
   todayWeatherFetchInFlight=true;
   try{if(onStage)onStage('weather-fetch');}catch(e){}
-  fetch(_clBuildZipLookupUrl(zip),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('ZIP lookup failed');return r.json();}).then(function(geo){
-    var item=geo&&geo.results&&geo.results[0];
-    if(!item)throw new Error('ZIP Code not found');
-    var lat=item.latitude,lon=item.longitude,label=(item.name||zip);
-    return fetch(_clBuildWeatherUrl(lat,lon),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error('Weather fetch failed');return r.json();}).then(function(data){
+
+  _clLookupZipCoordinates(zip).then(function(loc){
+    var lat=loc.lat, lon=loc.lon, label=loc.label||zip;
+    return fetch(_clBuildWeatherUrl(lat,lon),{cache:'no-store'}).then(function(r){
+      if(!r.ok)throw new Error('Open-Meteo weather failed: HTTP '+r.status);
+      return r.json();
+    }).then(function(data){
+      if(!data||!data.current)throw new Error('Open-Meteo returned no current weather');
       var obj=_clWeatherObjectFromOpenMeteo(data,lat,lon,label);
-      _clSetWeatherCache(obj);todayWeatherFetchInFlight=false;if(cb)cb(obj,null);try{showTodayZone();}catch(e){}
+      obj.zip=zip;
+      obj.source='Open-Meteo · '+label;
+      obj.refreshPath='saved_zip_direct';
+      _clSetWeatherCache(obj);
+      todayWeatherFetchInFlight=false;
+      if(cb)cb(obj,null);
+      try{showTodayZone();}catch(e){}
     });
-  }).catch(function(err){todayWeatherFetchInFlight=false;if(cb)cb(cached,err);});
+  }).catch(function(err){
+    todayWeatherFetchInFlight=false;
+    if(cb)cb(cached,err);
+  });
 }
+
 function fetchTodayWeather(force,cb,onStage){
   _ensureActivityEnvSettings();
   var cached=_clGetWeatherCache();
@@ -15810,6 +15975,20 @@ function fetchTodayWeather(force,cb,onStage){
       _clSetWeatherCache(obj);todayWeatherFetchInFlight=false;if(cb)cb(obj,null);try{showTodayZone();}catch(e){}
     }).catch(function(err){todayWeatherFetchInFlight=false;if(cb)cb(cached,err);});
   },function(err){todayWeatherFetchInFlight=false;if(cb)cb(cached,err||new Error('Location denied'));},{enableHighAccuracy:false,timeout:9000,maximumAge:10*60*1000});
+}
+function _clFetchWeatherForConfiguredSource(force,cb,onStage){
+  _ensureActivityEnvSettings();
+  var source=(settings&&settings.todayWeatherSource)||'zip';
+  if(source==='location')return fetchTodayWeather(!!force,cb,onStage);
+  return fetchTodayWeatherByZip(_clResolveSavedWeatherZip(),cb,onStage);
+}
+function _clActivitySnapshotFromWeatherCache(c){
+  var win=selectedActivityWindowMinutes||settings.activityWeatherDefaultWindowMin||30;
+  var st=_clWeatherWindowStats(c,win);
+  var cur=(c&&c.current)||{};
+  var threshold=parseInt(settings.activityWeatherRainThresholdPct,10);if(!threshold||threshold<1)threshold=40;
+  var heat=(typeof cur.feelsLike==='number')?cur.feelsLike:st.maxFeels;
+  return {source:'open-meteo',capturedAt:new Date().toISOString(),location:(c&&c.source)||'configured weather source',windowMinutes:win,current:cur,rainMaxProbability:st.rainProb,rainTotalInches:Math.round((st.rainAmount||0)*1000)/1000,rainLikely:(st.rainProb>=threshold)||(st.rainAmount>0.01),heatIndexF:heat,summary:((st.rainProb>=threshold)||(st.rainAmount>0.01))?'Rain possible before return':'Rain unlikely in selected window',weatherAgeMinutes:_clWeatherAgeMinutes(c)};
 }
 function _clWeatherWindowStats(cache,minutes){
   var result={rainProb:0,rainAmount:0,maxFeels:null,maxTemp:null,maxWind:0,maxGust:0};if(!cache)return result;var cutoff=Date.now()+((minutes||120)*60000);
@@ -15836,13 +16015,53 @@ function buildTodayWeatherPillHTML(){
 }
 function openTodayWeatherModal(){
   _ensureActivityEnvSettings();
+  try{_clNormalizeTodayWeatherModeFromCache();}catch(e){}
   todayWeatherModalState='idle';
   todayWeatherModalLastError=null;
   var c=_clGetWeatherCache();
-  var html='<div class="modal-title" style="font-size:26px;margin-bottom:14px">☀️ Today\'s Weather</div><div id="todayWeatherModalBody">'+_renderTodayWeatherBody(c,null,'idle')+'</div>';
+  var stale=(c&&c.current&&!_clWeatherIsFresh(c));
+  var initialState=stale?'loading':'idle';
+  var html='<div class="modal-title" style="font-size:26px;margin-bottom:10px">☀️ Today\'s Weather</div><button type="button" onclick="hideModal();openHelpModal(\'weather\')" style="width:100%;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;border-radius:10px;padding:10px;font-size:14px;font-weight:800;margin-bottom:12px">How to use Today\'s Weather</button><div id="todayWeatherModalBody">'+_renderTodayWeatherBody(c,null,initialState)+'</div>';
   html+='<div class="modal-actions"><button class="modal-cancel" onclick="hideModal()">Close</button><button class="modal-ok" id="todayWeatherRefreshBtn" onclick="refreshTodayWeatherFromModal()">Refresh Weather</button></div>';
   showModal(html);
+  // v9.10.335: if cached weather is older than the user's refresh threshold, refresh automatically on open.
+  // This keeps the weather pill, planner, and activity weather on the same fresh source without requiring a manual tap.
+  if(stale){setTimeout(function(){
+    // v9.10.335: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
+    refreshTodayWeatherFromModal(true,'zip');
+  },100);}
 }
+
+// v9.10.335: Today's Weather banner must use the real weather state, not a stale/default activity flag.
+function _clIsTodayWeatherAutomaticEnabled(c){
+  try{
+    if(typeof _clRestoreWeatherSettingsBackup==='function')_clRestoreWeatherSettingsBackup();
+    var mode=String((settings&& (settings.activityWeatherMode||settings.activityEnvironmentalMode))||'').toLowerCase();
+    if(mode==='internet'||mode==='automatic'||mode==='auto')return true;
+    if(settings&&(settings.useAutomaticWeather===true||settings.automaticWeather===true))return true;
+    // If a valid Today Weather cache is present, the Today Weather feature is active for display purposes.
+    // Do not show an automatic-weather-off banner while showing automatic weather data.
+    if(c&&c.current)return true;
+    // If the home weather pill is enabled and a weather source is configured, treat Today Weather as active.
+    if(settings&&settings.todayWeatherPillEnabled!==false&&(settings.todayWeatherSavedZip||settings.todayWeatherSource==='location'))return true;
+  }catch(e){}
+  return false;
+}
+function _clNormalizeTodayWeatherModeFromCache(){
+  try{
+    var c=(typeof _clGetWeatherCache==='function')?_clGetWeatherCache():null;
+    if(c&&c.current&&settings&&settings.todayWeatherPillEnabled!==false){
+      var mode=String(settings.activityWeatherMode||settings.activityEnvironmentalMode||'').toLowerCase();
+      if(mode!=='internet'&&mode!=='automatic'&&mode!=='auto'){
+        settings.activityWeatherMode='internet';
+        settings.activityEnvironmentalMode='internet';
+        try{localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
+        try{if(typeof _clSaveWeatherSettingsBackup==='function')_clSaveWeatherSettingsBackup();}catch(e){}
+      }
+    }
+  }catch(e){}
+}
+
 function _renderTodayWeatherBody(c,err,state){
   state=state||todayWeatherModalState||'idle';
   var html='';
@@ -15851,17 +16070,22 @@ function _renderTodayWeatherBody(c,err,state){
   }else if(state==='loading'){
     html+='<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px;margin-bottom:12px;font-size:15px;color:#1e3a8a;line-height:1.5"><strong>Checking Today\'s Weather…</strong><br>Getting current conditions, rain, Feels Like, wind direction, and gusts.</div>';
   }
-  if(settings.activityWeatherMode!=='internet'){
+  if(!_clIsTodayWeatherAutomaticEnabled(c)){
     html+='<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin-bottom:12px;font-size:14px;color:#334155;line-height:1.5">Automatic weather is currently off. You can still use Manual conditions in Log Activity, or turn on Automatic here.</div>';
     html+='<button type="button" onclick="settings.activityWeatherMode=\'internet\';settings.activityEnvironmentalMode=\'internet\';localStorage.setItem(\'BP_TRACKER_SETTINGS\',JSON.stringify(settings));todayWeatherModalLastError=null;todayWeatherModalState=\'idle\';var b=document.getElementById(\'todayWeatherModalBody\');if(b)b.innerHTML=_renderTodayWeatherBody(_clGetWeatherCache(),null,\'idle\')" style="width:100%;background:#0ea5e9;color:#fff;border:none;border-radius:10px;padding:12px;font-size:16px;font-weight:800;margin-bottom:12px">Turn On Automatic Weather</button>';
   }
-  if(err&&state==='error'){
+  var hasWeather=!!(c&&c.current);
+  if(err&&state==='error'&&!hasWeather){
     html+=_renderNoWeatherChoices(err);
   }
-  if(!c||!c.current){
+  if(!hasWeather){
     if(!(err&&state==='error')) html+=_renderNoWeatherChoices(null);
   }else{
+    if(err&&state==='error'){
+      html+='<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px;margin-bottom:12px;font-size:14px;color:#92400e;line-height:1.45"><strong>Live weather could not be updated.</strong><br>Showing saved weather. Tap Refresh to try again.</div>';
+    }
     var cur=c.current,stats30=_clWeatherWindowStats(c,30),stats60=_clWeatherWindowStats(c,60),stats120=_clWeatherWindowStats(c,120);
+    html+='<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:14px;color:#1e3a8a"><strong>Weather ZIP being used: '+String((c&&c.zip)||_clResolveSavedWeatherZip()||'77340')+'</strong></div>';
     html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
     html+=_twCell('Temperature',Math.round(cur.temperature)+'°');
     html+=_twCell('Feels Like',Math.round(cur.feelsLike)+'°');
@@ -15869,7 +16093,8 @@ function _renderTodayWeatherBody(c,err,state){
     html+=_twCell('Wind',(cur.windCompass?cur.windCompass+' ':'')+Math.round(cur.windSpeed||0)+' mph'+(cur.windGusts?' · Gusts '+Math.round(cur.windGusts)+' mph':''));
     html+='</div>';
     html+='<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin-bottom:12px"><div style="font-size:15px;font-weight:800;color:#0f172a;margin-bottom:8px">🌧 Rain</div>'+_rainLine('Next 30 min',stats30)+_rainLine('Next 60 min',stats60)+_rainLine('Next 2 hours',stats120)+'</div>';
-    html+='<div style="font-size:12px;color:#64748b;margin-bottom:12px">Updated '+new Date(c.fetchedAt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+' · Source: '+(c.source||'Weather')+'</div>';
+    if(!_clWeatherIsFresh(c)){html+='<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:13px;color:#92400e"><strong>Saved weather: '+_clWeatherUpdatedLabel(c)+'.</strong></div>';}
+    html+='<div style="font-size:12px;color:#64748b;margin-bottom:12px"><strong>ZIP: '+String((c&&c.zip)||_clResolveSavedWeatherZip()||'77340')+'</strong> · Source: '+(c.source||'Weather')+'</div>';
   }
   html+=_renderPickupPlanner(c);
   return html;
@@ -15882,6 +16107,7 @@ function _renderNoWeatherChoices(err){
   var html='<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:12px;margin-bottom:12px;color:#1e3a8a">';
   html+='<div style="font-size:18px;font-weight:900;margin-bottom:6px">🌤 Today\'s Weather</div>';
   html+='<div style="font-size:14px;line-height:1.5;margin-bottom:10px">'+msg+' Cardiac Lens never checks your location unless you ask it to.</div>';
+  html+='<div style="font-size:13px;font-weight:900;color:#1e40af;margin-bottom:8px">Saved ZIP being used: '+String(_clResolveSavedWeatherZip()||'77340')+'</div>';
   html+='<div style="display:grid;grid-template-columns:1fr;gap:8px">';
   html+='<button type="button" onclick="refreshTodayWeatherFromModal(false,\'location\')" style="background:#10b981;color:white;border:none;border-radius:10px;padding:12px;font-size:16px;font-weight:900">Use My Location</button>';
   html+='<div style="display:flex;gap:8px;align-items:stretch"><input id="todayWeatherZipInput" inputmode="numeric" pattern="[0-9]*" maxlength="10" class="modal-input" placeholder="Saved ZIP Code" value="'+String(zip).replace(/"/g,'&quot;')+'" style="font-size:16px;margin:0;flex:1"><button type="button" onclick="useSavedZipWeather()" style="background:#2563eb;color:white;border:none;border-radius:10px;padding:0 12px;font-size:15px;font-weight:900">Use ZIP</button></div>';
@@ -15901,7 +16127,11 @@ function useSavedZipWeather(){
   refreshTodayWeatherFromModal(false,'zip');
 }
 function refreshTodayWeatherFromModal(silent,source){
-  source=source||settings.todayWeatherSource||'zip';
+  // v9.10.335: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
+  source=(source==='location')?'location':'zip';
+  if(source==='zip'){
+    try{settings.todayWeatherSource='zip';settings.todayWeatherSavedZip=_clResolveSavedWeatherZip();localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
+  }
   var body=document.getElementById('todayWeatherModalBody');
   var btn=document.getElementById('todayWeatherRefreshBtn');
   var requestId=++todayWeatherModalRequestSeq;
@@ -15927,7 +16157,7 @@ function refreshTodayWeatherFromModal(silent,source){
     }
   };
   if(source==='location')fetchTodayWeather(true,done,stage);
-  else fetchTodayWeatherByZip(settings.todayWeatherSavedZip,done,stage);
+  else fetchTodayWeatherByZip(_clResolveSavedWeatherZip(),done,stage);
 }function _twCell(label,val){return '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:10px"><div style="font-size:12px;color:#64748b;font-weight:700">'+label+'</div><div style="font-size:20px;color:#0f172a;font-weight:900">'+val+'</div></div>';}
 function _rainLine(label,st){return '<div style="display:flex;justify-content:space-between;border-top:1px solid #e5e7eb;padding:7px 0;font-size:14px"><span>'+label+'</span><strong>'+Math.round(st.rainProb||0)+'%</strong></div>';}
 function _renderPickupPlanner(c){
@@ -15966,7 +16196,8 @@ function addPickupPlannerDestination(){
   settings.activityDestinations=settings.activityDestinations||[];
   var exists=settings.activityDestinations.some(function(d){return d&&String(d.label||'').toLowerCase()===name.toLowerCase();});
   if(!exists){settings.activityDestinations.push({label:name,minutes:settings.activityWeatherDefaultWindowMin||30});}
-  try{localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
+  settings.activityDestinations=_clMergeDestinations(settings.activityDestinations,[]);
+  _clSaveAllSettings();
   var body=document.getElementById('todayWeatherModalBody');
   if(body)body.innerHTML=_renderTodayWeatherBody(_clGetWeatherCache(),null,'loaded');
   setTimeout(function(){var sel=document.getElementById('pickupPlannerDest');if(sel)sel.value=name;},50);
@@ -15988,7 +16219,21 @@ function runPickupPlanner(){
   html+='</div>';out.innerHTML=html;
 }
 function runPlannedTripAnalyzer(){
-  var c=_clGetWeatherCache(),out=document.getElementById('plannedTripResults');
+  var out=document.getElementById('plannedTripResults');
+  if(!out)return;
+  var c=_clGetWeatherCache();
+  if(!c||!c.hourly){out.innerHTML='<div style="color:#9a3412;font-size:13px">Refresh Weather first.</div>';return;}
+  if(!_clWeatherIsFresh(c)){
+    out.innerHTML='<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px;font-size:13px;color:#1e40af">Refreshing weather before analyzing this trip…</div>';
+    _clFetchWeatherForConfiguredSource(true,function(nc,err){
+      if(err&&!nc){out.innerHTML='<div style="color:#9a3412;font-size:13px">Weather refresh failed. Try Refresh Weather, then analyze again.</div>';return;}
+      _renderPlannedTripAnalysis(nc||_clGetWeatherCache(),out);
+    });
+    return;
+  }
+  _renderPlannedTripAnalysis(c,out);
+}
+function _renderPlannedTripAnalysis(c,out){
   if(!out)return;
   if(!c||!c.hourly){out.innerHTML='<div style="color:#9a3412;font-size:13px">Refresh Weather first.</div>';return;}
   var day=(document.getElementById('pickupPlannerDay')||{}).value||'today';
@@ -16002,9 +16247,10 @@ function runPlannedTripAnalyzer(){
   var overall=_outdoorOverallDecision(stayDry,heat,wind);
   var html='<div style="background:#fff;border:1px solid #bfdbfe;border-radius:10px;padding:10px">';
   html+='<div style="font-size:15px;font-weight:900;color:#1e40af;margin-bottom:6px">Planned Trip: '+_formatTimeDisplay(leave)+' → '+_formatTimeDisplay(ret)+'</div>';
+  html+='<div style="font-size:12px;color:#64748b;margin:-2px 0 8px 0">Weather source: '+((c&&c.source)||'Open-Meteo')+' · updated '+_clWeatherUpdatedLabel(c)+'</div>';
   html+='<div style="background:'+overall.bg+';border:1px solid '+overall.border+';border-radius:10px;padding:10px;margin-bottom:10px"><div style="font-size:13px;color:'+overall.color+';font-weight:800">Overall</div><div style="font-size:22px;color:'+overall.color+';font-weight:900">'+overall.icon+' '+overall.label+'</div><div style="font-size:13px;color:'+overall.color+';line-height:1.4">'+overall.text+'</div></div>';
   html+='<div style="display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:10px">';
-  html+=_decisionCard('☔ Stay Dry',stayDry.stars+'  '+stayDry.confidence+'%',stayDry.label,stayDry.text,stayDry.color);
+  html+=_decisionCard('☔ Rain Risk',stayDry.stars+'  '+Math.round(win.maxRain||0)+'%',stayDry.label,stayDry.text,stayDry.color);
   html+=_decisionCard('🔥 Heat Stress',heat.stars+'  '+heat.label,'Max Feels Like '+Math.round(win.maxFeels)+'°',heat.text,heat.color);
   html+=_decisionCard('💨 Wind',wind.stars+'  '+wind.label,'Wind '+(win.windCompass?win.windCompass+' ':'')+Math.round(win.maxWind)+' mph · Gusts '+Math.round(win.maxGust)+' mph',wind.text,wind.color);
   html+='</div>';
@@ -16018,13 +16264,13 @@ function _outdoorStars(score){
   return '★★★★★'.slice(0,full)+'☆☆☆☆☆'.slice(0,5-full);
 }
 function _outdoorStayDry(maxRain){
-  var conf=Math.max(0,Math.min(100,100-Math.round(maxRain||0)));
-  var score=5,label='Excellent chance of staying dry',text='Rain is unlikely during this planned window.',color='#166534';
-  if(conf<50){score=1;label='Rain likely';text='Rain is likely during this planned trip. Consider delaying or use a backup plan.';color='#991b1b';}
-  else if(conf<70){score=2;label='Rain possible';text='A shower is possible. Carry rain protection or have a backup plan.';color='#92400e';}
-  else if(conf<85){score=3;label='Good chance of staying dry';text='Rain risk is present but not high. Recheck before leaving.';color='#1d4ed8';}
-  else if(conf<95){score=4;label='Very good chance of staying dry';text='Low rain risk for this window.';color='#166534';}
-  return {confidence:conf,stars:_outdoorStars(score),score:score,label:label,text:text,color:color};
+  var risk=Math.max(0,Math.min(100,Math.round(maxRain||0)));
+  var score=5,label='Low rain risk',text='Rain is unlikely during this planned window.',color='#166534';
+  if(risk>=50){score=1;label='Rain likely';text='Rain is likely during this planned trip. Consider delaying or use a backup plan.';color='#991b1b';}
+  else if(risk>=30){score=2;label='Rain possible';text='A shower is possible. Carry rain protection or have a backup plan.';color='#92400e';}
+  else if(risk>=15){score=3;label='Some rain risk';text='Rain risk is present but not high. Recheck before leaving.';color='#1d4ed8';}
+  else if(risk>=5){score=4;label='Very low rain risk';text='Low rain risk for this window.';color='#166534';}
+  return {confidence:100-risk,rainRisk:risk,stars:_outdoorStars(score),score:score,label:label,text:text,color:color};
 }
 function _outdoorHeatStress(maxFeels,durationMin){
   var f=parseFloat(maxFeels||0),d=parseInt(durationMin||0,10);
@@ -18132,7 +18378,7 @@ function addSettingsActivityWindow(){
   if(!label||!mins||mins<1){alert('Enter a label and minutes.');return;}
   settings.activityWindows=settings.activityWindows||[];
   settings.activityWindows.push({label:label,minutes:mins});
-  try{localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
+  _clSaveAllSettings();
   openSettings();setTimeout(function(){var sec=document.getElementById('sset-activity-weather');if(sec)sec.style.display='block';},100);
 }
 function addSettingsActivityDestination(){
@@ -18142,7 +18388,8 @@ function addSettingsActivityDestination(){
   if(!label){alert('Enter a destination name.');return;}
   settings.activityDestinations=settings.activityDestinations||[];
   settings.activityDestinations.push({label:label,minutes:(mins&&mins>0)?mins:null});
-  try{localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
+  settings.activityDestinations=_clMergeDestinations(settings.activityDestinations,[]);
+  _clSaveAllSettings();
   openSettings();setTimeout(function(){var sec=document.getElementById('sset-activity-weather');if(sec)sec.style.display='block';},100);
 }
 function saveSettings(){
@@ -18194,9 +18441,11 @@ try{
   var tws=document.querySelector('input[name="todayWeatherSourceSetting"]:checked');if(tws)settings.todayWeatherSource=tws.value;
   var twz=document.getElementById('settingTodayWeatherZip');if(twz)settings.todayWeatherSavedZip=String(twz.value||'').trim();
   var twc=document.getElementById('settingTodayWeatherCacheMinutes');if(twc)settings.todayWeatherCacheMinutes=Math.min(120,Math.max(5,parseInt(twc.value)||20));
+  _clSaveWeatherSettingsBackup();
 }catch(e){}
 try{
 localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));
+_clSaveWeatherSettingsBackup();
 }catch(e){
 console.error('Failed to save settings');
 }
@@ -18336,6 +18585,7 @@ settings.customActivities=settings.customActivities||[];
 settings.morningCheckin=(settings.morningCheckin!==undefined)?settings.morningCheckin:true;
 settings.weightUnit=settings.weightUnit||'lbs';
 settings.weightAlertThreshold=settings.weightAlertThreshold||3;
+try{_clRestoreWeatherSettingsBackup();}catch(e){}
 try{_clRestoreSecurityProfile();}catch(e){}
 // Migrate: ensure reminderEnabled defaults to true on older events
 settings.dailyEvents.forEach(function(evt){
@@ -44773,4 +45023,240 @@ function _showAskClarifyChips(options) {
   function takeoverFunctions(){window._clUnlock=function(force){if(cfg().active&&!unlocked&&force!==true){show();return;}var old=document.getElementById('clSecureLock');if(old)old.style.display='none';};window._clLockFromBtn=function(){unlocked=false;show();};window._clShowLock=function(){unlocked=false;show();};window._clKeyTap=function(){show();};window.CardiacLensSecureTakeover={version:VERSION,show:function(){unlocked=false;show();},status:cfg};}
   function boot(){installCss();takeoverFunctions();var c=cfg();if(c.active)show();document.addEventListener('click',function(e){var t=e.target;if(t&&(t.id==='clPrivacyLockPill'||(t.closest&&t.closest('#clPrivacyLockPill')))){e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation();unlocked=false;show();return false;}},true);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,100);});else setTimeout(boot,100);setTimeout(boot,1000);setTimeout(boot,4000);
+})();
+
+// ── v9.10.335: Weather hardening override ─────────────────────────────
+// Purpose: keep Today's Weather simple and predictable: Saved ZIP -> coordinates -> Open-Meteo -> render.
+// No GPS unless Use My Location is explicitly tapped. Older weather code remains below this override but these
+// same global function names take precedence for buttons, modal open, planner, and activity weather.
+(function(){
+  var ZIP_DEFAULT = '77340';
+  var ZIP_COORDS = {
+    '77340': { lat: 30.7235, lon: -95.5508, label: 'Huntsville' },
+    '77320': { lat: 30.7235, lon: -95.5508, label: 'Huntsville' }
+  };
+  var WEATHER_TIMEOUT_MS = 12000;
+  function _cl335DigitsZip(v){
+    var z = String(v || '').trim();
+    var m = z.match(/\d{5}/);
+    return m ? m[0] : '';
+  }
+  function _cl335ReadWeatherBackup(){
+    try { return JSON.parse(localStorage.getItem('CARDIACLENS_WEATHER_SETTINGS') || '{}') || {}; } catch(e) { return {}; }
+  }
+  function _cl335PersistWeatherSettings(){
+    try {
+      if (!window.settings) return;
+      settings.todayWeatherSource = 'zip';
+      settings.todayWeatherPillEnabled = true;
+      settings.todayWeatherSavedZip = _cl335DigitsZip(settings.todayWeatherSavedZip) || ZIP_DEFAULT;
+      if (!settings.todayWeatherCacheMinutes) settings.todayWeatherCacheMinutes = 20;
+      localStorage.setItem('BP_TRACKER_SETTINGS', JSON.stringify(settings));
+      var snap = _cl335ReadWeatherBackup();
+      snap.todayWeatherSource = 'zip';
+      snap.todayWeatherSavedZip = settings.todayWeatherSavedZip;
+      snap.todayWeatherPillEnabled = true;
+      snap.todayWeatherCacheMinutes = settings.todayWeatherCacheMinutes;
+      snap.savedAt = new Date().toISOString();
+      localStorage.setItem('CARDIACLENS_WEATHER_SETTINGS', JSON.stringify(snap));
+    } catch(e) {}
+  }
+  window._clResolveSavedWeatherZip = function(){
+    var zip = '';
+    try { zip = _cl335DigitsZip(settings && settings.todayWeatherSavedZip); } catch(e) {}
+    if (!zip) {
+      var b = _cl335ReadWeatherBackup();
+      zip = _cl335DigitsZip(b.todayWeatherSavedZip);
+    }
+    if (!zip) {
+      try { var c = window._clGetWeatherCache ? _clGetWeatherCache() : null; zip = _cl335DigitsZip(c && (c.zip || c.savedZip)); } catch(e) {}
+    }
+    if (!zip) zip = ZIP_DEFAULT;
+    try {
+      if (window.settings) {
+        settings.todayWeatherSavedZip = zip;
+        settings.todayWeatherSource = 'zip';
+        settings.todayWeatherPillEnabled = true;
+      }
+      _cl335PersistWeatherSettings();
+    } catch(e) {}
+    return zip;
+  };
+  function _cl335WeatherUrl(lat, lon){
+    return 'https://api.open-meteo.com/v1/forecast?latitude=' + encodeURIComponent(lat) +
+      '&longitude=' + encodeURIComponent(lon) +
+      '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=2' +
+      '&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m' +
+      '&hourly=precipitation_probability,precipitation,rain,temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m' +
+      '&_cl=' + Date.now();
+  }
+  function _cl335FetchJson(url){
+    return new Promise(function(resolve, reject){
+      var done = false;
+      var timer = setTimeout(function(){ if (!done) { done = true; reject(new Error('Weather request timed out')); } }, WEATHER_TIMEOUT_MS);
+      fetch(url, { cache: 'no-store', mode: 'cors' }).then(function(r){
+        if (done) return;
+        if (!r.ok) throw new Error('Weather request failed: HTTP ' + r.status);
+        return r.json();
+      }).then(function(j){ if (!done) { done = true; clearTimeout(timer); resolve(j); } })
+        .catch(function(err){ if (!done) { done = true; clearTimeout(timer); reject(err); } });
+    });
+  }
+  function _cl335LookupZip(zip){
+    zip = _cl335DigitsZip(zip) || ZIP_DEFAULT;
+    if (ZIP_COORDS[zip]) return Promise.resolve(Object.assign({ zip: zip }, ZIP_COORDS[zip]));
+    var url = 'https://geocoding-api.open-meteo.com/v1/search?name=' + encodeURIComponent(zip) + '&count=1&language=en&format=json&country_code=US&_cl=' + Date.now();
+    return _cl335FetchJson(url).then(function(geo){
+      var item = geo && geo.results && geo.results[0];
+      if (!item) throw new Error('ZIP code not found: ' + zip);
+      return { zip: zip, lat: item.latitude, lon: item.longitude, label: item.name || zip };
+    });
+  }
+  function _cl335WindCompass(deg){
+    if (deg === undefined || deg === null || deg === '' || isNaN(parseFloat(deg))) return '';
+    var dirs = ['N','NE','E','SE','S','SW','W','NW'];
+    return dirs[Math.round((((parseFloat(deg)%360)+360)%360)/45)%8];
+  }
+  function _cl335WeatherObject(data, loc){
+    var cur = (data && data.current) || {};
+    if (cur.temperature_2m === undefined && cur.apparent_temperature === undefined) throw new Error('Weather response missing current conditions');
+    return {
+      fetchedAt: new Date().toISOString(),
+      source: 'Open-Meteo · ' + (loc.label || loc.zip),
+      sourceLabel: loc.label || loc.zip,
+      zip: loc.zip,
+      savedZip: loc.zip,
+      refreshPath: 'saved_zip_direct_v335',
+      timezone: data.timezone || '',
+      current: {
+        temperature: cur.temperature_2m,
+        feelsLike: cur.apparent_temperature,
+        humidity: cur.relative_humidity_2m,
+        rain: cur.rain,
+        precipitation: cur.precipitation,
+        windSpeed: cur.wind_speed_10m,
+        windGusts: cur.wind_gusts_10m,
+        windDirection: cur.wind_direction_10m,
+        windCompass: _cl335WindCompass(cur.wind_direction_10m),
+        weatherCode: cur.weather_code
+      },
+      hourly: data.hourly || null,
+      minutely_15: data.minutely_15 || null
+    };
+  }
+  function _cl335SetCache(obj){
+    try { localStorage.setItem('CARDIACLENS_TODAY_WEATHER_CACHE', JSON.stringify(obj)); } catch(e) {}
+    try { if (typeof showTodayZone === 'function') showTodayZone(); } catch(e) {}
+  }
+  function _cl335RecordWeatherError(err, zip){
+    try { localStorage.setItem('CARDIACLENS_WEATHER_LAST_ERROR', JSON.stringify({ at: new Date().toISOString(), zip: zip || '', message: String((err && err.message) || err || 'Weather refresh failed') })); } catch(e) {}
+  }
+  window.fetchTodayWeatherByZip = function(zip, cb, onStage){
+    zip = _cl335DigitsZip(zip || _clResolveSavedWeatherZip()) || ZIP_DEFAULT;
+    _cl335PersistWeatherSettings();
+    var cached = window._clGetWeatherCache ? _clGetWeatherCache() : null;
+    try { if (onStage) onStage('weather-fetch'); } catch(e) {}
+    _cl335LookupZip(zip).then(function(loc){
+      return _cl335FetchJson(_cl335WeatherUrl(loc.lat, loc.lon)).then(function(data){
+        var obj = _cl335WeatherObject(data, loc);
+        _cl335SetCache(obj);
+        if (cb) cb(obj, null);
+        return obj;
+      });
+    }).catch(function(err){
+      _cl335RecordWeatherError(err, zip);
+      if (cb) cb(cached, err);
+    });
+  };
+  window._clFetchWeatherForConfiguredSource = function(force, cb, onStage){
+    // Stable default: saved ZIP. Location mode is only used by the explicit Use My Location button.
+    var c = window._clGetWeatherCache ? _clGetWeatherCache() : null;
+    try { if (!force && typeof _clWeatherIsFresh === 'function' && _clWeatherIsFresh(c)) { if (cb) cb(c, null); return; } } catch(e) {}
+    fetchTodayWeatherByZip(_clResolveSavedWeatherZip(), cb, onStage);
+  };
+  window.refreshTodayWeatherFromModal = function(silent, source){
+    source = (source === 'location') ? 'location' : 'zip';
+    var body = document.getElementById('todayWeatherModalBody');
+    var btn = document.getElementById('todayWeatherRefreshBtn');
+    var requestId = (window.todayWeatherModalRequestSeq = (window.todayWeatherModalRequestSeq || 0) + 1);
+    window.todayWeatherModalState = (source === 'location') ? 'permission' : 'loading';
+    window.todayWeatherModalLastError = null;
+    if (btn) { btn.disabled = true; btn.textContent = 'Checking…'; btn.style.opacity = '.7'; }
+    if (body) body.innerHTML = _renderTodayWeatherBody(_clGetWeatherCache ? _clGetWeatherCache() : null, null, 'loading');
+    var done = function(c, err){
+      if (requestId !== window.todayWeatherModalRequestSeq) return;
+      var b = document.getElementById('todayWeatherModalBody');
+      var rb = document.getElementById('todayWeatherRefreshBtn');
+      if (rb) { rb.disabled = false; rb.textContent = 'Refresh Weather'; rb.style.opacity = '1'; }
+      window.todayWeatherModalState = err ? 'error' : 'loaded';
+      window.todayWeatherModalLastError = err || null;
+      if (b) b.innerHTML = _renderTodayWeatherBody(c, err, window.todayWeatherModalState);
+    };
+    if (source === 'location' && navigator.geolocation && typeof fetchTodayWeather === 'function') {
+      fetchTodayWeather(true, done, function(){ if (body) body.innerHTML = _renderTodayWeatherBody(_clGetWeatherCache(), null, 'loading'); });
+    } else {
+      fetchTodayWeatherByZip(_clResolveSavedWeatherZip(), done, function(){ if (body) body.innerHTML = _renderTodayWeatherBody(_clGetWeatherCache(), null, 'loading'); });
+    }
+  };
+  window.openTodayWeatherModal = function(){
+    _cl335PersistWeatherSettings();
+    var c = window._clGetWeatherCache ? _clGetWeatherCache() : null;
+    var stale = !(c && c.current) || (typeof _clWeatherIsFresh === 'function' && !_clWeatherIsFresh(c));
+    var html = '<div class="modal-title" style="font-size:26px;margin-bottom:10px">☀️ Today\'s Weather</div>' +
+      '<button type="button" onclick="hideModal();openHelpModal(\'weather\')" style="width:100%;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;border-radius:10px;padding:10px;font-size:14px;font-weight:800;margin-bottom:12px">How to use Today\'s Weather</button>' +
+      '<div id="todayWeatherModalBody">' + _renderTodayWeatherBody(c, null, stale ? 'loading' : 'loaded') + '</div>' +
+      '<div class="modal-actions"><button class="modal-cancel" onclick="hideModal()">Close</button><button class="modal-ok" id="todayWeatherRefreshBtn" onclick="refreshTodayWeatherFromModal(false,\'zip\')">Refresh Weather</button></div>';
+    showModal(html);
+    if (stale) setTimeout(function(){ refreshTodayWeatherFromModal(true, 'zip'); }, 80);
+  };
+  window.useSavedZipWeather = function(){
+    var inp = document.getElementById('todayWeatherZipInput');
+    var zip = _cl335DigitsZip(inp && inp.value) || ZIP_DEFAULT;
+    if (window.settings) {
+      settings.todayWeatherSavedZip = zip;
+      settings.todayWeatherSource = 'zip';
+      settings.todayWeatherPillEnabled = true;
+      settings.activityWeatherMode = 'internet';
+      settings.activityEnvironmentalMode = 'internet';
+    }
+    _cl335PersistWeatherSettings();
+    refreshTodayWeatherFromModal(false, 'zip');
+  };
+  function _cl335PersistDestinations(){
+    try {
+      if (!settings.activityDestinations) settings.activityDestinations = [];
+      if (typeof _clMergeDestinations === 'function') settings.activityDestinations = _clMergeDestinations(settings.activityDestinations, []);
+      localStorage.setItem('BP_TRACKER_SETTINGS', JSON.stringify(settings));
+      if (typeof _clSaveWeatherSettingsBackup === 'function') _clSaveWeatherSettingsBackup();
+      return true;
+    } catch(e) { return false; }
+  }
+  window.addPickupPlannerDestination = function(){
+    if (!window.settings) return;
+    var inp = document.getElementById('pickupPlannerNewDest');
+    var name = inp ? String(inp.value || '').trim() : '';
+    if (!name) { if (typeof showToast === 'function') showToast('Enter a destination name first'); return; }
+    settings.activityDestinations = settings.activityDestinations || [];
+    var exists = settings.activityDestinations.some(function(d){ return d && String(d.label || '').toLowerCase() === name.toLowerCase(); });
+    if (!exists) settings.activityDestinations.push({ label: name, minutes: settings.activityWeatherDefaultWindowMin || 30 });
+    _cl335PersistDestinations();
+    var body = document.getElementById('todayWeatherModalBody');
+    if (body) body.innerHTML = _renderTodayWeatherBody(_clGetWeatherCache ? _clGetWeatherCache() : null, null, 'loaded');
+    setTimeout(function(){ var sel = document.getElementById('pickupPlannerDest'); if (sel) sel.value = name; }, 50);
+    if (typeof showToast === 'function') showToast(exists ? 'Destination already saved' : 'Destination saved');
+  };
+  window.addSettingsActivityDestination = function(){
+    if (!window.settings) return;
+    var l = document.getElementById('settingNewDestLabel');
+    var m = document.getElementById('settingNewDestMinutes');
+    var label = l ? String(l.value || '').trim() : '';
+    var mins = m ? parseInt(m.value, 10) : 0;
+    if (!label) { alert('Enter a destination name.'); return; }
+    settings.activityDestinations = settings.activityDestinations || [];
+    var exists = settings.activityDestinations.some(function(d){ return d && String(d.label || '').toLowerCase() === label.toLowerCase(); });
+    if (!exists) settings.activityDestinations.push({ label: label, minutes: (mins && mins > 0) ? mins : null });
+    _cl335PersistDestinations();
+    openSettings();
+    setTimeout(function(){ var sec = document.getElementById('sset-activity-weather'); if (sec) sec.style.display = 'block'; }, 100);
+  };
 })();

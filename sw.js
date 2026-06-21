@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.322-home-weather-pill-trip-planner';
+const CACHE_NAME = 'cardiaclens-v9.10.335-weather-hardening';
 const PRECACHE_URLS = ['./manifest.json','./icon-192.png','./icon-512.png','./apple-touch-icon.png','./favicon-32.png','./favicon-16.png'];
 self.addEventListener('install', event => { self.skipWaiting(); event.waitUntil(caches.open(CACHE_NAME).then(cache => Promise.all(PRECACHE_URLS.map(url => cache.add(url).catch(() => null))))); });
 self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key.indexOf('cardiaclens-') === 0 && key !== CACHE_NAME).map(key => caches.delete(key)))).then(() => self.clients.claim())); });

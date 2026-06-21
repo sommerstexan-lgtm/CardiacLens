@@ -1,1 +1,7 @@
-{"version":"v9.10.322","build":"Persistence Audit: Med Intel canonical storage + split-brain prevention","updated":"2026-06-21T20:30:00Z"}
+{
+  "version": "v9.10.335",
+  "build": "v9.10.335",
+  "updated": "2026-06-21T23:30:00Z",
+  "name": "CardiacLens v9.10.335",
+  "label": "Weather Help + Weather Hardening"
+}
