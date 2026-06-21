@@ -1,8 +1,8 @@
 {
-  "version": "v9.10.311",
+  "version": "v9.10.312",
   "date": "2026-06-21",
-  "label": "v9.10.311",
-  "build": "outdoor-planner-decision-guidance",
-  "notes": "Outdoor Planner now translates planned-trip weather into Stay Dry Confidence, Heat Stress, Wind, and Overall guidance; Help text updated; mobile layout inspected.",
+  "label": "v9.10.312",
+  "build": "weather-saved-zip-mobile-polish",
+  "notes": "Adds Saved ZIP Code weather option, friendly no-weather flow, Use My Location option, Help updates, and mobile polish checks.",
   "timestamp": "2026-06-21T12:45:00Z"
 }
