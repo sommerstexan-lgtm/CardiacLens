@@ -8097,7 +8097,7 @@ function getJourneyFormData(activityName){
 }
 
 
-// Weather settings persistence guard (v9.10.338)
+// Weather settings persistence guard (v9.10.341)
 var CARDIACLENS_WEATHER_SETTINGS_KEY='CARDIACLENS_WEATHER_SETTINGS';
 function _clMergeDestinations(a,b){
   var out=[],seen={};
@@ -8142,7 +8142,7 @@ function _clWeatherSettingsSnapshot(){
   };}catch(e){return null;}
 }
 function _clSaveWeatherSettingsBackup(){
-  // v9.10.338: current saved settings win; backup only fills missing weather fields.
+  // v9.10.341: current saved settings win; backup only fills missing weather fields.
   try{
     var snap=_clWeatherSettingsSnapshot(); if(!snap)return;
     var prior=null;
@@ -8164,14 +8164,14 @@ function _clSaveWeatherSettingsBackup(){
   }catch(e){}
 }
 function _clRestoreWeatherSettingsBackup(){
-  // v9.10.338: restore defensively. Blank/default backup fields must not erase current settings.
+  // v9.10.341: restore defensively. Blank/default backup fields must not erase current settings.
   try{
     var raw=localStorage.getItem(CARDIACLENS_WEATHER_SETTINGS_KEY); if(!raw)return;
     var w=JSON.parse(raw); if(!w||typeof w!=='object')return;
     var fields=['activityWeatherMode','activityEnvironmentalMode','activityWeatherStoreSnapshot','activityWeatherRainThresholdPct','activityWeatherDefaultWindowMin','activityWeatherAskOnOutdoor','activityWeatherStoreCoordinates','todayWeatherPillEnabled','todayWeatherCacheMinutes','todayWeatherSavedZip','todayWeatherSource','pickupPlannerDefaultDate','activityWindows','activityDestinations'];
     fields.forEach(function(k){
       if(w[k]===undefined||w[k]===null)return;
-      // v9.10.338: current Saved ZIP settings must not be overwritten by older backup values.
+      // v9.10.341: current Saved ZIP settings must not be overwritten by older backup values.
       // Backup is only a fill-in source, not the authority when current settings are explicit.
       if(k==='todayWeatherSource'){
         var curSource=settings&&settings.todayWeatherSource;
@@ -8211,7 +8211,7 @@ function _ensureActivityEnvSettings(){
     var legacyNames={'Doctor':true,'Store':true,'Church':true,'Aggarwala':true,'HEB':true};
     settings.activityDestinations=(settings.activityDestinations||[]).filter(function(d){return d&&d.label&&!legacyNames[d.label];});
     settings.activityDestinationLegacyCleanupV309=true;
-    // v9.10.338: do not write defaults from _ensureActivityEnvSettings().
+    // v9.10.341: do not write defaults from _ensureActivityEnvSettings().
     // This function may run during startup before saved settings are loaded.
   }
   // v9.10.321: no baked-in destinations. Users add their own.
@@ -8403,11 +8403,23 @@ function renderActivityEnvironmentStatus(){
   var icon=s.rainLikely?'🌧':'✓';
   stat.innerHTML='<div style="background:'+bg+';border-radius:8px;padding:10px;font-size:13px;color:'+col+';font-weight:700">'+icon+' '+s.summary+' · '+(s.windowMinutes||30)+' min window<br><span style="font-weight:600">Rain: '+rain+' · Heat index: '+heat+'</span></div>';
 }
+function getActivityEventContextSnapshot(activityName){
+  var ctx={capturedAt:new Date().toISOString(),activity:activityName||'',hydration:{todayOz:(typeof dailyFluid!=='undefined'?dailyFluid:null)},recentBP:null,recentSymptoms:[]};
+  try{
+    if(B&&B.length){var bp=B[B.length-1];ctx.recentBP={time:bp.t||'',systolic:bp.s||null,diastolic:bp.d||null,pulse:bp.h||null};}
+    if(S&&S.length){ctx.recentSymptoms=S.slice(-5).map(function(x){return {time:x.t||'',symptom:x.symptom||x.name||'',severity:x.severity||x.level||''};});}
+  }catch(e){}
+  return ctx;
+}
+
 function getActivityEnvironmentFormData(){
   var mode=selectedEnvironmentalMode||'manual';
   var cm=document.getElementById('customWindowMinutes');
   if(cm&&document.getElementById('activityWindowSelect')&&document.getElementById('activityWindowSelect').value==='__CUSTOM__')selectedActivityWindowMinutes=parseInt(cm.value)||null;
-  return {mode:mode,destination:selectedDestination||'',outsideWindowLabel:selectedActivityWindow||'',outsideWindowMinutes:selectedActivityWindowMinutes||null,manualConditionBand:selectedTempBand,weatherSnapshot:((mode==='internet'&&settings.activityWeatherStoreSnapshot!==false)?activityEnvironmentSnapshot:null)};
+  var manualFactors=[];
+  [['hotKitchen','Hot kitchen'],['standingLong','Standing long time'],['afterMeal','After meal'],['stairsHills','Stairs / hills'],['humidRoom','Humid room'],['stressful','Stressful'],['afterShower','After shower'],['warmRoom','Warm room']].forEach(function(x){var el=document.getElementById('envCtx_'+x[0]);if(el&&el.checked)manualFactors.push(x[1]);});
+  var other=document.getElementById('envCtxOther');
+  return {mode:mode,destination:selectedDestination||'',outsideWindowLabel:selectedActivityWindow||'',outsideWindowMinutes:selectedActivityWindowMinutes||null,manualConditionBand:selectedTempBand,manualEnvironmentFactors:manualFactors,manualEnvironmentOther:(other?other.value.trim():''),weatherSnapshot:((mode==='internet'&&settings.activityWeatherStoreSnapshot!==false)?activityEnvironmentSnapshot:null),contextSnapshot:getActivityEventContextSnapshot(document.getElementById('activitySelect')?document.getElementById('activitySelect').value:'')};
 }
 
 function _isActivityFinishedForSave(){
@@ -8721,6 +8733,8 @@ function minimizeActivityLog(){
     destination:selectedDestination,
     environmentalMode:selectedEnvironmentalMode,
     environmentSnapshot:activityEnvironmentSnapshot,
+    manualEnvironmentFactors:(function(){var a=[];[['hotKitchen','Hot kitchen'],['standingLong','Standing long time'],['afterMeal','After meal'],['stairsHills','Stairs / hills'],['humidRoom','Humid room'],['stressful','Stressful'],['afterShower','After shower'],['warmRoom','Warm room']].forEach(function(x){var el=document.getElementById('envCtx_'+x[0]);if(el&&el.checked)a.push(x[1]);});return a;})(),
+    manualEnvironmentOther:(function(){var el=document.getElementById('envCtxOther');return el?el.value.trim():'';})(),
     activityContext:selectedActivityContext,
     journeyRole:selectedJourneyRole,
     journeyName:selectedJourneyName,
@@ -8754,8 +8768,33 @@ function minimizeActivityLog(){
   showToast(modeMsg);
 }
 
+
+function _loadMinimizedActivityFromStorage(){
+  try{
+    var raw=localStorage.getItem('CB_ACTIVITY_MINIMIZED');
+    if(!raw) return false;
+    var parsed=JSON.parse(raw);
+    if(!parsed || !parsed.state) return false;
+    _minimizedActivityState=parsed.state;
+    var base=parseInt(parsed.elapsedSeconds||0,10);
+    if(isNaN(base)) base=0;
+    if(parsed.state.isTimerMode){
+      var away=Math.max(0, Math.floor((Date.now()-(parsed.minimizedAt||Date.now()))/1000));
+      activityElapsedSeconds=base+away;
+      activityStartTime=Date.now()-(activityElapsedSeconds*1000);
+    }else{
+      activityElapsedSeconds=base;
+    }
+    _activityMinimized=true;
+    return true;
+  }catch(e){return false;}
+}
+
 // Reopen the activity modal and restore all saved state.
 function restoreActivityLog(){
+  if(!_minimizedActivityState){
+    _loadMinimizedActivityFromStorage();
+  }
   if(!_minimizedActivityState) return;
   var state=_minimizedActivityState;
   _activityMinimized=false;
@@ -8789,6 +8828,8 @@ function restoreActivityLog(){
     var dSel=document.getElementById('activityDestinationSelect');if(dSel&&selectedDestination)dSel.value=selectedDestination;
     selectEnvironmentalMode(selectedEnvironmentalMode);
     if(activityEnvironmentSnapshot)renderActivityEnvironmentStatus();
+    if(state.manualEnvironmentFactors&&state.manualEnvironmentFactors.length){state.manualEnvironmentFactors.forEach(function(label){var map={'Hot kitchen':'hotKitchen','Standing long time':'standingLong','After meal':'afterMeal','Stairs / hills':'stairsHills','Humid room':'humidRoom','Stressful':'stressful','After shower':'afterShower','Warm room':'warmRoom'};var el=document.getElementById('envCtx_'+map[label]);if(el)el.checked=true;});}
+    var other=document.getElementById('envCtxOther');if(other&&state.manualEnvironmentOther)other.value=state.manualEnvironmentOther;
 
     if(state.isTimerMode){
       // Switch to timer mode display
@@ -8801,22 +8842,34 @@ function restoreActivityLog(){
         var tDisp=document.getElementById('timerDisplay');
         if(tDisp) tDisp.style.display='block';
       }
-      // Update timer display immediately
+      // Treat minimized timer as still running after restore from storage.
+      activityTimerPaused=false;
+      activityTimerStoppedForSave=false;
+      activityStartTime=Date.now()-(activityElapsedSeconds*1000);
+      if(activityTimerInterval) clearInterval(activityTimerInterval);
+      activityTimerInterval=setInterval(function(){
+        var elapsed=Math.floor((Date.now()-activityStartTime)/1000);
+        activityElapsedSeconds=elapsed;
+        var mins=Math.floor(elapsed/60);
+        var secs=elapsed%60;
+        var tTime=document.getElementById('timerTime');
+        if(tTime) tTime.textContent=(mins<10?'0':'')+mins+':'+(secs<10?'0':'')+secs;
+      },100);
       var mins=Math.floor(activityElapsedSeconds/60);
       var secs=activityElapsedSeconds%60;
       var tTime=document.getElementById('timerTime');
       if(tTime) tTime.textContent=(mins<10?'0':'')+mins+':'+(secs<10?'0':'')+secs;
       // Correct button states
-      var isRunning=!!activityTimerInterval;
       var startBtn=document.getElementById('timerStartBtn');
       var pauseBtn=document.getElementById('timerPauseBtn');
       var resumeBtn=document.getElementById('timerResumeBtn');
       var stopBtn=document.getElementById('timerStopBtn');
       if(startBtn)  startBtn.style.display='none';
-      if(pauseBtn)  pauseBtn.style.display=isRunning?'inline-block':'none';
-      if(resumeBtn) resumeBtn.style.display=isRunning?'none':'inline-block';
+      if(pauseBtn)  pauseBtn.style.display='inline-block';
+      if(resumeBtn) resumeBtn.style.display='none';
       if(stopBtn)   stopBtn.style.display='inline-block';
-      activityTimerStoppedForSave=(!isRunning && activityElapsedSeconds>=60);
+      var pausedLabel=document.getElementById('timerPausedLabel');
+      if(pausedLabel) pausedLabel.style.display='none';
       updateActivitySaveState();
     } else {
       // Restore manual duration value
@@ -8838,6 +8891,9 @@ function _forceNewActivity(){
 // Timer mode: shows live elapsed time. Manual mode: shows static label.
 function _startActivityPillTick(){
   _stopActivityPillTick();
+  if(!_minimizedActivityState){
+    _loadMinimizedActivityFromStorage();
+  }
   var pill=document.getElementById('activityPillBtn');
   var label=document.getElementById('activityPillLabel');
   var timeEl=document.getElementById('activityPillTime');
@@ -8859,12 +8915,17 @@ function _startActivityPillTick(){
     return; // no interval needed — nothing to tick
   }
 
-  // Timer mode: tick every second
+  // Timer mode: tick every second, including after iOS/browser resume.
+  if(!activityStartTime){
+    activityStartTime=Date.now()-(activityElapsedSeconds*1000);
+  }
   pill.style.display='flex';
   _syncFab();
   _activityPillInterval=setInterval(function(){
     if(!_activityMinimized){ _stopActivityPillTick(); return; }
-    var e=activityElapsedSeconds;
+    var e=Math.floor((Date.now()-activityStartTime)/1000);
+    if(e<activityElapsedSeconds) e=activityElapsedSeconds;
+    activityElapsedSeconds=e;
     var m=Math.floor(e/60), s=e%60;
     if(timeEl) timeEl.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
   }, 1000);
@@ -9078,6 +9139,7 @@ journeyId:journeyData.journeyId,
 journeyName:journeyData.journeyName,
 environmentalMode:(envData.mode||'manual'),
 environmentalSnapshot:envData,
+eventContextSnapshot:(envData.contextSnapshot||null),
 linkedBP:{before:null,after:null}
 });
 // Save BP before reading if it exists
@@ -9158,6 +9220,15 @@ function buildTempBandHTML(){
     h+='<div style="font-size:11px;color:'+b.col+';margin-top:3px">'+b.sub+'</div>';
     h+='</button>';
   }
+  h+='</div>';
+  h+='<div style="margin-top:12px;border-top:1px solid #e2e8f0;padding-top:10px">';
+  h+='<div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:6px">🏠 Indoor / lifestyle context (optional)</div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;color:#334155">';
+  [['hotKitchen','Hot kitchen'],['standingLong','Standing long time'],['afterMeal','After meal'],['stairsHills','Stairs / hills'],['humidRoom','Humid room'],['stressful','Stressful'],['afterShower','After shower'],['warmRoom','Warm room']].forEach(function(x){
+    h+='<label style="display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:8px"><input type="checkbox" id="envCtx_'+x[0]+'"/> '+x[1]+'</label>';
+  });
+  h+='</div>';
+  h+='<input type="text" id="envCtxOther" class="modal-input" style="margin-top:8px;font-size:15px" placeholder="Other context, e.g., oven on, carrying groceries" />';
   h+='</div></div>';
   return h;
 }
@@ -9461,6 +9532,16 @@ for(var i=activityData.length-1;i>=0;i--){
   h+='<div style="margin-top:12px;padding:12px;background:#f0fdf4;border-left:4px solid '+exertionColor+';border-radius:6px">';
   h+='<div style="font-size:16px;font-weight:600;color:'+exertionColor+'">'+r.exertion+' Exertion</div></div>';
   if(r.notes){ h+='<div style="margin-top:12px;padding:12px;background:#f3f4f6;border-radius:6px;font-size:16px;color:#374151"><strong>Notes:</strong> '+r.notes+'</div>'; }
+  if(r.environmentalSnapshot){
+    var es=r.environmentalSnapshot;
+    var parts=[];
+    if(es.manualEnvironmentFactors&&es.manualEnvironmentFactors.length)parts.push('Context: '+es.manualEnvironmentFactors.join(', '));
+    if(es.manualEnvironmentOther)parts.push('Other: '+es.manualEnvironmentOther);
+    if(es.weatherSnapshot){var ws=es.weatherSnapshot;parts.push('Weather: '+(ws.summary||'captured')+(ws.heatIndexF!==null&&ws.heatIndexF!==undefined?' · Feels like '+Math.round(ws.heatIndexF)+'°':''));}
+    if(es.contextSnapshot&&es.contextSnapshot.hydration&&es.contextSnapshot.hydration.todayOz!==null)parts.push('Fluid today at save: '+es.contextSnapshot.hydration.todayOz+' oz');
+    if(es.contextSnapshot&&es.contextSnapshot.recentBP)parts.push('Recent BP: '+es.contextSnapshot.recentBP.systolic+'/'+es.contextSnapshot.recentBP.diastolic+' HR '+es.contextSnapshot.recentBP.pulse);
+    if(parts.length)h+='<div style="margin-top:12px;padding:12px;background:#ecfeff;border-left:4px solid #0891b2;border-radius:6px;font-size:14px;color:#164e63"><strong>Activity Context:</strong><br>'+parts.join('<br>')+'</div>';
+  }
   h+='</div>';
 }
 document.getElementById('activity').innerHTML=h||'<div style="padding:24px;text-align:center;color:#6b7280;background:#f3f4f6;border-radius:8px">No activities logged yet</div>';
@@ -15861,7 +15942,7 @@ function _clWindCompass(deg){
 function _clGetWeatherCache(){try{var raw=localStorage.getItem(TODAY_WEATHER_CACHE_KEY);return raw?JSON.parse(raw):null;}catch(e){return null;}}
 function _clSetWeatherCache(obj){try{localStorage.setItem(TODAY_WEATHER_CACHE_KEY,JSON.stringify(obj));}catch(e){}}
 function _clResolveSavedWeatherZip(){
-  // v9.10.338: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
+  // v9.10.341: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
   // Today Weather must not fall back to GPS unless the user explicitly taps Use My Location.
   try{
     var z=String((settings&&settings.todayWeatherSavedZip)||'').trim();
@@ -15891,7 +15972,7 @@ function _clWeatherUpdatedLabel(c){
   return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+' ('+ageText+')';
 }
 function _clBuildWeatherUrl(lat,lon){
-  // v9.10.338: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
+  // v9.10.341: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
   // The app only needs current conditions + hourly forecast for rain/heat/wind guidance.
   return 'https://api.open-meteo.com/v1/forecast?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+
     '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=2'+
@@ -15899,7 +15980,7 @@ function _clBuildWeatherUrl(lat,lon){
     '&hourly=precipitation_probability,precipitation,rain,temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m';
 }
 
-// v9.10.338: Saved ZIP uses a direct local coordinate table first.
+// v9.10.341: Saved ZIP uses a direct local coordinate table first.
 // For Robert's normal area, 77340 always resolves directly to Huntsville coordinates.
 var CL_ZIP_COORDS={
   '77340':{lat:30.7235,lon:-95.5508,label:'Huntsville'},
@@ -16024,15 +16105,15 @@ function openTodayWeatherModal(){
   var html='<div class="modal-title" style="font-size:26px;margin-bottom:10px">☀️ Today\'s Weather</div><button type="button" onclick="hideModal();openHelpModal(\'weather\')" style="width:100%;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;border-radius:10px;padding:10px;font-size:14px;font-weight:800;margin-bottom:12px">How to use Today\'s Weather</button><div id="todayWeatherModalBody">'+_renderTodayWeatherBody(c,null,initialState)+'</div>';
   html+='<div class="modal-actions"><button class="modal-cancel" onclick="hideModal()">Close</button><button class="modal-ok" id="todayWeatherRefreshBtn" onclick="refreshTodayWeatherFromModal()">Refresh Weather</button></div>';
   showModal(html);
-  // v9.10.338: if cached weather is older than the user's refresh threshold, refresh automatically on open.
+  // v9.10.341: if cached weather is older than the user's refresh threshold, refresh automatically on open.
   // This keeps the weather pill, planner, and activity weather on the same fresh source without requiring a manual tap.
   if(stale){setTimeout(function(){
-    // v9.10.338: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
+    // v9.10.341: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
     refreshTodayWeatherFromModal(true,'zip');
   },100);}
 }
 
-// v9.10.338: Today's Weather banner must use the real weather state, not a stale/default activity flag.
+// v9.10.341: Today's Weather banner must use the real weather state, not a stale/default activity flag.
 function _clIsTodayWeatherAutomaticEnabled(c){
   try{
     if(typeof _clRestoreWeatherSettingsBackup==='function')_clRestoreWeatherSettingsBackup();
@@ -16127,7 +16208,7 @@ function useSavedZipWeather(){
   refreshTodayWeatherFromModal(false,'zip');
 }
 function refreshTodayWeatherFromModal(silent,source){
-  // v9.10.338: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
+  // v9.10.341: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
   source=(source==='location')?'location':'zip';
   if(source==='zip'){
     try{settings.todayWeatherSource='zip';settings.todayWeatherSavedZip=_clResolveSavedWeatherZip();localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
@@ -45025,7 +45106,7 @@ function _showAskClarifyChips(options) {
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,100);});else setTimeout(boot,100);setTimeout(boot,1000);setTimeout(boot,4000);
 })();
 
-// ── v9.10.338: Weather hardening override ─────────────────────────────
+// ── v9.10.341: Weather hardening override ─────────────────────────────
 // Purpose: keep Today's Weather simple and predictable: Saved ZIP -> coordinates -> Open-Meteo -> render.
 // No GPS unless Use My Location is explicitly tapped. Older weather code remains below this override but these
 // same global function names take precedence for buttons, modal open, planner, and activity weather.
