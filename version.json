@@ -1,7 +1,7 @@
 {
-  "version": "v9.10.341",
-  "build": "v9.10.341",
-  "updated": "2026-06-22T23:15:00Z",
-  "name": "CardiacLens v9.10.341",
-  "label": "Activity Event Context Snapshot"
+  "version": "9.10.347.1",
+  "build": "v9.10.347",
+  "name": "CardiacLens v9.10.347",
+  "label": "Stable Cardiac Context v1.0 + Version/Help Sync",
+  "updated": "2026-06-23"
 }

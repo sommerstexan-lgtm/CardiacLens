@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- CardiacLens versioned archive: v9.10.341 - deploy reference copy -->
+<!-- CardiacLens versioned archive: v9.10.347.1 - deploy reference copy -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -28,7 +28,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.341' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.1' }, params || {}));
       }
     } catch(e) {}
   };
@@ -910,7 +910,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.341';
+    var GD_VERSION   = 'v9.10.347.1';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1447,7 +1447,7 @@
   // -- End CL_SEC_COLOR migration ---------------------------------------------
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
-<title>CardiacLens v9.10.341</title>
+<title>CardiacLens v9.10.347.1</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
@@ -2156,7 +2156,7 @@ input[type="time"].modal-input,input[type="time"]{-webkit-appearance:auto;appear
 
 @keyframes askPulse{0%,100%{opacity:0.3}50%{opacity:1}}
 
-/* ── SECURE ACCESS LOCK SCREEN (v9.10.341 letter + symbol keypad) ─────────────────────────────── */
+/* ── SECURE ACCESS LOCK SCREEN (v9.10.347.1 letter + symbol keypad) ─────────────────────────────── */
 #clSecureLock{position:fixed;inset:0;z-index:9999999;background:#f0f4f8;display:flex;align-items:flex-start;justify-content:center;padding:16px;padding-top:calc(16px + env(safe-area-inset-top));padding-bottom:calc(16px + env(safe-area-inset-bottom));font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow-y:auto}
 #clSecureLock .cl-lock-inner{width:100%;max-width:430px;display:flex;flex-direction:column;align-items:center;margin:auto}
 #clSecureLock .cl-lock-logo{display:flex;align-items:center;gap:10px;margin-bottom:2px}
@@ -2334,7 +2334,7 @@ input[type="time"].modal-input,input[type="time"]{-webkit-appearance:auto;appear
     <!-- Version + clock row -->
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid rgba(255,255,255,0.15);padding-top:12px">
       <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px">
-        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.341 · Medical Grade - Free</span>
+        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.347.1 · Medical Grade - Free</span>
         <span id="cl-gd-heartbeat" style="font-size:11px;color:rgba(125,211,252,0.55);font-weight:500;letter-spacing:0.01em">ð Eyes open...</span>
         <!-- ═══════════════════════════════════════════════════════════════════
              VERSION UPDATE CHECKLIST — update ALL 8 locations every release:
@@ -2400,15 +2400,15 @@ input[type="time"].modal-input,input[type="time"]{-webkit-appearance:auto;appear
              R9. manifest.json must be sourced from the prior known-good deploy ZIP.
 
              ZIP ASSEMBLY:
-             R10. ZIP must contain exactly 5 files, listed by explicit name —
+             R10. ZIP must contain exactly 6 root deployment files, listed by explicit name —
                   no folder, no glob:
-                  CardiacLensvX_XX_XXX.html / sw.js / index.html /
-                  manifest.json / version.json
+                  index.html / all.js / manifest.json / sw.js /
+                  version.json / reset.html
              R11. version.json date must match today's actual date.
 
              AFTER ZIP ASSEMBLY:
-             R12. List ZIP contents and verify both HTML files are present, roughly
-                  equal in size, and consistent with prior version file sizes.
+             R12. List ZIP contents and verify the 6 root deployment files are present.
+                  index.html and all.js must be consistent with prior version file sizes.
                   A file double the expected size = doubled file slipped through.
 
              CHANGELOG INTEGRITY:
@@ -2535,7 +2535,7 @@ input[type="time"].modal-input,input[type="time"]{-webkit-appearance:auto;appear
                   check and a final READY TO ZIP or DO NOT ZIP summary. That
                   output must be shown to the user before the ZIP is built.
              ═══════════════════════════════════════════════════════════════════ -->
-        <span style="font-size:12px;color:#94a3b8;font-weight:400">Updated June 22, 2026</span>
+        <span style="font-size:12px;color:#94a3b8;font-weight:400">Updated June 23, 2026</span>
       </div>
       <div id="t" style="font-size:14px;color:#94a3b8;text-align:right;font-weight:600"></div>
     </div>
@@ -4193,7 +4193,7 @@ Custom Range
         </div>
 
         <div style="background:#f3f4f6;border-radius:10px;padding:14px;font-size:13px;color:#6b7280;line-height:1.7">
-          CardiacLens v9.10.341 · Free &amp; Source-Available · Built by a cardiac patient, for cardiac patients · cardiaclens.com<br>
+          CardiacLens v9.10.347.1 · Free &amp; Source-Available · Built by a cardiac patient, for cardiac patients · cardiaclens.com<br>
           No ads · No account · No subscription · Your data stays on your device · Always free
         </div>
       </section>
@@ -4350,6 +4350,14 @@ Custom Range
         <h3>Known Issues</h3>
         <p style="font-size:15px;color:#4b5563;margin-bottom:4px">This tab tracks <strong>bugs that were reported and fixed</strong> — things that were broken and are now resolved. Each entry describes the defective behavior, the root cause, and the fix applied.</p>
         <p style="font-size:14px;color:#6b7280;margin-bottom:16px">For new features and capabilities, see the <strong>Planned Features</strong> tab.</p>
+
+        <div style="background:#ecfdf5;border-left:4px solid #10b981;padding:14px 16px;border-radius:8px;margin-bottom:12px">
+          <strong style="font-size:16px">✅ Stable in v9.10.347.1 &mdash; June 23, 2026</strong>
+          <ul style="font-size:14px;margin:6px 0 0 0;padding-left:18px;color:#064e3b;line-height:1.8">
+            <li><strong>Cardiac Context v1.0 locked for activity testing.</strong> Activity logging now supports Indoor, Outdoor, and Mixed context, saves weather/environment, fluid total, recent BP/HR when available, Activity History context details, Ask About Activity, and Analysis Completeness. This release only syncs version labels, Help/About notes, manifest, and service-worker cache naming so today's iPhone activity testing starts from one clean version.</li>
+            <li><strong>iOS update safety.</strong> Service-worker registration continues to use the iOS-compatible <code>./sw.js</code> URL with <code>updateViaCache:'none'</code>; the cache name was bumped to v9.10.347.1 so GitHub/iPhone installs do not keep serving the older v345/v346 shell.</li>
+          </ul>
+        </div>
 
         <div style="background:#f3f4f6;border:2px solid #9ca3af;border-radius:10px;padding:16px;margin-bottom:16px">
           <div style="font-size:15px;font-weight:800;color:#374151;margin-bottom:8px">📱 Platform note: iOS reminder limitations aren't a CardiacLens bug</div>
@@ -7005,7 +7013,7 @@ Custom Range
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.341';
+  var CURRENT='v9.10.347.1';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -7543,7 +7551,7 @@ notes:true
 dailyEvents:[],
 customActivities:[], // User-defined custom physical activities
 securityProfile:null, // Secure Access mirror for update persistence
-// Activity / Today's Weather settings (v9.10.341)
+// Activity / Today's Weather settings (v9.10.347.1)
 activityWeatherMode:'manual', // off | manual | internet
 activityWeatherStoreSnapshot:true,
 activityWeatherRainThresholdPct:40,
@@ -13405,18 +13413,18 @@ var activityTypes=defaultActivityTypes;
 
 var selectedExertion='';
 var selectedTempBand=null;
-// Activity environment/window state (v9.10.341)
+// Activity environment/window state (v9.10.347.1)
 var selectedActivityWindow='';
 var selectedActivityWindowMinutes=null;
 var selectedDestination='';
 var selectedEnvironmentalMode='manual';
 var activityEnvironmentSnapshot=null;
-// Today's Weather request guard (v9.10.341) — one location/weather request per activity modal/window.
+// Today's Weather request guard (v9.10.347.1) — one location/weather request per activity modal/window.
 // Prevents repeated browser location prompts when Automatic is selected and the user changes fields.
 var activityEnvironmentFetchInFlight=false;
 var activityEnvironmentFetchKey='';
 var activityEnvironmentFetchFailedKey='';
-// Activity context / journey state (v9.10.341)
+// Activity context / journey state (v9.10.347.1)
 var selectedActivityContext='';
 var selectedJourneyRole='single';
 var selectedJourneyName='';
@@ -13425,7 +13433,7 @@ var activityTimerInterval=null;
 var activityStartTime=null;
 var activityElapsedSeconds=0;
 var activityTimerPaused=false;
-var activityTimerStoppedForSave=false; // v9.10.341: Save unlocks only after activity is finished
+var activityTimerStoppedForSave=false; // v9.10.347.1: Save unlocks only after activity is finished
 
 // Background activity state (v9.10.36) — set when user minimizes the activity modal
 var _activityMinimized=false;
@@ -13593,7 +13601,7 @@ desc.style.display='block';
 }else{
 desc.style.display='none';
 }
-// v9.10.341: suggest activity context without adding friction
+// v9.10.347.1: suggest activity context without adding friction
 if(select.value && select.value!=='__ADD_NEW__'){
   selectedActivityContext=getDefaultActivityContext(select.value);
   renderActivityContextButtons();
@@ -13609,13 +13617,14 @@ function getDefaultActivityContext(activity){
 }
 function buildActivityContextHTML(){
   var h='<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin:12px 0">';
-  h+='<div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:8px">📌 Activity Context</div>';
+  h+='<div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:8px">❤️ Cardiac Context</div>';
   h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">';
   [['indoor','Indoor'],['outdoor','Outdoor'],['mixed','Mixed']].forEach(function(x){
     h+='<button type="button" id="actCtx_'+x[0]+'" onclick="selectActivityContext(\''+x[0]+'\')" style="border:2px solid #cbd5e1;background:#fff;color:#0f172a;border-radius:8px;padding:10px 6px;font-size:14px;font-weight:700;cursor:pointer">'+x[1]+'</button>';
   });
   h+='</div>';
-  h+='<div style="font-size:12px;color:#64748b;margin-top:6px">Indoor usually does not need rain/heat. Mixed means travel plus an indoor stop, like a doctor visit.</div>';
+  h+='<div style="font-size:12px;color:#64748b;margin-top:6px">Indoor captures room/standing context. Outdoor captures weather. Mixed captures travel plus an indoor stop, like a doctor visit.</div>';
+  h+='<div style="font-size:12px;color:#075985;background:#e0f2fe;border-radius:8px;padding:8px;margin-top:8px;font-weight:700">Saved with activity for Ask, history, and doctor review.</div>';
   h+='</div>';
   return h;
 }
@@ -13625,20 +13634,31 @@ function renderActivityContextButtons(){
 }
 function _getActiveJourney(){try{return JSON.parse(localStorage.getItem('CB_ACTIVE_JOURNEY')||'null');}catch(e){return null;}}
 function _setActiveJourney(j){try{if(j)localStorage.setItem('CB_ACTIVE_JOURNEY',JSON.stringify(j));else localStorage.removeItem('CB_ACTIVE_JOURNEY');}catch(e){}}
+function clearActiveJourney(){
+  _setActiveJourney(null);
+  selectedJourneyId=null;
+  selectedJourneyName='';
+  var name=document.getElementById('journeyNameInput');
+  if(name)name.value='';
+  var wrap=document.getElementById('activeJourneyNotice');
+  if(wrap)wrap.style.display='none';
+}
 function buildJourneyHTML(){
   var active=_getActiveJourney();
   var h='<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin-bottom:12px">';
   h+='<div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:6px">🧭 Journey / Trip</div>';
-  if(active){h+='<div style="background:#eff6ff;border-radius:8px;padding:8px;margin-bottom:8px;font-size:13px;color:#1e40af;font-weight:700">Active journey: '+active.name+'</div>';}
+  if(active){
+    h+='<div id="activeJourneyNotice" style="background:#eff6ff;border-radius:8px;padding:8px;margin-bottom:8px;font-size:13px;color:#1e40af;font-weight:700">Active journey available: '+active.name+'<br><span style="font-weight:500;color:#475569">Only used if you choose Continue/Return/Complete below.</span><br><button type="button" onclick="clearActiveJourney()" style="margin-top:6px;background:#fff;color:#dc2626;border:1px solid #fecaca;border-radius:6px;padding:5px 8px;font-size:12px;font-weight:700">Clear active journey</button></div>';
+  }
   h+='<select id="journeyRoleSelect" class="modal-input" onchange="handleJourneyRoleSelection()" style="font-size:16px;margin-bottom:8px">';
-  h+='<option value="single">Single activity</option>';
-  h+='<option value="outbound">Start journey — outbound segment</option>';
-  h+='<option value="segment">Continue journey — middle segment</option>';
-  h+='<option value="return">Continue journey — return segment</option>';
-  h+='<option value="complete">Complete journey with this segment</option>';
+  h+='<option value="single">Single activity / destination only</option>';
+  h+='<option value="outbound">Start new journey — outbound segment</option>';
+  h+='<option value="segment">Continue active journey — middle segment</option>';
+  h+='<option value="return">Continue active journey — return segment</option>';
+  h+='<option value="complete">Complete active journey with this segment</option>';
   h+='</select>';
-  h+='<input type="text" id="journeyNameInput" class="modal-input" placeholder="Journey name (optional, e.g. Doctor appointment)" oninput="selectedJourneyName=this.value.trim()" />';
-  h+='<div style="font-size:12px;color:#64748b;margin-top:6px">Use this when one real-world trip has multiple parts: ride there, appointment, ride home.</div>';
+  h+='<input type="text" id="journeyNameInput" class="modal-input" placeholder="Journey name only if this is a multi-part trip" oninput="selectedJourneyName=this.value.trim()" />';
+  h+='<div style="font-size:12px;color:#64748b;margin-top:6px">Single activity saves as its own activity. Journey is only for multi-part trips: ride there, appointment, ride home.</div>';
   h+='</div>';
   return h;
 }
@@ -13647,6 +13667,16 @@ function handleJourneyRoleSelection(){
   selectedJourneyRole=sel?sel.value:'single';
   var active=_getActiveJourney();
   var name=document.getElementById('journeyNameInput');
+  if(selectedJourneyRole==='single'){
+    selectedJourneyId=null;
+    selectedJourneyName=(name&&name.value?name.value.trim():'');
+    return;
+  }
+  if(selectedJourneyRole==='outbound'){
+    selectedJourneyId=null;
+    selectedJourneyName=(name&&name.value?name.value.trim():'');
+    return;
+  }
   if(active&&name&&!name.value){name.value=active.name;selectedJourneyName=active.name;selectedJourneyId=active.id;}
 }
 function getJourneyFormData(activityName){
@@ -13655,16 +13685,20 @@ function getJourneyFormData(activityName){
   var active=_getActiveJourney();
   var name=(nameEl&&nameEl.value.trim())||selectedDestination||activityName||'Journey';
   var id=null;
-  if(role==='single')return {role:'single',journeyId:null,journeyName:'',active:false};
+  if(role==='single')return {role:'single',journeyId:null,journeyName:(nameEl&&nameEl.value.trim())||'',active:false};
+  if(role==='outbound'){
+    id='journey_'+Date.now()+'_'+Math.floor(Math.random()*1000);
+    _setActiveJourney({id:id,name:name,startedAt:new Date().toISOString()});
+    return {role:role,journeyId:id,journeyName:name,active:true};
+  }
   if(active){id=active.id;name=active.name||name;}
   else{id='journey_'+Date.now()+'_'+Math.floor(Math.random()*1000);}
-  if(role==='outbound'&&!active){_setActiveJourney({id:id,name:name,startedAt:new Date().toISOString()});}
   if(role==='complete'){_setActiveJourney(null);}
   return {role:role,journeyId:id,journeyName:name,active:(role!=='complete')};
 }
 
 
-// Weather settings persistence guard (v9.10.341)
+// Weather settings persistence guard (v9.10.347.1)
 var CARDIACLENS_WEATHER_SETTINGS_KEY='CARDIACLENS_WEATHER_SETTINGS';
 function _clMergeDestinations(a,b){
   var out=[],seen={};
@@ -13709,7 +13743,7 @@ function _clWeatherSettingsSnapshot(){
   };}catch(e){return null;}
 }
 function _clSaveWeatherSettingsBackup(){
-  // v9.10.341: current saved settings win; backup only fills missing weather fields.
+  // v9.10.347.1: current saved settings win; backup only fills missing weather fields.
   try{
     var snap=_clWeatherSettingsSnapshot(); if(!snap)return;
     var prior=null;
@@ -13731,14 +13765,14 @@ function _clSaveWeatherSettingsBackup(){
   }catch(e){}
 }
 function _clRestoreWeatherSettingsBackup(){
-  // v9.10.341: restore defensively. Blank/default backup fields must not erase current settings.
+  // v9.10.347.1: restore defensively. Blank/default backup fields must not erase current settings.
   try{
     var raw=localStorage.getItem(CARDIACLENS_WEATHER_SETTINGS_KEY); if(!raw)return;
     var w=JSON.parse(raw); if(!w||typeof w!=='object')return;
     var fields=['activityWeatherMode','activityEnvironmentalMode','activityWeatherStoreSnapshot','activityWeatherRainThresholdPct','activityWeatherDefaultWindowMin','activityWeatherAskOnOutdoor','activityWeatherStoreCoordinates','todayWeatherPillEnabled','todayWeatherCacheMinutes','todayWeatherSavedZip','todayWeatherSource','pickupPlannerDefaultDate','activityWindows','activityDestinations'];
     fields.forEach(function(k){
       if(w[k]===undefined||w[k]===null)return;
-      // v9.10.341: current Saved ZIP settings must not be overwritten by older backup values.
+      // v9.10.347.1: current Saved ZIP settings must not be overwritten by older backup values.
       // Backup is only a fill-in source, not the authority when current settings are explicit.
       if(k==='todayWeatherSource'){
         var curSource=settings&&settings.todayWeatherSource;
@@ -13773,15 +13807,15 @@ function _ensureActivityEnvSettings(){
     {label:'Medium — 1 hr',minutes:60},{label:'Long — 2 hr',minutes:120}
   ];}
   if(!settings.activityDestinations){settings.activityDestinations=[];}
-  // v9.10.341: remove legacy/test destination presets that were seeded during weather testing.
+  // v9.10.347.1: remove legacy/test destination presets that were seeded during weather testing.
   if(!settings.activityDestinationLegacyCleanupV309){
     var legacyNames={'Doctor':true,'Store':true,'Church':true,'Aggarwala':true,'HEB':true};
     settings.activityDestinations=(settings.activityDestinations||[]).filter(function(d){return d&&d.label&&!legacyNames[d.label];});
     settings.activityDestinationLegacyCleanupV309=true;
-    // v9.10.341: do not write defaults from _ensureActivityEnvSettings().
+    // v9.10.347.1: do not write defaults from _ensureActivityEnvSettings().
     // This function may run during startup before saved settings are loaded.
   }
-  // v9.10.341: no baked-in destinations. Users add their own.
+  // v9.10.347.1: no baked-in destinations. Users add their own.
   if(settings.activityEnvironmentalMode&&!settings.activityWeatherMode)settings.activityWeatherMode=settings.activityEnvironmentalMode;
   if(!settings.activityWeatherMode)settings.activityWeatherMode='manual';
   settings.activityEnvironmentalMode=settings.activityWeatherMode; // backwards-compatible alias
@@ -14987,6 +15021,155 @@ function _actHistRenderFilters(){
   fDiv.style.display = 'block';
 }
 
+
+// v9.10.347.1 KISS: Cardiac Context display helpers (display only; no save/storage changes)
+function clActivityEsc(v){
+  return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
+}
+function clActivityWeatherText(a){
+  var es=(a&&a.environmentalSnapshot)||{};
+  var ws=es.weatherSnapshot||{};
+  var bits=[];
+  if(ws.summary) bits.push(ws.summary);
+  if(ws.heatIndexF!==null&&ws.heatIndexF!==undefined) bits.push('Feels like '+Math.round(ws.heatIndexF)+'°');
+  if(ws.tempF!==null&&ws.tempF!==undefined) bits.push('Temp '+Math.round(ws.tempF)+'°');
+  if(ws.rainChancePct!==null&&ws.rainChancePct!==undefined) bits.push('Rain '+Math.round(ws.rainChancePct)+'%');
+  if(ws.windMph!==null&&ws.windMph!==undefined) bits.push('Wind '+Math.round(ws.windMph)+' mph'+(ws.windDir?' '+ws.windDir:''));
+  if(!bits.length&&a&&a.outdoorTempF) bits.push('Manual outdoor estimate '+Math.round(a.outdoorTempF)+'°');
+  return bits.join(' · ');
+}
+function clActivityContextLines(a){
+  var lines=[];
+  if(!a) return lines;
+  var es=a.environmentalSnapshot||{};
+  var cs=a.eventContextSnapshot||es.contextSnapshot||{};
+  var manual=[];
+  if(es.mode) manual.push('Mode: '+es.mode);
+  if(es.manualEnvironmentFactors&&es.manualEnvironmentFactors.length) manual=manual.concat(es.manualEnvironmentFactors);
+  if(es.manualEnvironmentOther) manual.push(es.manualEnvironmentOther);
+  if(manual.length) lines.push('Environment: '+manual.join(', '));
+  var w=clActivityWeatherText(a);
+  if(w) lines.push('Weather: '+w);
+  if(cs.hydration&&cs.hydration.todayOz!==null&&cs.hydration.todayOz!==undefined) lines.push('Fluid today at save: '+cs.hydration.todayOz+' oz');
+  if(cs.recentBP) lines.push('Recent BP: '+cs.recentBP.systolic+'/'+cs.recentBP.diastolic+' HR '+cs.recentBP.pulse+(cs.recentBP.time?' at '+cs.recentBP.time:''));
+  if(cs.recentSymptoms&&cs.recentSymptoms.length){
+    var sx=cs.recentSymptoms.map(function(s){return (s.symptom||s.name||'symptom')+(s.severity?' sev '+s.severity:'')+(s.time?' at '+s.time:'');}).join('; ');
+    lines.push('Recent symptoms: '+sx);
+  }
+  return lines;
+}
+
+function clActivityFindLinkedBP(a, timing){
+  if(!a) return null;
+  try{
+    if(typeof B!=='undefined' && B && B.length && a.id){
+      for(var i=B.length-1;i>=0;i--){
+        if(B[i] && B[i].activityId===a.id && B[i].activityTiming===timing) return B[i];
+      }
+    }
+  }catch(e){}
+  return null;
+}
+function clActivityAnalysisCompleteness(a){
+  var captured=[];
+  var missing=[];
+  if(!a){return {captured:captured,missing:['Activity record'],percent:0};}
+  var es=a.environmentalSnapshot||{};
+  var cs=a.eventContextSnapshot||es.contextSnapshot||{};
+  var weather=clActivityWeatherText(a);
+  var before=clActivityFindLinkedBP(a,'before');
+  var after=clActivityFindLinkedBP(a,'after');
+
+  if(a.duration) captured.push('Duration'); else missing.push('Duration');
+  if(es.mode||a.activityContext||a.environmentalMode) captured.push('Environment mode'); else missing.push('Environment mode');
+  if(weather) captured.push('Weather snapshot'); else missing.push('Weather snapshot');
+  if(cs.hydration && cs.hydration.todayOz!==null && cs.hydration.todayOz!==undefined) captured.push('Fluid total at save'); else missing.push('Fluid total at save');
+  if(cs.recentBP) captured.push('Recent BP/HR'); else missing.push('Recent BP/HR');
+  if(before) captured.push('Before activity BP'); else missing.push('Before activity BP');
+  if(after) captured.push('After activity / recovery BP'); else missing.push('After activity / recovery BP');
+  if(cs.recentSymptoms && cs.recentSymptoms.length) captured.push('Recent symptoms'); else missing.push('Symptoms');
+  if(a.notes) captured.push('Notes'); else missing.push('Notes');
+
+  var total=captured.length+missing.length;
+  var pct=total?Math.round((captured.length/total)*100):0;
+  return {captured:captured,missing:missing,percent:pct,beforeBP:before,afterBP:after};
+}
+function clActivityCompletenessHtml(a){
+  var c=clActivityAnalysisCompleteness(a);
+  var cap=c.captured.length?c.captured.map(clActivityEsc).join(', '):'None';
+  var miss=c.missing.length?c.missing.map(clActivityEsc).join(', '):'None';
+  var html='<div style="background:#fff7ed;border-left:4px solid #f59e0b;border-radius:10px;padding:14px;margin-bottom:12px;color:#7c2d12;font-size:15px;line-height:1.6">';
+  html+='<strong>Analysis Completeness</strong><br>';
+  html+='<div style="font-size:28px;font-weight:900;margin:4px 0">'+c.percent+'%</div>';
+  html+='<strong>Captured:</strong> '+cap+'<br>';
+  html+='<strong>Missing:</strong> '+miss+'<br>';
+  if(c.missing.indexOf('Before activity BP')>=0 || c.missing.indexOf('After activity / recovery BP')>=0){
+    html+='<div style="margin-top:6px;font-weight:700">Tip: Before/after BP makes activity analysis much stronger.</div>';
+  }
+  html+='</div>';
+  return html;
+}
+function clActivityCompletenessText(a){
+  var c=clActivityAnalysisCompleteness(a);
+  return 'Analysis completeness '+c.percent+'%. Captured: '+(c.captured.length?c.captured.join(', '):'none')+'. Missing: '+(c.missing.length?c.missing.join(', '):'none')+'.';
+}
+
+function _clFindHistoricalActivity(dateKey,timeKey){
+  var list=(typeof _actHistAllData!=='undefined'&&_actHistAllData)||[];
+  for(var i=0;i<list.length;i++){if((list[i]._date||getTodayKey())===dateKey&&list[i].t===timeKey)return list[i];}
+  return null;
+}
+function _clActivityContextHtml(a){
+  var lines=clActivityContextLines(a);
+  if(!lines.length)return '';
+  var html='<details style="margin-top:12px;background:#ecfeff;border-left:4px solid #0891b2;border-radius:8px;padding:10px;color:#164e63;font-size:14px">';
+  html+='<summary style="font-weight:900;cursor:pointer">▼ Cardiac Context</summary>';
+  html+='<div style="margin-top:8px;line-height:1.6">'+lines.map(clActivityEsc).join('<br>')+'</div>';
+  html+='</details>';
+  return html;
+}
+function openActivityContextDetailsFor(a){
+  if(!a){alert('Activity not found');return;}
+  var lines=clActivityContextLines(a);
+  var html='<div class="modal-title">Cardiac Context Details</div>';
+  html+='<div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-bottom:12px">';
+  html+='<div style="font-size:22px;font-weight:900;color:#0f172a;margin-bottom:4px">'+clActivityEsc(a.activity||'Activity')+'</div>';
+  html+='<div style="font-size:15px;color:#475569">'+clActivityEsc(a._date||a.date||'')+' '+clActivityEsc(a.t||'')+' · '+clActivityEsc(a.duration||'')+' min · '+clActivityEsc(a.exertion||'')+' exertion</div>';
+  html+='</div>';
+  html+='<div style="background:#ecfeff;border-left:4px solid #0891b2;border-radius:10px;padding:14px;margin-bottom:12px;color:#164e63;font-size:15px;line-height:1.6">';
+  html+='<strong>Saved Context Snapshot</strong><br>'+(lines.length?lines.map(clActivityEsc).join('<br>'):'No context snapshot saved for this activity.');
+  html+='</div>';
+  html+=clActivityCompletenessHtml(a);
+  html+='<button class="modal-ok" onclick="askActivityContextForCurrentDetail()" style="width:100%;margin-top:8px;background:#0f2a4a">💬 Ask About This Activity</button>';
+  html+='<button class="modal-cancel" onclick="hideModal()" style="width:100%;margin-top:8px">Close</button>';
+  window._clCurrentActivityContextDetail=a;
+  showModal(html);
+}
+function openActivityContextDetails(i){
+  var a=(typeof A!=='undefined'&&A&&A[i])?A[i]:null;
+  openActivityContextDetailsFor(a);
+}
+function openActivityContextDetailsHistorical(dateKey,timeKey){
+  openActivityContextDetailsFor(_clFindHistoricalActivity(dateKey,timeKey));
+}
+function askActivityContextFor(a){
+  if(!a){alert('Activity not found');return;}
+  var q='Explain this saved activity using only my CardiacLens data. Activity: '+(a.activity||'Activity')+'. Logged: '+(a._date||a.date||'')+' '+(a.t||'unknown time')+'. Include activity duration, environment/weather, fluid total at save, recent BP/HR, symptoms, notes, before/after BP if available, and analysis completeness. '+clActivityCompletenessText(a)+' Do not diagnose; summarize what is known, what is missing, and what would be useful to discuss with my doctor.';
+  try{hideModal();}catch(e){}
+  openAskPanel();
+  setTimeout(function(){var inp=document.getElementById('askInput');if(inp){inp.value=q;inp.style.height='120px';}if(typeof submitAskQuestion==='function')submitAskQuestion();},350);
+}
+function askActivityContext(i){
+  askActivityContextFor((typeof A!=='undefined'&&A&&A[i])?A[i]:null);
+}
+function askActivityContextHistorical(dateKey,timeKey){
+  askActivityContextFor(_clFindHistoricalActivity(dateKey,timeKey));
+}
+function askActivityContextForCurrentDetail(){
+  askActivityContextFor(window._clCurrentActivityContextDetail||null);
+}
+
+
 function _actHistRenderReadings(data){
   var filtered = _actHistApplyFilter(data);
   var countEl = document.getElementById('actHistCount');
@@ -15011,6 +15194,12 @@ function _actHistRenderReadings(data){
     h+='<div style="margin-top:12px;padding:12px;background:#f0fdf4;border-left:4px solid '+exertionColor+';border-radius:6px">';
     h+='<div style="font-size:16px;font-weight:600;color:'+exertionColor+'">'+r.exertion+' Exertion</div></div>';
     if(r.notes){ h+='<div style="margin-top:12px;padding:12px;background:#f3f4f6;border-radius:6px;font-size:16px;color:#374151"><strong>Notes:</strong> '+r.notes+'</div>'; }
+    var ctxHtml=_clActivityContextHtml(r);
+    if(ctxHtml){
+      h+=ctxHtml;
+      h+='<button onclick="openActivityContextDetailsHistorical(\''+entryDate+'\',\''+r.t+'\')" style="margin-top:8px;background:#0891b2;color:#fff;border:none;border-radius:8px;padding:8px 10px;font-size:13px;font-weight:800;cursor:pointer">🔎 View Context Details</button>';
+      h+='<button onclick="askActivityContextHistorical(\''+entryDate+'\',\''+r.t+'\')" style="margin-top:8px;margin-left:6px;background:#0f2a4a;color:#fff;border:none;border-radius:8px;padding:8px 10px;font-size:13px;font-weight:800;cursor:pointer">💬 Ask About Activity</button>';
+    }
     h+='</div>';
   }
   document.getElementById('activity').innerHTML = h || '<p style="color:#6b7280;text-align:center;font-size:16px;padding:20px">No activities match the current filters</p>';
@@ -15036,7 +15225,85 @@ function jumpToActHistDate(dateStr){
 }
 
 function editActivityHistorical(dateKey, timeKey){
-  alert('Editing historical activities is not yet available.');
+  var storageKey='BP_TRACKER_'+dateKey;
+  var raw=localStorage.getItem(storageKey);
+  if(!raw){ alert('Could not find data for '+dateKey); return; }
+  var dayData=JSON.parse(raw);
+  var arr=dayData.activities||dayData.A||[];
+  var idx=-1;
+  for(var i=0;i<arr.length;i++){ if(arr[i].t===timeKey){ idx=i; break; } }
+  if(idx===-1){ alert('Could not find that activity entry.'); return; }
+  var entry=arr[idx];
+  var html='<div class="modal-title">Edit Activity</div>';
+  html+='<div style="margin-bottom:16px">';
+  html+='<label style="display:block;font-size:16px;font-weight:600;margin-bottom:8px">Activity Type:</label>';
+  html+='<input type="text" id="editHistActivityType" class="modal-input" value="'+(entry.activity||'')+'" placeholder="e.g., Walking, Cooking" />';
+  html+='</div>';
+  html+='<div style="margin-bottom:16px">';
+  html+='<label style="display:block;font-size:16px;font-weight:600;margin-bottom:8px">Duration (minutes):</label>';
+  html+='<input type="number" inputmode="numeric" id="editHistActivityDuration" class="modal-input" value="'+(entry.duration||'')+'" step="1" min="1" max="999" onblur="_sanitizeNumericInput(this)"/>';
+  html+='</div>';
+  html+='<div style="margin-bottom:16px">';
+  html+='<label style="display:block;font-size:16px;font-weight:600;margin-bottom:8px">Exertion Level:</label>';
+  html+='<select id="editHistActivityExertion" class="modal-input">';
+  var exertions=['Light','Moderate','Vigorous'];
+  for(var j=0;j<exertions.length;j++){
+    html+='<option value="'+exertions[j]+'"'+(exertions[j]===entry.exertion?' selected':'')+'>'+exertions[j]+'</option>';
+  }
+  html+='</select>';
+  html+='</div>';
+  html+='<div style="margin-bottom:16px">';
+  html+='<label style="display:block;font-size:16px;font-weight:600;margin-bottom:8px">Time:</label>';
+  html+='<input type="time" id="editHistActivityTime" class="modal-input" value="'+(entry.t||'')+'" />';
+  html+='</div>';
+  html+='<div style="margin-bottom:16px">';
+  html+='<label style="display:block;font-size:16px;font-weight:600;margin-bottom:8px">Notes (optional):</label>';
+  html+='<textarea id="editHistActivityNotes" class="modal-input" rows="3" placeholder="How did you feel?">'+(entry.notes||'')+'</textarea>';
+  html+='</div>';
+  html+='<div class="modal-actions">';
+  html+='<button class="modal-cancel" onclick="hideModal()">Cancel</button>';
+  html+='<button class="modal-ok" onclick="saveEditedActivityHistorical(\''+dateKey+'\',\''+timeKey+'\')">Save Changes</button>';
+  html+='</div>';
+  showModal(html);
+}
+
+function saveEditedActivityHistorical(dateKey, timeKey){
+  var activityType=document.getElementById('editHistActivityType').value.trim();
+  var duration=parseInt(document.getElementById('editHistActivityDuration').value);
+  var exertion=document.getElementById('editHistActivityExertion').value;
+  var time=document.getElementById('editHistActivityTime').value;
+  var notes=document.getElementById('editHistActivityNotes').value.trim();
+  if(!activityType){ _showInlineError('⚠️ Please enter activity type'); return; }
+  if(!duration||duration<1){ _showInlineError('⚠️ Please enter a valid duration'); return; }
+  if(!time){ _showInlineError('⚠️ Please enter a valid time'); return; }
+  var storageKey='BP_TRACKER_'+dateKey;
+  var raw=localStorage.getItem(storageKey);
+  if(!raw){ alert('Could not find data for '+dateKey); return; }
+  var dayData=JSON.parse(raw);
+  var arr=dayData.activities||dayData.A||[];
+  var idx=-1;
+  for(var i=0;i<arr.length;i++){ if(arr[i].t===timeKey){ idx=i; break; } }
+  if(idx===-1){ alert('Could not find that activity entry.'); return; }
+  arr[idx].activity=activityType;
+  arr[idx].duration=duration;
+  arr[idx].exertion=exertion;
+  arr[idx].t=time;
+  arr[idx].notes=notes;
+  dayData.activities=arr; dayData.A=arr;
+  localStorage.setItem(storageKey,JSON.stringify(dayData));
+  if(dateKey===getTodayKey()){
+    for(var ai=0;ai<A.length;ai++){ if(A[ai].t===timeKey){ A[ai]=arr[idx]; break; } }
+  }
+  for(var hi=0;hi<_actHistAllData.length;hi++){
+    if(_actHistAllData[hi]._date===dateKey && _actHistAllData[hi].t===timeKey){
+      _actHistAllData[hi]=Object.assign({}, arr[idx], {_date:dateKey});
+      break;
+    }
+  }
+  _actHistRenderReadings(_actHistAllData);
+  renderActivityChart();
+  completeAndCloseModal();
+  alert('✓ Activity entry updated');
 }
 function deleteActivityHistorical(dateKey, timeKey){
   if(!confirm('Delete activity entry from '+dateKey+' at '+timeKey+'?')) return;
@@ -15099,15 +15366,11 @@ for(var i=activityData.length-1;i>=0;i--){
   h+='<div style="margin-top:12px;padding:12px;background:#f0fdf4;border-left:4px solid '+exertionColor+';border-radius:6px">';
   h+='<div style="font-size:16px;font-weight:600;color:'+exertionColor+'">'+r.exertion+' Exertion</div></div>';
   if(r.notes){ h+='<div style="margin-top:12px;padding:12px;background:#f3f4f6;border-radius:6px;font-size:16px;color:#374151"><strong>Notes:</strong> '+r.notes+'</div>'; }
-  if(r.environmentalSnapshot){
-    var es=r.environmentalSnapshot;
-    var parts=[];
-    if(es.manualEnvironmentFactors&&es.manualEnvironmentFactors.length)parts.push('Context: '+es.manualEnvironmentFactors.join(', '));
-    if(es.manualEnvironmentOther)parts.push('Other: '+es.manualEnvironmentOther);
-    if(es.weatherSnapshot){var ws=es.weatherSnapshot;parts.push('Weather: '+(ws.summary||'captured')+(ws.heatIndexF!==null&&ws.heatIndexF!==undefined?' · Feels like '+Math.round(ws.heatIndexF)+'°':''));}
-    if(es.contextSnapshot&&es.contextSnapshot.hydration&&es.contextSnapshot.hydration.todayOz!==null)parts.push('Fluid today at save: '+es.contextSnapshot.hydration.todayOz+' oz');
-    if(es.contextSnapshot&&es.contextSnapshot.recentBP)parts.push('Recent BP: '+es.contextSnapshot.recentBP.systolic+'/'+es.contextSnapshot.recentBP.diastolic+' HR '+es.contextSnapshot.recentBP.pulse);
-    if(parts.length)h+='<div style="margin-top:12px;padding:12px;background:#ecfeff;border-left:4px solid #0891b2;border-radius:6px;font-size:14px;color:#164e63"><strong>Activity Context:</strong><br>'+parts.join('<br>')+'</div>';
+  var todayCtxHtml=_clActivityContextHtml(r);
+  if(todayCtxHtml){
+    h+=todayCtxHtml;
+    h+='<button onclick="openActivityContextDetails('+i+')" style="margin-top:8px;background:#0891b2;color:#fff;border:none;border-radius:8px;padding:8px 10px;font-size:13px;font-weight:800;cursor:pointer">🔎 View Context Details</button>';
+    h+='<button onclick="askActivityContext('+i+')" style="margin-top:8px;margin-left:6px;background:#0f2a4a;color:#fff;border:none;border-radius:8px;padding:8px 10px;font-size:13px;font-weight:800;cursor:pointer">💬 Ask About Activity</button>';
   }
   h+='</div>';
 }
@@ -18484,7 +18747,7 @@ function _checkDisclaimerAccepted(){
 
 function _acceptDisclaimer(){
   try{
-    var rec = {accepted: true, ts: new Date().toISOString(), version: 'v9.10.341'};
+    var rec = {accepted: true, ts: new Date().toISOString(), version: 'v9.10.347.1'};
     // Checksum the acknowledgment record
     rec._cs = _cbHash(rec.ts + '|' + rec.version + '|' + CB_TAMPER_SALT);
     localStorage.setItem(CB_DISCLAIMER_KEY, JSON.stringify(rec));
@@ -21498,7 +21761,7 @@ function buildSmartStatusMessage(zoneData) {
 }
 
 
-// ── Home Today's Weather pill + pickup/trip planner (v9.10.341) ─────────────
+// ── Home Today's Weather pill + pickup/trip planner (v9.10.347.1) ─────────────
 var TODAY_WEATHER_CACHE_KEY='CARDIACLENS_TODAY_WEATHER_CACHE';
 var todayWeatherFetchInFlight=false;
 var todayWeatherModalRequestSeq=0;
@@ -21512,7 +21775,7 @@ function _clWindCompass(deg){
 function _clGetWeatherCache(){try{var raw=localStorage.getItem(TODAY_WEATHER_CACHE_KEY);return raw?JSON.parse(raw):null;}catch(e){return null;}}
 function _clSetWeatherCache(obj){try{localStorage.setItem(TODAY_WEATHER_CACHE_KEY,JSON.stringify(obj));}catch(e){}}
 function _clResolveSavedWeatherZip(){
-  // v9.10.341: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
+  // v9.10.347.1: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
   // Today Weather must not fall back to GPS unless the user explicitly taps Use My Location.
   try{
     var z=String((settings&&settings.todayWeatherSavedZip)||'').trim();
@@ -21542,7 +21805,7 @@ function _clWeatherUpdatedLabel(c){
   return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+' ('+ageText+')';
 }
 function _clBuildWeatherUrl(lat,lon){
-  // v9.10.341: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
+  // v9.10.347.1: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
   // The app only needs current conditions + hourly forecast for rain/heat/wind guidance.
   return 'https://api.open-meteo.com/v1/forecast?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+
     '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=2'+
@@ -21550,7 +21813,7 @@ function _clBuildWeatherUrl(lat,lon){
     '&hourly=precipitation_probability,precipitation,rain,temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m';
 }
 
-// v9.10.341: Saved ZIP uses a direct local coordinate table first.
+// v9.10.347.1: Saved ZIP uses a direct local coordinate table first.
 // For Robert's normal area, 77340 always resolves directly to Huntsville coordinates.
 var CL_ZIP_COORDS={
   '77340':{lat:30.7235,lon:-95.5508,label:'Huntsville'},
@@ -21675,15 +21938,15 @@ function openTodayWeatherModal(){
   var html='<div class="modal-title" style="font-size:26px;margin-bottom:10px">☀️ Today\'s Weather</div><button type="button" onclick="hideModal();openHelpModal(\'weather\')" style="width:100%;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;border-radius:10px;padding:10px;font-size:14px;font-weight:800;margin-bottom:12px">How to use Today\'s Weather</button><div id="todayWeatherModalBody">'+_renderTodayWeatherBody(c,null,initialState)+'</div>';
   html+='<div class="modal-actions"><button class="modal-cancel" onclick="hideModal()">Close</button><button class="modal-ok" id="todayWeatherRefreshBtn" onclick="refreshTodayWeatherFromModal()">Refresh Weather</button></div>';
   showModal(html);
-  // v9.10.341: if cached weather is older than the user's refresh threshold, refresh automatically on open.
+  // v9.10.347.1: if cached weather is older than the user's refresh threshold, refresh automatically on open.
   // This keeps the weather pill, planner, and activity weather on the same fresh source without requiring a manual tap.
   if(stale){setTimeout(function(){
-    // v9.10.341: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
+    // v9.10.347.1: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
     refreshTodayWeatherFromModal(true,'zip');
   },100);}
 }
 
-// v9.10.341: Today's Weather banner must use the real weather state, not a stale/default activity flag.
+// v9.10.347.1: Today's Weather banner must use the real weather state, not a stale/default activity flag.
 function _clIsTodayWeatherAutomaticEnabled(c){
   try{
     if(typeof _clRestoreWeatherSettingsBackup==='function')_clRestoreWeatherSettingsBackup();
@@ -21778,7 +22041,7 @@ function useSavedZipWeather(){
   refreshTodayWeatherFromModal(false,'zip');
 }
 function refreshTodayWeatherFromModal(silent,source){
-  // v9.10.341: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
+  // v9.10.347.1: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
   source=(source==='location')?'location':'zip';
   if(source==='zip'){
     try{settings.todayWeatherSource='zip';settings.todayWeatherSavedZip=_clResolveSavedWeatherZip();localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
@@ -22099,7 +22362,8 @@ function tile(icon, count, label, accentColor, cardKey) {
       ? 'background:'+accentColor+'0d;border:2px dashed '+accentColor+'55;text-align:center;cursor:pointer;'
       : 'background:'+accentColor+'18;border:2.5px solid '+accentColor+';box-shadow:0 4px 14px '+accentColor+'44;text-align:center;cursor:pointer;';
     var countColor = isEmpty ? accentColor+'66' : accentColor;
-    return '<div class="stat-tile" style="'+tileStyle+'" onclick="toggleCardSection(\''+cardKey+'\')">'
+    var tileClick = (cardKey==='activities') ? 'showActivitiesHistory()' : 'toggleCardSection(\''+cardKey+'\')';
+    return '<div class="stat-tile" style="'+tileStyle+'" onclick="'+tileClick+'">'
          + '<div style="font-size:22px;font-weight:800;color:'+countColor+'">'+count+'</div>'
          + '<div style="font-size:11px;color:#4b5563;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+icon+' '+label+'</div>'
          + actionLabel
@@ -23647,7 +23911,7 @@ html+=lbBadge;
 html+='<div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">';
 html+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
 html+='<div>';
-html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.341</span></div>';
+html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.347.1</span></div>';
 html+='<div id="settingsVersionStatus" style="font-size:13px;color:#6b7280;margin-top:3px">Tap "Check for Updates" to see if a newer version is available</div>';
 html+='</div>';
 html+='<button onclick="checkForUpdates(true)" id="checkUpdateBtn" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">🔍 Check for Updates</button>';
@@ -23806,7 +24070,7 @@ html+='</div>';// close settings-section
   html+='</div></div>';
 })();
 
-// ── v9.10.341: Activity & Today's Weather Settings ─────────────────────────
+// ── v9.10.347.1: Activity & Today's Weather Settings ─────────────────────────
 (function(){
   _ensureActivityEnvSettings();
   var wm=settings.activityWeatherMode||'manual';
@@ -40925,7 +41189,7 @@ alert(`🏃 Activity Summary\n\n` +
 var VERSION_JSON_URL = 'https://cardiaclens.com/version.json';
 var VERSION_CHECK_KEY = 'CARDIACLENS_LAST_VERSION_CHECK';
 var VERSION_DISMISSED_KEY = 'CARDIACLENS_UPDATE_DISMISSED';
-var CURRENT_VERSION = 'v9.10.341';
+var CURRENT_VERSION = 'v9.10.347.1';
 var _latestVersionData = null; // cached from last fetch
 
 // Detect whether running as an installed Home Screen PWA on iOS
@@ -43425,7 +43689,7 @@ function _clMedIntelTime(rec){
   try{ return rec&&rec.approvedAt ? (new Date(rec.approvedAt).getTime()||0) : 0; }catch(e){ return 0; }
 }
 function _clCanonicalizeMedIntelStorage(){
-  // v9.10.341: one source of truth for Medication Intelligence.
+  // v9.10.347.1: one source of truth for Medication Intelligence.
   // Older code wrote/read both CLINBRIDGE_MED_INTEL and CARDIACLENS_MED_INTEL.
   // Merge both safely, keeping the newest approvedAt for each medicine+metric,
   // then write the same canonical object to both keys so old/new readers agree.
@@ -43477,7 +43741,7 @@ function _mipMarkWeeklyReviewComplete(){
     var stamp=new Date().toISOString();
     localStorage.setItem('CARDIACLENS_MIP_WEEKLY_REVIEWED_AT',stamp);
     if(!medIntelData||typeof medIntelData!=='object')medIntelData={};
-    medIntelData._weeklyReview={completedAt:stamp,version:'v9.10.341'};
+    medIntelData._weeklyReview={completedAt:stamp,version:'v9.10.347.1'};
     _mipSave();
   }catch(e){}
 }
@@ -43624,7 +43888,7 @@ function _mipRecordHistory(medName, metric, entry) {
 // or its approvedAt is 7+ days old. Returns one entry per medicine+metric,
 // plus a PP entry, in the same drug-class/name order as the MIP panel.
 function _mipDueItems() {
-  // v9.10.341: global weekly-review completion guard.
+  // v9.10.347.1: global weekly-review completion guard.
   // The per-threshold approvedAt values are still the source of truth, but this
   // prevents the red weekly-review card from reappearing immediately after a
   // version update/import when the user has already completed the full queue
@@ -50901,7 +51165,7 @@ function _showAskClarifyChips(options) {
 /* CardiacLens Secure Access Takeover v9.10.287
    Reliability pass: pointer-event tap handling, preserved app tab for email, exact cooldown thresholds. */
 (function(){
-  var VERSION='v9.10.341';
+  var VERSION='v9.10.347.1';
   var KEY='CL_SEC_KEY', COLOR='CL_SEC_COLOR', Q='CL_SEC_Q', A='CL_SEC_A', DONE='CL_SEC_DONE';
   var FAILS='CL_SEC_FAILS', COOL='CL_SEC_COOL_UNTIL';
   var COLORS={red:'#e53935',blue:'#1565c0',green:'#2e7d32',orange:'#e65100',purple:'#6a1b9a',teal:'#00695c',pink:'#c2185b',gold:'#f57f17'};
@@ -51059,7 +51323,7 @@ function _showAskClarifyChips(options) {
   // attachment state. This review screen never auto-attaches images; it gives the
   // user a visible message to copy, then opens email from a direct button tap.
   function installFeedbackReviewOverrides(){
-    function currentVersion(){return (typeof CURRENT_VERSION!=='undefined')?CURRENT_VERSION:'v9.10.341';}
+    function currentVersion(){return (typeof CURRENT_VERSION!=='undefined')?CURRENT_VERSION:'v9.10.347.1';}
     function deviceLine(){try{return (navigator.userAgent||'').slice(0,180);}catch(e){return '';}}
     function feedbackStamp(){try{var d=new Date();function z(n){return String(n).padStart(2,'0');}return 'ID '+d.getFullYear()+z(d.getMonth()+1)+z(d.getDate())+'-'+z(d.getHours())+z(d.getMinutes())+z(d.getSeconds());}catch(e){return 'ID '+Date.now();}}
     function supportPayload(){
@@ -51145,7 +51409,7 @@ function _showAskClarifyChips(options) {
 
 
 
-  // v9.10.341: Final tappable email contact workflow
+  // v9.10.347.1: Final tappable email contact workflow
   // Purpose: keep feedback simple while still opening the user's default mail app.
   // Primary action is a real mailto: link to robert@cardiaclens.com. Copy remains as fallback.
   (function installPlainSupportContactOverride(){
@@ -51273,7 +51537,7 @@ function _showAskClarifyChips(options) {
   function boot(){installCss();takeoverFunctions();var c=cfg();if(c.active)show();document.addEventListener('click',function(e){var t=e.target;if(t&&(t.id==='clPrivacyLockPill'||(t.closest&&t.closest('#clPrivacyLockPill')))){e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation();unlocked=false;show();return false;}},true);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,100);});else setTimeout(boot,100);setTimeout(boot,1000);setTimeout(boot,4000);
 })();
-// ── v9.10.341: Weather hardening override ─────────────────────────────
+// ── v9.10.347.1: Weather hardening override ─────────────────────────────
 // Purpose: keep Today's Weather simple and predictable: Saved ZIP -> coordinates -> Open-Meteo -> render.
 // No GPS unless Use My Location is explicitly tapped. Older weather code remains below this override but these
 // same global function names take precedence for buttons, modal open, planner, and activity weather.

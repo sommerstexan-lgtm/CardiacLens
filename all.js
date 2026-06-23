@@ -8042,13 +8042,13 @@ function getDefaultActivityContext(activity){
 }
 function buildActivityContextHTML(){
   var h='<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin:12px 0">';
-  h+='<div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:8px">📌 Activity Context</div>';
+  h+='<div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:8px">❤️ Cardiac Context</div>';
   h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">';
   [['indoor','Indoor'],['outdoor','Outdoor'],['mixed','Mixed']].forEach(function(x){
     h+='<button type="button" id="actCtx_'+x[0]+'" onclick="selectActivityContext(\''+x[0]+'\')" style="border:2px solid #cbd5e1;background:#fff;color:#0f172a;border-radius:8px;padding:10px 6px;font-size:14px;font-weight:700;cursor:pointer">'+x[1]+'</button>';
   });
   h+='</div>';
-  h+='<div style="font-size:12px;color:#64748b;margin-top:6px">Indoor usually does not need rain/heat. Mixed means travel plus an indoor stop, like a doctor visit.</div>';
+  h+='<div style="font-size:12px;color:#64748b;margin-top:6px">Indoor captures room/standing context. Outdoor captures weather. Mixed captures travel plus an indoor stop, like a doctor visit.</div>';
   h+='</div>';
   return h;
 }
@@ -8058,20 +8058,31 @@ function renderActivityContextButtons(){
 }
 function _getActiveJourney(){try{return JSON.parse(localStorage.getItem('CB_ACTIVE_JOURNEY')||'null');}catch(e){return null;}}
 function _setActiveJourney(j){try{if(j)localStorage.setItem('CB_ACTIVE_JOURNEY',JSON.stringify(j));else localStorage.removeItem('CB_ACTIVE_JOURNEY');}catch(e){}}
+function clearActiveJourney(){
+  _setActiveJourney(null);
+  selectedJourneyId=null;
+  selectedJourneyName='';
+  var name=document.getElementById('journeyNameInput');
+  if(name)name.value='';
+  var wrap=document.getElementById('activeJourneyNotice');
+  if(wrap)wrap.style.display='none';
+}
 function buildJourneyHTML(){
   var active=_getActiveJourney();
   var h='<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin-bottom:12px">';
   h+='<div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:6px">🧭 Journey / Trip</div>';
-  if(active){h+='<div style="background:#eff6ff;border-radius:8px;padding:8px;margin-bottom:8px;font-size:13px;color:#1e40af;font-weight:700">Active journey: '+active.name+'</div>';}
+  if(active){
+    h+='<div id="activeJourneyNotice" style="background:#eff6ff;border-radius:8px;padding:8px;margin-bottom:8px;font-size:13px;color:#1e40af;font-weight:700">Active journey available: '+active.name+'<br><span style="font-weight:500;color:#475569">Only used if you choose Continue/Return/Complete below.</span><br><button type="button" onclick="clearActiveJourney()" style="margin-top:6px;background:#fff;color:#dc2626;border:1px solid #fecaca;border-radius:6px;padding:5px 8px;font-size:12px;font-weight:700">Clear active journey</button></div>';
+  }
   h+='<select id="journeyRoleSelect" class="modal-input" onchange="handleJourneyRoleSelection()" style="font-size:16px;margin-bottom:8px">';
-  h+='<option value="single">Single activity</option>';
-  h+='<option value="outbound">Start journey — outbound segment</option>';
-  h+='<option value="segment">Continue journey — middle segment</option>';
-  h+='<option value="return">Continue journey — return segment</option>';
-  h+='<option value="complete">Complete journey with this segment</option>';
+  h+='<option value="single">Single activity / destination only</option>';
+  h+='<option value="outbound">Start new journey — outbound segment</option>';
+  h+='<option value="segment">Continue active journey — middle segment</option>';
+  h+='<option value="return">Continue active journey — return segment</option>';
+  h+='<option value="complete">Complete active journey with this segment</option>';
   h+='</select>';
-  h+='<input type="text" id="journeyNameInput" class="modal-input" placeholder="Journey name (optional, e.g. Doctor appointment)" oninput="selectedJourneyName=this.value.trim()" />';
-  h+='<div style="font-size:12px;color:#64748b;margin-top:6px">Use this when one real-world trip has multiple parts: ride there, appointment, ride home.</div>';
+  h+='<input type="text" id="journeyNameInput" class="modal-input" placeholder="Journey name only if this is a multi-part trip" oninput="selectedJourneyName=this.value.trim()" />';
+  h+='<div style="font-size:12px;color:#64748b;margin-top:6px">Single activity saves as its own activity. Journey is only for multi-part trips: ride there, appointment, ride home.</div>';
   h+='</div>';
   return h;
 }
@@ -8080,6 +8091,16 @@ function handleJourneyRoleSelection(){
   selectedJourneyRole=sel?sel.value:'single';
   var active=_getActiveJourney();
   var name=document.getElementById('journeyNameInput');
+  if(selectedJourneyRole==='single'){
+    selectedJourneyId=null;
+    selectedJourneyName=(name&&name.value?name.value.trim():'');
+    return;
+  }
+  if(selectedJourneyRole==='outbound'){
+    selectedJourneyId=null;
+    selectedJourneyName=(name&&name.value?name.value.trim():'');
+    return;
+  }
   if(active&&name&&!name.value){name.value=active.name;selectedJourneyName=active.name;selectedJourneyId=active.id;}
 }
 function getJourneyFormData(activityName){
@@ -8088,16 +8109,20 @@ function getJourneyFormData(activityName){
   var active=_getActiveJourney();
   var name=(nameEl&&nameEl.value.trim())||selectedDestination||activityName||'Journey';
   var id=null;
-  if(role==='single')return {role:'single',journeyId:null,journeyName:'',active:false};
+  if(role==='single')return {role:'single',journeyId:null,journeyName:(nameEl&&nameEl.value.trim())||'',active:false};
+  if(role==='outbound'){
+    id='journey_'+Date.now()+'_'+Math.floor(Math.random()*1000);
+    _setActiveJourney({id:id,name:name,startedAt:new Date().toISOString()});
+    return {role:role,journeyId:id,journeyName:name,active:true};
+  }
   if(active){id=active.id;name=active.name||name;}
   else{id='journey_'+Date.now()+'_'+Math.floor(Math.random()*1000);}
-  if(role==='outbound'&&!active){_setActiveJourney({id:id,name:name,startedAt:new Date().toISOString()});}
   if(role==='complete'){_setActiveJourney(null);}
   return {role:role,journeyId:id,journeyName:name,active:(role!=='complete')};
 }
 
 
-// Weather settings persistence guard (v9.10.341)
+// Weather settings persistence guard (v9.10.347.1)
 var CARDIACLENS_WEATHER_SETTINGS_KEY='CARDIACLENS_WEATHER_SETTINGS';
 function _clMergeDestinations(a,b){
   var out=[],seen={};
@@ -8142,7 +8167,7 @@ function _clWeatherSettingsSnapshot(){
   };}catch(e){return null;}
 }
 function _clSaveWeatherSettingsBackup(){
-  // v9.10.341: current saved settings win; backup only fills missing weather fields.
+  // v9.10.347.1: current saved settings win; backup only fills missing weather fields.
   try{
     var snap=_clWeatherSettingsSnapshot(); if(!snap)return;
     var prior=null;
@@ -8164,14 +8189,14 @@ function _clSaveWeatherSettingsBackup(){
   }catch(e){}
 }
 function _clRestoreWeatherSettingsBackup(){
-  // v9.10.341: restore defensively. Blank/default backup fields must not erase current settings.
+  // v9.10.347.1: restore defensively. Blank/default backup fields must not erase current settings.
   try{
     var raw=localStorage.getItem(CARDIACLENS_WEATHER_SETTINGS_KEY); if(!raw)return;
     var w=JSON.parse(raw); if(!w||typeof w!=='object')return;
     var fields=['activityWeatherMode','activityEnvironmentalMode','activityWeatherStoreSnapshot','activityWeatherRainThresholdPct','activityWeatherDefaultWindowMin','activityWeatherAskOnOutdoor','activityWeatherStoreCoordinates','todayWeatherPillEnabled','todayWeatherCacheMinutes','todayWeatherSavedZip','todayWeatherSource','pickupPlannerDefaultDate','activityWindows','activityDestinations'];
     fields.forEach(function(k){
       if(w[k]===undefined||w[k]===null)return;
-      // v9.10.341: current Saved ZIP settings must not be overwritten by older backup values.
+      // v9.10.347.1: current Saved ZIP settings must not be overwritten by older backup values.
       // Backup is only a fill-in source, not the authority when current settings are explicit.
       if(k==='todayWeatherSource'){
         var curSource=settings&&settings.todayWeatherSource;
@@ -8211,7 +8236,7 @@ function _ensureActivityEnvSettings(){
     var legacyNames={'Doctor':true,'Store':true,'Church':true,'Aggarwala':true,'HEB':true};
     settings.activityDestinations=(settings.activityDestinations||[]).filter(function(d){return d&&d.label&&!legacyNames[d.label];});
     settings.activityDestinationLegacyCleanupV309=true;
-    // v9.10.341: do not write defaults from _ensureActivityEnvSettings().
+    // v9.10.347.1: do not write defaults from _ensureActivityEnvSettings().
     // This function may run during startup before saved settings are loaded.
   }
   // v9.10.321: no baked-in destinations. Users add their own.
@@ -8421,6 +8446,156 @@ function getActivityEnvironmentFormData(){
   var other=document.getElementById('envCtxOther');
   return {mode:mode,destination:selectedDestination||'',outsideWindowLabel:selectedActivityWindow||'',outsideWindowMinutes:selectedActivityWindowMinutes||null,manualConditionBand:selectedTempBand,manualEnvironmentFactors:manualFactors,manualEnvironmentOther:(other?other.value.trim():''),weatherSnapshot:((mode==='internet'&&settings.activityWeatherStoreSnapshot!==false)?activityEnvironmentSnapshot:null),contextSnapshot:getActivityEventContextSnapshot(document.getElementById('activitySelect')?document.getElementById('activitySelect').value:'')};
 }
+
+
+
+// v9.10.347.1 KISS: Cardiac Context display helpers (display only; no save/storage changes)
+function clActivityEsc(v){
+  return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
+}
+function clActivityWeatherText(a){
+  var es=(a&&a.environmentalSnapshot)||{};
+  var ws=es.weatherSnapshot||{};
+  var bits=[];
+  if(ws.summary) bits.push(ws.summary);
+  if(ws.heatIndexF!==null&&ws.heatIndexF!==undefined) bits.push('Feels like '+Math.round(ws.heatIndexF)+'°');
+  if(ws.tempF!==null&&ws.tempF!==undefined) bits.push('Temp '+Math.round(ws.tempF)+'°');
+  if(ws.rainChancePct!==null&&ws.rainChancePct!==undefined) bits.push('Rain '+Math.round(ws.rainChancePct)+'%');
+  if(ws.windMph!==null&&ws.windMph!==undefined) bits.push('Wind '+Math.round(ws.windMph)+' mph'+(ws.windDir?' '+ws.windDir:''));
+  if(!bits.length&&a&&a.outdoorTempF) bits.push('Manual outdoor estimate '+Math.round(a.outdoorTempF)+'°');
+  return bits.join(' · ');
+}
+function clActivityContextLines(a){
+  var lines=[];
+  if(!a) return lines;
+  var es=a.environmentalSnapshot||{};
+  var cs=a.eventContextSnapshot||es.contextSnapshot||{};
+  var manual=[];
+  if(es.mode) manual.push('Mode: '+es.mode);
+  if(es.manualEnvironmentFactors&&es.manualEnvironmentFactors.length) manual=manual.concat(es.manualEnvironmentFactors);
+  if(es.manualEnvironmentOther) manual.push(es.manualEnvironmentOther);
+  if(manual.length) lines.push('Environment: '+manual.join(', '));
+  var w=clActivityWeatherText(a);
+  if(w) lines.push('Weather: '+w);
+  if(cs.hydration&&cs.hydration.todayOz!==null&&cs.hydration.todayOz!==undefined) lines.push('Fluid today at save: '+cs.hydration.todayOz+' oz');
+  if(cs.recentBP) lines.push('Recent BP: '+cs.recentBP.systolic+'/'+cs.recentBP.diastolic+' HR '+cs.recentBP.pulse+(cs.recentBP.time?' at '+cs.recentBP.time:''));
+  if(cs.recentSymptoms&&cs.recentSymptoms.length){
+    var sx=cs.recentSymptoms.map(function(s){return (s.symptom||s.name||'symptom')+(s.severity?' sev '+s.severity:'')+(s.time?' at '+s.time:'');}).join('; ');
+    lines.push('Recent symptoms: '+sx);
+  }
+  return lines;
+}
+
+function clActivityFindLinkedBP(a, timing){
+  if(!a) return null;
+  try{
+    if(typeof B!=='undefined' && B && B.length && a.id){
+      for(var i=B.length-1;i>=0;i--){
+        if(B[i] && B[i].activityId===a.id && B[i].activityTiming===timing) return B[i];
+      }
+    }
+  }catch(e){}
+  return null;
+}
+function clActivityAnalysisCompleteness(a){
+  var captured=[];
+  var missing=[];
+  if(!a){return {captured:captured,missing:['Activity record'],percent:0};}
+  var es=a.environmentalSnapshot||{};
+  var cs=a.eventContextSnapshot||es.contextSnapshot||{};
+  var weather=clActivityWeatherText(a);
+  var before=clActivityFindLinkedBP(a,'before');
+  var after=clActivityFindLinkedBP(a,'after');
+
+  if(a.duration) captured.push('Duration'); else missing.push('Duration');
+  if(es.mode||a.activityContext||a.environmentalMode) captured.push('Environment mode'); else missing.push('Environment mode');
+  if(weather) captured.push('Weather snapshot'); else missing.push('Weather snapshot');
+  if(cs.hydration && cs.hydration.todayOz!==null && cs.hydration.todayOz!==undefined) captured.push('Fluid total at save'); else missing.push('Fluid total at save');
+  if(cs.recentBP) captured.push('Recent BP/HR'); else missing.push('Recent BP/HR');
+  if(before) captured.push('Before activity BP'); else missing.push('Before activity BP');
+  if(after) captured.push('After activity / recovery BP'); else missing.push('After activity / recovery BP');
+  if(cs.recentSymptoms && cs.recentSymptoms.length) captured.push('Recent symptoms'); else missing.push('Symptoms');
+  if(a.notes) captured.push('Notes'); else missing.push('Notes');
+
+  var total=captured.length+missing.length;
+  var pct=total?Math.round((captured.length/total)*100):0;
+  return {captured:captured,missing:missing,percent:pct,beforeBP:before,afterBP:after};
+}
+function clActivityCompletenessHtml(a){
+  var c=clActivityAnalysisCompleteness(a);
+  var cap=c.captured.length?c.captured.map(clActivityEsc).join(', '):'None';
+  var miss=c.missing.length?c.missing.map(clActivityEsc).join(', '):'None';
+  var html='<div style="background:#fff7ed;border-left:4px solid #f59e0b;border-radius:10px;padding:14px;margin-bottom:12px;color:#7c2d12;font-size:15px;line-height:1.6">';
+  html+='<strong>Analysis Completeness</strong><br>';
+  html+='<div style="font-size:28px;font-weight:900;margin:4px 0">'+c.percent+'%</div>';
+  html+='<strong>Captured:</strong> '+cap+'<br>';
+  html+='<strong>Missing:</strong> '+miss+'<br>';
+  if(c.missing.indexOf('Before activity BP')>=0 || c.missing.indexOf('After activity / recovery BP')>=0){
+    html+='<div style="margin-top:6px;font-weight:700">Tip: Before/after BP makes activity analysis much stronger.</div>';
+  }
+  html+='</div>';
+  return html;
+}
+function clActivityCompletenessText(a){
+  var c=clActivityAnalysisCompleteness(a);
+  return 'Analysis completeness '+c.percent+'%. Captured: '+(c.captured.length?c.captured.join(', '):'none')+'. Missing: '+(c.missing.length?c.missing.join(', '):'none')+'.';
+}
+
+function _clFindHistoricalActivity(dateKey,timeKey){
+  var list=(typeof _actHistAllData!=='undefined'&&_actHistAllData)||[];
+  for(var i=0;i<list.length;i++){if((list[i]._date||getTodayKey())===dateKey&&list[i].t===timeKey)return list[i];}
+  return null;
+}
+function _clActivityContextHtml(a){
+  var lines=clActivityContextLines(a);
+  if(!lines.length)return '';
+  var html='<details style="margin-top:12px;background:#ecfeff;border-left:4px solid #0891b2;border-radius:8px;padding:10px;color:#164e63;font-size:14px">';
+  html+='<summary style="font-weight:900;cursor:pointer">▼ Cardiac Context</summary>';
+  html+='<div style="margin-top:8px;line-height:1.6">'+lines.map(clActivityEsc).join('<br>')+'</div>';
+  html+='</details>';
+  return html;
+}
+function openActivityContextDetailsFor(a){
+  if(!a){alert('Activity not found');return;}
+  var lines=clActivityContextLines(a);
+  var html='<div class="modal-title">Cardiac Context Details</div>';
+  html+='<div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-bottom:12px">';
+  html+='<div style="font-size:22px;font-weight:900;color:#0f172a;margin-bottom:4px">'+clActivityEsc(a.activity||'Activity')+'</div>';
+  html+='<div style="font-size:15px;color:#475569">'+clActivityEsc(a._date||a.date||'')+' '+clActivityEsc(a.t||'')+' · '+clActivityEsc(a.duration||'')+' min · '+clActivityEsc(a.exertion||'')+' exertion</div>';
+  html+='</div>';
+  html+='<div style="background:#ecfeff;border-left:4px solid #0891b2;border-radius:10px;padding:14px;margin-bottom:12px;color:#164e63;font-size:15px;line-height:1.6">';
+  html+='<strong>Saved Context Snapshot</strong><br>'+(lines.length?lines.map(clActivityEsc).join('<br>'):'No context snapshot saved for this activity.');
+  html+='</div>';
+  html+=clActivityCompletenessHtml(a);
+  html+='<button class="modal-ok" onclick="askActivityContextForCurrentDetail()" style="width:100%;margin-top:8px;background:#0f2a4a">💬 Ask About This Activity</button>';
+  html+='<button class="modal-cancel" onclick="hideModal()" style="width:100%;margin-top:8px">Close</button>';
+  window._clCurrentActivityContextDetail=a;
+  showModal(html);
+}
+function openActivityContextDetails(i){
+  var a=(typeof A!=='undefined'&&A&&A[i])?A[i]:null;
+  openActivityContextDetailsFor(a);
+}
+function openActivityContextDetailsHistorical(dateKey,timeKey){
+  openActivityContextDetailsFor(_clFindHistoricalActivity(dateKey,timeKey));
+}
+function askActivityContextFor(a){
+  if(!a){alert('Activity not found');return;}
+  var q='Explain this saved activity using only my CardiacLens data. Activity: '+(a.activity||'Activity')+'. Logged: '+(a._date||a.date||'')+' '+(a.t||'unknown time')+'. Include activity duration, environment/weather, fluid total at save, recent BP/HR, symptoms, notes, before/after BP if available, and analysis completeness. '+clActivityCompletenessText(a)+' Do not diagnose; summarize what is known, what is missing, and what would be useful to discuss with my doctor.';
+  try{hideModal();}catch(e){}
+  openAskPanel();
+  setTimeout(function(){var inp=document.getElementById('askInput');if(inp){inp.value=q;inp.style.height='120px';}if(typeof submitAskQuestion==='function')submitAskQuestion();},350);
+}
+function askActivityContext(i){
+  askActivityContextFor((typeof A!=='undefined'&&A&&A[i])?A[i]:null);
+}
+function askActivityContextHistorical(dateKey,timeKey){
+  askActivityContextFor(_clFindHistoricalActivity(dateKey,timeKey));
+}
+function askActivityContextForCurrentDetail(){
+  askActivityContextFor(window._clCurrentActivityContextDetail||null);
+}
+
 
 function _isActivityFinishedForSave(){
   var timerDisplay=document.getElementById('timerDisplay');
@@ -9444,6 +9619,12 @@ function _actHistRenderReadings(data){
     h+='<div style="margin-top:12px;padding:12px;background:#f0fdf4;border-left:4px solid '+exertionColor+';border-radius:6px">';
     h+='<div style="font-size:16px;font-weight:600;color:'+exertionColor+'">'+r.exertion+' Exertion</div></div>';
     if(r.notes){ h+='<div style="margin-top:12px;padding:12px;background:#f3f4f6;border-radius:6px;font-size:16px;color:#374151"><strong>Notes:</strong> '+r.notes+'</div>'; }
+    var ctxHtml=_clActivityContextHtml(r);
+    if(ctxHtml){
+      h+=ctxHtml;
+      h+='<button onclick="openActivityContextDetailsHistorical(\''+entryDate+'\',\''+r.t+'\')" style="margin-top:8px;background:#0891b2;color:#fff;border:none;border-radius:8px;padding:8px 10px;font-size:13px;font-weight:800;cursor:pointer">🔎 View Context Details</button>';
+      h+='<button onclick="askActivityContextHistorical(\''+entryDate+'\',\''+r.t+'\')" style="margin-top:8px;margin-left:6px;background:#0f2a4a;color:#fff;border:none;border-radius:8px;padding:8px 10px;font-size:13px;font-weight:800;cursor:pointer">💬 Ask About Activity</button>';
+    }
     h+='</div>';
   }
   document.getElementById('activity').innerHTML = h || '<p style="color:#6b7280;text-align:center;font-size:16px;padding:20px">No activities match the current filters</p>';
@@ -9469,7 +9650,85 @@ function jumpToActHistDate(dateStr){
 }
 
 function editActivityHistorical(dateKey, timeKey){
-  alert('Editing historical activities is not yet available.');
+  var storageKey='BP_TRACKER_'+dateKey;
+  var raw=localStorage.getItem(storageKey);
+  if(!raw){ alert('Could not find data for '+dateKey); return; }
+  var dayData=JSON.parse(raw);
+  var arr=dayData.activities||dayData.A||[];
+  var idx=-1;
+  for(var i=0;i<arr.length;i++){ if(arr[i].t===timeKey){ idx=i; break; } }
+  if(idx===-1){ alert('Could not find that activity entry.'); return; }
+  var entry=arr[idx];
+  var html='<div class="modal-title">Edit Activity</div>';
+  html+='<div style="margin-bottom:16px">';
+  html+='<label style="display:block;font-size:16px;font-weight:600;margin-bottom:8px">Activity Type:</label>';
+  html+='<input type="text" id="editHistActivityType" class="modal-input" value="'+(entry.activity||'')+'" placeholder="e.g., Walking, Cooking" />';
+  html+='</div>';
+  html+='<div style="margin-bottom:16px">';
+  html+='<label style="display:block;font-size:16px;font-weight:600;margin-bottom:8px">Duration (minutes):</label>';
+  html+='<input type="number" inputmode="numeric" id="editHistActivityDuration" class="modal-input" value="'+(entry.duration||'')+'" step="1" min="1" max="999" onblur="_sanitizeNumericInput(this)"/>';
+  html+='</div>';
+  html+='<div style="margin-bottom:16px">';
+  html+='<label style="display:block;font-size:16px;font-weight:600;margin-bottom:8px">Exertion Level:</label>';
+  html+='<select id="editHistActivityExertion" class="modal-input">';
+  var exertions=['Light','Moderate','Vigorous'];
+  for(var j=0;j<exertions.length;j++){
+    html+='<option value="'+exertions[j]+'"'+(exertions[j]===entry.exertion?' selected':'')+'>'+exertions[j]+'</option>';
+  }
+  html+='</select>';
+  html+='</div>';
+  html+='<div style="margin-bottom:16px">';
+  html+='<label style="display:block;font-size:16px;font-weight:600;margin-bottom:8px">Time:</label>';
+  html+='<input type="time" id="editHistActivityTime" class="modal-input" value="'+(entry.t||'')+'" />';
+  html+='</div>';
+  html+='<div style="margin-bottom:16px">';
+  html+='<label style="display:block;font-size:16px;font-weight:600;margin-bottom:8px">Notes (optional):</label>';
+  html+='<textarea id="editHistActivityNotes" class="modal-input" rows="3" placeholder="How did you feel?">'+(entry.notes||'')+'</textarea>';
+  html+='</div>';
+  html+='<div class="modal-actions">';
+  html+='<button class="modal-cancel" onclick="hideModal()">Cancel</button>';
+  html+='<button class="modal-ok" onclick="saveEditedActivityHistorical(\''+dateKey+'\',\''+timeKey+'\')">Save Changes</button>';
+  html+='</div>';
+  showModal(html);
+}
+
+function saveEditedActivityHistorical(dateKey, timeKey){
+  var activityType=document.getElementById('editHistActivityType').value.trim();
+  var duration=parseInt(document.getElementById('editHistActivityDuration').value);
+  var exertion=document.getElementById('editHistActivityExertion').value;
+  var time=document.getElementById('editHistActivityTime').value;
+  var notes=document.getElementById('editHistActivityNotes').value.trim();
+  if(!activityType){ _showInlineError('⚠️ Please enter activity type'); return; }
+  if(!duration||duration<1){ _showInlineError('⚠️ Please enter a valid duration'); return; }
+  if(!time){ _showInlineError('⚠️ Please enter a valid time'); return; }
+  var storageKey='BP_TRACKER_'+dateKey;
+  var raw=localStorage.getItem(storageKey);
+  if(!raw){ alert('Could not find data for '+dateKey); return; }
+  var dayData=JSON.parse(raw);
+  var arr=dayData.activities||dayData.A||[];
+  var idx=-1;
+  for(var i=0;i<arr.length;i++){ if(arr[i].t===timeKey){ idx=i; break; } }
+  if(idx===-1){ alert('Could not find that activity entry.'); return; }
+  arr[idx].activity=activityType;
+  arr[idx].duration=duration;
+  arr[idx].exertion=exertion;
+  arr[idx].t=time;
+  arr[idx].notes=notes;
+  dayData.activities=arr; dayData.A=arr;
+  localStorage.setItem(storageKey,JSON.stringify(dayData));
+  if(dateKey===getTodayKey()){
+    for(var ai=0;ai<A.length;ai++){ if(A[ai].t===timeKey){ A[ai]=arr[idx]; break; } }
+  }
+  for(var hi=0;hi<_actHistAllData.length;hi++){
+    if(_actHistAllData[hi]._date===dateKey && _actHistAllData[hi].t===timeKey){
+      _actHistAllData[hi]=Object.assign({}, arr[idx], {_date:dateKey});
+      break;
+    }
+  }
+  _actHistRenderReadings(_actHistAllData);
+  renderActivityChart();
+  completeAndCloseModal();
+  alert('✓ Activity entry updated');
 }
 function deleteActivityHistorical(dateKey, timeKey){
   if(!confirm('Delete activity entry from '+dateKey+' at '+timeKey+'?')) return;
@@ -9532,15 +9791,11 @@ for(var i=activityData.length-1;i>=0;i--){
   h+='<div style="margin-top:12px;padding:12px;background:#f0fdf4;border-left:4px solid '+exertionColor+';border-radius:6px">';
   h+='<div style="font-size:16px;font-weight:600;color:'+exertionColor+'">'+r.exertion+' Exertion</div></div>';
   if(r.notes){ h+='<div style="margin-top:12px;padding:12px;background:#f3f4f6;border-radius:6px;font-size:16px;color:#374151"><strong>Notes:</strong> '+r.notes+'</div>'; }
-  if(r.environmentalSnapshot){
-    var es=r.environmentalSnapshot;
-    var parts=[];
-    if(es.manualEnvironmentFactors&&es.manualEnvironmentFactors.length)parts.push('Context: '+es.manualEnvironmentFactors.join(', '));
-    if(es.manualEnvironmentOther)parts.push('Other: '+es.manualEnvironmentOther);
-    if(es.weatherSnapshot){var ws=es.weatherSnapshot;parts.push('Weather: '+(ws.summary||'captured')+(ws.heatIndexF!==null&&ws.heatIndexF!==undefined?' · Feels like '+Math.round(ws.heatIndexF)+'°':''));}
-    if(es.contextSnapshot&&es.contextSnapshot.hydration&&es.contextSnapshot.hydration.todayOz!==null)parts.push('Fluid today at save: '+es.contextSnapshot.hydration.todayOz+' oz');
-    if(es.contextSnapshot&&es.contextSnapshot.recentBP)parts.push('Recent BP: '+es.contextSnapshot.recentBP.systolic+'/'+es.contextSnapshot.recentBP.diastolic+' HR '+es.contextSnapshot.recentBP.pulse);
-    if(parts.length)h+='<div style="margin-top:12px;padding:12px;background:#ecfeff;border-left:4px solid #0891b2;border-radius:6px;font-size:14px;color:#164e63"><strong>Activity Context:</strong><br>'+parts.join('<br>')+'</div>';
+  var parts=clActivityContextLines(r);
+  if(parts.length){
+    h+='<div style="margin-top:12px;padding:12px;background:#ecfeff;border-left:4px solid #0891b2;border-radius:6px;font-size:14px;color:#164e63"><strong>Activity Context:</strong><br>'+parts.slice(0,4).map(clActivityEsc).join('<br>')+'</div>';
+    h+='<button onclick="openActivityContextDetails('+i+')" style="margin-top:8px;background:#0891b2;color:#fff;border:none;border-radius:8px;padding:8px 10px;font-size:13px;font-weight:800;cursor:pointer">🔎 View Context Details</button>';
+    h+='<button onclick="askActivityContext('+i+')" style="margin-top:8px;margin-left:6px;background:#0f2a4a;color:#fff;border:none;border-radius:8px;padding:8px 10px;font-size:13px;font-weight:800;cursor:pointer">💬 Ask About Activity</button>';
   }
   h+='</div>';
 }
@@ -15942,7 +16197,7 @@ function _clWindCompass(deg){
 function _clGetWeatherCache(){try{var raw=localStorage.getItem(TODAY_WEATHER_CACHE_KEY);return raw?JSON.parse(raw):null;}catch(e){return null;}}
 function _clSetWeatherCache(obj){try{localStorage.setItem(TODAY_WEATHER_CACHE_KEY,JSON.stringify(obj));}catch(e){}}
 function _clResolveSavedWeatherZip(){
-  // v9.10.341: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
+  // v9.10.347.1: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
   // Today Weather must not fall back to GPS unless the user explicitly taps Use My Location.
   try{
     var z=String((settings&&settings.todayWeatherSavedZip)||'').trim();
@@ -15972,7 +16227,7 @@ function _clWeatherUpdatedLabel(c){
   return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+' ('+ageText+')';
 }
 function _clBuildWeatherUrl(lat,lon){
-  // v9.10.341: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
+  // v9.10.347.1: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
   // The app only needs current conditions + hourly forecast for rain/heat/wind guidance.
   return 'https://api.open-meteo.com/v1/forecast?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+
     '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=2'+
@@ -15980,7 +16235,7 @@ function _clBuildWeatherUrl(lat,lon){
     '&hourly=precipitation_probability,precipitation,rain,temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m';
 }
 
-// v9.10.341: Saved ZIP uses a direct local coordinate table first.
+// v9.10.347.1: Saved ZIP uses a direct local coordinate table first.
 // For Robert's normal area, 77340 always resolves directly to Huntsville coordinates.
 var CL_ZIP_COORDS={
   '77340':{lat:30.7235,lon:-95.5508,label:'Huntsville'},
@@ -16105,15 +16360,15 @@ function openTodayWeatherModal(){
   var html='<div class="modal-title" style="font-size:26px;margin-bottom:10px">☀️ Today\'s Weather</div><button type="button" onclick="hideModal();openHelpModal(\'weather\')" style="width:100%;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;border-radius:10px;padding:10px;font-size:14px;font-weight:800;margin-bottom:12px">How to use Today\'s Weather</button><div id="todayWeatherModalBody">'+_renderTodayWeatherBody(c,null,initialState)+'</div>';
   html+='<div class="modal-actions"><button class="modal-cancel" onclick="hideModal()">Close</button><button class="modal-ok" id="todayWeatherRefreshBtn" onclick="refreshTodayWeatherFromModal()">Refresh Weather</button></div>';
   showModal(html);
-  // v9.10.341: if cached weather is older than the user's refresh threshold, refresh automatically on open.
+  // v9.10.347.1: if cached weather is older than the user's refresh threshold, refresh automatically on open.
   // This keeps the weather pill, planner, and activity weather on the same fresh source without requiring a manual tap.
   if(stale){setTimeout(function(){
-    // v9.10.341: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
+    // v9.10.347.1: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
     refreshTodayWeatherFromModal(true,'zip');
   },100);}
 }
 
-// v9.10.341: Today's Weather banner must use the real weather state, not a stale/default activity flag.
+// v9.10.347.1: Today's Weather banner must use the real weather state, not a stale/default activity flag.
 function _clIsTodayWeatherAutomaticEnabled(c){
   try{
     if(typeof _clRestoreWeatherSettingsBackup==='function')_clRestoreWeatherSettingsBackup();
@@ -16208,7 +16463,7 @@ function useSavedZipWeather(){
   refreshTodayWeatherFromModal(false,'zip');
 }
 function refreshTodayWeatherFromModal(silent,source){
-  // v9.10.341: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
+  // v9.10.347.1: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
   source=(source==='location')?'location':'zip';
   if(source==='zip'){
     try{settings.todayWeatherSource='zip';settings.todayWeatherSavedZip=_clResolveSavedWeatherZip();localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
@@ -16529,7 +16784,8 @@ function tile(icon, count, label, accentColor, cardKey) {
       ? 'background:'+accentColor+'0d;border:2px dashed '+accentColor+'55;text-align:center;cursor:pointer;'
       : 'background:'+accentColor+'18;border:2.5px solid '+accentColor+';box-shadow:0 4px 14px '+accentColor+'44;text-align:center;cursor:pointer;';
     var countColor = isEmpty ? accentColor+'66' : accentColor;
-    return '<div class="stat-tile" style="'+tileStyle+'" onclick="toggleCardSection(\''+cardKey+'\')">'
+    var tileClick = (cardKey==='activities') ? 'showActivitiesHistory()' : 'toggleCardSection(\''+cardKey+'\')';
+    return '<div class="stat-tile" style="'+tileStyle+'" onclick="'+tileClick+'">'
          + '<div style="font-size:22px;font-weight:800;color:'+countColor+'">'+count+'</div>'
          + '<div style="font-size:11px;color:#4b5563;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+icon+' '+label+'</div>'
          + actionLabel
@@ -42645,6 +42901,7 @@ function buildAskContext(dateFrom, dateTo) {
         if (act.t) line += ' at ' + act.t;
         if (act.notes) line += ' note:"' + act.notes + '"';
         ctx.push(line);
+        addActivityAskContextLines(ctx, act, '    Activity '+(i+1));
       });
     } else { ctx.push('Activities today: none logged'); }
   } catch(e) {}
@@ -43025,6 +43282,7 @@ function buildAskContext(dateFrom, dateTo) {
         var aLine = '  ['+a._date+'] '+(a.activity||'activity')+(a.duration?' '+a.duration+' min':'')+(a.exertion?' exertion:'+a.exertion:'');
         if(a.notes) aLine += ' note:"'+a.notes+'"';
         ctx.push(aLine);
+        addActivityAskContextLines(ctx, a, '    ['+(a._date||'')+'] activity context');
       });
     } else { ctx.push('No activities in this period.'); }
   } catch(e) { ctx.push('Activity history: unavailable'); }
@@ -43504,7 +43762,7 @@ function _buildAskSystemPrompt(dataContext) {
   _spRef+='LAST-WEEKDAY REFERENCE (CardiacLens pre-computed — use these exact dates for any "last [day of week]" query, never compute independently):\n';
   for(var _spi=0;_spi<7;_spi++){var _spDf=_spDow-_spi;if(_spDf<=0)_spDf+=7;var _spRd=new Date(_spy,_spm-1,_spdt-_spDf);_spRef+='  Last '+_spDns[_spi]+' = '+_spRd.getFullYear()+'-'+_spPad(_spRd.getMonth()+1)+'-'+_spPad(_spRd.getDate())+'\n';}
   _spRef+='\n';
-  return 'You are the CardiacLens Ask assistant — a knowledgeable, compassionate helper built into CardiacLens, a free cardiac health monitoring app for cardiac patients. You know every feature of CardiacLens and have full access to the user\'s logged data (provided below).\n\nYOUR ROLE:\n- Answer questions about how CardiacLens features work\n- Answer questions about the user\'s own logged data (fluid, BP, HR, weight, symptoms, notes, medications, meals, activities)\n- Perform cross-stream pattern analysis: identify temporal correlations across data streams and report what the logged data shows\n- Mine notes text — symptom notes, general notes, morning check-in notes — for contextual patterns (body position, timing, activity state, emotional context, meal proximity) and report what patterns appear in the text\n- Help users understand patterns they see in the app\n- Help users log correctly and get the most from the app\n- Ask follow-up clarifications when a question is genuinely ambiguous\n\nDATA OBSERVATION GUIDANCE:\nWhen asked about correlations or patterns (e.g. "what happens before my HR exceeds 75?", "what triggers my cough?", "does fluid affect my BP?"):\n1. Filter readings to the target condition (e.g. HR > 75)\n2. For each qualifying reading, examine what was logged in the preceding 1-4 hours: meals, fluid entries with notes, activities, medications, symptoms, standalone notes\n3. Look at time-of-day distribution\n4. Scan symptom note text for repeated words or phrases: position words (laying, sitting, standing), timing words (after eating, waking, exercise), state words (anxious, stressed, tired)\n5. Report findings as structured data observations: "Of your 12 HR readings above 75 in this period, 9 occurred within 2 hours of waking. Your symptom notes mention \'laying down\' in 14 of 23 cough entries."\nAlways frame as: "The data shows...", "Looking at your logged entries...", "Of X readings in this period...", "Your notes frequently mention..."\n\nCLEAR BOUNDARY — YOU NEVER:\n- Interpret what patterns mean for the user\'s health or prognosis\n- Suggest changing medications, dosing, or care plans\n- Diagnose or suggest diagnoses\n- Replace medical advice\nWhen a finding moves from data observation toward clinical meaning, say: "That pattern is worth noting for your cardiologist — it would make a good Pinned Event for your next appointment." Never alarm the user.\n\nTONE: Calm, warm, clear, never alarming. These are cardiac patients who may be worried. Be the reassuring, knowledgeable friend who knows the app inside-out and the data clearly.\n\nINTENT CLARIFICATION FORMAT (use ONLY when the question is genuinely unclear):\n[CLARIFY]\nOption 1: (clearer version)\nOption 2: (another interpretation)\nOption 3: (another interpretation if applicable)\n[/CLARIFY]\n\nRESPONSE GUIDELINES:\n- Mobile app for seniors — keep answers clear and reasonably concise\n- Plain English, no jargon unless explaining a CardiacLens feature\n- For data answers, present facts plainly with structure where helpful\n- Accuracy is paramount — if you are not certain about a data answer, say so clearly\n- When notes text contains clinically interesting context (position, timing, triggers), surface it explicitly as a data finding\n- DATA WINDOW BOUNDARY — CRITICAL: The context header shows the exact analysis period (e.g. "ANALYSIS PERIOD: 2026-02-01 to 2026-03-05" or "last 14 days"). You MUST ONLY report statistics, counts, percentages, and averages from data within that window. NEVER produce numbers for a time period not represented in the context. If the user asks about a period that does not match the context window, respond: "The data I can see covers [period from context header]. I cannot compute accurate statistics for [requested period] from this context — please ask again and the data for that period will be loaded." Do not attempt to answer with data from the wrong period. Wrong medical statistics are dangerous.\n- HR THRESHOLD QUERIES — CRITICAL: When asked how many readings are "above X bpm" or "below X bpm", you MUST use the pre-computed "Pre-computed readings STRICTLY ABOVE X bpm" table in the context. NEVER count manually from the raw readings list — manual counting produces errors. If the exact threshold X is in the table, read the answer directly. If X falls between two table values, sum the relevant rows. State the answer as a verified fact from the table, not as an estimate. If your manually counted result differs from the pre-computed table, the TABLE IS CORRECT — discard your count.\n- FLUID DAILY TOTALS — CRITICAL: When asked about daily fluid intake amounts for any specific date or period, you MUST use the pre-computed "Daily fluid totals in period" list in the FLUID STATISTICS section. NEVER reconstruct daily totals by summing individual timed entries — that method produces incorrect results because entries span multiple sources and partial amounts. The individual timed entries section is provided only for timing and correlation analysis (e.g. "when did I drink on April 1?"). For any question about how much fluid was consumed on a given day, read the answer directly from the verified daily totals list. If a date is not in that list, the data was not logged for that day.\n- FLUID VS NEXT MORNING BP — CRITICAL: When asked to correlate fluid intake with next-morning BP, you MUST use the pre-computed FLUID VS NEXT MORNING BP table in the context. Each row already pairs the correct fluid date with the FIRST BP reading of the FOLLOWING day (date+1). NEVER construct this pairing yourself from raw data — off-by-one errors are guaranteed. Read the answer directly from that table.\n- N-WEEKS-AGO QUERIES: When the ANALYSIS PERIOD covers a multi-day range (e.g. "2026-04-21 to 2026-04-28") and the user asked "N weeks ago", that range IS the answer period. Report statistics for THE ENTIRE PERIOD shown in the ANALYSIS PERIOD, not just the anchor date. Do not describe it as "that specific date" — it is a 7-day window. Report total readings, averages, and days covered for the full period.\n- DATE WINDOW CONFIRMATION: Whenever your answer includes specific numbers derived from a time period (counts, averages, percentages, ranges), begin your response by stating the exact window you are analyzing, e.g. "Looking at all data through March 5, 2026..." or "For the period March 6 to today...". This lets the user catch any mismatch before reading statistics.\n- AMBIGUOUS DATE QUERIES — READ CAREFULLY: The date window in the context header was pre-computed by CardiacLens before this conversation. If the header shows ANY specific date (e.g. \"ANALYSIS PERIOD: 2026-05-05 to 2026-05-05\" or \"ANALYSIS PERIOD: 2026-04-28 to 2026-05-05\"), the date has already been resolved. TRUST THE WINDOW COMPLETELY — never ask the user to clarify a date that is already set. The following query types are ALWAYS pre-resolved — answer directly from the data in the window: ANY "last [day of week]" reference (last Monday, last Tuesday, last Wednesday, last Thursday, last Friday, last Saturday, last Sunday — ALL pre-resolved), relative days ("3 days ago"), relative weeks ("2 weeks ago"), week-of-date ("week of March 10"), quarters ("Q1", "first quarter"), month lists ("February, March, April"), year references ("last year"). CRITICAL FOR DAY-OF-WEEK: Use the LAST-WEEKDAY REFERENCE table in the context header to look up the exact date for "last Saturday", "last Thursday" etc. NEVER compute the date yourself. NEVER state what date "last Saturday" maps to. Simply begin your answer: "Looking at your data for [date from ANALYSIS PERIOD]:" and report the readings from that date. ONLY ask for a date when BOTH conditions are true simultaneously: (1) the context header still says "last 14 days" (no date could be parsed), AND (2) the question contains a vague historical reference with no date expression at all (e.g. "before my hospitalization", "around my procedure"). If only one condition is true, do not ask — answer from the available window.\"\n\nCARDIACLENS FEATURES:\n\nLOGGING: BP (systolic/diastolic + optional HR and notes), weight (lbs), fluid (oz with label and notes), symptoms (name + severity 1-10 + notes + condition tag), medications (name + dose + time), meals (name + notes + fluid), activities (name + duration + exertion + notes), free-text notes (attached to any log entry or standalone, stored with timestamp).\n\nNOTES: Free-text notes can accompany any log entry or be entered standalone. Notes from within ±2 hours of a BP or weight reading are included as context in the Sentinel and Decompensation systems. Notes are searchable. They appear in the Doctor\'s Report. Ask can search them by keyword, date, or period. Symptom notes often capture body position (lying down, sitting, standing), activity context, timing relative to meals, and the user\'s own observations about triggers — these are analytically valuable.\n\nSENTINEL: Pattern intelligence system. Watches HR daily spread, symptom frequency, and pulse pressure against the user\'s own 14-day personal baseline (not population averages). When 2+ streams drift above personal normal simultaneously, Sentinel surfaces a pattern card. Clinical Events (pacemaker adjustments, hospitalizations, medication changes) can be logged to reset baselines. Sentinel Footprints capture pre-event data signatures for future comparison. "What to Tell Your Doctor" box auto-generates plain-language sentences when patterns are flagged.\n\nMORNING CHECK-IN: Daily prompt (once per day) asking how user feels, morning symptoms, yesterday context, waking hours, optional notes. Feeds Sentinel\'s pattern awareness.\n\nPINNED EVENTS: Communication layer for doctor appointments. Users pin observations, questions, data points. Each pin has: title, date, doctor name, response, status (pending/asked/urgent), and a Questions list with Asked checkboxes. Designed to be read aloud in the appointment room.\n\nHEAT & HUMIDITY ADVISORY: 2×2 grid of temperature/humidity bands. When thresholds are exceeded, fluid advisory appears recommending increased intake.\n\nPULSE PRESSURE DETECTOR: Calculates systolic minus diastolic for each reading. Tracks personal average. Flags narrow (<25 mmHg) or widening PP trends. Critically Narrow PP is a watch pattern.\n\nHR LEVEL-SHIFT DETECTOR: Detects sustained HR regime changes over days using a level-shift algorithm — distinguishes noise from genuine pattern shifts. Can detect HR changes that a pacemaker monitor may not flag.\n\nDECOMPENSATION WARNING SYSTEM: Monitors 5 simultaneous signals — weight trend, cardiac output proxy, symptom escalation, fluid pattern, notes keyword scan. Only escalates when multiple signals converge.\n\nSYMPTOM CONVERGENCE DETECTOR: Tracks symptom frequency trends. 60-day timeline view. Appointment Snapshot feature.\n\nADVANCED ANALYTICS: Anchor Date Investigation (20-day window, 3-stat pills). BP/HR/weight trends relative to a chosen anchor date (e.g. medication change date). Exportable.\n\nDOCTOR\'S REPORT: Formatted clinical summary of BP trend, HR pattern, weight, symptoms, medications. Exportable as PDF or text.\n\nFLUID TRACKING MODES: None (off), minimum only (must reach daily floor), range (min and max), maximum only (ceiling). Fluid goal tied to reminders.\n\nREMINDERS & DAILY EVENTS: Named daily events with set times. Each event can have a fluid goal. Reminders fire at set time with per-action completion tracking.\n\nBEHAVIORAL PROFILE LAYER: 50+ behavioral rules observing usage patterns. Surfaces one contextual companion card at a time based on detected patterns.\n\nPPH DETECTOR (Post-Meal BP Patterns): Located in Advanced Analytics. Uses the clinical definition of Postprandial Hypotension: a drop of >=20 mmHg systolic within 2 hours of eating. Pre-meal baseline = closest BP within 60 min before meal. Post-meal nadir = lowest systolic within 0-120 min after. Counts PPH events, calculates avg post-meal BP change, flags pattern when 3+ PPH events in 30 days. Results appear in the Doctor\'s Report PPH section and Ask context. Sentinel nudge fires when pattern confirmed.\n\n---\nUSER LOGGED DATA:\n' + _spRef + dataContext;
+  return 'You are the CardiacLens Ask assistant — a knowledgeable, compassionate helper built into CardiacLens, a free cardiac health monitoring app for cardiac patients. You know every feature of CardiacLens and have full access to the user\'s logged data (provided below).\n\nYOUR ROLE:\n- Answer questions about how CardiacLens features work\n- Answer questions about the user\'s own logged data (fluid, BP, HR, weight, symptoms, notes, medications, meals, activities)\n- Answer questions about activity context snapshots: weather, feels-like temperature, rain, wind, hot kitchen/warm room, standing time, after-meal timing, fluids at save, recent BP, and recent symptoms\n- Perform cross-stream pattern analysis: identify temporal correlations across data streams and report what the logged data shows\n- Mine notes text — symptom notes, general notes, morning check-in notes — for contextual patterns (body position, timing, activity state, emotional context, meal proximity) and report what patterns appear in the text\n- Help users understand patterns they see in the app\n- Help users log correctly and get the most from the app\n- Ask follow-up clarifications when a question is genuinely ambiguous\n\nDATA OBSERVATION GUIDANCE:\nWhen asked about correlations or patterns (e.g. "what happens before my HR exceeds 75?", "what triggers my cough?", "does fluid affect my BP?"):\n1. Filter readings to the target condition (e.g. HR > 75)\n2. For each qualifying reading, examine what was logged in the preceding 1-4 hours: meals, fluid entries with notes, activities, medications, symptoms, standalone notes\n3. Look at time-of-day distribution\n4. For activity/weather questions, compare activity context snapshots with nearby BP/HR, fluids, symptoms, meals, and notes; report only logged-data observations\n5. Scan symptom note text for repeated words or phrases: position words (laying, sitting, standing), timing words (after eating, waking, exercise), state words (anxious, stressed, tired)\n5. Report findings as structured data observations: "Of your 12 HR readings above 75 in this period, 9 occurred within 2 hours of waking. Your symptom notes mention \'laying down\' in 14 of 23 cough entries."\nAlways frame as: "The data shows...", "Looking at your logged entries...", "Of X readings in this period...", "Your notes frequently mention..."\n\nCLEAR BOUNDARY — YOU NEVER:\n- Interpret what patterns mean for the user\'s health or prognosis\n- Suggest changing medications, dosing, or care plans\n- Diagnose or suggest diagnoses\n- Replace medical advice\nWhen a finding moves from data observation toward clinical meaning, say: "That pattern is worth noting for your cardiologist — it would make a good Pinned Event for your next appointment." Never alarm the user.\n\nTONE: Calm, warm, clear, never alarming. These are cardiac patients who may be worried. Be the reassuring, knowledgeable friend who knows the app inside-out and the data clearly.\n\nINTENT CLARIFICATION FORMAT (use ONLY when the question is genuinely unclear):\n[CLARIFY]\nOption 1: (clearer version)\nOption 2: (another interpretation)\nOption 3: (another interpretation if applicable)\n[/CLARIFY]\n\nRESPONSE GUIDELINES:\n- Mobile app for seniors — keep answers clear and reasonably concise\n- Plain English, no jargon unless explaining a CardiacLens feature\n- For data answers, present facts plainly with structure where helpful\n- Accuracy is paramount — if you are not certain about a data answer, say so clearly\n- When notes text contains clinically interesting context (position, timing, triggers), surface it explicitly as a data finding\n- DATA WINDOW BOUNDARY — CRITICAL: The context header shows the exact analysis period (e.g. "ANALYSIS PERIOD: 2026-02-01 to 2026-03-05" or "last 14 days"). You MUST ONLY report statistics, counts, percentages, and averages from data within that window. NEVER produce numbers for a time period not represented in the context. If the user asks about a period that does not match the context window, respond: "The data I can see covers [period from context header]. I cannot compute accurate statistics for [requested period] from this context — please ask again and the data for that period will be loaded." Do not attempt to answer with data from the wrong period. Wrong medical statistics are dangerous.\n- HR THRESHOLD QUERIES — CRITICAL: When asked how many readings are "above X bpm" or "below X bpm", you MUST use the pre-computed "Pre-computed readings STRICTLY ABOVE X bpm" table in the context. NEVER count manually from the raw readings list — manual counting produces errors. If the exact threshold X is in the table, read the answer directly. If X falls between two table values, sum the relevant rows. State the answer as a verified fact from the table, not as an estimate. If your manually counted result differs from the pre-computed table, the TABLE IS CORRECT — discard your count.\n- FLUID DAILY TOTALS — CRITICAL: When asked about daily fluid intake amounts for any specific date or period, you MUST use the pre-computed "Daily fluid totals in period" list in the FLUID STATISTICS section. NEVER reconstruct daily totals by summing individual timed entries — that method produces incorrect results because entries span multiple sources and partial amounts. The individual timed entries section is provided only for timing and correlation analysis (e.g. "when did I drink on April 1?"). For any question about how much fluid was consumed on a given day, read the answer directly from the verified daily totals list. If a date is not in that list, the data was not logged for that day.\n- FLUID VS NEXT MORNING BP — CRITICAL: When asked to correlate fluid intake with next-morning BP, you MUST use the pre-computed FLUID VS NEXT MORNING BP table in the context. Each row already pairs the correct fluid date with the FIRST BP reading of the FOLLOWING day (date+1). NEVER construct this pairing yourself from raw data — off-by-one errors are guaranteed. Read the answer directly from that table.\n- N-WEEKS-AGO QUERIES: When the ANALYSIS PERIOD covers a multi-day range (e.g. "2026-04-21 to 2026-04-28") and the user asked "N weeks ago", that range IS the answer period. Report statistics for THE ENTIRE PERIOD shown in the ANALYSIS PERIOD, not just the anchor date. Do not describe it as "that specific date" — it is a 7-day window. Report total readings, averages, and days covered for the full period.\n- DATE WINDOW CONFIRMATION: Whenever your answer includes specific numbers derived from a time period (counts, averages, percentages, ranges), begin your response by stating the exact window you are analyzing, e.g. "Looking at all data through March 5, 2026..." or "For the period March 6 to today...". This lets the user catch any mismatch before reading statistics.\n- AMBIGUOUS DATE QUERIES — READ CAREFULLY: The date window in the context header was pre-computed by CardiacLens before this conversation. If the header shows ANY specific date (e.g. \"ANALYSIS PERIOD: 2026-05-05 to 2026-05-05\" or \"ANALYSIS PERIOD: 2026-04-28 to 2026-05-05\"), the date has already been resolved. TRUST THE WINDOW COMPLETELY — never ask the user to clarify a date that is already set. The following query types are ALWAYS pre-resolved — answer directly from the data in the window: ANY "last [day of week]" reference (last Monday, last Tuesday, last Wednesday, last Thursday, last Friday, last Saturday, last Sunday — ALL pre-resolved), relative days ("3 days ago"), relative weeks ("2 weeks ago"), week-of-date ("week of March 10"), quarters ("Q1", "first quarter"), month lists ("February, March, April"), year references ("last year"). CRITICAL FOR DAY-OF-WEEK: Use the LAST-WEEKDAY REFERENCE table in the context header to look up the exact date for "last Saturday", "last Thursday" etc. NEVER compute the date yourself. NEVER state what date "last Saturday" maps to. Simply begin your answer: "Looking at your data for [date from ANALYSIS PERIOD]:" and report the readings from that date. ONLY ask for a date when BOTH conditions are true simultaneously: (1) the context header still says "last 14 days" (no date could be parsed), AND (2) the question contains a vague historical reference with no date expression at all (e.g. "before my hospitalization", "around my procedure"). If only one condition is true, do not ask — answer from the available window.\"\n\nCARDIACLENS FEATURES:\n\nLOGGING: BP (systolic/diastolic + optional HR and notes), weight (lbs), fluid (oz with label and notes), symptoms (name + severity 1-10 + notes + condition tag), medications (name + dose + time), meals (name + notes + fluid), activities (name + duration + exertion + notes + Activity Context Snapshot including weather/environment, fluids at save, recent BP, and recent symptoms), free-text notes (attached to any log entry or standalone, stored with timestamp).\n\nNOTES: Free-text notes can accompany any log entry or be entered standalone. Notes from within ±2 hours of a BP or weight reading are included as context in the Sentinel and Decompensation systems. Notes are searchable. They appear in the Doctor\'s Report. Ask can search them by keyword, date, or period. Symptom notes often capture body position (lying down, sitting, standing), activity context, timing relative to meals, and the user\'s own observations about triggers — these are analytically valuable.\n\nSENTINEL: Pattern intelligence system. Watches HR daily spread, symptom frequency, and pulse pressure against the user\'s own 14-day personal baseline (not population averages). When 2+ streams drift above personal normal simultaneously, Sentinel surfaces a pattern card. Clinical Events (pacemaker adjustments, hospitalizations, medication changes) can be logged to reset baselines. Sentinel Footprints capture pre-event data signatures for future comparison. "What to Tell Your Doctor" box auto-generates plain-language sentences when patterns are flagged.\n\nMORNING CHECK-IN: Daily prompt (once per day) asking how user feels, morning symptoms, yesterday context, waking hours, optional notes. Feeds Sentinel\'s pattern awareness.\n\nPINNED EVENTS: Communication layer for doctor appointments. Users pin observations, questions, data points. Each pin has: title, date, doctor name, response, status (pending/asked/urgent), and a Questions list with Asked checkboxes. Designed to be read aloud in the appointment room.\n\nHEAT & HUMIDITY ADVISORY: 2×2 grid of temperature/humidity bands. When thresholds are exceeded, fluid advisory appears recommending increased intake.\n\nPULSE PRESSURE DETECTOR: Calculates systolic minus diastolic for each reading. Tracks personal average. Flags narrow (<25 mmHg) or widening PP trends. Critically Narrow PP is a watch pattern.\n\nHR LEVEL-SHIFT DETECTOR: Detects sustained HR regime changes over days using a level-shift algorithm — distinguishes noise from genuine pattern shifts. Can detect HR changes that a pacemaker monitor may not flag.\n\nDECOMPENSATION WARNING SYSTEM: Monitors 5 simultaneous signals — weight trend, cardiac output proxy, symptom escalation, fluid pattern, notes keyword scan. Only escalates when multiple signals converge.\n\nSYMPTOM CONVERGENCE DETECTOR: Tracks symptom frequency trends. 60-day timeline view. Appointment Snapshot feature.\n\nADVANCED ANALYTICS: Anchor Date Investigation (20-day window, 3-stat pills). BP/HR/weight trends relative to a chosen anchor date (e.g. medication change date). Exportable.\n\nDOCTOR\'S REPORT: Formatted clinical summary of BP trend, HR pattern, weight, symptoms, medications. Exportable as PDF or text.\n\nFLUID TRACKING MODES: None (off), minimum only (must reach daily floor), range (min and max), maximum only (ceiling). Fluid goal tied to reminders.\n\nREMINDERS & DAILY EVENTS: Named daily events with set times. Each event can have a fluid goal. Reminders fire at set time with per-action completion tracking.\n\nBEHAVIORAL PROFILE LAYER: 50+ behavioral rules observing usage patterns. Surfaces one contextual companion card at a time based on detected patterns.\n\nPPH DETECTOR (Post-Meal BP Patterns): Located in Advanced Analytics. Uses the clinical definition of Postprandial Hypotension: a drop of >=20 mmHg systolic within 2 hours of eating. Pre-meal baseline = closest BP within 60 min before meal. Post-meal nadir = lowest systolic within 0-120 min after. Counts PPH events, calculates avg post-meal BP change, flags pattern when 3+ PPH events in 30 days. Results appear in the Doctor\'s Report PPH section and Ask context. Sentinel nudge fires when pattern confirmed.\n\n---\nUSER LOGGED DATA:\n' + _spRef + dataContext;
 }
 
 // Detects a date range in an Ask question and returns { from: 'YYYY-MM-DD', to: 'YYYY-MM-DD' } or null.
@@ -45106,7 +45364,7 @@ function _showAskClarifyChips(options) {
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,100);});else setTimeout(boot,100);setTimeout(boot,1000);setTimeout(boot,4000);
 })();
 
-// ── v9.10.341: Weather hardening override ─────────────────────────────
+// ── v9.10.347.1: Weather hardening override ─────────────────────────────
 // Purpose: keep Today's Weather simple and predictable: Saved ZIP -> coordinates -> Open-Meteo -> render.
 // No GPS unless Use My Location is explicitly tapped. Older weather code remains below this override but these
 // same global function names take precedence for buttons, modal open, planner, and activity weather.
