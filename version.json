@@ -1,7 +1,7 @@
 {
-  "version": "9.10.347.2",
-  "build": "v9.10.347",
-  "name": "CardiacLens v9.10.347",
-  "label": "Stable Cardiac Context v1.0 + Version/Help Sync",
+  "version": "v9.10.347.8",
+  "build": "v9.10.347.8",
+  "name": "CardiacLens v9.10.347.8",
+  "label": "Restore Activity Scroll Fix",
   "updated": "2026-06-23"
 }

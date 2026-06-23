@@ -2109,6 +2109,7 @@ function _syncFab(){
 
   // Status FAB (bottom-center): hide when any modal open; syncStatusFab handles show/hide otherwise
   syncStatusFab();
+  if(typeof _layoutBottomPills==='function') _layoutBottomPills();
 }
 
 
@@ -7896,8 +7897,8 @@ html+='<div id="recentBPCard" style="margin-bottom:12px"></div>';
 
 html+='<div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:12px;margin-bottom:14px">';
 html+='<div style="font-size:13px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">1. What are you doing?</div>';
-html+='<label style="display:block;font-size:18px;font-weight:600;margin-bottom:8px">Activity Type:</label>';
-html+='<select id="activitySelect" class="modal-input" style="font-size:20px" onchange="handleActivitySelection()">';
+html+='<label style="display:block;font-size:18px;font-weight:600;margin-bottom:8px">Activity Type <span style="color:#dc2626">*</span>:</label>';
+html+='<select id="activitySelect" class="modal-input" style="font-size:20px" onchange="handleActivitySelection();updateActivityStartState()">';
 html+='<option value="">-- Choose Activity --</option>';
 var allActivityTypes=getActivityTypes();
 var customActivities=settings.customActivities||[];
@@ -7968,7 +7969,7 @@ html+='<div id="timerDisplay" style="display:none;text-align:center;padding:20px
 html+='<div id="timerTime" style="font-size:48px;font-weight:bold;color:#10b981;font-family:monospace">00:00</div>';
 html+='<div id="timerPausedLabel" style="display:none;font-size:13px;font-weight:700;color:#f59e0b;letter-spacing:1px;margin-top:4px">⏸ PAUSED</div>';
 html+='<div style="display:flex;gap:10px;justify-content:center;margin-top:12px">';
-html+='<button type="button" id="timerStartBtn" class="modal-btn" onclick="startActivityTimer()" style="background:#10b981;color:#fff">▶ Start Activity</button>';
+html+='<button type="button" id="timerStartBtn" class="modal-btn" onclick="startActivityTimer()" disabled title="Select Activity Type and Cardiac Context first" style="background:#10b981;color:#fff;opacity:0.45;cursor:not-allowed">▶ Start Activity</button>';
 html+='<button type="button" id="timerPauseBtn" class="modal-btn" onclick="pauseActivityTimer()" style="background:#f59e0b;color:#fff;display:none">⏸ Pause</button>';
 html+='<button type="button" id="timerResumeBtn" class="modal-btn" onclick="startActivityTimer()" style="background:#10b981;color:#fff;display:none">▶ Resume</button>';
 html+='<button type="button" id="timerStopBtn" class="modal-btn" onclick="stopActivityTimer()" style="background:#ef4444;color:#fff;display:none">⏹ Finish Activity</button>';
@@ -7984,7 +7985,7 @@ document.getElementById('activitySelect').focus();
 },100);
 setTimeout(function(){_showRecentBPCard();},150);
 setTimeout(function(){selectEnvironmentalMode(selectedEnvironmentalMode||settings.activityEnvironmentalMode||'manual');},175);
-setTimeout(function(){var a=document.getElementById('activitySelect');selectedActivityContext=selectedActivityContext||getDefaultActivityContext(a?a.value:'');renderActivityContextButtons();handleJourneyRoleSelection();updateActivitySaveState();},200);
+setTimeout(function(){var a=document.getElementById('activitySelect');selectedActivityContext=selectedActivityContext||getDefaultActivityContext(a?a.value:'');renderActivityContextButtons();handleJourneyRoleSelection();updateActivitySaveState();updateActivityStartState();},200);
 }
 
 // NEW: Handle activity selection including "Add New"
@@ -8031,6 +8032,7 @@ if(select.value && select.value!=='__ADD_NEW__'){
   selectedActivityContext=getDefaultActivityContext(select.value);
   renderActivityContextButtons();
 }
+updateActivityStartState();
 }
 
 function getDefaultActivityContext(activity){
@@ -8042,7 +8044,7 @@ function getDefaultActivityContext(activity){
 }
 function buildActivityContextHTML(){
   var h='<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin:12px 0">';
-  h+='<div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:8px">❤️ Cardiac Context</div>';
+  h+='<div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:8px">❤️ Cardiac Context <span style="color:#dc2626">*</span></div>';
   h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">';
   [['indoor','Indoor'],['outdoor','Outdoor'],['mixed','Mixed']].forEach(function(x){
     h+='<button type="button" id="actCtx_'+x[0]+'" onclick="selectActivityContext(\''+x[0]+'\')" style="border:2px solid #cbd5e1;background:#fff;color:#0f172a;border-radius:8px;padding:10px 6px;font-size:14px;font-weight:700;cursor:pointer">'+x[1]+'</button>';
@@ -8052,7 +8054,7 @@ function buildActivityContextHTML(){
   h+='</div>';
   return h;
 }
-function selectActivityContext(ctx){selectedActivityContext=ctx;renderActivityContextButtons();}
+function selectActivityContext(ctx){selectedActivityContext=ctx;renderActivityContextButtons();updateActivityStartState();}
 function renderActivityContextButtons(){
   ['indoor','outdoor','mixed'].forEach(function(c){var b=document.getElementById('actCtx_'+c);if(!b)return;b.style.borderColor=(selectedActivityContext===c?'#0369a1':'#cbd5e1');b.style.background=(selectedActivityContext===c?'#e0f2fe':'#fff');});
 }
@@ -8122,7 +8124,7 @@ function getJourneyFormData(activityName){
 }
 
 
-// Weather settings persistence guard (v9.10.347.2)
+// Weather settings persistence guard (v9.10.347.8)
 var CARDIACLENS_WEATHER_SETTINGS_KEY='CARDIACLENS_WEATHER_SETTINGS';
 function _clMergeDestinations(a,b){
   var out=[],seen={};
@@ -8167,7 +8169,7 @@ function _clWeatherSettingsSnapshot(){
   };}catch(e){return null;}
 }
 function _clSaveWeatherSettingsBackup(){
-  // v9.10.347.2: current saved settings win; backup only fills missing weather fields.
+  // v9.10.347.8: current saved settings win; backup only fills missing weather fields.
   try{
     var snap=_clWeatherSettingsSnapshot(); if(!snap)return;
     var prior=null;
@@ -8189,14 +8191,14 @@ function _clSaveWeatherSettingsBackup(){
   }catch(e){}
 }
 function _clRestoreWeatherSettingsBackup(){
-  // v9.10.347.2: restore defensively. Blank/default backup fields must not erase current settings.
+  // v9.10.347.8: restore defensively. Blank/default backup fields must not erase current settings.
   try{
     var raw=localStorage.getItem(CARDIACLENS_WEATHER_SETTINGS_KEY); if(!raw)return;
     var w=JSON.parse(raw); if(!w||typeof w!=='object')return;
     var fields=['activityWeatherMode','activityEnvironmentalMode','activityWeatherStoreSnapshot','activityWeatherRainThresholdPct','activityWeatherDefaultWindowMin','activityWeatherAskOnOutdoor','activityWeatherStoreCoordinates','todayWeatherPillEnabled','todayWeatherCacheMinutes','todayWeatherSavedZip','todayWeatherSource','pickupPlannerDefaultDate','activityWindows','activityDestinations'];
     fields.forEach(function(k){
       if(w[k]===undefined||w[k]===null)return;
-      // v9.10.347.2: current Saved ZIP settings must not be overwritten by older backup values.
+      // v9.10.347.8: current Saved ZIP settings must not be overwritten by older backup values.
       // Backup is only a fill-in source, not the authority when current settings are explicit.
       if(k==='todayWeatherSource'){
         var curSource=settings&&settings.todayWeatherSource;
@@ -8236,7 +8238,7 @@ function _ensureActivityEnvSettings(){
     var legacyNames={'Doctor':true,'Store':true,'Church':true,'Aggarwala':true,'HEB':true};
     settings.activityDestinations=(settings.activityDestinations||[]).filter(function(d){return d&&d.label&&!legacyNames[d.label];});
     settings.activityDestinationLegacyCleanupV309=true;
-    // v9.10.347.2: do not write defaults from _ensureActivityEnvSettings().
+    // v9.10.347.8: do not write defaults from _ensureActivityEnvSettings().
     // This function may run during startup before saved settings are loaded.
   }
   // v9.10.321: no baked-in destinations. Users add their own.
@@ -8449,7 +8451,7 @@ function getActivityEnvironmentFormData(){
 
 
 
-// v9.10.347.2 KISS: Cardiac Context display helpers (display only; no save/storage changes)
+// v9.10.347.8 KISS: Cardiac Context display helpers (display only; no save/storage changes)
 function clActivityEsc(v){
   return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
 }
@@ -8603,7 +8605,9 @@ function _isActivityFinishedForSave(){
   var isTimerMode=timerDisplay&&timerDisplay.style.display==='block';
   var isManualMode=manualInput&&manualInput.parentElement&&manualInput.parentElement.style.display==='block';
   if(isTimerMode){
-    return !!activityTimerStoppedForSave && activityElapsedSeconds>=60 && !activityTimerInterval;
+    // v9.10.347.8 KISS: Once the user taps Finish Activity, any positive elapsed time can be saved.
+    // Do not require the full 60 seconds to pass; short real-world activities still matter.
+    return !!activityTimerStoppedForSave && activityElapsedSeconds>0 && !activityTimerInterval;
   }
   if(isManualMode){
     var v=parseInt(manualInput.value,10);
@@ -8660,10 +8664,32 @@ updateActivitySaveState();
 }
 }
 
+
+function _isActivityStartReady(){
+  var sel=document.getElementById('activitySelect');
+  return !!(sel && sel.value && selectedActivityContext);
+}
+
+function updateActivityStartState(){
+  var btn=document.getElementById('timerStartBtn');
+  if(!btn)return;
+  var ready=_isActivityStartReady();
+  btn.disabled=!ready;
+  btn.style.opacity=ready?'1':'0.45';
+  btn.style.cursor=ready?'pointer':'not-allowed';
+  btn.title=ready?'Start activity and show activity pill':'Select Activity Type and Cardiac Context first';
+}
+
 function startActivityTimer(){
+if(!_isActivityStartReady()){
+  _showInlineError('⚠️ Please select Activity Type and Cardiac Context before starting.');
+  updateActivityStartState();
+  return;
+}
 if(activityTimerInterval){
-console.log('Timer already running');
-return;
+  // Timer already running; ensure the proven minimized/pill workflow is active.
+  minimizeActivityLog();
+  return;
 }
 activityTimerPaused=false;
 activityTimerStoppedForSave=false;
@@ -8682,6 +8708,9 @@ var mins=Math.floor(elapsed/60);
 var secs=elapsed%60;
 var __tt=document.getElementById('timerTime');if(__tt){__tt.textContent=(mins<10?'0':'')+mins+':'+(secs<10?'0':'')+secs;}
 },100);
+// v9.10.347.8 KISS: Start Activity now uses the proven Minimize workflow.
+// This creates/persists the activity pill, closes the modal, and starts the pill timer immediately.
+minimizeActivityLog();
 }
 
 function pauseActivityTimer(){
@@ -8715,7 +8744,7 @@ if(pauseBtn)pauseBtn.style.display='none';
 if(resumeBtn)resumeBtn.style.display='none';
 if(stopBtn)stopBtn.style.display='none';
 if(pausedLabel)pausedLabel.style.display='none';
-activityTimerStoppedForSave=(activityElapsedSeconds>=60);
+activityTimerStoppedForSave=(activityElapsedSeconds>0); // v9.10.347.8: Save unlocks after Stop for any positive elapsed time
 updateActivitySaveState();
 }
 
@@ -8882,6 +8911,79 @@ completeAndCloseModal();
 }
 
 // ── Background Activity System (v9.10.36) ────────────────────────────────────
+
+
+// v9.10.347.8 KISS: activity pill state is created immediately when timer starts.
+// This is intentionally limited to the floating pill lifecycle; activity save/history/context logic is untouched.
+function _captureActivityPillStateFromForm(isTimerMode){
+  var sel=document.getElementById('activitySelect');
+  var notes=document.getElementById('activityNotes');
+  var manualInput=document.getElementById('durationMinutes');
+  var activityType=(sel&&sel.value)?sel.value:'Activity';
+  _minimizedActivityState={
+    activityType:  activityType,
+    notes:         notes ? notes.value : '',
+    exertion:      selectedExertion,
+    tempBand:      selectedTempBand,
+    activityWindow:selectedActivityWindow,
+    activityWindowMinutes:selectedActivityWindowMinutes,
+    destination:selectedDestination,
+    environmentalMode:selectedEnvironmentalMode,
+    environmentSnapshot:activityEnvironmentSnapshot,
+    manualEnvironmentFactors:(function(){var a=[];[['hotKitchen','Hot kitchen'],['standingLong','Standing long time'],['afterMeal','After meal'],['stairsHills','Stairs / hills'],['humidRoom','Humid room'],['stressful','Stressful'],['afterShower','After shower'],['warmRoom','Warm room']].forEach(function(x){var el=document.getElementById('envCtx_'+x[0]);if(el&&el.checked)a.push(x[1]);});return a;})(),
+    manualEnvironmentOther:(function(){var el=document.getElementById('envCtxOther');return el?el.value.trim():'';})(),
+    activityContext:selectedActivityContext,
+    journeyRole:selectedJourneyRole,
+    journeyName:selectedJourneyName,
+    journeyId:selectedJourneyId,
+    isTimerMode:   !!isTimerMode,
+    manualMinutes: (!isTimerMode && manualInput) ? (manualInput.value||'') : ''
+  };
+  _activityMinimized=true;
+  try {
+    localStorage.setItem('CB_ACTIVITY_MINIMIZED', JSON.stringify({
+      state:          _minimizedActivityState,
+      elapsedSeconds: activityElapsedSeconds,
+      minimizedAt:    Date.now()
+    }));
+  } catch(e) {}
+}
+
+// v9.10.347.8 KISS: prevent bottom floating controls from covering each other on iPhone.
+function _layoutBottomPills(){
+  var activity=document.getElementById('activityPillBtn');
+  var status=document.getElementById('statusFab');
+  var ask=document.getElementById('askFloatBtn');
+  var activityVisible=activity&&activity.style.display!=='none'&&activity.style.display!=='';
+  var statusVisible=status&&status.style.display!=='none'&&status.style.display!=='';
+  if(activity){
+    activity.style.left='12px';
+    activity.style.right='auto';
+    activity.style.bottom='24px';
+    activity.style.maxWidth='42vw';
+    activity.style.overflow='hidden';
+    activity.style.whiteSpace='nowrap';
+  }
+  var lbl=document.getElementById('activityPillLabel');
+  if(lbl){
+    lbl.style.overflow='hidden';
+    lbl.style.textOverflow='ellipsis';
+    lbl.style.whiteSpace='nowrap';
+    lbl.style.maxWidth='72px';
+    lbl.style.display='inline-block';
+  }
+  if(ask){
+    ask.style.right='12px';
+    ask.style.bottom='24px';
+  }
+  if(status){
+    status.style.left='50%';
+    status.style.transform='translateX(-50%)';
+    status.style.bottom=(activityVisible&&statusVisible)?'78px':'24px';
+    status.style.maxWidth='70vw';
+    status.style.whiteSpace='nowrap';
+  }
+}
 
 // Snapshot current form state and collapse modal to background pill.
 // Works in both timer mode (timer keeps running) and manual mode (no live clock).
@@ -9052,6 +9154,15 @@ function restoreActivityLog(){
       if(manDur && state.manualMinutes) manDur.value=state.manualMinutes;
       updateActivitySaveState();
     }
+    // v9.10.347.8 KISS: returning from the Activity pill should land at the active timer/save area,
+    // not the top of the Log Activity setup modal.
+    setTimeout(function(){
+      var target=document.getElementById('activityTimingSection')||document.getElementById('timerDisplay')||document.getElementById('timerStartBtn');
+      if(target && target.scrollIntoView){
+        try{ target.scrollIntoView({behavior:'auto', block:'center'}); }
+        catch(e){ target.scrollIntoView(); }
+      }
+    }, 50);
   }, 250);
 }
 
@@ -9087,6 +9198,7 @@ function _startActivityPillTick(){
     if(timeEl) timeEl.textContent='📝';
     pill.style.display='flex';
     _syncFab();
+    if(typeof _layoutBottomPills==='function') _layoutBottomPills();
     return; // no interval needed — nothing to tick
   }
 
@@ -9096,6 +9208,7 @@ function _startActivityPillTick(){
   }
   pill.style.display='flex';
   _syncFab();
+  if(typeof _layoutBottomPills==='function') _layoutBottomPills();
   _activityPillInterval=setInterval(function(){
     if(!_activityMinimized){ _stopActivityPillTick(); return; }
     var e=Math.floor((Date.now()-activityStartTime)/1000);
@@ -9244,10 +9357,10 @@ console.log('Duration check - Timer mode:',isTimerMode,'Manual mode:',isManualMo
 
 if(isTimerMode){
 // Timer mode - use elapsed seconds
-duration=Math.floor(activityElapsedSeconds/60);
-console.log('Timer mode duration:',duration,'minutes');
-if(duration<=0){
-_showInlineError('⚠️ Please run the timer first, then tap STOP before saving. Timer shows: '+Math.floor(activityElapsedSeconds)+' seconds');
+duration=Math.max(1,Math.ceil(activityElapsedSeconds/60));
+console.log('Timer mode duration:',duration,'minutes from seconds:',activityElapsedSeconds);
+if(activityElapsedSeconds<=0){
+_showInlineError('⚠️ Please run the timer first, then tap STOP before saving.');
 return;
 }
 }else if(isManualMode){
@@ -9261,12 +9374,12 @@ return;
 // No mode clearly selected - try to detect from content
 if(activityElapsedSeconds>0){
 // Has timer data, use it
-duration=Math.floor(activityElapsedSeconds/60);
-if(duration<=0){
-_showInlineError('⚠️ Timer ran for less than 1 minute. Please run the timer for at least 1 minute.');
+duration=Math.max(1,Math.ceil(activityElapsedSeconds/60));
+if(activityElapsedSeconds<=0){
+_showInlineError('⚠️ Timer has no elapsed time yet.');
 return;
 }
-console.log('Fallback: Using timer duration:',duration,'minutes');
+console.log('Fallback: Using timer duration:',duration,'minutes from seconds:',activityElapsedSeconds);
 }else if(manualInput&&manualInput.value){
 // Has manual input
 duration=parseInt(manualInput.value);
@@ -9661,7 +9774,7 @@ function editActivityHistorical(dateKey, timeKey){
   var entry=arr[idx];
   var html='<div class="modal-title">Edit Activity</div>';
   html+='<div style="margin-bottom:16px">';
-  html+='<label style="display:block;font-size:16px;font-weight:600;margin-bottom:8px">Activity Type:</label>';
+  html+='<label style="display:block;font-size:16px;font-weight:600;margin-bottom:8px">Activity Type <span style="color:#dc2626">*</span>:</label>';
   html+='<input type="text" id="editHistActivityType" class="modal-input" value="'+(entry.activity||'')+'" placeholder="e.g., Walking, Cooking" />';
   html+='</div>';
   html+='<div style="margin-bottom:16px">';
@@ -9821,7 +9934,7 @@ function editActivity(i){
 var entry=A[i];
 var html='<div class="modal-title">Edit Activity</div>';
 html+='<div style="margin-bottom:16px">';
-html+='<label style="display:block;font-size:16px;font-weight:600;margin-bottom:8px">Activity Type:</label>';
+html+='<label style="display:block;font-size:16px;font-weight:600;margin-bottom:8px">Activity Type <span style="color:#dc2626">*</span>:</label>';
 html+='<input type="text" id="editActivityType" class="modal-input" value="'+(entry.activity||'')+'" placeholder="e.g., Walking, Running" />';
 html+='</div>';
 html+='<div style="margin-bottom:16px">';
@@ -15942,6 +16055,7 @@ function syncStatusFab() {
     if (el && !el.classList.contains('card-panel-hidden')) { anyOpen = true; break; }
   }
   fab.style.display = anyOpen ? 'flex' : 'none';
+  if(typeof _layoutBottomPills==='function') _layoutBottomPills();
 }
 
 function toggleCardSection(key) {
@@ -16197,7 +16311,7 @@ function _clWindCompass(deg){
 function _clGetWeatherCache(){try{var raw=localStorage.getItem(TODAY_WEATHER_CACHE_KEY);return raw?JSON.parse(raw):null;}catch(e){return null;}}
 function _clSetWeatherCache(obj){try{localStorage.setItem(TODAY_WEATHER_CACHE_KEY,JSON.stringify(obj));}catch(e){}}
 function _clResolveSavedWeatherZip(){
-  // v9.10.347.2: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
+  // v9.10.347.8: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
   // Today Weather must not fall back to GPS unless the user explicitly taps Use My Location.
   try{
     var z=String((settings&&settings.todayWeatherSavedZip)||'').trim();
@@ -16227,7 +16341,7 @@ function _clWeatherUpdatedLabel(c){
   return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+' ('+ageText+')';
 }
 function _clBuildWeatherUrl(lat,lon){
-  // v9.10.347.2: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
+  // v9.10.347.8: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
   // The app only needs current conditions + hourly forecast for rain/heat/wind guidance.
   return 'https://api.open-meteo.com/v1/forecast?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+
     '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=2'+
@@ -16235,7 +16349,7 @@ function _clBuildWeatherUrl(lat,lon){
     '&hourly=precipitation_probability,precipitation,rain,temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m';
 }
 
-// v9.10.347.2: Saved ZIP uses a direct local coordinate table first.
+// v9.10.347.8: Saved ZIP uses a direct local coordinate table first.
 // For Robert's normal area, 77340 always resolves directly to Huntsville coordinates.
 var CL_ZIP_COORDS={
   '77340':{lat:30.7235,lon:-95.5508,label:'Huntsville'},
@@ -16360,15 +16474,15 @@ function openTodayWeatherModal(){
   var html='<div class="modal-title" style="font-size:26px;margin-bottom:10px">☀️ Today\'s Weather</div><button type="button" onclick="hideModal();openHelpModal(\'weather\')" style="width:100%;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;border-radius:10px;padding:10px;font-size:14px;font-weight:800;margin-bottom:12px">How to use Today\'s Weather</button><div id="todayWeatherModalBody">'+_renderTodayWeatherBody(c,null,initialState)+'</div>';
   html+='<div class="modal-actions"><button class="modal-cancel" onclick="hideModal()">Close</button><button class="modal-ok" id="todayWeatherRefreshBtn" onclick="refreshTodayWeatherFromModal()">Refresh Weather</button></div>';
   showModal(html);
-  // v9.10.347.2: if cached weather is older than the user's refresh threshold, refresh automatically on open.
+  // v9.10.347.8: if cached weather is older than the user's refresh threshold, refresh automatically on open.
   // This keeps the weather pill, planner, and activity weather on the same fresh source without requiring a manual tap.
   if(stale){setTimeout(function(){
-    // v9.10.347.2: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
+    // v9.10.347.8: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
     refreshTodayWeatherFromModal(true,'zip');
   },100);}
 }
 
-// v9.10.347.2: Today's Weather banner must use the real weather state, not a stale/default activity flag.
+// v9.10.347.8: Today's Weather banner must use the real weather state, not a stale/default activity flag.
 function _clIsTodayWeatherAutomaticEnabled(c){
   try{
     if(typeof _clRestoreWeatherSettingsBackup==='function')_clRestoreWeatherSettingsBackup();
@@ -16463,7 +16577,7 @@ function useSavedZipWeather(){
   refreshTodayWeatherFromModal(false,'zip');
 }
 function refreshTodayWeatherFromModal(silent,source){
-  // v9.10.347.2: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
+  // v9.10.347.8: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
   source=(source==='location')?'location':'zip';
   if(source==='zip'){
     try{settings.todayWeatherSource='zip';settings.todayWeatherSavedZip=_clResolveSavedWeatherZip();localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
@@ -45364,7 +45478,7 @@ function _showAskClarifyChips(options) {
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,100);});else setTimeout(boot,100);setTimeout(boot,1000);setTimeout(boot,4000);
 })();
 
-// ── v9.10.347.2: Weather hardening override ─────────────────────────────
+// ── v9.10.347.8: Weather hardening override ─────────────────────────────
 // Purpose: keep Today's Weather simple and predictable: Saved ZIP -> coordinates -> Open-Meteo -> render.
 // No GPS unless Use My Location is explicitly tapped. Older weather code remains below this override but these
 // same global function names take precedence for buttons, modal open, planner, and activity weather.
