@@ -8124,7 +8124,7 @@ function getJourneyFormData(activityName){
 }
 
 
-// Weather settings persistence guard (v9.10.347.8)
+// Weather settings persistence guard (v9.10.347.10)
 var CARDIACLENS_WEATHER_SETTINGS_KEY='CARDIACLENS_WEATHER_SETTINGS';
 function _clMergeDestinations(a,b){
   var out=[],seen={};
@@ -8169,7 +8169,7 @@ function _clWeatherSettingsSnapshot(){
   };}catch(e){return null;}
 }
 function _clSaveWeatherSettingsBackup(){
-  // v9.10.347.8: current saved settings win; backup only fills missing weather fields.
+  // v9.10.347.10: current saved settings win; backup only fills missing weather fields.
   try{
     var snap=_clWeatherSettingsSnapshot(); if(!snap)return;
     var prior=null;
@@ -8191,14 +8191,14 @@ function _clSaveWeatherSettingsBackup(){
   }catch(e){}
 }
 function _clRestoreWeatherSettingsBackup(){
-  // v9.10.347.8: restore defensively. Blank/default backup fields must not erase current settings.
+  // v9.10.347.10: restore defensively. Blank/default backup fields must not erase current settings.
   try{
     var raw=localStorage.getItem(CARDIACLENS_WEATHER_SETTINGS_KEY); if(!raw)return;
     var w=JSON.parse(raw); if(!w||typeof w!=='object')return;
     var fields=['activityWeatherMode','activityEnvironmentalMode','activityWeatherStoreSnapshot','activityWeatherRainThresholdPct','activityWeatherDefaultWindowMin','activityWeatherAskOnOutdoor','activityWeatherStoreCoordinates','todayWeatherPillEnabled','todayWeatherCacheMinutes','todayWeatherSavedZip','todayWeatherSource','pickupPlannerDefaultDate','activityWindows','activityDestinations'];
     fields.forEach(function(k){
       if(w[k]===undefined||w[k]===null)return;
-      // v9.10.347.8: current Saved ZIP settings must not be overwritten by older backup values.
+      // v9.10.347.10: current Saved ZIP settings must not be overwritten by older backup values.
       // Backup is only a fill-in source, not the authority when current settings are explicit.
       if(k==='todayWeatherSource'){
         var curSource=settings&&settings.todayWeatherSource;
@@ -8238,7 +8238,7 @@ function _ensureActivityEnvSettings(){
     var legacyNames={'Doctor':true,'Store':true,'Church':true,'Aggarwala':true,'HEB':true};
     settings.activityDestinations=(settings.activityDestinations||[]).filter(function(d){return d&&d.label&&!legacyNames[d.label];});
     settings.activityDestinationLegacyCleanupV309=true;
-    // v9.10.347.8: do not write defaults from _ensureActivityEnvSettings().
+    // v9.10.347.10: do not write defaults from _ensureActivityEnvSettings().
     // This function may run during startup before saved settings are loaded.
   }
   // v9.10.321: no baked-in destinations. Users add their own.
@@ -8451,7 +8451,7 @@ function getActivityEnvironmentFormData(){
 
 
 
-// v9.10.347.8 KISS: Cardiac Context display helpers (display only; no save/storage changes)
+// v9.10.347.10 KISS: Cardiac Context display helpers (display only; no save/storage changes)
 function clActivityEsc(v){
   return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
 }
@@ -8583,7 +8583,7 @@ function openActivityContextDetailsHistorical(dateKey,timeKey){
 }
 function askActivityContextFor(a){
   if(!a){alert('Activity not found');return;}
-  var q='Explain this saved activity using only my CardiacLens data. Activity: '+(a.activity||'Activity')+'. Logged: '+(a._date||a.date||'')+' '+(a.t||'unknown time')+'. Include activity duration, environment/weather, fluid total at save, recent BP/HR, symptoms, notes, before/after BP if available, and analysis completeness. '+clActivityCompletenessText(a)+' Do not diagnose; summarize what is known, what is missing, and what would be useful to discuss with my doctor.';
+  var q='Explain this saved activity using only my CardiacLens data. Treat the saved activity as a Cardiac Context Snapshot, not as a simple activity record. Activity: '+(a.activity||'Activity')+'. Logged: '+(a._date||a.date||'')+' '+(a.t||'unknown time')+'. Use the snapshot fields when present: activity, duration, exertion, Indoor/Outdoor/Mixed environment, weather snapshot, feels-like temperature, rain/wind context, fluid total at save, recent BP/HR, symptoms, notes, before/after BP if available, and analysis completeness. Never say weather or weather-impact context is unavailable when a saved weather snapshot or environmental context exists; instead say what was captured and what additional data would strengthen analysis. '+clActivityCompletenessText(a)+' Do not diagnose; summarize what is known, what is missing, and what would be useful to discuss with my doctor.';
   try{hideModal();}catch(e){}
   openAskPanel();
   setTimeout(function(){var inp=document.getElementById('askInput');if(inp){inp.value=q;inp.style.height='120px';}if(typeof submitAskQuestion==='function')submitAskQuestion();},350);
@@ -8605,7 +8605,7 @@ function _isActivityFinishedForSave(){
   var isTimerMode=timerDisplay&&timerDisplay.style.display==='block';
   var isManualMode=manualInput&&manualInput.parentElement&&manualInput.parentElement.style.display==='block';
   if(isTimerMode){
-    // v9.10.347.8 KISS: Once the user taps Finish Activity, any positive elapsed time can be saved.
+    // v9.10.347.10 KISS: Once the user taps Finish Activity, any positive elapsed time can be saved.
     // Do not require the full 60 seconds to pass; short real-world activities still matter.
     return !!activityTimerStoppedForSave && activityElapsedSeconds>0 && !activityTimerInterval;
   }
@@ -8708,7 +8708,7 @@ var mins=Math.floor(elapsed/60);
 var secs=elapsed%60;
 var __tt=document.getElementById('timerTime');if(__tt){__tt.textContent=(mins<10?'0':'')+mins+':'+(secs<10?'0':'')+secs;}
 },100);
-// v9.10.347.8 KISS: Start Activity now uses the proven Minimize workflow.
+// v9.10.347.10 KISS: Start Activity now uses the proven Minimize workflow.
 // This creates/persists the activity pill, closes the modal, and starts the pill timer immediately.
 minimizeActivityLog();
 }
@@ -8744,7 +8744,7 @@ if(pauseBtn)pauseBtn.style.display='none';
 if(resumeBtn)resumeBtn.style.display='none';
 if(stopBtn)stopBtn.style.display='none';
 if(pausedLabel)pausedLabel.style.display='none';
-activityTimerStoppedForSave=(activityElapsedSeconds>0); // v9.10.347.8: Save unlocks after Stop for any positive elapsed time
+activityTimerStoppedForSave=(activityElapsedSeconds>0); // v9.10.347.10: Save unlocks after Stop for any positive elapsed time
 updateActivitySaveState();
 }
 
@@ -8913,7 +8913,7 @@ completeAndCloseModal();
 // ── Background Activity System (v9.10.36) ────────────────────────────────────
 
 
-// v9.10.347.8 KISS: activity pill state is created immediately when timer starts.
+// v9.10.347.10 KISS: activity pill state is created immediately when timer starts.
 // This is intentionally limited to the floating pill lifecycle; activity save/history/context logic is untouched.
 function _captureActivityPillStateFromForm(isTimerMode){
   var sel=document.getElementById('activitySelect');
@@ -8949,7 +8949,7 @@ function _captureActivityPillStateFromForm(isTimerMode){
   } catch(e) {}
 }
 
-// v9.10.347.8 KISS: prevent bottom floating controls from covering each other on iPhone.
+// v9.10.347.10 KISS: prevent bottom floating controls from covering each other on iPhone.
 function _layoutBottomPills(){
   var activity=document.getElementById('activityPillBtn');
   var status=document.getElementById('statusFab');
@@ -9154,7 +9154,7 @@ function restoreActivityLog(){
       if(manDur && state.manualMinutes) manDur.value=state.manualMinutes;
       updateActivitySaveState();
     }
-    // v9.10.347.8 KISS: returning from the Activity pill should land at the active timer/save area,
+    // v9.10.347.10 KISS: returning from the Activity pill should land at the active timer/save area,
     // not the top of the Log Activity setup modal.
     setTimeout(function(){
       var target=document.getElementById('activityTimingSection')||document.getElementById('timerDisplay')||document.getElementById('timerStartBtn');
@@ -16311,7 +16311,7 @@ function _clWindCompass(deg){
 function _clGetWeatherCache(){try{var raw=localStorage.getItem(TODAY_WEATHER_CACHE_KEY);return raw?JSON.parse(raw):null;}catch(e){return null;}}
 function _clSetWeatherCache(obj){try{localStorage.setItem(TODAY_WEATHER_CACHE_KEY,JSON.stringify(obj));}catch(e){}}
 function _clResolveSavedWeatherZip(){
-  // v9.10.347.8: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
+  // v9.10.347.10: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
   // Today Weather must not fall back to GPS unless the user explicitly taps Use My Location.
   try{
     var z=String((settings&&settings.todayWeatherSavedZip)||'').trim();
@@ -16341,7 +16341,7 @@ function _clWeatherUpdatedLabel(c){
   return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+' ('+ageText+')';
 }
 function _clBuildWeatherUrl(lat,lon){
-  // v9.10.347.8: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
+  // v9.10.347.10: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
   // The app only needs current conditions + hourly forecast for rain/heat/wind guidance.
   return 'https://api.open-meteo.com/v1/forecast?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+
     '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=2'+
@@ -16349,7 +16349,7 @@ function _clBuildWeatherUrl(lat,lon){
     '&hourly=precipitation_probability,precipitation,rain,temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m';
 }
 
-// v9.10.347.8: Saved ZIP uses a direct local coordinate table first.
+// v9.10.347.10: Saved ZIP uses a direct local coordinate table first.
 // For Robert's normal area, 77340 always resolves directly to Huntsville coordinates.
 var CL_ZIP_COORDS={
   '77340':{lat:30.7235,lon:-95.5508,label:'Huntsville'},
@@ -16474,15 +16474,15 @@ function openTodayWeatherModal(){
   var html='<div class="modal-title" style="font-size:26px;margin-bottom:10px">☀️ Today\'s Weather</div><button type="button" onclick="hideModal();openHelpModal(\'weather\')" style="width:100%;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;border-radius:10px;padding:10px;font-size:14px;font-weight:800;margin-bottom:12px">How to use Today\'s Weather</button><div id="todayWeatherModalBody">'+_renderTodayWeatherBody(c,null,initialState)+'</div>';
   html+='<div class="modal-actions"><button class="modal-cancel" onclick="hideModal()">Close</button><button class="modal-ok" id="todayWeatherRefreshBtn" onclick="refreshTodayWeatherFromModal()">Refresh Weather</button></div>';
   showModal(html);
-  // v9.10.347.8: if cached weather is older than the user's refresh threshold, refresh automatically on open.
+  // v9.10.347.10: if cached weather is older than the user's refresh threshold, refresh automatically on open.
   // This keeps the weather pill, planner, and activity weather on the same fresh source without requiring a manual tap.
   if(stale){setTimeout(function(){
-    // v9.10.347.8: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
+    // v9.10.347.10: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
     refreshTodayWeatherFromModal(true,'zip');
   },100);}
 }
 
-// v9.10.347.8: Today's Weather banner must use the real weather state, not a stale/default activity flag.
+// v9.10.347.10: Today's Weather banner must use the real weather state, not a stale/default activity flag.
 function _clIsTodayWeatherAutomaticEnabled(c){
   try{
     if(typeof _clRestoreWeatherSettingsBackup==='function')_clRestoreWeatherSettingsBackup();
@@ -16577,7 +16577,7 @@ function useSavedZipWeather(){
   refreshTodayWeatherFromModal(false,'zip');
 }
 function refreshTodayWeatherFromModal(silent,source){
-  // v9.10.347.8: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
+  // v9.10.347.10: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
   source=(source==='location')?'location':'zip';
   if(source==='zip'){
     try{settings.todayWeatherSource='zip';settings.todayWeatherSavedZip=_clResolveSavedWeatherZip();localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
@@ -29992,6 +29992,45 @@ html+=`</table></div>`;
 }
 }
 
+
+// Activity & Cardiac Context Summary (v9.10.347.10)
+if(settings.features&&settings.features.exercise&&data.activities&&data.activities.length>0){
+function _clDrEsc(v){return String(v===undefined||v===null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function _clDrDate(d){if(!d)return'';var parts=String(d).split('-');if(parts.length===3){var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return mo[parseInt(parts[1],10)-1]+' '+parseInt(parts[2],10);}return d;}
+function _clDrContext(a){var c=(a.activityContext||a.contextType||'').toString().toLowerCase();var es=a.environmentalSnapshot||{};if(!c&&es.context)c=String(es.context).toLowerCase();if(!c&&es.mode)c=String(es.mode).toLowerCase();if(c.indexOf('mixed')>=0)return'Mixed';if(c.indexOf('out')>=0)return'Outdoor';if(c.indexOf('in')>=0)return'Indoor';return'Not specified';}
+function _clDrWeather(a){try{if(typeof clActivityWeatherText==='function')return clActivityWeatherText(a)||'';}catch(e){}var es=a.environmentalSnapshot||{};var ws=es.weatherSnapshot||es.weather||{};var out=[];if(ws.feelsLikeF||ws.feelsLike)out.push('Feels like '+(ws.feelsLikeF||ws.feelsLike)+'°');if(ws.tempF||ws.temperature)out.push('Temp '+(ws.tempF||ws.temperature)+'°');if(ws.rainText)out.push(ws.rainText);if(ws.precipChance!==undefined&&ws.precipChance!==null)out.push('Rain '+ws.precipChance+'%');if(ws.windMph)out.push('Wind '+ws.windMph+' mph');return out.join(' · ');}
+function _clDrCtxSnap(a){var es=a.environmentalSnapshot||{};return a.eventContextSnapshot||es.contextSnapshot||{};}
+function _clDrFluid(a){var cs=_clDrCtxSnap(a);if(cs&&cs.hydration&&(cs.hydration.todayOz!==undefined&&cs.hydration.todayOz!==null))return cs.hydration.todayOz+' oz';if(a.fluidTodayAtSave!==undefined&&a.fluidTodayAtSave!==null)return a.fluidTodayAtSave+' oz';return'';}
+function _clDrRecentBP(a){var cs=_clDrCtxSnap(a);var r=cs&&cs.recentBP;if(r&&r.s&&r.d)return r.s+'/'+r.d+(r.h?' HR '+r.h:'');return'';}
+function _clDrSymOrNote(a){var cs=_clDrCtxSnap(a);return !!(a.notes||(cs&&cs.recentSymptoms&&cs.recentSymptoms.length));}
+function _clDrLinked(a,kind){return bpReadings.find(function(bp){return bp.activityId===a.id&&bp.activityTiming===kind;});}
+function _clDrScore(a){var score=0;if(a.notes)score+=50;if(/help|assist|rescue|exhaust|winded|dizzy|chest|short|breath|could not|couldn't|fall|fell/i.test(a.notes||''))score+=80;if(_clDrLinked(a,'before')&&_clDrLinked(a,'after'))score+=35;if(_clDrWeather(a))score+=15;if(_clDrContext(a)!=='Not specified')score+=10;if((a.duration||0)>=30)score+=10;return score;}
+var acts=data.activities.slice().sort(function(a,b){var da=(a._date||'')+' '+(a.t||'');var db=(b._date||'')+' '+(b.t||'');return da<db?1:da>db?-1:0;});
+var totalActs=acts.length;
+var totalMinutes=acts.reduce(function(s,a){return s+(parseInt(a.duration,10)||0);},0);
+var ctxCounts={Indoor:0,Outdoor:0,Mixed:0,'Not specified':0};
+var withContext=0,withWeather=0,withBP=0,withNotes=0,withSymptoms=0;
+acts.forEach(function(a){var ctx=_clDrContext(a);ctxCounts[ctx]=(ctxCounts[ctx]||0)+1;if(ctx!=='Not specified')withContext++;if(_clDrWeather(a))withWeather++;if(_clDrLinked(a,'before')&&_clDrLinked(a,'after'))withBP++;if(a.notes)withNotes++;var cs=_clDrCtxSnap(a);if(cs&&cs.recentSymptoms&&cs.recentSymptoms.length)withSymptoms++;});
+var typeCounts={};acts.forEach(function(a){var t=(a.activity||a.type||'Activity').split('(')[0].trim();typeCounts[t]=(typeCounts[t]||0)+1;});
+var topTypes=Object.keys(typeCounts).sort(function(a,b){return typeCounts[b]-typeCounts[a]||a.localeCompare(b);}).slice(0,4).map(function(t){return _clDrEsc(t)+' ('+typeCounts[t]+')';}).join(', ');
+var notable=acts.slice().sort(function(a,b){return _clDrScore(b)-_clDrScore(a);}).slice(0,4);
+html+=`<div class="report-section" style="background:#f8fafc;border:2px solid #0f766e">
+<div class="report-section-title" style="color:#0f766e">🏃 Activity & Cardiac Context Summary <span style="font-size:13px;font-weight:400">(${totalActs} logged)</span></div>
+<p style="font-size:13px;color:#475569;margin:0 0 10px 0;line-height:1.5"><strong>Why this helps:</strong> Activities show lifestyle demand even when BP was not recorded. BP adds cardiovascular response; context still shows what the patient was doing, for how long, under what environment, with fluids, symptoms, and notes when available.</p>
+<table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:10px">
+<tr style="background:#ccfbf1"><th style="padding:6px;text-align:left">Metric</th><th style="padding:6px;text-align:left">Value</th></tr>
+<tr><td style="padding:6px;font-weight:600">Activities logged:</td><td style="padding:6px">${totalActs} (${totalMinutes} total min)</td></tr>
+<tr style="background:#f8fafc"><td style="padding:6px;font-weight:600">Environment:</td><td style="padding:6px">Indoor ${ctxCounts.Indoor||0} · Outdoor ${ctxCounts.Outdoor||0} · Mixed ${ctxCounts.Mixed||0}</td></tr>
+<tr><td style="padding:6px;font-weight:600">Context captured:</td><td style="padding:6px">${withContext} environment · ${withWeather} weather · ${withBP} before/after BP · ${withNotes} notes</td></tr>
+<tr style="background:#f8fafc"><td style="padding:6px;font-weight:600">Most common:</td><td style="padding:6px">${topTypes||'Not enough activity data'}</td></tr>
+</table>`;
+if(notable.length){html+=`<div style="font-size:14px;font-weight:800;color:#0f766e;margin:8px 0 6px 0">Most relevant activity records</div>`;notable.forEach(function(a,i){var before=_clDrLinked(a,'before'),after=_clDrLinked(a,'after');var bpLine=(before&&after)?('BP '+before.s+'/'+before.d+(before.h?' HR '+before.h:'')+' → '+after.s+'/'+after.d+(after.h?' HR '+after.h:'')):'Cardiovascular response: no before/after BP paired';var weather=_clDrWeather(a);var fluid=_clDrFluid(a);var recent=_clDrRecentBP(a);var note=a.notes?String(a.notes).substring(0,150):'';html+=`<div style="background:#fff;border-left:4px solid #14b8a6;border-radius:6px;padding:9px 10px;margin:7px 0;page-break-inside:avoid">
+<div style="font-size:14px;font-weight:800;color:#0f172a">${i+1}. ${_clDrEsc(_clDrDate(a._date))} ${_clDrEsc(a.t||'')} · ${_clDrEsc(a.activity||a.type||'Activity')} · ${parseInt(a.duration,10)||0} min · ${_clDrEsc(a.exertion||'')}</div>
+<div style="font-size:13px;color:#334155;line-height:1.5">Context: ${_clDrEsc(_clDrContext(a))}${weather?' · '+_clDrEsc(weather):''}${fluid?' · Fluids '+_clDrEsc(fluid):''}${recent?' · Recent BP '+_clDrEsc(recent):''}<br>${_clDrEsc(bpLine)}${note?'<br><strong>Patient note:</strong> “'+_clDrEsc(note)+'”':''}</div>
+</div>`;});}
+html+=`<div style="font-size:12px;color:#475569;line-height:1.5;margin-top:8px"><strong>Interpretation note:</strong> Activity without paired BP is still useful lifestyle context. It should not be treated as a failed record; it simply means cardiovascular response cannot be calculated for that activity.</div></div>`;
+}
+
 // Weight summary
 if(weightEntries.length>0){
 html+=`
@@ -30235,7 +30274,7 @@ html+=`</div>`;
 
 html+=`
 <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:2px solid #e5e7eb;color:#6b7280;font-size:14px">
-<p style="margin:0">CardiacLens v9.10.287 — Free & Source-Available</p>
+<p style="margin:0">CardiacLens v9.10.347.10 — Free & Source-Available</p>
 <p style="margin:4px 0 0 0">Report Generated: ${reportDate}</p>
 </div>`;
 
@@ -30438,6 +30477,22 @@ text+=`- ${type}: ${d.count} session(s), BP change ${sysChange>0?'+':''}${sysCha
 }
 }
 
+
+// Activity & Cardiac Context Summary (v9.10.347.10)
+if(settings.features&&settings.features.exercise&&data.activities&&data.activities.length>0){
+function _clTxtContext(a){var c=(a.activityContext||a.contextType||'').toString().toLowerCase();var es=a.environmentalSnapshot||{};if(!c&&es.context)c=String(es.context).toLowerCase();if(!c&&es.mode)c=String(es.mode).toLowerCase();if(c.indexOf('mixed')>=0)return'Mixed';if(c.indexOf('out')>=0)return'Outdoor';if(c.indexOf('in')>=0)return'Indoor';return'Not specified';}
+function _clTxtWeather(a){try{if(typeof clActivityWeatherText==='function')return clActivityWeatherText(a)||'';}catch(e){}var es=a.environmentalSnapshot||{};var ws=es.weatherSnapshot||es.weather||{};var out=[];if(ws.feelsLikeF||ws.feelsLike)out.push('Feels like '+(ws.feelsLikeF||ws.feelsLike)+'°');if(ws.precipChance!==undefined&&ws.precipChance!==null)out.push('Rain '+ws.precipChance+'%');if(ws.windMph)out.push('Wind '+ws.windMph+' mph');return out.join(' · ');}
+function _clTxtSnap(a){var es=a.environmentalSnapshot||{};return a.eventContextSnapshot||es.contextSnapshot||{};}
+function _clTxtFluid(a){var cs=_clTxtSnap(a);if(cs&&cs.hydration&&(cs.hydration.todayOz!==undefined&&cs.hydration.todayOz!==null))return cs.hydration.todayOz+' oz';return'';}
+function _clTxtBP(a,kind){return bpReadings.find(function(bp){return bp.activityId===a.id&&bp.activityTiming===kind;});}
+function _clTxtScore(a){var score=0;if(a.notes)score+=50;if(/help|assist|rescue|exhaust|winded|dizzy|chest|short|breath|could not|couldn't|fall|fell/i.test(a.notes||''))score+=80;if(_clTxtBP(a,'before')&&_clTxtBP(a,'after'))score+=35;if(_clTxtWeather(a))score+=15;if(_clTxtContext(a)!=='Not specified')score+=10;if((a.duration||0)>=30)score+=10;return score;}
+var actsTxt=data.activities.slice().sort(function(a,b){var da=(a._date||'')+' '+(a.t||'');var db=(b._date||'')+' '+(b.t||'');return da<db?1:da>db?-1:0;});
+var ctxTxt={Indoor:0,Outdoor:0,Mixed:0,'Not specified':0};var withCtxTxt=0,withWeatherTxt=0,withBPTxt=0,withNotesTxt=0;var minTxt=0;
+actsTxt.forEach(function(a){minTxt+=(parseInt(a.duration,10)||0);var c=_clTxtContext(a);ctxTxt[c]=(ctxTxt[c]||0)+1;if(c!=='Not specified')withCtxTxt++;if(_clTxtWeather(a))withWeatherTxt++;if(_clTxtBP(a,'before')&&_clTxtBP(a,'after'))withBPTxt++;if(a.notes)withNotesTxt++;});
+text+=`\nACTIVITY & CARDIAC CONTEXT SUMMARY\n-----------------------------------\nActivities logged: ${actsTxt.length} (${minTxt} total minutes)\nEnvironment: Indoor ${ctxTxt.Indoor||0}, Outdoor ${ctxTxt.Outdoor||0}, Mixed ${ctxTxt.Mixed||0}\nContext captured: ${withCtxTxt} environment, ${withWeatherTxt} weather, ${withBPTxt} before/after BP, ${withNotesTxt} notes\nNote: Activity without paired BP is still useful lifestyle context; it simply means cardiovascular response cannot be calculated.\n`;
+actsTxt.slice().sort(function(a,b){return _clTxtScore(b)-_clTxtScore(a);}).slice(0,4).forEach(function(a,i){var before=_clTxtBP(a,'before'),after=_clTxtBP(a,'after');var bp=(before&&after)?(`BP ${before.s}/${before.d}${before.h?' HR '+before.h:''} -> ${after.s}/${after.d}${after.h?' HR '+after.h:''}`):'Cardiovascular response: no before/after BP paired';text+=`${i+1}. ${a._date||''} ${a.t||''} - ${a.activity||a.type||'Activity'} - ${parseInt(a.duration,10)||0} min - ${a.exertion||''}\n   Context: ${_clTxtContext(a)}${_clTxtWeather(a)?' - '+_clTxtWeather(a):''}${_clTxtFluid(a)?' - Fluids '+_clTxtFluid(a):''}\n   ${bp}${a.notes?'\n   Patient note: "'+String(a.notes).substring(0,150)+'"':''}\n`;});
+}
+
 // Weight
 if(weightEntries.length>0){
 text+=`
@@ -30543,7 +30598,7 @@ Note: This report is based on patient self-tracked data. Clinical correlation
 and examination are essential for diagnosis and treatment decisions.
 
 ---
-CardiacLens v9.10.287 Medical Grade - Free
+CardiacLens v9.10.347.10 Medical Grade - Free
 Report Generated: ${reportDate}`;
 
 return text;
@@ -34662,7 +34717,7 @@ report.push(notes);
 report.push('');
 }
 report.push('═══════════════════════════════════════════════════════════');
-report.push('This report was generated by CardiacLens v9.10.287 Medical Grade - Free');
+report.push('This report was generated by CardiacLens v9.10.347.10 Medical Grade - Free');
 report.push('Advanced Analytics Dashboard - Phase 3 Implementation');
 report.push('═══════════════════════════════════════════════════════════');
 const blob=new Blob([report.join('\n')],{type:'text/plain'});
@@ -34752,7 +34807,7 @@ ${periodHTML}
 <h2>Key Insights</h2>
 ${insightsHTML}
 <div style="margin-top:40px;padding:20px;background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:8px">
-<strong>CardiacLens v9.10.287 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
+<strong>CardiacLens v9.10.347.10 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
 This report is not a substitute for professional medical advice.
 </div>
 </body>
@@ -45478,7 +45533,7 @@ function _showAskClarifyChips(options) {
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,100);});else setTimeout(boot,100);setTimeout(boot,1000);setTimeout(boot,4000);
 })();
 
-// ── v9.10.347.8: Weather hardening override ─────────────────────────────
+// ── v9.10.347.10: Weather hardening override ─────────────────────────────
 // Purpose: keep Today's Weather simple and predictable: Saved ZIP -> coordinates -> Open-Meteo -> render.
 // No GPS unless Use My Location is explicitly tapped. Older weather code remains below this override but these
 // same global function names take precedence for buttons, modal open, planner, and activity weather.
