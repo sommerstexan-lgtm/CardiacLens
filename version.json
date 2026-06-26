@@ -1,7 +1,7 @@
 {
-  "version": "v9.10.347.10",
-  "build": "v9.10.347.10",
-  "name": "CardiacLens v9.10.347.10",
-  "label": "Doctor Activity Context Summary",
-  "updated": "2026-06-24"
+  "version": "v9.10.347.116",
+  "date": "2026-06-26",
+  "notes": "Final deploy-readiness pass: update main-page date, align version metadata, verify syntax, and remove non-deploy grep artifact",
+  "label": "FinalDeployReadiness",
+  "updated": "2026-06-26"
 }

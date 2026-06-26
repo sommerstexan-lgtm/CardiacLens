@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- CardiacLens versioned archive: v9.10.347.10 - deploy reference copy -->
+<!-- CardiacLens versioned archive: v9.10.347.116 - deploy reference copy -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -28,7 +28,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.10' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.116' }, params || {}));
       }
     } catch(e) {}
   };
@@ -910,7 +910,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.347.10';
+    var GD_VERSION   = 'v9.10.347.116';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1447,7 +1447,7 @@
   // -- End CL_SEC_COLOR migration ---------------------------------------------
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
-<title>CardiacLens v9.10.347.10</title>
+<title>CardiacLens v9.10.347.116</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
@@ -2156,7 +2156,7 @@ input[type="time"].modal-input,input[type="time"]{-webkit-appearance:auto;appear
 
 @keyframes askPulse{0%,100%{opacity:0.3}50%{opacity:1}}
 
-/* ── SECURE ACCESS LOCK SCREEN (v9.10.347.10 letter + symbol keypad) ─────────────────────────────── */
+/* ── SECURE ACCESS LOCK SCREEN (v9.10.347.116 letter + symbol keypad) ─────────────────────────────── */
 #clSecureLock{position:fixed;inset:0;z-index:9999999;background:#f0f4f8;display:flex;align-items:flex-start;justify-content:center;padding:16px;padding-top:calc(16px + env(safe-area-inset-top));padding-bottom:calc(16px + env(safe-area-inset-bottom));font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow-y:auto}
 #clSecureLock .cl-lock-inner{width:100%;max-width:430px;display:flex;flex-direction:column;align-items:center;margin:auto}
 #clSecureLock .cl-lock-logo{display:flex;align-items:center;gap:10px;margin-bottom:2px}
@@ -2334,7 +2334,7 @@ input[type="time"].modal-input,input[type="time"]{-webkit-appearance:auto;appear
     <!-- Version + clock row -->
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid rgba(255,255,255,0.15);padding-top:12px">
       <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px">
-        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.347.10 · Medical Grade - Free</span>
+        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.347.116 · Medical Grade - Free</span>
         <span id="cl-gd-heartbeat" style="font-size:11px;color:rgba(125,211,252,0.55);font-weight:500;letter-spacing:0.01em">ð Eyes open...</span>
         <!-- ═══════════════════════════════════════════════════════════════════
              VERSION UPDATE CHECKLIST — update ALL 8 locations every release:
@@ -2535,7 +2535,7 @@ input[type="time"].modal-input,input[type="time"]{-webkit-appearance:auto;appear
                   check and a final READY TO ZIP or DO NOT ZIP summary. That
                   output must be shown to the user before the ZIP is built.
              ═══════════════════════════════════════════════════════════════════ -->
-        <span style="font-size:12px;color:#94a3b8;font-weight:400">Updated June 24, 2026</span>
+        <span style="font-size:12px;color:#94a3b8;font-weight:400">Updated June 26, 2026</span>
       </div>
       <div id="t" style="font-size:14px;color:#94a3b8;text-align:right;font-weight:600"></div>
     </div>
@@ -3264,6 +3264,17 @@ Custom Range
           </ol>
         </div>
 
+        <div style="background:#ecfeff;border-left:4px solid #0891b2;padding:14px 16px;border-radius:8px;margin-bottom:16px">
+          <strong style="font-size:16px">Log Activity — Indoor, Outdoor, or Mixed first</strong>
+          <ul style="margin:10px 0 0 0;padding-left:20px;font-size:14px;color:#155e75;line-height:1.8">
+            <li>When Log Activity opens, choose <strong>Indoor</strong>, <strong>Outdoor</strong>, or <strong>Mixed</strong> first. The rest of the form opens based on that choice.</li>
+            <li><strong>Indoor</strong> keeps the workflow focused on activity type, BP-before, effort, notes, and time tracking.</li>
+            <li><strong>Outdoor</strong> adds today's weather and outside time-window fields.</li>
+            <li><strong>Mixed</strong> adds weather, trip/destination context, and journey fields for activities with both indoor and outdoor portions.</li>
+            <li>Weather Awareness may appear for Outdoor or Mixed activities when captured conditions deserve attention. It is observational and does not stop you from continuing.</li>
+          </ul>
+        </div>
+
         <div style="background:#f0fdf4;border-left:4px solid #10b981;padding:14px 16px;border-radius:8px;margin-bottom:16px">
           <strong style="font-size:16px">Before a Doctor Appointment</strong>
           <ol style="margin:10px 0 0 0;padding-left:20px;font-size:14px;color:#065f46;line-height:1.9">
@@ -3906,6 +3917,17 @@ Custom Range
           </div>
         </div>
 
+        <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:18px;margin-bottom:16px">
+          <div style="font-size:16px;font-weight:800;color:#9a3412;margin-bottom:10px">Weather Awareness in Log Activity</div>
+          <p style="font-size:14px;color:#9a3412;line-height:1.7;margin:0 0 8px 0">For Outdoor and Mixed activities, Log Activity can show a compact Weather Awareness panel using the weather or manual conditions already captured for that activity.</p>
+          <ul style="font-size:14px;color:#9a3412;line-height:1.8;margin:0;padding-left:20px">
+            <li>It can display items such as Feels Like, wind, rain chance, and the saved/manual weather source.</li>
+            <li>It is meant to make outdoor conditions easy to notice before starting.</li>
+            <li>It does not diagnose, predict an outcome, or decide whether you should continue.</li>
+            <li>Indoor activities do not show Weather Awareness because outdoor conditions do not apply.</li>
+          </ul>
+        </div>
+
         <div style="background:#ecfeff;border:1px solid #67e8f9;border-radius:12px;padding:18px;margin-bottom:16px">
           <div style="font-size:16px;font-weight:800;color:#155e75;margin-bottom:10px">Privacy</div>
           <p style="font-size:14px;color:#155e75;line-height:1.7;margin:0">Saved-ZIP weather does not send your health data anywhere. CardiacLens stores your health data on your device. It does not require an account, upload your health records, or sell your data.</p>
@@ -4193,7 +4215,7 @@ Custom Range
         </div>
 
         <div style="background:#f3f4f6;border-radius:10px;padding:14px;font-size:13px;color:#6b7280;line-height:1.7">
-          CardiacLens v9.10.347.10 · Free &amp; Source-Available · Built by a cardiac patient, for cardiac patients · cardiaclens.com<br>
+          CardiacLens v9.10.347.116 · Free &amp; Source-Available · Built by a cardiac patient, for cardiac patients · cardiaclens.com<br>
           No ads · No account · No subscription · Your data stays on your device · Always free
         </div>
       </section>
@@ -4352,10 +4374,10 @@ Custom Range
         <p style="font-size:14px;color:#6b7280;margin-bottom:16px">For new features and capabilities, see the <strong>Planned Features</strong> tab.</p>
 
         <div style="background:#ecfdf5;border-left:4px solid #10b981;padding:14px 16px;border-radius:8px;margin-bottom:12px">
-          <strong style="font-size:16px">✅ Stable in v9.10.347.10 &mdash; June 24, 2026</strong>
+          <strong style="font-size:16px">✅ Stable in v9.10.347.116 &mdash; June 26, 2026</strong>
           <ul style="font-size:14px;margin:6px 0 0 0;padding-left:18px;color:#064e3b;line-height:1.8">
             <li><strong>Cardiac Context v1.0 locked for activity testing.</strong> Activity logging supports Indoor, Outdoor, and Mixed context, saves weather/environment, fluid total, recent BP/HR when available, Activity History context details, Ask About Activity, and Analysis Completeness. v347.10 updates Ask guidance so activity answers treat weather/environment as part of the saved Cardiac Context Snapshot instead of claiming there is no weather-impact field.</li>
-            <li><strong>iOS update safety.</strong> Service-worker registration continues to use the iOS-compatible <code>./sw.js</code> URL with <code>updateViaCache:'none'</code>; the cache name was bumped to v9.10.347.10 so GitHub/iPhone installs do not keep serving an older shell.</li>
+            <li><strong>iOS update safety.</strong> Service-worker registration continues to use the iOS-compatible <code>./sw.js</code> URL with <code>updateViaCache:'none'</code>; the cache name was bumped to v9.10.347.116 so GitHub/iPhone installs do not keep serving an older shell.</li>
           </ul>
         </div>
 
@@ -7013,7 +7035,7 @@ Custom Range
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.347.10';
+  var CURRENT='v9.10.347.116';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -7551,7 +7573,7 @@ notes:true
 dailyEvents:[],
 customActivities:[], // User-defined custom physical activities
 securityProfile:null, // Secure Access mirror for update persistence
-// Activity / Today's Weather settings (v9.10.347.10)
+// Activity / Today's Weather settings (v9.10.347.116)
 activityWeatherMode:'manual', // off | manual | internet
 activityWeatherStoreSnapshot:true,
 activityWeatherRainThresholdPct:40,
@@ -8648,8 +8670,9 @@ function _wzB_end(el){
       var evts=settings.dailyEvents||[];
       var hasMedEvent=evts.some(function(e){return e.actions&&e.actions.indexOf('logBP')!==-1&&e.reminderEnabled!==false;});
       if(hasMedEvent) cl.events=true;
-      var beforeReading=B&&B.some(function(r){return r.medicationTiming==='before';});
-      var afterReading=B&&B.some(function(r){return r.medicationTiming==='after';});
+      var bpReadings=(typeof _getTodayBPReadings==='function')?_getTodayBPReadings():(B||[]);
+      var beforeReading=bpReadings&&bpReadings.some(function(r){return r.medicationTiming==='before';});
+      var afterReading=bpReadings&&bpReadings.some(function(r){return r.medicationTiming==='after';});
       if(beforeReading) cl.firstBefore=true;
       if(afterReading) cl.firstAfter=true;
     }
@@ -9943,7 +9966,7 @@ function _bpHistRenderFilters(){
 
 // Re-renders only the readings list (#bp). Preserves filter UI focus.
 function _bpHistRenderReadings(){
-  var allData = getAllHistoricalData().bp || [];
+  var allData = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (getAllHistoricalData().bp || []);
   var filtered = _bpHistApplyFilter(allData);
   var countEl = document.getElementById('bpHistCount');
   if(countEl) countEl.textContent = filtered.length + ' reading' + (filtered.length!==1?'s':'') + ' shown';
@@ -13409,23 +13432,63 @@ types=types.concat(settings.customActivities);
 return types;
 }
 
+// Activity Type options are filtered by the user-selected Cardiac Context.
+// Custom activities remain available in every context because CardiacLens cannot safely infer user intent from custom names.
+function getActivityTypesForContext(ctx){
+ctx=(ctx||'').toLowerCase();
+var map={
+  indoor:['Yoga','Weight Training','Cooking','House Cleaning','Laundry','Other'],
+  outdoor:['Walking','Running','Cycling','E-bike','Swimming','Sports','Yard Work','Manual Work','Other'],
+  mixed:['Walking','Cycling','E-bike','Shopping','Doctor Visit','Church','Other']
+};
+var types=map[ctx]||[];
+if(settings.customActivities&&settings.customActivities.length>0){
+  types=types.concat(settings.customActivities);
+}
+return types;
+}
+function buildActivityOptionsHTML(ctx){
+var html='<option value="">-- Choose Activity --</option>';
+var types=getActivityTypesForContext(ctx);
+for(var i=0;i<types.length;i++){
+  html+='<option value="'+types[i]+'">'+types[i]+'</option>';
+}
+if(settings.customActivities&&settings.customActivities.length>0){
+  html+='<option disabled>──────────</option>';
+}
+html+='<option disabled>──────────</option>';
+html+='<option value="__ADD_NEW__">➕ Add New Activity...</option>';
+return html;
+}
+function refreshActivityOptionsForContext(){
+var sel=document.getElementById('activitySelect');
+if(!sel)return;
+var prior=sel.value;
+sel.innerHTML=buildActivityOptionsHTML(selectedActivityContext);
+var keep=false;
+for(var i=0;i<sel.options.length;i++){if(sel.options[i].value===prior)keep=true;}
+sel.value=keep?prior:'';
+var desc=document.getElementById('manualWorkDesc');
+if(desc)desc.style.display=(sel.value==='Manual Work')?'block':'none';
+}
+
 // Keep activityTypes variable for backwards compatibility
 var activityTypes=defaultActivityTypes;
 
 var selectedExertion='';
 var selectedTempBand=null;
-// Activity environment/window state (v9.10.347.10)
+// Activity environment/window state (v9.10.347.116)
 var selectedActivityWindow='';
 var selectedActivityWindowMinutes=null;
 var selectedDestination='';
 var selectedEnvironmentalMode='manual';
 var activityEnvironmentSnapshot=null;
-// Today's Weather request guard (v9.10.347.10) — one location/weather request per activity modal/window.
+// Today's Weather request guard (v9.10.347.116) — one location/weather request per activity modal/window.
 // Prevents repeated browser location prompts when Automatic is selected and the user changes fields.
 var activityEnvironmentFetchInFlight=false;
 var activityEnvironmentFetchKey='';
 var activityEnvironmentFetchFailedKey='';
-// Activity context / journey state (v9.10.347.10)
+// Activity context / journey state (v9.10.347.116)
 var selectedActivityContext='';
 var selectedJourneyRole='single';
 var selectedJourneyName='';
@@ -13434,14 +13497,20 @@ var activityTimerInterval=null;
 var activityStartTime=null;
 var activityElapsedSeconds=0;
 var activityTimerPaused=false;
-var activityTimerStoppedForSave=false; // v9.10.347.10: Save unlocks only after activity is finished
+var activityTimerStoppedForSave=false; // v9.10.347.116: Save unlocks only after activity is finished
 
 // Background activity state (v9.10.36) — set when user minimizes the activity modal
 var _activityMinimized=false;
 var _minimizedActivityState=null; // {activityType, notes, exertion, tempBand}
 var _activityPillInterval=null;   // setInterval that ticks the pill display
 
-function logActivity(){
+function logActivity(preserveActivityContext){
+// v9.10.347.113 KISS: restore/resume may rebuild the form with an existing context.
+preserveActivityContext=!!preserveActivityContext;
+// v9.10.347.111 KISS: honor a persisted/minimized activity before opening a fresh setup.
+if(!preserveActivityContext&&!_activityMinimized && !_minimizedActivityState){
+  _loadMinimizedActivityFromStorage();
+}
 // v9.10.36: if a timed activity is already running in the background, ask first
 if(_activityMinimized && _minimizedActivityState){
   var isTimer=_minimizedActivityState.isTimerMode;
@@ -13467,27 +13536,18 @@ if(_activityMinimized && _minimizedActivityState){
   showModal(html);
   return;
 }
+if(!preserveActivityContext)selectedActivityContext='';
 var html='<div class="modal-title">Log Activity Setup</div>';
+html+=buildActivityContextHTML();
+html+='<div id="activityDetailsAfterContext" style="display:none">';
 html+='<div id="recentBPCard" style="margin-bottom:12px"></div>';
 
 html+='<div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:12px;margin-bottom:14px">';
 html+='<div style="font-size:13px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">1. What are you doing?</div>';
 html+='<label style="display:block;font-size:18px;font-weight:600;margin-bottom:8px">Activity Type <span style="color:#dc2626">*</span>:</label>';
 html+='<select id="activitySelect" class="modal-input" style="font-size:20px" onchange="handleActivitySelection();updateActivityStartState()">';
-html+='<option value="">-- Choose Activity --</option>';
-var allActivityTypes=getActivityTypes();
+html+=buildActivityOptionsHTML(selectedActivityContext);
 var customActivities=settings.customActivities||[];
-for(var i=0;i<defaultActivityTypes.length;i++){
-html+='<option value="'+defaultActivityTypes[i]+'">'+defaultActivityTypes[i]+'</option>';
-}
-if(customActivities.length>0){
-html+='<option disabled>──────────</option>';
-for(var i=0;i<customActivities.length;i++){
-html+='<option value="'+customActivities[i]+'">'+customActivities[i]+'</option>';
-}
-}
-html+='<option disabled>──────────</option>';
-html+='<option value="__ADD_NEW__">➕ Add New Activity...</option>';
 html+='</select>';
 if(customActivities.length>0){
 html+='<button type="button" onclick="openActivityManager()" style="margin-top:8px;padding:8px 12px;background:#6b7280;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;width:100%">⚙️ Manage Custom Activities</button>';
@@ -13495,13 +13555,12 @@ html+='<button type="button" onclick="openActivityManager()" style="margin-top:8
 html+='<div id="manualWorkDesc" style="display:none;margin-top:12px">';
 html+='<input type="text" id="workDescription" class="modal-input" placeholder="Describe manual work (e.g., gardening, moving boxes)" />';
 html+='</div>';
-html+=buildActivityContextHTML();
-html+=buildJourneyHTML();
-html+=buildActivityWindowHTML();
-html+=buildDestinationHTML();
+html+='<div id="activityJourneySection" style="display:none">'+buildJourneyHTML()+'</div>';
+html+='<div id="activityWindowSection" style="display:none">'+buildActivityWindowHTML()+'</div>';
+html+='<div id="activityDestinationSection" style="display:none">'+buildDestinationHTML()+'</div>';
 html+='</div>';
 
-html+='<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:12px;margin-bottom:14px">';
+html+='<div id="activityBPSection" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:12px;margin-bottom:14px">';
 html+='<div style="font-size:13px;font-weight:800;color:#1e40af;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">2. BP before you start</div>';
 html+='<div id="bpBeforeStatus" style="margin-bottom:8px;padding:8px;background:#dbeafe;border-radius:6px;font-size:14px;font-weight:600;color:#1e40af;display:none"></div>';
 html+='<button type="button" id="takeBPBeforeBtn" class="modal-btn" onclick="takeBPBeforeActivity()" style="background:#3b82f6;color:#fff;margin-bottom:0;display:block;width:100%">📊 Take BP Before Activity</button>';
@@ -13512,16 +13571,17 @@ html+='<div>• If you skip it, your after-BP will still save, but this session 
 html+='</div>';
 html+='</div>';
 
-html+='<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px;margin-bottom:14px">';
+html+='<div id="activityWeatherSection" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px;margin-bottom:14px">';
 html+='<div style="font-size:13px;font-weight:800;color:#166534;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">3. Today\'s Weather</div>';
 html+=buildEnvironmentalModeHTML();
 html+='<div id="internetEnvironmentStatus" style="display:none;margin-bottom:12px"></div>';
+html+='<div id="activityWeatherAwareness" style="display:none;margin-bottom:12px"></div>';
 html+=buildTempBandHTML();
 html+='</div>';
 
 html+='<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:12px;margin-bottom:14px">';
 html+='<div style="font-size:13px;font-weight:800;color:#9a3412;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">4. Effort and notes</div>';
-html+='<label style="display:block;font-size:18px;font-weight:600;margin:0 0 8px 0">Exertion Level:</label>';
+html+='<label style="display:block;font-size:18px;font-weight:600;margin:0 0 8px 0">Exertion Level <span style="font-size:13px;font-weight:400;color:#6b7280">(optional)</span>:</label>';
 html+='<div style="display:flex;gap:12px;margin-bottom:16px">';
 html+='<button type="button" class="modal-btn" id="exertionLight" onclick="selectExertion(\'Light\')">Light</button>';
 html+='<button type="button" class="modal-btn" id="exertionModerate" onclick="selectExertion(\'Moderate\')">Moderate</button>';
@@ -13532,13 +13592,13 @@ html+='</div>';
 
 html+='<div style="background:#f8fafc;border:2px solid #cbd5e1;border-radius:12px;padding:12px;margin-bottom:14px">';
 html+='<div style="font-size:13px;font-weight:800;color:#334155;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">5. Start or enter completed time</div>';
-html+='<label style="display:block;font-size:18px;font-weight:600;margin:0 0 8px 0">Tracking:</label>';
+html+='<label style="display:block;font-size:18px;font-weight:600;margin:0 0 8px 0">Tracking <span style="color:#dc2626">*</span>:</label>';
 html+='<div style="display:flex;gap:12px;margin-bottom:16px">';
 html+='<button type="button" class="modal-btn" id="manualTimeBtn" onclick="selectTimeMode(\'manual\')">Manual Entry</button>';
 html+='<button type="button" class="modal-btn" id="timerBtn" onclick="selectTimeMode(\'timer\')">Use Timer</button>';
 html+='</div>';
 html+='<div id="manualTimeInput" style="display:none">';
-html+='<input type="number" inputmode="numeric" id="durationMinutes" class="modal-input" placeholder="Completed duration (minutes)" min="1" oninput="updateActivitySaveState()" onblur="_sanitizeNumericInput(this);updateActivitySaveState()"/>';
+html+='<input type="number" inputmode="numeric" id="durationMinutes" class="modal-input" placeholder="Completed duration minutes (required)" min="1" oninput="updateActivitySaveState()" onblur="_sanitizeNumericInput(this);updateActivitySaveState()"/>';
 html+='</div>';
 html+='<div id="timerDisplay" style="display:none;text-align:center;padding:20px;background:#f0fdf4;border-radius:12px;margin-bottom:0">';
 html+='<div id="timerTime" style="font-size:48px;font-weight:bold;color:#10b981;font-family:monospace">00:00</div>';
@@ -13554,19 +13614,19 @@ html+='</div>';
 
 html+='<button type="button" onclick="minimizeActivityLog()" style="width:100%;margin-bottom:10px;background:none;border:2px solid #0369a1;color:#0369a1;border-radius:10px;padding:12px;font-size:16px;font-weight:600;cursor:pointer">↙ Minimize — do something else and come back</button>';
 html+='<div class="modal-actions"><button class="modal-cancel" onclick="cancelActivityLog()">Cancel</button><button class="modal-ok" id="activitySaveBtn" onclick="saveActivity()" disabled style="opacity:0.45;cursor:not-allowed">Save Completed Activity</button></div>';
+html+='</div>';
 showModal(html);
-setTimeout(function(){
-document.getElementById('activitySelect').focus();
-},100);
-setTimeout(function(){_showRecentBPCard();},150);
+setTimeout(function(){var a=document.getElementById('activitySelect');if(a&&a.offsetParent!==null)a.focus();},100);
+setTimeout(function(){if(selectedActivityContext)_showRecentBPCard();},150);
 setTimeout(function(){selectEnvironmentalMode(selectedEnvironmentalMode||settings.activityEnvironmentalMode||'manual');},175);
-setTimeout(function(){var a=document.getElementById('activitySelect');selectedActivityContext=selectedActivityContext||getDefaultActivityContext(a?a.value:'');renderActivityContextButtons();handleJourneyRoleSelection();updateActivitySaveState();updateActivityStartState();},200);
+setTimeout(function(){renderActivityContextButtons();updateActivitySectionsForContext();handleJourneyRoleSelection();updateActivitySaveState();updateActivityStartState();},200);
 }
 
 // NEW: Handle activity selection including "Add New"
 function handleActivitySelection(){
 var select=document.getElementById('activitySelect');
 var desc=document.getElementById('manualWorkDesc');
+if(!select){return;}
 if(select.value==='__ADD_NEW__'){
 // Add new activity
 var activityName=prompt('Enter new activity name:');
@@ -13598,15 +13658,13 @@ setTimeout(function(){
 document.getElementById('activitySelect').value=activityName;
 },100);
 }else if(select.value==='Manual Work'){
-desc.style.display='block';
+if(desc)desc.style.display='block';
 }else{
-desc.style.display='none';
+if(desc)desc.style.display='none';
 }
-// v9.10.347.10: suggest activity context without adding friction
-if(select.value && select.value!=='__ADD_NEW__'){
-  selectedActivityContext=getDefaultActivityContext(select.value);
-  renderActivityContextButtons();
-}
+// Activity context is intentionally chosen by the user; Indoor / Outdoor / Mixed controls which sections appear.
+renderActivityContextButtons();
+updateActivitySectionsForContext();
 updateActivityStartState();
 }
 
@@ -13615,7 +13673,7 @@ function getDefaultActivityContext(activity){
   if(activity.indexOf('cooking')>=0||activity.indexOf('clean')>=0||activity.indexOf('laundry')>=0||activity.indexOf('yoga')>=0||activity.indexOf('weight')>=0||activity.indexOf('indoor')>=0)return 'indoor';
   if(activity.indexOf('doctor')>=0||activity.indexOf('church')>=0||activity.indexOf('store')>=0||activity.indexOf('shop')>=0||activity.indexOf('restaurant')>=0||activity.indexOf('visit')>=0)return 'mixed';
   if(activity.indexOf('walk')>=0||activity.indexOf('run')>=0||activity.indexOf('cycling')>=0||activity.indexOf('e-bike')>=0||activity.indexOf('yard')>=0||activity.indexOf('manual')>=0||activity.indexOf('sports')>=0)return 'outdoor';
-  return selectedActivityContext||'outdoor';
+  return selectedActivityContext||'';
 }
 function buildActivityContextHTML(){
   var h='<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin:12px 0">';
@@ -13625,14 +13683,46 @@ function buildActivityContextHTML(){
     h+='<button type="button" id="actCtx_'+x[0]+'" onclick="selectActivityContext(\''+x[0]+'\')" style="border:2px solid #cbd5e1;background:#fff;color:#0f172a;border-radius:8px;padding:10px 6px;font-size:14px;font-weight:700;cursor:pointer">'+x[1]+'</button>';
   });
   h+='</div>';
-  h+='<div style="font-size:12px;color:#64748b;margin-top:6px">Indoor captures room/standing context. Outdoor captures weather. Mixed captures travel plus an indoor stop, like a doctor visit.</div>';
-  h+='<div style="font-size:12px;color:#075985;background:#e0f2fe;border-radius:8px;padding:8px;margin-top:8px;font-weight:700">Saved with activity for Ask, history, and doctor review.</div>';
+  h+='<div style="font-size:12px;color:#64748b;margin-top:6px">Choose one to open only the sections that apply. Indoor hides outdoor/trip fields. Outdoor adds weather/window. Mixed adds weather, trip, and destination.</div>';
   h+='</div>';
   return h;
 }
-function selectActivityContext(ctx){selectedActivityContext=ctx;renderActivityContextButtons();updateActivityStartState();}
+function selectActivityContext(ctx){
+  selectedActivityContext=ctx;
+  renderActivityContextButtons();
+  refreshActivityOptionsForContext();
+  updateActivitySectionsForContext();
+  updateActivityStartState();
+}
 function renderActivityContextButtons(){
   ['indoor','outdoor','mixed'].forEach(function(c){var b=document.getElementById('actCtx_'+c);if(!b)return;b.style.borderColor=(selectedActivityContext===c?'#0369a1':'#cbd5e1');b.style.background=(selectedActivityContext===c?'#e0f2fe':'#fff');});
+}
+function updateActivitySectionsForContext(){
+  var ctx=selectedActivityContext||'';
+  var details=document.getElementById('activityDetailsAfterContext');
+  if(details)details.style.display=ctx?'block':'none';
+  if(ctx&&document.getElementById('recentBPCard'))_showRecentBPCard();
+  var weather=document.getElementById('activityWeatherSection');
+  var windowSec=document.getElementById('activityWindowSection');
+  var dest=document.getElementById('activityDestinationSection');
+  var journey=document.getElementById('activityJourneySection');
+  if(weather)weather.style.display=(ctx==='outdoor'||ctx==='mixed')?'block':'none';
+  if(windowSec)windowSec.style.display=(ctx==='outdoor'||ctx==='mixed')?'block':'none';
+  if(dest)dest.style.display=(ctx==='mixed')?'block':'none';
+  if(journey)journey.style.display=(ctx==='mixed')?'block':'none';
+  renderActivityWeatherAwareness();
+  if(ctx==='indoor'){
+    selectedActivityWindow='';selectedActivityWindowMinutes=null;selectedDestination='';selectedJourneyRole='single';selectedJourneyName='';selectedJourneyId=null;
+    var w=document.getElementById('activityWindowSelect');if(w)w.value='';
+    var d=document.getElementById('activityDestinationSelect');if(d)d.value='';
+    var j=document.getElementById('journeyRoleSelect');if(j)j.value='single';
+    var jn=document.getElementById('journeyNameInput');if(jn)jn.value='';
+  }else if(ctx==='outdoor'){
+    selectedDestination='';selectedJourneyRole='single';selectedJourneyName='';selectedJourneyId=null;
+    var d2=document.getElementById('activityDestinationSelect');if(d2)d2.value='';
+    var j2=document.getElementById('journeyRoleSelect');if(j2)j2.value='single';
+    var jn2=document.getElementById('journeyNameInput');if(jn2)jn2.value='';
+  }
 }
 function _getActiveJourney(){try{return JSON.parse(localStorage.getItem('CB_ACTIVE_JOURNEY')||'null');}catch(e){return null;}}
 function _setActiveJourney(j){try{if(j)localStorage.setItem('CB_ACTIVE_JOURNEY',JSON.stringify(j));else localStorage.removeItem('CB_ACTIVE_JOURNEY');}catch(e){}}
@@ -13700,7 +13790,7 @@ function getJourneyFormData(activityName){
 }
 
 
-// Weather settings persistence guard (v9.10.347.10)
+// Weather settings persistence guard (v9.10.347.116)
 var CARDIACLENS_WEATHER_SETTINGS_KEY='CARDIACLENS_WEATHER_SETTINGS';
 function _clMergeDestinations(a,b){
   var out=[],seen={};
@@ -13745,7 +13835,7 @@ function _clWeatherSettingsSnapshot(){
   };}catch(e){return null;}
 }
 function _clSaveWeatherSettingsBackup(){
-  // v9.10.347.10: current saved settings win; backup only fills missing weather fields.
+  // v9.10.347.116: current saved settings win; backup only fills missing weather fields.
   try{
     var snap=_clWeatherSettingsSnapshot(); if(!snap)return;
     var prior=null;
@@ -13767,14 +13857,14 @@ function _clSaveWeatherSettingsBackup(){
   }catch(e){}
 }
 function _clRestoreWeatherSettingsBackup(){
-  // v9.10.347.10: restore defensively. Blank/default backup fields must not erase current settings.
+  // v9.10.347.116: restore defensively. Blank/default backup fields must not erase current settings.
   try{
     var raw=localStorage.getItem(CARDIACLENS_WEATHER_SETTINGS_KEY); if(!raw)return;
     var w=JSON.parse(raw); if(!w||typeof w!=='object')return;
     var fields=['activityWeatherMode','activityEnvironmentalMode','activityWeatherStoreSnapshot','activityWeatherRainThresholdPct','activityWeatherDefaultWindowMin','activityWeatherAskOnOutdoor','activityWeatherStoreCoordinates','todayWeatherPillEnabled','todayWeatherCacheMinutes','todayWeatherSavedZip','todayWeatherSource','pickupPlannerDefaultDate','activityWindows','activityDestinations'];
     fields.forEach(function(k){
       if(w[k]===undefined||w[k]===null)return;
-      // v9.10.347.10: current Saved ZIP settings must not be overwritten by older backup values.
+      // v9.10.347.116: current Saved ZIP settings must not be overwritten by older backup values.
       // Backup is only a fill-in source, not the authority when current settings are explicit.
       if(k==='todayWeatherSource'){
         var curSource=settings&&settings.todayWeatherSource;
@@ -13809,15 +13899,15 @@ function _ensureActivityEnvSettings(){
     {label:'Medium — 1 hr',minutes:60},{label:'Long — 2 hr',minutes:120}
   ];}
   if(!settings.activityDestinations){settings.activityDestinations=[];}
-  // v9.10.347.10: remove legacy/test destination presets that were seeded during weather testing.
+  // v9.10.347.116: remove legacy/test destination presets that were seeded during weather testing.
   if(!settings.activityDestinationLegacyCleanupV309){
     var legacyNames={'Doctor':true,'Store':true,'Church':true,'Aggarwala':true,'HEB':true};
     settings.activityDestinations=(settings.activityDestinations||[]).filter(function(d){return d&&d.label&&!legacyNames[d.label];});
     settings.activityDestinationLegacyCleanupV309=true;
-    // v9.10.347.10: do not write defaults from _ensureActivityEnvSettings().
+    // v9.10.347.116: do not write defaults from _ensureActivityEnvSettings().
     // This function may run during startup before saved settings are loaded.
   }
-  // v9.10.347.10: no baked-in destinations. Users add their own.
+  // v9.10.347.116: no baked-in destinations. Users add their own.
   if(settings.activityEnvironmentalMode&&!settings.activityWeatherMode)settings.activityWeatherMode=settings.activityEnvironmentalMode;
   if(!settings.activityWeatherMode)settings.activityWeatherMode='manual';
   settings.activityEnvironmentalMode=settings.activityWeatherMode; // backwards-compatible alias
@@ -13931,6 +14021,7 @@ function selectEnvironmentalMode(mode){
   var stat=document.getElementById('internetEnvironmentStatus');
   if(stat)stat.style.display=(mode==='internet')?'block':'none';
   updateActivityEnvironmentFromForm();
+  renderActivityWeatherAwareness();
 }
 function updateActivityEnvironmentFromForm(){
   var cm=document.getElementById('customWindowMinutes');
@@ -13997,7 +14088,7 @@ function buildActivityEnvironmentSnapshot(data,lat,lon){
 }
 function renderActivityEnvironmentStatus(){
   var stat=document.getElementById('internetEnvironmentStatus');
-  if(!stat||!activityEnvironmentSnapshot)return;
+  if(!stat||!activityEnvironmentSnapshot){renderActivityWeatherAwareness();return;}
   var s=activityEnvironmentSnapshot;
   var rain=(s.rainMaxProbability!==null)?(s.rainMaxProbability+'%'):(s.rainTotalInches>0?(s.rainTotalInches+' in'):'Low');
   var heat=(s.heatIndexF!==null)?Math.round(s.heatIndexF)+'°':'—';
@@ -14005,6 +14096,33 @@ function renderActivityEnvironmentStatus(){
   var col=s.rainLikely?'#9a3412':'#166534';
   var icon=s.rainLikely?'🌧':'✓';
   stat.innerHTML='<div style="background:'+bg+';border-radius:8px;padding:10px;font-size:13px;color:'+col+';font-weight:700">'+icon+' '+s.summary+' · '+(s.windowMinutes||30)+' min window<br><span style="font-weight:600">Rain: '+rain+' · Heat index: '+heat+'</span></div>';
+  renderActivityWeatherAwareness();
+}
+function renderActivityWeatherAwareness(){
+  var box=document.getElementById('activityWeatherAwareness');
+  if(!box)return;
+  var ctx=selectedActivityContext||'';
+  if(ctx!=='outdoor'&&ctx!=='mixed'){box.style.display='none';box.innerHTML='';return;}
+  var items=[];
+  var s=activityEnvironmentSnapshot;
+  if(selectedEnvironmentalMode==='internet'&&s){
+    if(s.heatIndexF!==null&&s.heatIndexF!==undefined&&parseFloat(s.heatIndexF)>=90)items.push('Feels like: '+Math.round(parseFloat(s.heatIndexF))+'°F');
+    if(s.rainLikely){
+      var rain=(s.rainMaxProbability!==null&&s.rainMaxProbability!==undefined)?(s.rainMaxProbability+'%'):(s.rainTotalInches>0?(s.rainTotalInches+' in'):'Possible');
+      items.push('Rain in selected window: '+rain);
+    }
+  }
+  if(selectedEnvironmentalMode==='manual'&&selectedTempBand!==null&&selectedTempBand!==undefined&&selectedTempBand>=2){
+    items.push('Manual condition selected: '+(selectedTempBand>=3?'Extreme heat':'Hot'));
+  }
+  if(!items.length){box.style.display='none';box.innerHTML='';return;}
+  box.style.display='block';
+  box.innerHTML='<div style="background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #f59e0b;border-radius:10px;padding:12px;color:#92400e">'+
+    '<div style="font-size:14px;font-weight:800;margin-bottom:6px">Weather Awareness</div>'+
+    '<div style="font-size:13px;line-height:1.45;margin-bottom:6px">Current outdoor conditions may increase physical demands during your activity.</div>'+
+    '<div style="font-size:13px;font-weight:700;line-height:1.45">'+items.join('<br>')+'</div>'+
+    '<div style="font-size:12px;line-height:1.45;margin-top:6px;color:#78350f">Options remain available: continue, refresh weather, or change activity.</div>'+
+    '</div>';
 }
 function getActivityEventContextSnapshot(activityName){
   var ctx={capturedAt:new Date().toISOString(),activity:activityName||'',hydration:{todayOz:(typeof dailyFluid!=='undefined'?dailyFluid:null)},recentBP:null,recentSymptoms:[]};
@@ -14031,7 +14149,7 @@ function _isActivityFinishedForSave(){
   var isTimerMode=timerDisplay&&timerDisplay.style.display==='block';
   var isManualMode=manualInput&&manualInput.parentElement&&manualInput.parentElement.style.display==='block';
   if(isTimerMode){
-    // v9.10.347.10 KISS: Once the user taps Finish Activity, any positive elapsed time can be saved.
+    // v9.10.347.116 KISS: Once the user taps Finish Activity, any positive elapsed time can be saved.
     // Do not require the full 60 seconds to pass; short real-world activities still matter.
     return !!activityTimerStoppedForSave && activityElapsedSeconds>0 && !activityTimerInterval;
   }
@@ -14134,7 +14252,7 @@ var mins=Math.floor(elapsed/60);
 var secs=elapsed%60;
 var __tt=document.getElementById('timerTime');if(__tt){__tt.textContent=(mins<10?'0':'')+mins+':'+(secs<10?'0':'')+secs;}
 },100);
-// v9.10.347.10 KISS: Start Activity now uses the proven Minimize workflow.
+// v9.10.347.116 KISS: Start Activity now uses the proven Minimize workflow.
 // This creates/persists the activity pill, closes the modal, and starts the pill timer immediately.
 minimizeActivityLog();
 }
@@ -14170,7 +14288,7 @@ if(pauseBtn)pauseBtn.style.display='none';
 if(resumeBtn)resumeBtn.style.display='none';
 if(stopBtn)stopBtn.style.display='none';
 if(pausedLabel)pausedLabel.style.display='none';
-activityTimerStoppedForSave=(activityElapsedSeconds>0); // v9.10.347.10: Save unlocks after Stop for any positive elapsed time
+activityTimerStoppedForSave=(activityElapsedSeconds>0); // v9.10.347.116: Save unlocks after Stop for any positive elapsed time
 updateActivitySaveState();
 }
 
@@ -14183,6 +14301,66 @@ document.getElementById('exertion'+level).classList.add('selected');
 }
 
 // NEW: Store current activity info for BP linking
+var activityReturnStateForBP=null;
+function captureActivityReturnStateForBP(){
+  var sel=document.getElementById('activitySelect');
+  var notes=document.getElementById('activityNotes');
+  var dur=document.getElementById('durationMinutes');
+  return {
+    activityType: sel ? sel.value : '',
+    notes: notes ? notes.value : '',
+    exertion: selectedExertion,
+    tempBand: selectedTempBand,
+    activityWindow: selectedActivityWindow,
+    activityWindowMinutes: selectedActivityWindowMinutes,
+    destination: selectedDestination,
+    environmentalMode: selectedEnvironmentalMode,
+    environmentSnapshot: activityEnvironmentSnapshot,
+    activityContext: selectedActivityContext,
+    journeyRole: selectedJourneyRole,
+    journeyName: selectedJourneyName,
+    journeyId: selectedJourneyId,
+    manualMinutes: dur ? (dur.value||'') : ''
+  };
+}
+function restoreActivityAfterBP(state, bpLabel){
+  if(!state)return;
+  selectedActivityContext=state.activityContext||selectedActivityContext||getDefaultActivityContext(state.activityType||'');
+  logActivity(true);
+  setTimeout(function(){
+    selectedActivityContext=state.activityContext||selectedActivityContext||getDefaultActivityContext(state.activityType||'');
+    renderActivityContextButtons();
+    refreshActivityOptionsForContext();
+    updateActivitySectionsForContext();
+    var sel=document.getElementById('activitySelect');
+    if(sel&&state.activityType)sel.value=state.activityType;
+    handleActivitySelection();
+    var notes=document.getElementById('activityNotes');
+    if(notes)notes.value=state.notes||'';
+    if(state.exertion)selectExertion(state.exertion);
+    if(state.tempBand!==undefined&&state.tempBand!==null)selectTempBand(state.tempBand);
+    selectedActivityWindow=state.activityWindow||'';
+    selectedActivityWindowMinutes=state.activityWindowMinutes||null;
+    selectedDestination=state.destination||'';
+    selectedEnvironmentalMode=state.environmentalMode||selectedEnvironmentalMode||'manual';
+    activityEnvironmentSnapshot=state.environmentSnapshot||null;
+    selectedJourneyRole=state.journeyRole||'single';
+    selectedJourneyName=state.journeyName||'';
+    selectedJourneyId=state.journeyId||null;
+    var wSel=document.getElementById('activityWindowSelect');if(wSel&&selectedActivityWindowMinutes)wSel.value=String(selectedActivityWindowMinutes);
+    var dSel=document.getElementById('activityDestinationSelect');if(dSel&&selectedDestination)dSel.value=selectedDestination;
+    var jSel=document.getElementById('journeyRoleSelect');if(jSel)jSel.value=selectedJourneyRole;
+    var jName=document.getElementById('journeyNameInput');if(jName)jName.value=selectedJourneyName||'';
+    selectEnvironmentalMode(selectedEnvironmentalMode);
+    if(activityEnvironmentSnapshot)renderActivityEnvironmentStatus();
+    var dur=document.getElementById('durationMinutes');if(dur&&state.manualMinutes)dur.value=state.manualMinutes;
+    var bpStatus=document.getElementById('bpBeforeStatus');
+    var bpBtn=document.getElementById('takeBPBeforeBtn');
+    if(bpStatus&&bpLabel){bpStatus.textContent=bpLabel;bpStatus.style.display='block';}
+    if(bpBtn&&bpLabel)bpBtn.style.display='none';
+    updateActivityStartState();
+  },300);
+}
 var currentActivityForBP=null;
 var bpBeforeReading=null;
 var usingExistingBP=null;
@@ -14196,6 +14374,7 @@ if(!activityType){
 _showInlineError('⚠️ Please select an activity type first');
 return;
 }
+activityReturnStateForBP=captureActivityReturnStateForBP();
 currentActivityForBP={
 type:activityType,
 timing:'before'
@@ -14251,35 +14430,12 @@ if(currentActivityForBP){
 if(currentActivityForBP.timing==='before'){
 bpBeforeReading=reading;
 hideModal();
-// Reopen activity modal
+// Reopen the same activity setup instead of resetting to the first screen.
+var returnState=activityReturnStateForBP;
 setTimeout(function(){
-logActivity();
-// Restore form state with longer delay to ensure DOM is ready
-setTimeout(function(){
-// Set activity type
-var activitySelect=document.getElementById('activitySelect');
-if(activitySelect){
-activitySelect.value=currentActivityForBP.type;
-}
-// Switch to timer mode explicitly
-var timerBtn=document.getElementById('timerBtn');
-if(timerBtn){
-timerBtn.click(); // Use click to ensure full event handling
-}
-// Wait for mode switch to complete, then show BP status
-setTimeout(function(){
-var bpStatus=document.getElementById('bpBeforeStatus');
-var bpBtn=document.getElementById('takeBPBeforeBtn');
-if(bpStatus){
-bpStatus.textContent='✓ BP Before: '+s+'/'+d;
-bpStatus.style.display='block';
-}
-if(bpBtn){
-bpBtn.style.display='none';
-}
+restoreActivityAfterBP(returnState,'✓ BP Before: '+s+'/'+d);
+activityReturnStateForBP=null;
 currentActivityForBP=null;
-},200);
-},400);
 },300);
 }else{
 // After activity - link to saved activity
@@ -14306,9 +14462,11 @@ alert('✓ Blood pressure logged after activity: '+s+'/'+d+' mmHg');
 function cancelBPForActivity(){
 hideModal();
 if(currentActivityForBP&&currentActivityForBP.timing==='before'){
-// Reopen activity modal
+// Reopen the same activity setup instead of resetting to the first screen.
+var returnState=activityReturnStateForBP;
 setTimeout(function(){
-logActivity();
+restoreActivityAfterBP(returnState,'');
+activityReturnStateForBP=null;
 currentActivityForBP=null;
 },300);
 }else{
@@ -14339,7 +14497,7 @@ completeAndCloseModal();
 // ── Background Activity System (v9.10.36) ────────────────────────────────────
 
 
-// v9.10.347.10 KISS: activity pill state is created immediately when timer starts.
+// v9.10.347.116 KISS: activity pill state is created immediately when timer starts.
 // This is intentionally limited to the floating pill lifecycle; activity save/history/context logic is untouched.
 function _captureActivityPillStateFromForm(isTimerMode){
   var sel=document.getElementById('activitySelect');
@@ -14375,7 +14533,7 @@ function _captureActivityPillStateFromForm(isTimerMode){
   } catch(e) {}
 }
 
-// v9.10.347.10 KISS: prevent bottom floating controls from covering each other on iPhone.
+// v9.10.347.116 KISS: prevent bottom floating controls from covering each other on iPhone.
 function _layoutBottomPills(){
   var activity=document.getElementById('activityPillBtn');
   var status=document.getElementById('statusFab');
@@ -14503,32 +14661,37 @@ function restoreActivityLog(){
   _activityMinimized=false;
   _minimizedActivityState=null;
   _stopActivityPillTick();
+  try { localStorage.removeItem('CB_ACTIVITY_MINIMIZED'); } catch(e) {}
 
   // Rebuild the modal
-  logActivity();
+  selectedActivityContext=state.activityContext||selectedActivityContext||getDefaultActivityContext(state.activityType||'');
+  logActivity(true);
 
   // Restore form state after modal renders
   setTimeout(function(){
+    selectedActivityContext=state.activityContext||selectedActivityContext||getDefaultActivityContext(state.activityType||'');
+    renderActivityContextButtons();
+    refreshActivityOptionsForContext();
+    updateActivitySectionsForContext();
     var sel=document.getElementById('activitySelect');
     if(sel && state.activityType) sel.value=state.activityType;
+    handleActivitySelection();
     var notes=document.getElementById('activityNotes');
     if(notes && state.notes) notes.value=state.notes;
-    if(state.exertion) selectExertion(state.exertion);
-    if(state.tempBand!==undefined&&state.tempBand!==null) selectTempBand(state.tempBand);
     selectedActivityWindow=state.activityWindow||'';
     selectedActivityWindowMinutes=state.activityWindowMinutes||null;
     selectedDestination=state.destination||'';
     selectedEnvironmentalMode=state.environmentalMode||selectedEnvironmentalMode||'manual';
     activityEnvironmentSnapshot=state.environmentSnapshot||null;
-    selectedActivityContext=state.activityContext||selectedActivityContext||getDefaultActivityContext(state.activityType||'');
     selectedJourneyRole=state.journeyRole||'single';
     selectedJourneyName=state.journeyName||'';
     selectedJourneyId=state.journeyId||null;
     var jSel=document.getElementById('journeyRoleSelect');if(jSel)jSel.value=selectedJourneyRole;
     var jName=document.getElementById('journeyNameInput');if(jName&&selectedJourneyName)jName.value=selectedJourneyName;
-    renderActivityContextButtons();
     var wSel=document.getElementById('activityWindowSelect');if(wSel&&selectedActivityWindowMinutes)wSel.value=String(selectedActivityWindowMinutes);
     var dSel=document.getElementById('activityDestinationSelect');if(dSel&&selectedDestination)dSel.value=selectedDestination;
+    if(state.exertion) selectExertion(state.exertion);
+    if(state.tempBand!==undefined&&state.tempBand!==null) selectTempBand(state.tempBand);
     selectEnvironmentalMode(selectedEnvironmentalMode);
     if(activityEnvironmentSnapshot)renderActivityEnvironmentStatus();
     if(state.manualEnvironmentFactors&&state.manualEnvironmentFactors.length){state.manualEnvironmentFactors.forEach(function(label){var map={'Hot kitchen':'hotKitchen','Standing long time':'standingLong','After meal':'afterMeal','Stairs / hills':'stairsHills','Humid room':'humidRoom','Stressful':'stressful','After shower':'afterShower','Warm room':'warmRoom'};var el=document.getElementById('envCtx_'+map[label]);if(el)el.checked=true;});}
@@ -14580,7 +14743,7 @@ function restoreActivityLog(){
       if(manDur && state.manualMinutes) manDur.value=state.manualMinutes;
       updateActivitySaveState();
     }
-    // v9.10.347.10 KISS: returning from the Activity pill should land at the active timer/save area,
+    // v9.10.347.116 KISS: returning from the Activity pill should land at the active timer/save area,
     // not the top of the Log Activity setup modal.
     setTimeout(function(){
       var target=document.getElementById('activityTimingSection')||document.getElementById('timerDisplay')||document.getElementById('timerStartBtn');
@@ -14964,6 +15127,7 @@ function selectTempBand(level){
       btn.style.boxShadow='none';
     }
   }
+  renderActivityWeatherAwareness();
 }
 
 function getHeatSensitiveConditions(){
@@ -15135,7 +15299,7 @@ function _actHistRenderFilters(){
 }
 
 
-// v9.10.347.10 KISS: Cardiac Context display helpers (display only; no save/storage changes)
+// v9.10.347.116 KISS: Cardiac Context display helpers (display only; no save/storage changes)
 function clActivityEsc(v){
   return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
 }
@@ -17997,6 +18161,56 @@ var _medSafetyBlockedMeds = [];
 window._medSafetyWarnState = null;
 
 
+// Returns all BP readings from local storage plus today's session, preserving full history
+function _getAllBPReadings(){
+  var allBP=[];
+  var todayKey=getTodayKey();
+
+  // Prefer today's active session data when present.
+  if(B&&B.length>0){
+    B.forEach(function(r){ allBP.push(Object.assign({},r,{_date:todayKey})); });
+  }
+
+  try{
+    for(var i=0;i<localStorage.length;i++){
+      var key=localStorage.key(i);
+      if(key&&key.indexOf('BP_TRACKER_')===0&&key!=='BP_TRACKER_DAILY_DATA'){
+        var dateKey=key.replace('BP_TRACKER_','');
+        if(dateKey===todayKey&&B&&B.length>0)continue;
+        if(/^\d{4}-\d{2}-\d{2}$/.test(dateKey)){
+          var stored=localStorage.getItem(key);
+          if(stored){
+            var parsed=JSON.parse(stored);
+            if(parsed&&parsed.bp){
+              parsed.bp.forEach(function(r){ allBP.push(Object.assign({},r,{_date:dateKey})); });
+            }
+          }
+        }
+      }
+      else if(key&&key.indexOf('data-')===0){
+        var oldDateKey=key.replace('data-','');
+        if(oldDateKey===todayKey&&B&&B.length>0)continue;
+        if(/^\d{4}-\d{2}-\d{2}$/.test(oldDateKey)){
+          var oldStored=localStorage.getItem(key);
+          if(oldStored){
+            var oldParsed=JSON.parse(oldStored);
+            if(oldParsed&&oldParsed.B){
+              oldParsed.B.forEach(function(r){ allBP.push(Object.assign({},r,{_date:oldDateKey})); });
+            }
+          }
+        }
+      }
+    }
+  }catch(e){console.error('Failed to load all BP history:',e);}
+
+  allBP.sort(function(a,b){
+    var ak=(a._date||todayKey)+'T'+(a.t||'');
+    var bk=(b._date||todayKey)+'T'+(b.t||'');
+    return ak<bk?-1:ak>bk?1:0;
+  });
+  return allBP;
+}
+
 // Returns the most recent BP reading within 4 hours, or null
 function _getRecentBPReading(){
   var now = new Date();
@@ -18018,6 +18232,16 @@ function _getRecentBPReading(){
     }
   }
   return best;
+}
+
+// Returns HR readings from a supplied BP record set, preserving existing order
+function _getHRReadingsFromBP(records){
+  var values=[];
+  records=records||[];
+  for(var i=0;i<records.length;i++){
+    if(records[i]&&records[i].h&&records[i].h>0) values.push(Object.assign({},records[i],{hr:records[i].h}));
+  }
+  return values;
 }
 
 // Returns minutes ago as formatted string
@@ -18860,7 +19084,7 @@ function _checkDisclaimerAccepted(){
 
 function _acceptDisclaimer(){
   try{
-    var rec = {accepted: true, ts: new Date().toISOString(), version: 'v9.10.347.10'};
+    var rec = {accepted: true, ts: new Date().toISOString(), version: 'v9.10.347.116'};
     // Checksum the acknowledgment record
     rec._cs = _cbHash(rec.ts + '|' + rec.version + '|' + CB_TAMPER_SALT);
     localStorage.setItem(CB_DISCLAIMER_KEY, JSON.stringify(rec));
@@ -21548,7 +21772,13 @@ var CARD_LOG_FN = {
 // B2: Med Effectiveness tile tap handler — adapts to user's setup state
 function _openMedEffTile(){
   var hasMedData=medicineList&&medicineList.length>0;
-  var hasMedReadings=B&&B.some(function(r){return r.medicationRelated&&r.medicationTiming!=='none';});
+  var hasMedReadings=false;
+  try{
+    var medTileBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():[];
+    hasMedReadings=medTileBP.some(function(r){return r&&r.medicationRelated&&r.medicationTiming&&r.medicationTiming!=='none';});
+  }catch(e){
+    hasMedReadings=false;
+  }
   // Scan historical BP_TRACKER localStorage keys for tagged readings
   if(!hasMedReadings){
     try{
@@ -21735,14 +21965,15 @@ function buildSmartStatusMessage(zoneData) {
   var minuteOfDay = hour * 60 + now.getMinutes();
   var zone = zoneData ? zoneData.zone : null;
 
-  var bpCount       = B      ? B.length      : 0;
+  var todayBPData   = (typeof _getTodayBPReadings === 'function') ? _getTodayBPReadings() : (B || []);
+  var bpCount       = todayBPData.length;
   var weightCount   = W      ? W.length      : 0;
   var symptomCount  = S      ? S.length      : 0;
   var activityCount = A      ? A.length      : 0;
   var mealCount     = M      ? M.length      : 0;
   var notesCount    = notes  ? notes.length  : 0;
   var fluidEntries  = (fluidLog ? fluidLog.length : 0)
-                    + (B ? B.filter(function(r){return r.f>0;}).length : 0)
+                    + todayBPData.filter(function(r){return r.f>0;}).length
                     + (M ? M.filter(function(m){return m.mealFluidOz>0;}).length : 0);
   var medsSet = {};
   if(medLog){ medLog.forEach(function(e){ if(e.medicine) medsSet[e.medicine]=true; }); }
@@ -21783,11 +22014,11 @@ function buildSmartStatusMessage(zoneData) {
   var facts = [];
 
   // 1. BP in range with actual avg
-  if (bpCount > 0 && B && B.length > 0) {
+  if (bpCount > 0 && todayBPData.length > 0) {
     var totalSys = 0, totalDia = 0;
-    B.forEach(function(r){ totalSys += r.s; totalDia += r.d; });
-    var avgSys = Math.round(totalSys / B.length);
-    var avgDia = Math.round(totalDia / B.length);
+    todayBPData.forEach(function(r){ totalSys += r.s; totalDia += r.d; });
+    var avgSys = Math.round(totalSys / todayBPData.length);
+    var avgDia = Math.round(totalDia / todayBPData.length);
     facts.push('BP in range · avg ' + avgSys + '/' + avgDia);
   }
 
@@ -21875,7 +22106,7 @@ function buildSmartStatusMessage(zoneData) {
 }
 
 
-// ── Home Today's Weather pill + pickup/trip planner (v9.10.347.10) ─────────────
+// ── Home Today's Weather pill + pickup/trip planner (v9.10.347.116) ─────────────
 var TODAY_WEATHER_CACHE_KEY='CARDIACLENS_TODAY_WEATHER_CACHE';
 var todayWeatherFetchInFlight=false;
 var todayWeatherModalRequestSeq=0;
@@ -21889,7 +22120,7 @@ function _clWindCompass(deg){
 function _clGetWeatherCache(){try{var raw=localStorage.getItem(TODAY_WEATHER_CACHE_KEY);return raw?JSON.parse(raw):null;}catch(e){return null;}}
 function _clSetWeatherCache(obj){try{localStorage.setItem(TODAY_WEATHER_CACHE_KEY,JSON.stringify(obj));}catch(e){}}
 function _clResolveSavedWeatherZip(){
-  // v9.10.347.10: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
+  // v9.10.347.116: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
   // Today Weather must not fall back to GPS unless the user explicitly taps Use My Location.
   try{
     var z=String((settings&&settings.todayWeatherSavedZip)||'').trim();
@@ -21919,7 +22150,7 @@ function _clWeatherUpdatedLabel(c){
   return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+' ('+ageText+')';
 }
 function _clBuildWeatherUrl(lat,lon){
-  // v9.10.347.10: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
+  // v9.10.347.116: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
   // The app only needs current conditions + hourly forecast for rain/heat/wind guidance.
   return 'https://api.open-meteo.com/v1/forecast?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+
     '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=2'+
@@ -21927,7 +22158,7 @@ function _clBuildWeatherUrl(lat,lon){
     '&hourly=precipitation_probability,precipitation,rain,temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m';
 }
 
-// v9.10.347.10: Saved ZIP uses a direct local coordinate table first.
+// v9.10.347.116: Saved ZIP uses a direct local coordinate table first.
 // For Robert's normal area, 77340 always resolves directly to Huntsville coordinates.
 var CL_ZIP_COORDS={
   '77340':{lat:30.7235,lon:-95.5508,label:'Huntsville'},
@@ -22052,15 +22283,15 @@ function openTodayWeatherModal(){
   var html='<div class="modal-title" style="font-size:26px;margin-bottom:10px">☀️ Today\'s Weather</div><button type="button" onclick="hideModal();openHelpModal(\'weather\')" style="width:100%;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;border-radius:10px;padding:10px;font-size:14px;font-weight:800;margin-bottom:12px">How to use Today\'s Weather</button><div id="todayWeatherModalBody">'+_renderTodayWeatherBody(c,null,initialState)+'</div>';
   html+='<div class="modal-actions"><button class="modal-cancel" onclick="hideModal()">Close</button><button class="modal-ok" id="todayWeatherRefreshBtn" onclick="refreshTodayWeatherFromModal()">Refresh Weather</button></div>';
   showModal(html);
-  // v9.10.347.10: if cached weather is older than the user's refresh threshold, refresh automatically on open.
+  // v9.10.347.116: if cached weather is older than the user's refresh threshold, refresh automatically on open.
   // This keeps the weather pill, planner, and activity weather on the same fresh source without requiring a manual tap.
   if(stale){setTimeout(function(){
-    // v9.10.347.10: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
+    // v9.10.347.116: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
     refreshTodayWeatherFromModal(true,'zip');
   },100);}
 }
 
-// v9.10.347.10: Today's Weather banner must use the real weather state, not a stale/default activity flag.
+// v9.10.347.116: Today's Weather banner must use the real weather state, not a stale/default activity flag.
 function _clIsTodayWeatherAutomaticEnabled(c){
   try{
     if(typeof _clRestoreWeatherSettingsBackup==='function')_clRestoreWeatherSettingsBackup();
@@ -22155,7 +22386,7 @@ function useSavedZipWeather(){
   refreshTodayWeatherFromModal(false,'zip');
 }
 function refreshTodayWeatherFromModal(silent,source){
-  // v9.10.347.10: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
+  // v9.10.347.116: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
   source=(source==='location')?'location':'zip';
   if(source==='zip'){
     try{settings.todayWeatherSource='zip';settings.todayWeatherSavedZip=_clResolveSavedWeatherZip();localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
@@ -22509,7 +22740,13 @@ html+=tile('⚡', bpCount, 'HR Rate', '#f59e0b', 'rate');
 // B2: Med Effectiveness tile — always shown; behavior adapts to setup state
 (function(){
   var hasMedData=medicineList&&medicineList.length>0;
-  var hasMedReadings=B&&B.some(function(r){return r.medicationRelated&&r.medicationTiming!=='none';});
+  var hasMedReadings=false;
+  try{
+    var medTileBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():[];
+    hasMedReadings=medTileBP.some(function(r){return r&&r.medicationRelated&&r.medicationTiming&&r.medicationTiming!=='none';});
+  }catch(e){
+    hasMedReadings=false;
+  }
   html+='<div class="stat-tile" style="background:#10b98118;border:2.5px solid #10b981;box-shadow:0 4px 14px #10b98144;text-align:center;cursor:pointer;" onclick="_openMedEffTile()">'
        +'<div style="font-size:22px;font-weight:800;color:#10b981">'+(hasMedReadings?'📈':'💊')+'</div>'
        +'<div style="font-size:11px;color:#4b5563;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Med Effectiveness</div>'
@@ -24025,7 +24262,7 @@ html+=lbBadge;
 html+='<div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">';
 html+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
 html+='<div>';
-html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.347.10</span></div>';
+html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.347.116</span></div>';
 html+='<div id="settingsVersionStatus" style="font-size:13px;color:#6b7280;margin-top:3px">Tap "Check for Updates" to see if a newer version is available</div>';
 html+='</div>';
 html+='<button onclick="checkForUpdates(true)" id="checkUpdateBtn" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">🔍 Check for Updates</button>';
@@ -24184,7 +24421,7 @@ html+='</div>';// close settings-section
   html+='</div></div>';
 })();
 
-// ── v9.10.347.10: Activity & Today's Weather Settings ─────────────────────────
+// ── v9.10.347.116: Activity & Today's Weather Settings ─────────────────────────
 (function(){
   _ensureActivityEnvSettings();
   var wm=settings.activityWeatherMode||'manual';
@@ -26361,8 +26598,8 @@ var _hrHistMode = false;
 
 function showHRHistory(){
   _hrHistMode = true;
-  var histAll = getAllHistoricalData();
-  _hrHistAllData = (histAll.bp||[]).filter(function(r){ return r.h && r.h > 0; });
+  var allBP = (typeof _getAllBPReadings==='function') ? _getAllBPReadings() : ((getAllHistoricalData().bp)||[]);
+  _hrHistAllData = (typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(allBP):(allBP||[]).filter(function(r){ return r.h && r.h > 0; });
   var fDiv = document.getElementById('hrHistFiltersDiv');
   if(fDiv){ fDiv.style.display='none'; fDiv.innerHTML=''; }
   _hrHistRenderFilters();
@@ -27174,6 +27411,53 @@ var hrChart=null;
 
 var hrQuickStatsPeriod='today';
 
+function _getHRPeriodBounds(period){
+period=period||hrQuickStatsPeriod||'today';
+if(period==='all')return null;
+var todayKey=(typeof getTodayKey==='function')?getTodayKey():null;
+var base=todayKey?new Date(todayKey+'T12:00:00'):new Date();
+var startDate=new Date(base);
+var endDate=new Date(base);
+if(period==='week'){startDate.setDate(base.getDate()-6);}
+else if(period==='month'){startDate.setDate(base.getDate()-29);}
+startDate.setHours(0,0,0,0);
+endDate.setHours(23,59,59,999);
+return{startDate:startDate,endDate:endDate};
+}
+
+function _getHRExportPeriodLabel(period,readings){
+period=period||hrQuickStatsPeriod||'today';
+function fmt(d){return d.toLocaleDateString();}
+function readingDateOnly(r){
+var datePart=(r&&r._date)?String(r._date):((r&&r.date)?String(r.date):getTodayKey());
+var m=datePart.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+if(m)return new Date(parseInt(m[1],10),parseInt(m[2],10)-1,parseInt(m[3],10),12,0,0,0).toLocaleDateString();
+var d=new Date(datePart);
+return isNaN(d.getTime())?datePart:d.toLocaleDateString();
+}
+var bounds=(typeof _getHRPeriodBounds==='function')?_getHRPeriodBounds(period):null;
+if(bounds)return fmt(bounds.startDate)+' - '+fmt(bounds.endDate);
+if(readings&&readings.length){return readingDateOnly(readings[0])+' - '+readingDateOnly(readings[readings.length-1]);}
+return 'No data';
+}
+
+function _getHRReadingsForPeriod(period){
+period=period||hrQuickStatsPeriod||'today';
+var allBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():[];
+if(period==='all'){
+return (typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(allBP):allBP.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
+}
+var bounds=(typeof _getHRPeriodBounds==='function')?_getHRPeriodBounds(period):null;
+if(!bounds)return[];
+var filteredBP=allBP.filter(function(r){
+var datePart=(r&&r._date)?String(r._date):((r&&r.date)?String(r.date):getTodayKey());
+var timePart=(r&&r.t)?String(r.t):'12:00';
+var dt=new Date(datePart+'T'+timePart);
+return !isNaN(dt.getTime())&&dt>=bounds.startDate&&dt<=bounds.endDate;
+});
+return (typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(filteredBP):filteredBP.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
+}
+
 function setHRQuickStatsPeriod(period){
 hrQuickStatsPeriod=period;
 // Update button styles
@@ -27185,22 +27469,7 @@ if(p===period){btn.style.background='#7c3aed';btn.style.color='#fff';}
 else{btn.style.background='#e5e7eb';btn.style.color='#374151';}
 }
 });
-// Gather readings for chosen period
-var hrReadings=[];
-if(period==='today'){
-hrReadings=B.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
-}else{
-var endDate=new Date();endDate.setHours(23,59,59,999);
-var startDate=new Date();
-if(period==='week'){startDate.setDate(startDate.getDate()-7);}
-else if(period==='month'){startDate.setDate(startDate.getDate()-30);}
-else{startDate.setDate(startDate.getDate()-(typeof DATA_RETENTION_DAYS!=='undefined'?DATA_RETENTION_DAYS:90));}
-startDate.setHours(0,0,0,0);
-var allData=getHistoricalDataRange(startDate,endDate);
-if(allData&&allData.bp){
-hrReadings=allData.bp.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
-}
-}
+var hrReadings=_getHRReadingsForPeriod(period);
 if(hrReadings.length===0){
 var resultsArea=document.getElementById('hrQuickStatsGrid');
 if(resultsArea){resultsArea.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#6b7280;padding:20px 0">No heart rate data for this period</div>';}
@@ -27229,11 +27498,10 @@ function switchSCTab(tab){
 function buildSCTimeline(){
   var hist=getAllHistoricalData();
   var allSymsTL=hist.symptoms||[];
-  var allBPTL=hist.bp||[];
+  var allBPTL=(typeof _getAllBPReadings==='function')?_getAllBPReadings():(hist.bp||[]);
   var allWTL=hist.weight||[];
   var todayKey=getTodayKey();
   S.forEach(function(s){if(!allSymsTL.some(function(x){return x._date===todayKey&&x.symptom===s.symptom&&x.t===s.t;}))allSymsTL.push(Object.assign({},s,{_date:todayKey}));});
-  B.forEach(function(r){if(!allBPTL.some(function(x){return x._date===todayKey&&x.t===r.t;}))allBPTL.push(Object.assign({},r,{_date:todayKey}));});
   var now=new Date();
   var msDay=24*60*60*1000;
   var day60Key=new Date(now.getTime()-60*msDay).toISOString().split('T')[0];
@@ -27244,7 +27512,7 @@ function buildSCTimeline(){
   var dates=Object.keys(dateSet).sort();
   if(dates.length===0){document.getElementById('scTimeline').innerHTML='<div style="text-align:center;color:#6b7280;padding:20px">No data in last 60 days.</div>';return;}
   // HR patterns
-  var hrTL=allBPTL.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
+  var hrTL=(typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(allBPTL):allBPTL.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
   var hrPatsTL=hrTL.length>=6?detectPatterns(hrTL.slice().sort(function(a,b){var aStr=a._date?a._date+'T'+a.t+':00':'1970-01-01T'+a.t+':00';var bStr=b._date?b._date+'T'+b.t+':00':'1970-01-01T'+b.t+':00';return new Date(aStr)-new Date(bStr);})):[];
   var shiftDates={};
   hrPatsTL.filter(function(p){return p.type==='level_shift';}).forEach(function(p){shiftDates[p.splitDate]=p;});
@@ -27337,18 +27605,17 @@ function saveTimelineSnapshot(){
   // Build snapshot object
   var hist=getAllHistoricalData();
   var allSymsTL=hist.symptoms||[];
-  var allBPTL=hist.bp||[];
+  var allBPTL=(typeof _getAllBPReadings==='function')?_getAllBPReadings():(hist.bp||[]);
   var allWTL=hist.weight||[];
   var todayKey=getTodayKey();
   S.forEach(function(s){if(!allSymsTL.some(function(x){return x._date===todayKey&&x.symptom===s.symptom&&x.t===s.t;}))allSymsTL.push(Object.assign({},s,{_date:todayKey}));});
-  B.forEach(function(r){if(!allBPTL.some(function(x){return x._date===todayKey&&x.t===r.t;}))allBPTL.push(Object.assign({},r,{_date:todayKey}));});
 
   var now=new Date();
   var msDay=24*60*60*1000;
   var day60Key=new Date(now.getTime()-60*msDay).toISOString().split('T')[0];
 
   // HR patterns
-  var hrTLs=allBPTL.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
+  var hrTLs=(typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(allBPTL):allBPTL.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
   var hrPatsSnap=hrTLs.length>=6?detectPatterns(hrTLs.slice().sort(function(a,b){
     var aStr=a._date?a._date+'T'+a.t+':00':'1970-01-01T'+a.t+':00';
     var bStr=b._date?b._date+'T'+b.t+':00':'1970-01-01T'+b.t+':00';
@@ -27814,9 +28081,14 @@ function _sentFmtShort(dateStr) {
 function _sentGetDay(dateStr) {
   try { return JSON.parse(localStorage.getItem('BP_TRACKER_' + dateStr) || 'null'); } catch(e) { return null; }
 }
-function _sentMetrics(day) {
+function _sentMetrics(day, dateStr) {
   if (!day) return null;
-  var bp   = day.bp       || [];
+  var bp = [];
+  if (dateStr && typeof _getAllBPReadings === 'function') {
+    bp = _getAllBPReadings().filter(function(r){ return (r._date || '') === dateStr; });
+  } else {
+    bp = day.bp || [];
+  }
   var syms = day.symptoms || [];
   var wt   = day.weight   || [];
   var bpValid = bp.filter(function(r){ return r.s && r.d; });
@@ -27844,7 +28116,7 @@ function _sentComputeBaseline() {
     var ds  = _sentDateStr(i);
     var day = _sentGetDay(ds);
     if (!day) continue;
-    var m = _sentMetrics(day);
+    var m = _sentMetrics(day, ds);
     if (!m || m.bpCount < 3) continue;
     candidates.push({ date: ds, m: m });
   }
@@ -27898,7 +28170,7 @@ function _sentComputeRecentAvg(activeStart) {
     var ds = _sentDateStr(i);
     if (activeStart && ds < activeStart) break;
     var day = _sentGetDay(ds);
-    var m   = _sentMetrics(day);
+    var m   = _sentMetrics(day, ds);
     if (m && m.bpCount >= 2) days.push({ date: ds, m: m });
     if (!activeStart && days.length >= 14) break;
   }
@@ -27920,7 +28192,7 @@ function _sentCurrentWindow() {
   for (var i = 0; i <= 2; i++) {
     var ds  = _sentDateStr(i);
     var day = _sentGetDay(ds);
-    var m   = _sentMetrics(day);
+    var m   = _sentMetrics(day, ds);
     if (m && m.bpCount >= 1) days.push({ date: ds, m: m });
   }
   return days;
@@ -27958,7 +28230,7 @@ function _sentDailySeries(metricKey, days) {
   for (var i = days - 1; i >= 0; i--) {
     var ds  = _sentDateStr(i);
     var day = _sentGetDay(ds);
-    var m   = _sentMetrics(day);
+    var m   = _sentMetrics(day, ds);
     series.push({ date: ds, value: m ? fn(m) : null });
   }
   return series;
@@ -28078,7 +28350,7 @@ function _sentExtractFootprints() {
       d.setDate(d.getDate() - i);
       var ds  = d.toISOString().slice(0, 10);
       var day = _sentGetDay(ds);
-      var m   = _sentMetrics(day);
+      var m   = _sentMetrics(day, ds);
       if (m && m.bpCount >= 2) preDays.push({ date: ds, m: m });
     }
     if (!preDays.length) return;
@@ -28299,7 +28571,7 @@ function _buildSentinelPPHSection() {
     if (typeof getAllHistoricalData !== 'function') return '';
     var hist = getAllHistoricalData();
     var meals = hist.meals || [];
-    var bp    = hist.bp    || [];
+    var bp    = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (hist.bp || []);
     if (meals.length < 3 || bp.length < 5) return '';
 
     var cutoff = new Date();
@@ -29054,7 +29326,7 @@ function toggleSCDrill(btn){
 function analyzeSymptomConvergence(){
   var hist=getAllHistoricalData();
   var allSymptoms=hist.symptoms||[];
-  var allBPSC=hist.bp||[];
+  var allBPSC=(typeof _getAllBPReadings==='function')?_getAllBPReadings():(hist.bp||[]);
   var allWeightSC=hist.weight||[];
   var todayKey=getTodayKey();
 
@@ -29354,15 +29626,7 @@ function togglePPDrill(btn){
 }
 
 function analyzePulsePressure(){
-  var hist=getAllHistoricalData();
-  var allBP=hist.bp||[];
-  // Include today
-  B.forEach(function(r){
-    var todayKey=getTodayKey();
-    if(!allBP.some(function(x){return x._date===todayKey&&x.t===r.t;})){
-      allBP.push(Object.assign({},r,{_date:todayKey}));
-    }
-  });
+  var allBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():((getAllHistoricalData().bp)||[]);
 
   // Only readings with both systolic and diastolic
   var validBP=allBP.filter(function(r){return r.s>0&&r.d>0;});
@@ -29589,7 +29853,7 @@ function analyzePulsePressure(){
 function updateAnalyticsBadges(){
   try{
     var hist=getAllHistoricalData();
-    var allBPB=hist.bp||[];
+    var allBPB=(typeof _getAllBPReadings==='function')?_getAllBPReadings():(hist.bp||[]);
     var allSymsB=hist.symptoms||[];
     var allWB=hist.weight||[];
     var todayKey=getTodayKey();
@@ -29618,7 +29882,7 @@ function updateAnalyticsBadges(){
         var ydR=wSorted.filter(function(w){return w._date===ydKey;});
         if(ydR.length>0&&(latest-(parseFloat(ydR[0].w)||0))>=2)decompCount++;
       }
-      var hrB=allBPB.filter(function(r){return r.h&&r.h>0;});
+      var hrB=(typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(allBPB):allBPB.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
       if(hrB.length>=6){
         var hrSB=hrB.slice().sort(function(a,b){return ((a._date||'')+(a.t||'')).localeCompare((b._date||'')+(b.t||''));});
         var rHR=hrSB.filter(function(r){return (r._date||'')>=day3Key;});
@@ -29652,7 +29916,7 @@ function updateAnalyticsBadges(){
         else if(recentPPAvgB<40)ppCount=1;
       }
       // HR patterns cross-detector
-      var hrPPB=allBPB.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
+      var hrPPB=(typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(allBPB):allBPB.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
       if(hrPPB.length>=6){
         var hrPatsBadge=detectPatterns(hrPPB.slice().sort(function(a,b){var aS=a._date?a._date+'T'+a.t+':00':'1970-01-01T'+a.t+':00';var bS=b._date?b._date+'T'+b.t+':00':'1970-01-01T'+b.t+':00';return new Date(aS)-new Date(bS);}));
         if(hrPatsBadge.some(function(p){return p.type==='level_shift';}))ppCount=Math.max(ppCount,1);
@@ -29745,7 +30009,7 @@ function toggleDecompDrill(btn,id){
 
 function analyzeDecompensation(){
   var hist=getAllHistoricalData();
-  var allBP=hist.bp||[];
+  var allBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():(hist.bp||[]);
   var allWeight=hist.weight||[];
   var allSymptoms=hist.symptoms||[];
   var now=new Date();
@@ -30216,13 +30480,10 @@ function analyzeDecompensation(){
 function openHRDetector(){
 cbBehavior.track('screens','hr_detector');
 hrQuickStatsPeriod='today';
-// Use today's session data first, fall back to historical if empty
-var hrReadings=B.filter(r=>r.h && r.h>0).map(r=>({...r,hr:r.h}));
-if(hrReadings.length===0){
-  // Fall back to historical data (e.g. Chromebook local file testing)
-  var hist=getAllHistoricalData();
-  var histBP=hist.bp||[];
-  hrReadings=histBP.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
+// Use HR SSOT period helper for the default view, preserving historical fallback if today has no readings
+var hrReadings=(typeof _getHRReadingsForPeriod==='function')?_getHRReadingsForPeriod('today'):[];
+if(hrReadings.length===0 && typeof _getHRReadingsForPeriod==='function'){
+  hrReadings=_getHRReadingsForPeriod('all');
 }
 if(hrReadings.length===0){
 alert('No heart rate data available. Please add blood pressure readings with heart rate measurements.');
@@ -30786,14 +31047,14 @@ hrChart.destroy();
 hrChart=null;
 }
 
-// Show up to 100 readings (was 50); scroll handles the rest
-const displayReadings=readings.slice(-100);
+// Show the full selected period; horizontal scroll handles larger data sets
+const displayReadings=readings;
 const isMultiDay=(typeof hrQuickStatsPeriod!=='undefined'&&hrQuickStatsPeriod!=='today');
 
 // Update info text
 const infoEl=document.getElementById('chartDataInfo');
 if(infoEl){
-var infoMsg=readings.length>100?'Showing last 100 of '+readings.length+' readings':readings.length+' reading'+(readings.length!==1?'s':'');
+var infoMsg=readings.length+' reading'+(readings.length!==1?'s':'');
 if(isMultiDay)infoMsg+=' · scroll chart →';
 infoEl.textContent=infoMsg;
 }
@@ -30938,12 +31199,7 @@ hrChart=new Chart(ctx,config);
 }
 
 function exportHRReport(){
-var hrReadings=B.filter(r=>r.h && r.h>0).map(r=>({...r,hr:r.h}));
-// Fall back to historical data if no live session readings (e.g. Chromebook local file)
-if(hrReadings.length===0){
-  var hist=getAllHistoricalData();
-  hrReadings=(hist.bp||[]).filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
-}
+var hrReadings=(typeof _getHRReadingsForPeriod==='function')?_getHRReadingsForPeriod(hrQuickStatsPeriod):[];
 if(hrReadings.length===0){
   // Show friendly inline message instead of a jarring browser alert
   var exportBtn=document.querySelector('#hr-section-quick-stats button[onclick="exportHRReport()"]');
@@ -30956,14 +31212,32 @@ if(hrReadings.length===0){
   }
   return;
 }
-const sortedReadings=[...hrReadings].sort((a,b)=>new Date(a.t)-new Date(b.t));
+function _hrExportDate(r){
+var datePart=(r&&r._date)?String(r._date):((r&&r.date)?String(r.date):getTodayKey());
+var timePart=(r&&r.t)?String(r.t):((r&&r.time)?String(r.time):'00:00');
+if(timePart.indexOf('T')!==-1||/^\d{4}-\d{2}-\d{2}/.test(timePart)){
+  var fullDate=new Date(timePart);
+  if(!isNaN(fullDate.getTime())) return fullDate;
+}
+var dateMatch=datePart.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+var timeMatch=timePart.match(/^(\d{1,2}):(\d{2})/);
+if(dateMatch&&timeMatch){
+  return new Date(parseInt(dateMatch[1],10),parseInt(dateMatch[2],10)-1,parseInt(dateMatch[3],10),parseInt(timeMatch[1],10),parseInt(timeMatch[2],10),0,0);
+}
+var fallbackDate=new Date(datePart+' '+timePart);
+return isNaN(fallbackDate.getTime())?new Date():fallbackDate;
+}
+function _hrExportDateOnly(r){return _hrExportDate(r).toLocaleDateString();}
+function _hrExportDateTime(r){return _hrExportDate(r).toLocaleString();}
+hrReadings=hrReadings.map(function(r){var copy=Object.assign({},r);copy._exportDate=_hrExportDate(copy);return copy;});
+const sortedReadings=[...hrReadings].sort((a,b)=>a._exportDate-b._exportDate);
 const stats=calculateHRStats(sortedReadings);
 const timeInZone=calculateTimeInZones(sortedReadings);
 const patterns=detectPatterns(sortedReadings);
 const report=[];
 report.push('=== HEART RATE ANALYSIS REPORT ===');
 report.push(`Generated: ${new Date().toLocaleString()}`);
-report.push(`Analysis Period: ${new Date(sortedReadings[0].t).toLocaleDateString()} - ${new Date(sortedReadings[sortedReadings.length-1].t).toLocaleDateString()}`);
+report.push(`Analysis Period: ${_getHRExportPeriodLabel(hrQuickStatsPeriod,sortedReadings)}`);
 report.push(`Total Readings: ${sortedReadings.length}`);
 report.push('');
 report.push('STATISTICAL SUMMARY:');
@@ -31010,7 +31284,7 @@ correlations.push({reading:r,correlations:corr});
 if(correlations.length>0){
 report.push('MEDICAL CONTEXT CORRELATIONS:');
 correlations.forEach(c=>{
-report.push(`${new Date(c.reading.t).toLocaleTimeString()} - HR: ${c.reading.hr} BPM`);
+report.push(`${c.reading._exportDate.toLocaleTimeString()} - HR: ${c.reading.hr} BPM`);
 c.correlations.forEach(corr=>{
 report.push(`   - ${corr.minutesAfter} min after ${corr.event} (${corr.type})`);
 });
@@ -31039,7 +31313,7 @@ report.push('✓ No immediate concerns noted in this analysis period');
 report.push('');
 report.push('DETAILED READINGS:');
 sortedReadings.forEach(r=>{
-report.push(`${new Date(r.t).toLocaleString()} - HR: ${r.hr} BPM, BP: ${r.s}/${r.d}, Position: ${r.pos}`);
+report.push(`${_hrExportDateTime(r)} - HR: ${r.hr} BPM, BP: ${r.s}/${r.d}, Position: ${r.pos}`);
 if(r.n)report.push(`   Notes: ${r.n}`);
 if(r.contextSymptoms&&r.contextSymptoms.length>0)report.push(`   Symptoms: ${r.contextSymptoms.join(', ')}`);
 if(r.contextActivity&&r.contextActivity.length>0)report.push(`   Context: ${r.contextActivity.join(', ')}`);
@@ -31106,7 +31380,8 @@ if(reportDateRange==='30'){
 startDate=new Date();
 startDate.setDate(startDate.getDate()-30);
 }else if(reportDateRange==='all'){
-const allDates=B.map(r=>new Date(r.t));
+const allBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():[];
+const allDates=allBP.map(r=>new Date((r._date||getTodayKey())+' '+(r.t||'00:00'))).filter(d=>!isNaN(d.getTime()));
 startDate=allDates.length>0?new Date(Math.min(...allDates)):new Date();
 }else if(reportDateRange==='custom'){
 const start=document.getElementById('reportStartDate').value;
@@ -31127,10 +31402,10 @@ if(!range)return;
 const{startDate,endDate}=range;
 cbTrack('doctors_report_opened', { range_days: Math.round((endDate - startDate) / (1000*60*60*24)) });
 
-// Get ALL historical data, not just today's
-const allData=getAllHistoricalData();
+// Get BP/HR through the authoritative retrieval helper
+const allBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():[];
 
-const filteredBP=allData.bp.filter(r=>{
+const filteredBP=allBP.filter(r=>{
 // Combine _date and t to create full datetime
 const readingDate=new Date(r._date+' '+r.t);
 const passes=readingDate>=startDate&&readingDate<=endDate;
@@ -31153,7 +31428,7 @@ actionButtons.forEach(btn=>btn.disabled=true);
 return;
 }
 const stats=calculateBPStats(filteredBP);
-const hrReadings=filteredBP.filter(r=>r.hr&&r.hr>0);
+const hrReadings=(typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(filteredBP):filteredBP.filter(r=>r.hr&&r.hr>0);
 let previewHTML=`<div style="background:#f0f9ff;border:2px solid #3b82f6;border-radius:12px;padding:20px;margin:16px 0">
 <div style="font-size:22px;font-weight:700;color:#1e3a8a;margin-bottom:16px;text-align:center">✓ Report Ready</div>
 
@@ -31213,9 +31488,9 @@ const range=getDateRangeData();
 if(!range)return;
 const{startDate,endDate}=range;
 
-// Get ALL historical data, not just today's
-const allData=getAllHistoricalData();
-const filteredBP=allData.bp.filter(r=>{
+// Get ALL BP/HR readings through the authoritative retrieval path
+const allBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():((getAllHistoricalData().bp)||[]);
+const filteredBP=allBP.filter(r=>{
 // Combine _date and t to create full datetime
 const readingDate=new Date(r._date+' '+r.t);
 return readingDate>=startDate&&readingDate<=endDate;
@@ -31242,7 +31517,7 @@ function generateComprehensiveReport(readings,startDate,endDate){
 const report=[];
 const sortedReadings=[...readings].sort((a,b)=>new Date(a.t)-new Date(b.t));
 const stats=calculateBPStats(sortedReadings);
-const hrReadings=sortedReadings.filter(r=>r.hr&&r.hr>0);
+const hrReadings=(typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(sortedReadings):sortedReadings.filter(r=>r.hr&&r.hr>0);
 report.push('═══════════════════════════════════════════════════════════');
 report.push('                    BP TRACKER v7.0');
 report.push('              MEDICAL-GRADE ANALYSIS REPORT');
@@ -31460,9 +31735,9 @@ const range=getDateRangeData();
 if(!range)return;
 const{startDate,endDate}=range;
 
-// Get ALL historical data, not just today's
-const allData=getAllHistoricalData();
-const filteredBP=allData.bp.filter(r=>{
+// Get BP/HR through the SSOT retrieval path
+const allBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():((getAllHistoricalData().bp)||[]);
+const filteredBP=allBP.filter(r=>{
 // Combine _date and t to create full datetime
 const readingDate=new Date(r._date+' '+r.t);
 return readingDate>=startDate&&readingDate<=endDate;
@@ -31503,9 +31778,9 @@ const range=getDateRangeData();
 if(!range)return;
 const{startDate,endDate}=range;
 
-// Get ALL historical data, not just today's
-const allData=getAllHistoricalData();
-const filteredBP=allData.bp.filter(r=>{
+// Get BP/HR through the SSOT retrieval path
+const allBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():[];
+const filteredBP=allBP.filter(r=>{
 // Combine _date and t to create full datetime
 const readingDate=new Date(r._date+' '+r.t);
 return readingDate>=startDate&&readingDate<=endDate;
@@ -31836,7 +32111,7 @@ return;
 var beforeReadings=[];
 var afterReadings=[];
 
-allData.bp.forEach(function(reading){
+allBP.forEach(function(reading){
 if(!reading._date){
 console.log('Skipping reading with no _date field');
 return;
@@ -32139,7 +32414,8 @@ medReadings.push({s:reading.s,d:reading.d,h:reading.h,t:reading.t,medicationName
 });
 }
 if(medAnalysisPeriod==='today'){
-B.forEach(function(reading){
+var todayBPReadings=(typeof _getTodayBPReadings==='function')?_getTodayBPReadings():(B||[]);
+todayBPReadings.forEach(function(reading){
 if(reading.medicationRelated&&reading.medicationTiming&&reading.medicationTiming!=='none'){
 expandReading(reading,todayKey);
 }
@@ -32167,13 +32443,17 @@ startDate.setDate(startDate.getDate()-(typeof DATA_RETENTION_DAYS!=='undefined'?
 startDate.setHours(0,0,0,0);
 }
 
-var allData=getHistoricalDataRange(startDate,endDate);
+var allBPReadings=(typeof _getAllBPReadings==='function')?_getAllBPReadings():((getHistoricalDataRange(startDate,endDate).bp)||[]);
 
-if(!allData||!allData.bp||allData.bp.length===0){
+if(!allBPReadings||allBPReadings.length===0){
 return[];
 }
 
-allData.bp.forEach(function(reading){
+allBPReadings.forEach(function(reading){
+if(!reading||!reading._date)return;
+var readingDate=new Date(reading._date+'T00:00:00');
+readingDate.setHours(0,0,0,0);
+if(readingDate<startDate||readingDate>endDate)return;
 if(reading.medicationRelated&&reading.medicationTiming&&reading.medicationTiming!=='none'){
 expandReading(reading,reading._date||todayKey);
 }
@@ -32623,7 +32903,7 @@ populateMedicationHRData();
 }
 
 function populateMedicationHRData(){
-var allData=getAllHistoricalData();
+var allBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():((getAllHistoricalData().bp)||[]);
 var medReadings=[];
 var cutoffDate=null;
 
@@ -32649,8 +32929,8 @@ cutoffDate=null;
 
 console.log('HR Med period:',hrMedPeriod,'Cutoff date:',cutoffDate);
 
-// FIXED: allData is an object {bp: [...], weight: [...], ...}
-if(!allData||!allData.bp||allData.bp.length===0){
+// FIXED: BP readings come from the BP/HR SSOT path.
+if(!allBP||allBP.length===0){
 console.log('No BP data found for HR medication analysis');
 document.getElementById('hrMedicationResults').innerHTML=
 '<div style="padding:32px;text-align:center;background:#f0f9ff;border:2px solid #bae6fd;border-radius:12px">'+
@@ -32668,7 +32948,7 @@ return;
 }
 
 // Collect medication-related readings
-allData.bp.forEach(function(reading){
+allBP.forEach(function(reading){
 if(reading.medicationRelated&&reading.medicationTiming&&reading.medicationTiming!=='none'&&reading.h){
 // Get the date from the reading's _date property
 var readingDateStr=reading._date;
@@ -32963,7 +33243,7 @@ function buildDeepDiveSuggestions(){
   // ── Signal 4: Convergence spikes — run a quick convergence scan ───────────
   try{
     var histAll3 = getAllHistoricalData();
-    var allBP3 = histAll3.bp||[];
+    var allBP3 = (typeof _getAllBPReadings==='function') ? _getAllBPReadings() : (histAll3.bp||[]);
     var allS3  = histAll3.symptoms||[];
     var fluidTarget3 = settings.fluidMax||64;
     var allFluid3={};
@@ -33126,7 +33406,7 @@ function renderDeepDive(){
   // Gather all historical data
   var todayKey=getTodayKey();
   var histAll = getAllHistoricalData();
-  var allBP   = (histAll.bp||[]).filter(function(r){ return r._date>=_ddFrom&&r._date<=_ddTo; });
+  var allBP   = ((typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (histAll.bp||[])).filter(function(r){ return r._date>=_ddFrom&&r._date<=_ddTo; });
   var allW    = (histAll.weight||[]).filter(function(r){ return r._date>=_ddFrom&&r._date<=_ddTo; });
   var allS    = (histAll.symptoms||[]).filter(function(r){ return r._date>=_ddFrom&&r._date<=_ddTo; });
   var allA    = (histAll.activities||[]).filter(function(r){ return r._date>=_ddFrom&&r._date<=_ddTo; });
@@ -33146,7 +33426,7 @@ function renderDeepDive(){
       }
     });
   }
-  _ddPatchToday(allBP,  B,      function(r){ return r.t||''; });
+  if(typeof _getAllBPReadings !== 'function') _ddPatchToday(allBP,  B,      function(r){ return r.t||''; });
   _ddPatchToday(allW,   W,      function(r){ return r.t||''; });
   _ddPatchToday(allS,   S,      function(r){ return (r.symptom||'')+(r.t||''); });
   _ddPatchToday(allA,   A,      function(r){ return (r.activity||'')+(r.t||''); });
@@ -33181,7 +33461,7 @@ function renderDeepDive(){
   var totalDays=Math.round((toDate-fromDate)/(24*60*60*1000))+1;
 
   // ── BP Stats ─────────────────────────────────────────────────────────
-  var bpWithHR = allBP.filter(function(r){ return r.h>0; });
+  var bpWithHR = (typeof _getHRReadingsFromBP === 'function') ? _getHRReadingsFromBP(allBP) : allBP.filter(function(r){ return r.h>0; });
   var avgSys=0,avgDia=0,avgHR=0,inRangeCount=0;
   if(allBP.length>0){
     allBP.forEach(function(r){ avgSys+=r.s; avgDia+=r.d; });
@@ -35571,7 +35851,7 @@ html+=`</table></div>`;
 }
 
 
-// Activity & Cardiac Context Summary (v9.10.347.10)
+// Activity & Cardiac Context Summary (v9.10.347.116)
 if(settings.features&&settings.features.exercise&&data.activities&&data.activities.length>0){
 function _clDrEsc(v){return String(v===undefined||v===null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function _clDrDate(d){if(!d)return'';var parts=String(d).split('-');if(parts.length===3){var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return mo[parseInt(parts[1],10)-1]+' '+parseInt(parts[2],10);}return d;}
@@ -35852,7 +36132,7 @@ html+=`</div>`;
 
 html+=`
 <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:2px solid #e5e7eb;color:#6b7280;font-size:14px">
-<p style="margin:0">CardiacLens v9.10.347.10 — Free & Source-Available</p>
+<p style="margin:0">CardiacLens v9.10.347.116 — Free & Source-Available</p>
 <p style="margin:4px 0 0 0">Report Generated: ${reportDate}</p>
 </div>`;
 
@@ -35866,12 +36146,19 @@ if(_pinned.length>0){
   html+='<div style="font-size:18px;font-weight:800;color:#92400e;margin-bottom:8px">📌 Pinned Significant Events</div>';
   html+='<div style="font-size:13px;color:#78350f;margin-bottom:16px;line-height:1.5">The following events were flagged by CardiacLens pattern detectors and permanently preserved. Math is directional, not definitive — these patterns are for clinical discussion, not diagnosis.</div>';
   _pinned.forEach(function(evt,i){
+    function _pinVal(v){ return (v===undefined||v===null||String(v).trim()===''||String(v).trim().toLowerCase()==='undefined') ? '' : String(v); }
     var _col=_sevColor[evt.severity]||'#6b7280';
     var _bg=_sevBg[evt.severity]||'#f9fafb';
+    var _title=_pinVal(evt.title)||'Pinned event';
+    var _summary=_pinVal(evt.summary)||'Details not available';
+    var _source=_pinVal(evt.sourceLabel);
+    var _eventDate=_pinVal(evt.eventDateDisplay)||_pinVal(evt.eventDate);
     html+='<div style="background:'+_bg+';border-left:4px solid '+_col+';padding:12px 14px;border-radius:6px;margin-bottom:10px">';
-    html+='<div style="font-size:14px;font-weight:700;color:'+_col+'">'+(i+1)+'. '+evt.title+'</div>';
-    html+='<div style="font-size:13px;color:#374151;margin-top:4px">'+evt.summary+'</div>';
-    html+='<div style="font-size:12px;color:#6b7280;margin-top:4px">Source: '+(evt.sourceLabel||'')+'&nbsp;·&nbsp;Event date: '+(evt.eventDateDisplay||evt.eventDate)+'</div>';
+    html+='<div style="font-size:14px;font-weight:700;color:'+_col+'">'+(i+1)+'. '+_title+'</div>';
+    html+='<div style="font-size:13px;color:#374151;margin-top:4px">'+_summary+'</div>';
+    if(_source||_eventDate){
+      html+='<div style="font-size:12px;color:#6b7280;margin-top:4px">'+(_source?'Source: '+_source:'')+((_source&&_eventDate)?'&nbsp;·&nbsp;':'')+(_eventDate?'Event date: '+_eventDate:'')+'</div>';
+    }
     if(evt.rawData&&evt.rawData.bp&&evt.rawData.bp.length){
       html+='<div style="font-size:12px;color:#6b7280;margin-top:2px">'+evt.rawData.bp.length+' BP reading(s) logged that day</div>';
     }
@@ -36056,7 +36343,7 @@ text+=`- ${type}: ${d.count} session(s), BP change ${sysChange>0?'+':''}${sysCha
 }
 
 
-// Activity & Cardiac Context Summary (v9.10.347.10)
+// Activity & Cardiac Context Summary (v9.10.347.116)
 if(settings.features&&settings.features.exercise&&data.activities&&data.activities.length>0){
 function _clTxtContext(a){var c=(a.activityContext||a.contextType||'').toString().toLowerCase();var es=a.environmentalSnapshot||{};if(!c&&es.context)c=String(es.context).toLowerCase();if(!c&&es.mode)c=String(es.mode).toLowerCase();if(c.indexOf('mixed')>=0)return'Mixed';if(c.indexOf('out')>=0)return'Outdoor';if(c.indexOf('in')>=0)return'Indoor';return'Not specified';}
 function _clTxtWeather(a){try{if(typeof clActivityWeatherText==='function')return clActivityWeatherText(a)||'';}catch(e){}var es=a.environmentalSnapshot||{};var ws=es.weatherSnapshot||es.weather||{};var out=[];if(ws.feelsLikeF||ws.feelsLike)out.push('Feels like '+(ws.feelsLikeF||ws.feelsLike)+'°');if(ws.precipChance!==undefined&&ws.precipChance!==null)out.push('Rain '+ws.precipChance+'%');if(ws.windMph)out.push('Wind '+ws.windMph+' mph');return out.join(' · ');}
@@ -36176,7 +36463,7 @@ Note: This report is based on patient self-tracked data. Clinical correlation
 and examination are essential for diagnosis and treatment decisions.
 
 ---
-CardiacLens v9.10.347.10 Medical Grade - Free
+CardiacLens v9.10.347.116 Medical Grade - Free
 Report Generated: ${reportDate}`;
 
 return text;
@@ -36295,7 +36582,7 @@ const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(
 // Check if this is today - if so, use current session data
 if(key===todayKey){
 // Include today's current data from global variables
-if(B.length>0)allData.bp.push(...B.map(r=>({...r,_date:key})));
+if(typeof _getAllBPReadings!=='function'&&B.length>0)allData.bp.push(...B.map(r=>({...r,_date:key})));
 if(W.length>0)allData.weight.push(...W.map(r=>({...r,_date:key})));
 if(S.length>0)allData.symptoms.push(...S.map(r=>({...r,_date:key})));
 if(A.length>0)allData.activities.push(...A.map(r=>({...r,_date:key})));
@@ -36310,7 +36597,7 @@ if(dayData){
 try{
 const parsed=JSON.parse(dayData);
 // Map to consistent property names
-if(parsed.bp)allData.bp.push(...parsed.bp.map(r=>({...r,_date:key})));
+if(typeof _getAllBPReadings!=='function'&&parsed.bp)allData.bp.push(...parsed.bp.map(r=>({...r,_date:key})));
 if(parsed.weight)allData.weight.push(...parsed.weight.map(r=>({...r,_date:key})));
 if(parsed.symptoms)allData.symptoms.push(...parsed.symptoms.map(r=>({...r,_date:key})));
 if(parsed.activities)allData.activities.push(...parsed.activities.map(r=>({...r,_date:key})));
@@ -36323,6 +36610,12 @@ console.error('Error parsing data for BP_TRACKER_'+key,e);
 }
 }
 }
+}
+if(typeof _getAllBPReadings==='function'){
+allData.bp=_getAllBPReadings().filter(function(r){
+const readingDate=new Date((r._date||todayKey)+' '+(r.t||'00:00'));
+return readingDate>=startDate&&readingDate<=endDate;
+});
 }
 return allData;
 }
@@ -38928,16 +39221,13 @@ function generateMorningPatternsPhase2(checkins, el) {
   // ─── CHART C: Sleep Quality vs. Morning BP ────────────────────────────────
   html += '<div style="background:#eff6ff;border:2px solid #bfdbfe;border-radius:10px;padding:14px;margin-bottom:14px">';
   html += '<div style="font-size:14px;font-weight:700;color:#1e40af;margin-bottom:4px">Chart C — Sleep Quality vs. Next-Morning Systolic BP</div>';
-  // Pull BP readings by date from data (passed via closure via checkins — we need to access the allData store)
+  // Pull BP readings by date through the BP/HR SSOT.
   var poorSleepBPs = []; var goodSleepBPs = [];
+  var sleepBPReadings = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : [];
   checkins.forEach(function(r) {
     if (!r.yesterday || !r.yesterday.sleep) return;
-    // Look up BP readings for the check-in date
     try {
-      var dayData = localStorage.getItem('BP_TRACKER_' + r.date);
-      if (!dayData) return;
-      var d = JSON.parse(dayData);
-      var bps = (d.bp||[]).filter(function(b){ return b.s && b.s > 0; });
+      var bps = sleepBPReadings.filter(function(b){ return b._date === r.date && b.s && b.s > 0; });
       if (bps.length === 0) return;
       var avgSys = Math.round(bps.reduce(function(sum,b){return sum+b.s;},0)/bps.length);
       if (r.yesterday.sleep === 'poor') poorSleepBPs.push(avgSys);
@@ -39139,7 +39429,10 @@ processReading(data,dateKey,time);
 }
 
 function processReading(data,dateKey,time){
-const bp=data.bp||[];
+const readingDateKey=(dateKey||'').replace('BP_TRACKER_','');
+const bp=(typeof _getAllBPReadings==='function')
+?_getAllBPReadings().filter(function(r){return (r._date||readingDateKey)===readingDateKey;})
+:(data.bp||[]);
 console.log('BP readings:',bp,'looking for time:',time);
 console.log('Available times in readings:',bp.map(r=>r.t));
 // Find the specific reading by time
@@ -39418,6 +39711,18 @@ function loadAnchorWindowData(anchorDate){
   // Load morning check-ins
   var mciRecords = loadMorningCheckins ? loadMorningCheckins() : [];
 
+  // BP/HR SSOT: pre-load window BP/HR readings once, grouped by date.
+  var ssotBPByDate = {};
+  if(typeof _getAllBPReadings === 'function'){
+    _getAllBPReadings().forEach(function(r){
+      var rd = r && r._date;
+      if(rd && byDate[rd]){
+        if(!ssotBPByDate[rd]) ssotBPByDate[rd] = [];
+        ssotBPByDate[rd].push(Object.assign({}, r));
+      }
+    });
+  }
+
   // Fill each date
   dates.forEach(function(key){
     // Morning check-in
@@ -39426,7 +39731,7 @@ function loadAnchorWindowData(anchorDate){
 
     if(key === todayKey){
       // Today: use in-memory globals
-      byDate[key].bp          = (typeof B !== 'undefined' ? B : []).slice();
+      byDate[key].bp          = ssotBPByDate[key] || ((typeof _getAllBPReadings === 'function') ? [] : (typeof B !== 'undefined' ? B : []).slice());
       byDate[key].weight      = (typeof W !== 'undefined' ? W : []).slice();
       byDate[key].symptoms    = (typeof S !== 'undefined' ? S : []).slice();
       byDate[key].activities  = (typeof A !== 'undefined' ? A : []).slice();
@@ -39439,7 +39744,7 @@ function loadAnchorWindowData(anchorDate){
       if(raw){
         try{
           var d = JSON.parse(raw);
-          byDate[key].bp          = d.bp       || d.B || [];
+          byDate[key].bp          = ssotBPByDate[key] || ((typeof _getAllBPReadings === 'function') ? [] : (d.bp || d.B || []));
           byDate[key].weight      = d.weight   || d.W || [];
           byDate[key].symptoms    = d.symptoms || d.S || [];
           byDate[key].activities  = d.activities || d.A || [];
@@ -40295,7 +40600,7 @@ report.push(notes);
 report.push('');
 }
 report.push('═══════════════════════════════════════════════════════════');
-report.push('This report was generated by CardiacLens v9.10.347.10 Medical Grade - Free');
+report.push('This report was generated by CardiacLens v9.10.347.116 Medical Grade - Free');
 report.push('Advanced Analytics Dashboard - Phase 3 Implementation');
 report.push('═══════════════════════════════════════════════════════════');
 const blob=new Blob([report.join('\n')],{type:'text/plain'});
@@ -40385,7 +40690,7 @@ ${periodHTML}
 <h2>Key Insights</h2>
 ${insightsHTML}
 <div style="margin-top:40px;padding:20px;background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:8px">
-<strong>CardiacLens v9.10.347.10 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
+<strong>CardiacLens v9.10.347.116 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
 This report is not a substitute for professional medical advice.
 </div>
 </body>
@@ -41358,7 +41663,7 @@ alert(`🏃 Activity Summary\n\n` +
 var VERSION_JSON_URL = 'https://cardiaclens.com/version.json';
 var VERSION_CHECK_KEY = 'CARDIACLENS_LAST_VERSION_CHECK';
 var VERSION_DISMISSED_KEY = 'CARDIACLENS_UPDATE_DISMISSED';
-var CURRENT_VERSION = 'v9.10.347.10';
+var CURRENT_VERSION = 'v9.10.347.116';
 var _latestVersionData = null; // cached from last fetch
 
 // Detect whether running as an installed Home Screen PWA on iOS
@@ -41966,7 +42271,8 @@ return html;
 function createSummarySection(data,startDate,endDate){
 const avgSys=data.bp.length>0?data.bp.reduce((sum,r)=>sum+r.s,0)/data.bp.length:0;
 const avgDia=data.bp.length>0?data.bp.reduce((sum,r)=>sum+r.d,0)/data.bp.length:0;
-const avgHR=data.bp.filter(r=>r.h).length>0?data.bp.filter(r=>r.h).reduce((sum,r)=>sum+r.h,0)/data.bp.filter(r=>r.h).length:0;
+const hrReadings=_getHRReadingsFromBP(data.bp);
+const avgHR=hrReadings.length>0?hrReadings.reduce((sum,r)=>sum+r.hr,0)/hrReadings.length:0;
 let html='<div class="no-break">';
 html+='<div class="section-title">📋 Executive Summary</div>';
 html+='<table><tr>';
@@ -41992,7 +42298,7 @@ function createStatisticsSection(data){
 // Calculate detailed statistics
 const systolic=data.bp.map(r=>r.s);
 const diastolic=data.bp.map(r=>r.d);
-const heartRates=data.bp.filter(r=>r.h).map(r=>r.h);
+const heartRates=(typeof _getHRReadingsFromBP==='function'?_getHRReadingsFromBP(data.bp):data.bp.filter(r=>r.h).map(r=>({hr:r.h}))).map(function(r){return r.hr;});
 let html='<div class="no-break">';
 html+='<div class="section-title">📊 Detailed Statistics</div>';
 html+='<table>';
@@ -43858,7 +44164,7 @@ function _clMedIntelTime(rec){
   try{ return rec&&rec.approvedAt ? (new Date(rec.approvedAt).getTime()||0) : 0; }catch(e){ return 0; }
 }
 function _clCanonicalizeMedIntelStorage(){
-  // v9.10.347.10: one source of truth for Medication Intelligence.
+  // v9.10.347.116: one source of truth for Medication Intelligence.
   // Older code wrote/read both CLINBRIDGE_MED_INTEL and CARDIACLENS_MED_INTEL.
   // Merge both safely, keeping the newest approvedAt for each medicine+metric,
   // then write the same canonical object to both keys so old/new readers agree.
@@ -43910,7 +44216,7 @@ function _mipMarkWeeklyReviewComplete(){
     var stamp=new Date().toISOString();
     localStorage.setItem('CARDIACLENS_MIP_WEEKLY_REVIEWED_AT',stamp);
     if(!medIntelData||typeof medIntelData!=='object')medIntelData={};
-    medIntelData._weeklyReview={completedAt:stamp,version:'v9.10.347.10'};
+    medIntelData._weeklyReview={completedAt:stamp,version:'v9.10.347.116'};
     _mipSave();
   }catch(e){}
 }
@@ -43937,21 +44243,15 @@ function _mipCollect(days) {
   cutoff.setDate(cutoff.getDate() - days);
   var cutoffStr = cutoff.toISOString().slice(0,10);
   var sys=[], dia=[], hr=[], pp=[];
-  for (var i=0; i<localStorage.length; i++) {
-    var k = localStorage.key(i);
-    if (!k || !k.match(/^BP_TRACKER_(\d{4}-\d{2}-\d{2})$/)) continue;
-    var dateStr = k.replace('BP_TRACKER_','');
-    if (dateStr < cutoffStr) continue;
-    try {
-      var d = JSON.parse(localStorage.getItem(k));
-      (d.bp || []).forEach(function(r) {
-        if (r.s) sys.push(r.s);
-        if (r.d) dia.push(r.d);
-        if (r.h) hr.push(r.h);
-        if (r.s && r.d) pp.push(r.s - r.d);
-      });
-    } catch(e) {}
-  }
+  var allBP = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : [];
+  (allBP || []).forEach(function(r) {
+    var dateStr = r._date || '';
+    if (!dateStr || dateStr < cutoffStr) return;
+    if (r.s) sys.push(r.s);
+    if (r.d) dia.push(r.d);
+    if (r.h) hr.push(r.h);
+    if (r.s && r.d) pp.push(r.s - r.d);
+  });
   return {
     systolic:  _mipStats(sys),
     diastolic: _mipStats(dia),
@@ -44057,7 +44357,7 @@ function _mipRecordHistory(medName, metric, entry) {
 // or its approvedAt is 7+ days old. Returns one entry per medicine+metric,
 // plus a PP entry, in the same drug-class/name order as the MIP panel.
 function _mipDueItems() {
-  // v9.10.347.10: global weekly-review completion guard.
+  // v9.10.347.116: global weekly-review completion guard.
   // The per-threshold approvedAt values are still the source of truth, but this
   // prevents the red weekly-review card from reappearing immediately after a
   // version update/import when the user has already completed the full queue
@@ -45797,7 +46097,7 @@ function _injectPPPins() {
   }
 
   var hist = getAllHistoricalData();
-  var allBP = (hist.bp||[]).filter(function(r){return r.s>0&&r.d>0;}).sort(function(a,b){
+  var allBP = ((typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (hist.bp||[])).filter(function(r){return r.s>0&&r.d>0;}).sort(function(a,b){
     var da=a._date||'';var db=b._date||'';return da<db?1:da>db?-1:0;
   });
   var eventDate = allBP.length>0 ? allBP[0]._date : getTodayKey();
@@ -46003,7 +46303,7 @@ function _setTierGate(storageKey) {
 // ── Shared data loader (lightweight — no UI side effects) ─────────────────────
 function _loadTierData() {
   var hist = getAllHistoricalData();
-  var allBP     = (hist.bp      || []).slice().sort(function(a,b){ return (a._date+a.t).localeCompare(b._date+b.t); });
+  var allBP     = ((typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (hist.bp || [])).slice().sort(function(a,b){ return (a._date+a.t).localeCompare(b._date+b.t); });
   var allWeight = (hist.weight  || []).slice().sort(function(a,b){ return (a._date+(a.t||'')).localeCompare(b._date+(b.t||'')); });
   var allSyms   = (hist.symptoms|| []).slice().sort(function(a,b){ return (a._date+(a.t||'')).localeCompare(b._date+(b.t||'')); });
   var now = new Date();
@@ -47278,7 +47578,7 @@ var cbBehavior = (function() {
         try {
           var hAll = (typeof getAllHistoricalData === 'function') ? getAllHistoricalData() : {};
           var pphMeals = hAll.meals || [];
-          var pphBP = hAll.bp || [];
+          var pphBP = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (hAll.bp || []);
           if (pphMeals.length < 3 || pphBP.length < 5) return false;
           var cutoff30 = new Date(); cutoff30.setDate(cutoff30.getDate() - 30);
           var pphCount = 0;
@@ -47669,7 +47969,8 @@ var cbBehavior = (function() {
         // Require HR data — breathing sessions are only meaningful if HR is being tracked
         try {
           var hAll = (typeof getAllHistoricalData === 'function') ? getAllHistoricalData() : {};
-          var hrReadings = (hAll.bp || []).filter(function(r){ return r.h && r.h > 0; });
+          var allBP = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (hAll.bp || []);
+          var hrReadings = (typeof _getHRReadingsFromBP === 'function') ? _getHRReadingsFromBP(allBP) : allBP.filter(function(r){ return r.h && r.h > 0; });
           if (hrReadings.length < 5) return false;
         } catch(e) { return false; }
         // No breathing sessions ever logged
@@ -49130,7 +49431,7 @@ function buildAskContext(dateFrom, dateTo) {
   ctx.push('\n=== BLOOD PRESSURE HISTORY (' + windowLabel + ') ===');
   try {
     var hAll = (typeof getAllHistoricalData === 'function') ? getAllHistoricalData() : {};
-    var allBP = hAll.bp || [];
+    var allBP = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (hAll.bp || []);
 
     // DIRECT SUPPLEMENT: for every date in the query window, read localStorage directly.
     // getAllHistoricalData() uses its own 90-day cutoff which can miss dates that inWindow()
@@ -49301,33 +49602,38 @@ function buildAskContext(dateFrom, dateTo) {
   } catch(e) { ctx.push('Blood pressure history: unavailable'); }
 
   // Monthly statistics — pre-computed per-month averages for BP, HR, and weight.
-  // Allows accurate answers to "average HR by month" without AI computing from raw data.
-  ctx.push('\n=== MONTHLY STATISTICS (' + windowLabel + ') ===');
+  // Uses all available BP/HR history so "by month" answers are not limited by the default Ask window.
+  ctx.push('\n=== MONTHLY STATISTICS (all available data) ===');
   try {
     var _monthMap = {};
-    // Process today's in-memory BP readings
+    // Process BP/HR readings through the SSOT retrieval path across the full stored history.
+    var _monthlyBP = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : [];
+    (_monthlyBP || []).forEach(function(r){
+      if(!r || !r._date) return;
+      var _mMonthKey = r._date.slice(0, 7);
+      if (!_monthMap[_mMonthKey]) _monthMap[_mMonthKey] = { sys:[], dia:[], hr:[], wt:[] };
+      if(r.s>0&&r.d>0){_monthMap[_mMonthKey].sys.push(r.s);_monthMap[_mMonthKey].dia.push(r.d);}
+      if(r.h>0) _monthMap[_mMonthKey].hr.push(r.h);
+    });
+
+    // Process today's in-memory weight readings
     var _todayMonthKey = today.slice(0, 7); // "YYYY-MM"
-    if (typeof B !== 'undefined' && B.length > 0 && inWindow(today)) {
-      if (!_monthMap[_todayMonthKey]) _monthMap[_todayMonthKey] = { sys:[], dia:[], hr:[], wt:[] };
-      B.forEach(function(r){ if(r.s>0&&r.d>0){_monthMap[_todayMonthKey].sys.push(r.s);_monthMap[_todayMonthKey].dia.push(r.d);} if(r.h>0) _monthMap[_todayMonthKey].hr.push(r.h); });
-    }
-    if (typeof W !== 'undefined' && W.length > 0 && inWindow(today)) {
+    if (typeof W !== 'undefined' && W.length > 0) {
       if (!_monthMap[_todayMonthKey]) _monthMap[_todayMonthKey] = { sys:[], dia:[], hr:[], wt:[] };
       W.forEach(function(w){ if(w.w>0) _monthMap[_todayMonthKey].wt.push(w.w); });
     }
-    // Process historical data from localStorage
+    // Process historical weight data from localStorage across the full stored history.
     for (var _mi = 0; _mi < localStorage.length; _mi++) {
       var _mk = localStorage.key(_mi);
       if (!_mk || !_mk.startsWith('BP_TRACKER_') || _mk === 'BP_TRACKER_DAILY_DATA') continue;
       var _mDate = _mk.replace('BP_TRACKER_', '');
-      if (!_mDate.match(/^\d{4}-\d{2}-\d{2}$/) || !inWindow(_mDate)) continue;
+      if (!_mDate.match(/^\d{4}-\d{2}-\d{2}$/)) continue;
       var _mMonthKey = _mDate.slice(0, 7);
       if (!_monthMap[_mMonthKey]) _monthMap[_mMonthKey] = { sys:[], dia:[], hr:[], wt:[] };
       try {
         var _mRaw = localStorage.getItem(_mk);
         if (_mRaw) {
           var _mDay = JSON.parse(_mRaw);
-          (_mDay.bp||[]).forEach(function(r){ if(r.s>0&&r.d>0){_monthMap[_mMonthKey].sys.push(r.s);_monthMap[_mMonthKey].dia.push(r.d);} if(r.h>0) _monthMap[_mMonthKey].hr.push(r.h); });
           (_mDay.weight||[]).forEach(function(w){ if(w.w>0) _monthMap[_mMonthKey].wt.push(w.w); });
         }
       } catch(e2){}
@@ -49493,7 +49799,7 @@ function buildAskContext(dateFrom, dateTo) {
   ctx.push('\n=== MEDICATION EFFECTIVENESS (all available data) ===');
   try {
     var hAllMedEff = (typeof getAllHistoricalData === 'function') ? getAllHistoricalData() : {};
-    var allBPMed = hAllMedEff.bp || [];
+    var allBPMed = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (hAllMedEff.bp || []);
     // Separate before/after readings by medication name
     var _medBefore = {}, _medAfter = {};
     allBPMed.forEach(function(r) {
@@ -49577,7 +49883,7 @@ function buildAskContext(dateFrom, dateTo) {
   try {
     var hAllPPH = (typeof getAllHistoricalData === 'function') ? getAllHistoricalData() : {};
     var pphAllMeals = hAllPPH.meals || [];
-    var pphAllBP = hAllPPH.bp || [];
+    var pphAllBP = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (hAllPPH.bp || []);
     if (pphAllMeals.length >= 3 && pphAllBP.length >= 5) {
       var pphAskEvts = [];
       var cutoff30 = new Date(); cutoff30.setDate(cutoff30.getDate() - 30);
@@ -50462,10 +50768,14 @@ function _buildAskComparisonContext(periodA, periodB) {
     var bpReadings = [], symptoms = [], fluidDays = [];
     var weightReadings = [], medications = [], activities = [], meals = [], notesList = [];
     var todayKey = (typeof getTodayKey === 'function') ? getTodayKey() : new Date().toISOString().slice(0,10);
+    var useSSOTBP = (typeof _getAllBPReadings === 'function');
+    if (useSSOTBP) {
+      bpReadings = _getAllBPReadings().filter(function(r){ return r && r._date >= from && r._date <= to; });
+    }
 
     // Today's data
     if (todayKey >= from && todayKey <= to) {
-      if (typeof B !== 'undefined') B.forEach(function(r){ bpReadings.push(r); });
+      if (!useSSOTBP && typeof B !== 'undefined') B.forEach(function(r){ bpReadings.push(r); });
       if (typeof S !== 'undefined') S.forEach(function(s){ symptoms.push(s); });
       if (typeof W !== 'undefined') W.forEach(function(w){ weightReadings.push(w); });
       if (typeof medLog !== 'undefined') medLog.forEach(function(m){ medications.push(m); });
@@ -50486,7 +50796,7 @@ function _buildAskComparisonContext(periodA, periodB) {
         var raw = localStorage.getItem(key);
         if (!raw) continue;
         var dayData = JSON.parse(raw);
-        if (dayData.bp)       dayData.bp.forEach(function(r){ r._date = dateStr; bpReadings.push(r); });
+        if (!useSSOTBP && dayData.bp) dayData.bp.forEach(function(r){ r._date = dateStr; bpReadings.push(r); });
         if (dayData.symptoms) dayData.symptoms.forEach(function(s){ s._date = dateStr; symptoms.push(s); });
         if (dayData.weight)   dayData.weight.forEach(function(w){ w._date = dateStr; weightReadings.push(w); });
         if (dayData.medLog)   dayData.medLog.forEach(function(m){ m._date = dateStr; medications.push(m); });
@@ -51334,7 +51644,7 @@ function _showAskClarifyChips(options) {
 /* CardiacLens Secure Access Takeover v9.10.287
    Reliability pass: pointer-event tap handling, preserved app tab for email, exact cooldown thresholds. */
 (function(){
-  var VERSION='v9.10.347.10';
+  var VERSION='v9.10.347.116';
   var KEY='CL_SEC_KEY', COLOR='CL_SEC_COLOR', Q='CL_SEC_Q', A='CL_SEC_A', DONE='CL_SEC_DONE';
   var FAILS='CL_SEC_FAILS', COOL='CL_SEC_COOL_UNTIL';
   var COLORS={red:'#e53935',blue:'#1565c0',green:'#2e7d32',orange:'#e65100',purple:'#6a1b9a',teal:'#00695c',pink:'#c2185b',gold:'#f57f17'};
@@ -51492,7 +51802,7 @@ function _showAskClarifyChips(options) {
   // attachment state. This review screen never auto-attaches images; it gives the
   // user a visible message to copy, then opens email from a direct button tap.
   function installFeedbackReviewOverrides(){
-    function currentVersion(){return (typeof CURRENT_VERSION!=='undefined')?CURRENT_VERSION:'v9.10.347.10';}
+    function currentVersion(){return (typeof CURRENT_VERSION!=='undefined')?CURRENT_VERSION:'v9.10.347.116';}
     function deviceLine(){try{return (navigator.userAgent||'').slice(0,180);}catch(e){return '';}}
     function feedbackStamp(){try{var d=new Date();function z(n){return String(n).padStart(2,'0');}return 'ID '+d.getFullYear()+z(d.getMonth()+1)+z(d.getDate())+'-'+z(d.getHours())+z(d.getMinutes())+z(d.getSeconds());}catch(e){return 'ID '+Date.now();}}
     function supportPayload(){
@@ -51578,7 +51888,7 @@ function _showAskClarifyChips(options) {
 
 
 
-  // v9.10.347.10: Final tappable email contact workflow
+  // v9.10.347.116: Final tappable email contact workflow
   // Purpose: keep feedback simple while still opening the user's default mail app.
   // Primary action is a real mailto: link to robert@cardiaclens.com. Copy remains as fallback.
   (function installPlainSupportContactOverride(){
@@ -51706,7 +52016,7 @@ function _showAskClarifyChips(options) {
   function boot(){installCss();takeoverFunctions();var c=cfg();if(c.active)show();document.addEventListener('click',function(e){var t=e.target;if(t&&(t.id==='clPrivacyLockPill'||(t.closest&&t.closest('#clPrivacyLockPill')))){e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation();unlocked=false;show();return false;}},true);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,100);});else setTimeout(boot,100);setTimeout(boot,1000);setTimeout(boot,4000);
 })();
-// ── v9.10.347.10: Weather hardening override ─────────────────────────────
+// ── v9.10.347.116: Weather hardening override ─────────────────────────────
 // Purpose: keep Today's Weather simple and predictable: Saved ZIP -> coordinates -> Open-Meteo -> render.
 // No GPS unless Use My Location is explicitly tapped. Older weather code remains below this override but these
 // same global function names take precedence for buttons, modal open, planner, and activity weather.

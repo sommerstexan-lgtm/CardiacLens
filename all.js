@@ -1192,7 +1192,7 @@
     // On every load: write a provisional heartbeat timestamp immediately.
     // This prevents "Guard Dog fell asleep" flashing during the 8-second
     // initialization window -- iOS suspends timers when backgrounded, so the
-    // stored timestamp can be stale even though Guard Dog is healthy.
+    // stored timestamp can be stale even though Guard Dog is recorded.
     // The provisional write shows "On patrol..." for up to 15 seconds.
     // The real health check at 8s overwrites it with a verified timestamp.
     (function() {
@@ -3058,7 +3058,7 @@ function _wzB_step3(el){
 function _wzB_end(el){
   _wzEndScreen(el,'B',{
     headline:"You're set up for Medication Effectiveness tracking!",
-    preview:'After logging BP readings before and after your medications for a few days, the <strong>Med Effectiveness</strong> dashboard will show each medication\'s average systolic and diastolic impact, a before/after comparison chart, and an effectiveness score. Your cardiologist can see at a glance whether each drug is doing its job — data they cannot get from an office visit alone.',
+    preview:'After logging BP readings before and after your medications for a few days, the <strong>Med Effectiveness</strong> dashboard will show each medication\'s average systolic and diastolic impact, a before/after comparison chart, and an effectiveness score. Your cardiologist can see at a glance whether each drug is operating within the recorded data shown — data they cannot get from an office visit alone.',
     items:[
       {key:'meds',label:'Medications added to your list'},
       {key:'bp',label:'Blood pressure target range set'},
@@ -3073,8 +3073,9 @@ function _wzB_end(el){
       var evts=settings.dailyEvents||[];
       var hasMedEvent=evts.some(function(e){return e.actions&&e.actions.indexOf('logBP')!==-1&&e.reminderEnabled!==false;});
       if(hasMedEvent) cl.events=true;
-      var beforeReading=B&&B.some(function(r){return r.medicationTiming==='before';});
-      var afterReading=B&&B.some(function(r){return r.medicationTiming==='after';});
+      var bpReadings=(typeof _getTodayBPReadings==='function')?_getTodayBPReadings():(B||[]);
+      var beforeReading=bpReadings&&bpReadings.some(function(r){return r.medicationTiming==='before';});
+      var afterReading=bpReadings&&bpReadings.some(function(r){return r.medicationTiming==='after';});
       if(beforeReading) cl.firstBefore=true;
       if(afterReading) cl.firstAfter=true;
     }
@@ -4170,8 +4171,9 @@ alert(warnings.join('\n'));
 
 // === PHASE 2: UPDATE MEDICATION EFFECTIVENESS QUICK VIEW ===
 function updateMedEffectivenessQuickView(){
-// Get today's medication readings
-var medReadingsToday=B.filter(function(r){
+// Get today's medication readings through the BP/HR retrieval helper path
+var bpData=(typeof _getTodayBPReadings==='function')?_getTodayBPReadings():(B||[]);
+var medReadingsToday=bpData.filter(function(r){
 return r.medicationRelated&&r.medicationTiming!=='none';
 });
 
@@ -4368,7 +4370,7 @@ function _bpHistRenderFilters(){
 
 // Re-renders only the readings list (#bp). Preserves filter UI focus.
 function _bpHistRenderReadings(){
-  var allData = getAllHistoricalData().bp || [];
+  var allData = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (getAllHistoricalData().bp || []);
   var filtered = _bpHistApplyFilter(allData);
   var countEl = document.getElementById('bpHistCount');
   if(countEl) countEl.textContent = filtered.length + ' reading' + (filtered.length!==1?'s':'') + ' shown';
@@ -4456,7 +4458,7 @@ var fDiv2=document.getElementById('bpHistFiltersDiv');
 if(fDiv2){ fDiv2.style.display='none'; fDiv2.innerHTML=''; }
 // Reset filter state when leaving history
 bpHistFilter = { text:'', dateFrom:'', dateTo:'', sysMin:'', sysMax:'', diaMin:'', diaMax:'', hrMin:'', hrMax:'', sort:'newest' };
-var bpData=B;
+var bpData=(typeof _getTodayBPReadings==='function')?_getTodayBPReadings():(B||[]);
 var h='';
 // ── Personal baseline cross-reference ──────────────────────────────────────
 var _bpLoopBaseline = null;
@@ -7834,6 +7836,46 @@ types=types.concat(settings.customActivities);
 return types;
 }
 
+// Activity Type options are filtered by the user-selected Cardiac Context.
+// Custom activities remain available in every context because CardiacLens cannot safely infer user intent from custom names.
+function getActivityTypesForContext(ctx){
+ctx=(ctx||'').toLowerCase();
+var map={
+  indoor:['Yoga','Weight Training','Cooking','House Cleaning','Laundry','Other'],
+  outdoor:['Walking','Running','Cycling','E-bike','Swimming','Sports','Yard Work','Manual Work','Other'],
+  mixed:['Walking','Cycling','E-bike','Shopping','Doctor Visit','Church','Other']
+};
+var types=map[ctx]||[];
+if(settings.customActivities&&settings.customActivities.length>0){
+  types=types.concat(settings.customActivities);
+}
+return types;
+}
+function buildActivityOptionsHTML(ctx){
+var html='<option value="">-- Choose Activity --</option>';
+var types=getActivityTypesForContext(ctx);
+for(var i=0;i<types.length;i++){
+  html+='<option value="'+types[i]+'">'+types[i]+'</option>';
+}
+if(settings.customActivities&&settings.customActivities.length>0){
+  html+='<option disabled>──────────</option>';
+}
+html+='<option disabled>──────────</option>';
+html+='<option value="__ADD_NEW__">➕ Add New Activity...</option>';
+return html;
+}
+function refreshActivityOptionsForContext(){
+var sel=document.getElementById('activitySelect');
+if(!sel)return;
+var prior=sel.value;
+sel.innerHTML=buildActivityOptionsHTML(selectedActivityContext);
+var keep=false;
+for(var i=0;i<sel.options.length;i++){if(sel.options[i].value===prior)keep=true;}
+sel.value=keep?prior:'';
+var desc=document.getElementById('manualWorkDesc');
+if(desc)desc.style.display=(sel.value==='Manual Work')?'block':'none';
+}
+
 // Keep activityTypes variable for backwards compatibility
 var activityTypes=defaultActivityTypes;
 
@@ -7866,7 +7908,13 @@ var _activityMinimized=false;
 var _minimizedActivityState=null; // {activityType, notes, exertion, tempBand}
 var _activityPillInterval=null;   // setInterval that ticks the pill display
 
-function logActivity(){
+function logActivity(preserveActivityContext){
+// v9.10.347.113 KISS: restore/resume may rebuild the form with an existing context.
+preserveActivityContext=!!preserveActivityContext;
+// v9.10.347.111 KISS: honor a persisted/minimized activity before opening a fresh setup.
+if(!preserveActivityContext&&!_activityMinimized && !_minimizedActivityState){
+  _loadMinimizedActivityFromStorage();
+}
 // v9.10.36: if a timed activity is already running in the background, ask first
 if(_activityMinimized && _minimizedActivityState){
   var isTimer=_minimizedActivityState.isTimerMode;
@@ -7892,27 +7940,18 @@ if(_activityMinimized && _minimizedActivityState){
   showModal(html);
   return;
 }
+if(!preserveActivityContext)selectedActivityContext='';
 var html='<div class="modal-title">Log Activity Setup</div>';
+html+=buildActivityContextHTML();
+html+='<div id="activityDetailsAfterContext" style="display:none">';
 html+='<div id="recentBPCard" style="margin-bottom:12px"></div>';
 
 html+='<div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:12px;margin-bottom:14px">';
 html+='<div style="font-size:13px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">1. What are you doing?</div>';
 html+='<label style="display:block;font-size:18px;font-weight:600;margin-bottom:8px">Activity Type <span style="color:#dc2626">*</span>:</label>';
 html+='<select id="activitySelect" class="modal-input" style="font-size:20px" onchange="handleActivitySelection();updateActivityStartState()">';
-html+='<option value="">-- Choose Activity --</option>';
-var allActivityTypes=getActivityTypes();
+html+=buildActivityOptionsHTML(selectedActivityContext);
 var customActivities=settings.customActivities||[];
-for(var i=0;i<defaultActivityTypes.length;i++){
-html+='<option value="'+defaultActivityTypes[i]+'">'+defaultActivityTypes[i]+'</option>';
-}
-if(customActivities.length>0){
-html+='<option disabled>──────────</option>';
-for(var i=0;i<customActivities.length;i++){
-html+='<option value="'+customActivities[i]+'">'+customActivities[i]+'</option>';
-}
-}
-html+='<option disabled>──────────</option>';
-html+='<option value="__ADD_NEW__">➕ Add New Activity...</option>';
 html+='</select>';
 if(customActivities.length>0){
 html+='<button type="button" onclick="openActivityManager()" style="margin-top:8px;padding:8px 12px;background:#6b7280;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;width:100%">⚙️ Manage Custom Activities</button>';
@@ -7920,13 +7959,12 @@ html+='<button type="button" onclick="openActivityManager()" style="margin-top:8
 html+='<div id="manualWorkDesc" style="display:none;margin-top:12px">';
 html+='<input type="text" id="workDescription" class="modal-input" placeholder="Describe manual work (e.g., gardening, moving boxes)" />';
 html+='</div>';
-html+=buildActivityContextHTML();
-html+=buildJourneyHTML();
-html+=buildActivityWindowHTML();
-html+=buildDestinationHTML();
+html+='<div id="activityJourneySection" style="display:none">'+buildJourneyHTML()+'</div>';
+html+='<div id="activityWindowSection" style="display:none">'+buildActivityWindowHTML()+'</div>';
+html+='<div id="activityDestinationSection" style="display:none">'+buildDestinationHTML()+'</div>';
 html+='</div>';
 
-html+='<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:12px;margin-bottom:14px">';
+html+='<div id="activityBPSection" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:12px;margin-bottom:14px">';
 html+='<div style="font-size:13px;font-weight:800;color:#1e40af;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">2. BP before you start</div>';
 html+='<div id="bpBeforeStatus" style="margin-bottom:8px;padding:8px;background:#dbeafe;border-radius:6px;font-size:14px;font-weight:600;color:#1e40af;display:none"></div>';
 html+='<button type="button" id="takeBPBeforeBtn" class="modal-btn" onclick="takeBPBeforeActivity()" style="background:#3b82f6;color:#fff;margin-bottom:0;display:block;width:100%">📊 Take BP Before Activity</button>';
@@ -7937,16 +7975,17 @@ html+='<div>• If you skip it, your after-BP will still save, but this session 
 html+='</div>';
 html+='</div>';
 
-html+='<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px;margin-bottom:14px">';
+html+='<div id="activityWeatherSection" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px;margin-bottom:14px">';
 html+='<div style="font-size:13px;font-weight:800;color:#166534;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">3. Today\'s Weather</div>';
 html+=buildEnvironmentalModeHTML();
 html+='<div id="internetEnvironmentStatus" style="display:none;margin-bottom:12px"></div>';
+html+='<div id="activityWeatherAwareness" style="display:none;margin-bottom:12px"></div>';
 html+=buildTempBandHTML();
 html+='</div>';
 
 html+='<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:12px;margin-bottom:14px">';
 html+='<div style="font-size:13px;font-weight:800;color:#9a3412;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">4. Effort and notes</div>';
-html+='<label style="display:block;font-size:18px;font-weight:600;margin:0 0 8px 0">Exertion Level:</label>';
+html+='<label style="display:block;font-size:18px;font-weight:600;margin:0 0 8px 0">Exertion Level <span style="font-size:13px;font-weight:400;color:#6b7280">(optional)</span>:</label>';
 html+='<div style="display:flex;gap:12px;margin-bottom:16px">';
 html+='<button type="button" class="modal-btn" id="exertionLight" onclick="selectExertion(\'Light\')">Light</button>';
 html+='<button type="button" class="modal-btn" id="exertionModerate" onclick="selectExertion(\'Moderate\')">Moderate</button>';
@@ -7957,13 +7996,13 @@ html+='</div>';
 
 html+='<div style="background:#f8fafc;border:2px solid #cbd5e1;border-radius:12px;padding:12px;margin-bottom:14px">';
 html+='<div style="font-size:13px;font-weight:800;color:#334155;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">5. Start or enter completed time</div>';
-html+='<label style="display:block;font-size:18px;font-weight:600;margin:0 0 8px 0">Tracking:</label>';
+html+='<label style="display:block;font-size:18px;font-weight:600;margin:0 0 8px 0">Tracking <span style="color:#dc2626">*</span>:</label>';
 html+='<div style="display:flex;gap:12px;margin-bottom:16px">';
 html+='<button type="button" class="modal-btn" id="manualTimeBtn" onclick="selectTimeMode(\'manual\')">Manual Entry</button>';
 html+='<button type="button" class="modal-btn" id="timerBtn" onclick="selectTimeMode(\'timer\')">Use Timer</button>';
 html+='</div>';
 html+='<div id="manualTimeInput" style="display:none">';
-html+='<input type="number" inputmode="numeric" id="durationMinutes" class="modal-input" placeholder="Completed duration (minutes)" min="1" oninput="updateActivitySaveState()" onblur="_sanitizeNumericInput(this);updateActivitySaveState()"/>';
+html+='<input type="number" inputmode="numeric" id="durationMinutes" class="modal-input" placeholder="Completed duration minutes (required)" min="1" oninput="updateActivitySaveState()" onblur="_sanitizeNumericInput(this);updateActivitySaveState()"/>';
 html+='</div>';
 html+='<div id="timerDisplay" style="display:none;text-align:center;padding:20px;background:#f0fdf4;border-radius:12px;margin-bottom:0">';
 html+='<div id="timerTime" style="font-size:48px;font-weight:bold;color:#10b981;font-family:monospace">00:00</div>';
@@ -7979,19 +8018,19 @@ html+='</div>';
 
 html+='<button type="button" onclick="minimizeActivityLog()" style="width:100%;margin-bottom:10px;background:none;border:2px solid #0369a1;color:#0369a1;border-radius:10px;padding:12px;font-size:16px;font-weight:600;cursor:pointer">↙ Minimize — do something else and come back</button>';
 html+='<div class="modal-actions"><button class="modal-cancel" onclick="cancelActivityLog()">Cancel</button><button class="modal-ok" id="activitySaveBtn" onclick="saveActivity()" disabled style="opacity:0.45;cursor:not-allowed">Save Completed Activity</button></div>';
+html+='</div>';
 showModal(html);
-setTimeout(function(){
-document.getElementById('activitySelect').focus();
-},100);
-setTimeout(function(){_showRecentBPCard();},150);
+setTimeout(function(){var a=document.getElementById('activitySelect');if(a&&a.offsetParent!==null)a.focus();},100);
+setTimeout(function(){if(selectedActivityContext)_showRecentBPCard();},150);
 setTimeout(function(){selectEnvironmentalMode(selectedEnvironmentalMode||settings.activityEnvironmentalMode||'manual');},175);
-setTimeout(function(){var a=document.getElementById('activitySelect');selectedActivityContext=selectedActivityContext||getDefaultActivityContext(a?a.value:'');renderActivityContextButtons();handleJourneyRoleSelection();updateActivitySaveState();updateActivityStartState();},200);
+setTimeout(function(){renderActivityContextButtons();updateActivitySectionsForContext();handleJourneyRoleSelection();updateActivitySaveState();updateActivityStartState();},200);
 }
 
 // NEW: Handle activity selection including "Add New"
 function handleActivitySelection(){
 var select=document.getElementById('activitySelect');
 var desc=document.getElementById('manualWorkDesc');
+if(!select){return;}
 if(select.value==='__ADD_NEW__'){
 // Add new activity
 var activityName=prompt('Enter new activity name:');
@@ -8023,15 +8062,13 @@ setTimeout(function(){
 document.getElementById('activitySelect').value=activityName;
 },100);
 }else if(select.value==='Manual Work'){
-desc.style.display='block';
+if(desc)desc.style.display='block';
 }else{
-desc.style.display='none';
+if(desc)desc.style.display='none';
 }
-// v9.10.321: suggest activity context without adding friction
-if(select.value && select.value!=='__ADD_NEW__'){
-  selectedActivityContext=getDefaultActivityContext(select.value);
-  renderActivityContextButtons();
-}
+// Activity context is intentionally chosen by the user; Indoor / Outdoor / Mixed controls which sections appear.
+renderActivityContextButtons();
+updateActivitySectionsForContext();
 updateActivityStartState();
 }
 
@@ -8040,7 +8077,7 @@ function getDefaultActivityContext(activity){
   if(activity.indexOf('cooking')>=0||activity.indexOf('clean')>=0||activity.indexOf('laundry')>=0||activity.indexOf('yoga')>=0||activity.indexOf('weight')>=0||activity.indexOf('indoor')>=0)return 'indoor';
   if(activity.indexOf('doctor')>=0||activity.indexOf('church')>=0||activity.indexOf('store')>=0||activity.indexOf('shop')>=0||activity.indexOf('restaurant')>=0||activity.indexOf('visit')>=0)return 'mixed';
   if(activity.indexOf('walk')>=0||activity.indexOf('run')>=0||activity.indexOf('cycling')>=0||activity.indexOf('e-bike')>=0||activity.indexOf('yard')>=0||activity.indexOf('manual')>=0||activity.indexOf('sports')>=0)return 'outdoor';
-  return selectedActivityContext||'outdoor';
+  return selectedActivityContext||'';
 }
 function buildActivityContextHTML(){
   var h='<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin:12px 0">';
@@ -8050,13 +8087,46 @@ function buildActivityContextHTML(){
     h+='<button type="button" id="actCtx_'+x[0]+'" onclick="selectActivityContext(\''+x[0]+'\')" style="border:2px solid #cbd5e1;background:#fff;color:#0f172a;border-radius:8px;padding:10px 6px;font-size:14px;font-weight:700;cursor:pointer">'+x[1]+'</button>';
   });
   h+='</div>';
-  h+='<div style="font-size:12px;color:#64748b;margin-top:6px">Indoor captures room/standing context. Outdoor captures weather. Mixed captures travel plus an indoor stop, like a doctor visit.</div>';
+  h+='<div style="font-size:12px;color:#64748b;margin-top:6px">Choose one to open only the sections that apply. Indoor hides outdoor/trip fields. Outdoor adds weather/window. Mixed adds weather, trip, and destination.</div>';
   h+='</div>';
   return h;
 }
-function selectActivityContext(ctx){selectedActivityContext=ctx;renderActivityContextButtons();updateActivityStartState();}
+function selectActivityContext(ctx){
+  selectedActivityContext=ctx;
+  renderActivityContextButtons();
+  refreshActivityOptionsForContext();
+  updateActivitySectionsForContext();
+  updateActivityStartState();
+}
 function renderActivityContextButtons(){
   ['indoor','outdoor','mixed'].forEach(function(c){var b=document.getElementById('actCtx_'+c);if(!b)return;b.style.borderColor=(selectedActivityContext===c?'#0369a1':'#cbd5e1');b.style.background=(selectedActivityContext===c?'#e0f2fe':'#fff');});
+}
+function updateActivitySectionsForContext(){
+  var ctx=selectedActivityContext||'';
+  var details=document.getElementById('activityDetailsAfterContext');
+  if(details)details.style.display=ctx?'block':'none';
+  if(ctx&&document.getElementById('recentBPCard'))_showRecentBPCard();
+  var weather=document.getElementById('activityWeatherSection');
+  var windowSec=document.getElementById('activityWindowSection');
+  var dest=document.getElementById('activityDestinationSection');
+  var journey=document.getElementById('activityJourneySection');
+  if(weather)weather.style.display=(ctx==='outdoor'||ctx==='mixed')?'block':'none';
+  if(windowSec)windowSec.style.display=(ctx==='outdoor'||ctx==='mixed')?'block':'none';
+  if(dest)dest.style.display=(ctx==='mixed')?'block':'none';
+  if(journey)journey.style.display=(ctx==='mixed')?'block':'none';
+  renderActivityWeatherAwareness();
+  if(ctx==='indoor'){
+    selectedActivityWindow='';selectedActivityWindowMinutes=null;selectedDestination='';selectedJourneyRole='single';selectedJourneyName='';selectedJourneyId=null;
+    var w=document.getElementById('activityWindowSelect');if(w)w.value='';
+    var d=document.getElementById('activityDestinationSelect');if(d)d.value='';
+    var j=document.getElementById('journeyRoleSelect');if(j)j.value='single';
+    var jn=document.getElementById('journeyNameInput');if(jn)jn.value='';
+  }else if(ctx==='outdoor'){
+    selectedDestination='';selectedJourneyRole='single';selectedJourneyName='';selectedJourneyId=null;
+    var d2=document.getElementById('activityDestinationSelect');if(d2)d2.value='';
+    var j2=document.getElementById('journeyRoleSelect');if(j2)j2.value='single';
+    var jn2=document.getElementById('journeyNameInput');if(jn2)jn2.value='';
+  }
 }
 function _getActiveJourney(){try{return JSON.parse(localStorage.getItem('CB_ACTIVE_JOURNEY')||'null');}catch(e){return null;}}
 function _setActiveJourney(j){try{if(j)localStorage.setItem('CB_ACTIVE_JOURNEY',JSON.stringify(j));else localStorage.removeItem('CB_ACTIVE_JOURNEY');}catch(e){}}
@@ -8124,7 +8194,7 @@ function getJourneyFormData(activityName){
 }
 
 
-// Weather settings persistence guard (v9.10.347.10)
+// Weather settings persistence guard (v9.10.347.116)
 var CARDIACLENS_WEATHER_SETTINGS_KEY='CARDIACLENS_WEATHER_SETTINGS';
 function _clMergeDestinations(a,b){
   var out=[],seen={};
@@ -8169,7 +8239,7 @@ function _clWeatherSettingsSnapshot(){
   };}catch(e){return null;}
 }
 function _clSaveWeatherSettingsBackup(){
-  // v9.10.347.10: current saved settings win; backup only fills missing weather fields.
+  // v9.10.347.116: current saved settings win; backup only fills missing weather fields.
   try{
     var snap=_clWeatherSettingsSnapshot(); if(!snap)return;
     var prior=null;
@@ -8191,14 +8261,14 @@ function _clSaveWeatherSettingsBackup(){
   }catch(e){}
 }
 function _clRestoreWeatherSettingsBackup(){
-  // v9.10.347.10: restore defensively. Blank/default backup fields must not erase current settings.
+  // v9.10.347.116: restore defensively. Blank/default backup fields must not erase current settings.
   try{
     var raw=localStorage.getItem(CARDIACLENS_WEATHER_SETTINGS_KEY); if(!raw)return;
     var w=JSON.parse(raw); if(!w||typeof w!=='object')return;
     var fields=['activityWeatherMode','activityEnvironmentalMode','activityWeatherStoreSnapshot','activityWeatherRainThresholdPct','activityWeatherDefaultWindowMin','activityWeatherAskOnOutdoor','activityWeatherStoreCoordinates','todayWeatherPillEnabled','todayWeatherCacheMinutes','todayWeatherSavedZip','todayWeatherSource','pickupPlannerDefaultDate','activityWindows','activityDestinations'];
     fields.forEach(function(k){
       if(w[k]===undefined||w[k]===null)return;
-      // v9.10.347.10: current Saved ZIP settings must not be overwritten by older backup values.
+      // v9.10.347.116: current Saved ZIP settings must not be overwritten by older backup values.
       // Backup is only a fill-in source, not the authority when current settings are explicit.
       if(k==='todayWeatherSource'){
         var curSource=settings&&settings.todayWeatherSource;
@@ -8238,7 +8308,7 @@ function _ensureActivityEnvSettings(){
     var legacyNames={'Doctor':true,'Store':true,'Church':true,'Aggarwala':true,'HEB':true};
     settings.activityDestinations=(settings.activityDestinations||[]).filter(function(d){return d&&d.label&&!legacyNames[d.label];});
     settings.activityDestinationLegacyCleanupV309=true;
-    // v9.10.347.10: do not write defaults from _ensureActivityEnvSettings().
+    // v9.10.347.116: do not write defaults from _ensureActivityEnvSettings().
     // This function may run during startup before saved settings are loaded.
   }
   // v9.10.321: no baked-in destinations. Users add their own.
@@ -8355,6 +8425,7 @@ function selectEnvironmentalMode(mode){
   var stat=document.getElementById('internetEnvironmentStatus');
   if(stat)stat.style.display=(mode==='internet')?'block':'none';
   updateActivityEnvironmentFromForm();
+  renderActivityWeatherAwareness();
 }
 function updateActivityEnvironmentFromForm(){
   var cm=document.getElementById('customWindowMinutes');
@@ -8421,7 +8492,7 @@ function buildActivityEnvironmentSnapshot(data,lat,lon){
 }
 function renderActivityEnvironmentStatus(){
   var stat=document.getElementById('internetEnvironmentStatus');
-  if(!stat||!activityEnvironmentSnapshot)return;
+  if(!stat||!activityEnvironmentSnapshot){renderActivityWeatherAwareness();return;}
   var s=activityEnvironmentSnapshot;
   var rain=(s.rainMaxProbability!==null)?(s.rainMaxProbability+'%'):(s.rainTotalInches>0?(s.rainTotalInches+' in'):'Low');
   var heat=(s.heatIndexF!==null)?Math.round(s.heatIndexF)+'°':'—';
@@ -8429,11 +8500,39 @@ function renderActivityEnvironmentStatus(){
   var col=s.rainLikely?'#9a3412':'#166534';
   var icon=s.rainLikely?'🌧':'✓';
   stat.innerHTML='<div style="background:'+bg+';border-radius:8px;padding:10px;font-size:13px;color:'+col+';font-weight:700">'+icon+' '+s.summary+' · '+(s.windowMinutes||30)+' min window<br><span style="font-weight:600">Rain: '+rain+' · Heat index: '+heat+'</span></div>';
+  renderActivityWeatherAwareness();
+}
+function renderActivityWeatherAwareness(){
+  var box=document.getElementById('activityWeatherAwareness');
+  if(!box)return;
+  var ctx=selectedActivityContext||'';
+  if(ctx!=='outdoor'&&ctx!=='mixed'){box.style.display='none';box.innerHTML='';return;}
+  var items=[];
+  var s=activityEnvironmentSnapshot;
+  if(selectedEnvironmentalMode==='internet'&&s){
+    if(s.heatIndexF!==null&&s.heatIndexF!==undefined&&parseFloat(s.heatIndexF)>=90)items.push('Feels like: '+Math.round(parseFloat(s.heatIndexF))+'°F');
+    if(s.rainLikely){
+      var rain=(s.rainMaxProbability!==null&&s.rainMaxProbability!==undefined)?(s.rainMaxProbability+'%'):(s.rainTotalInches>0?(s.rainTotalInches+' in'):'Possible');
+      items.push('Rain in selected window: '+rain);
+    }
+  }
+  if(selectedEnvironmentalMode==='manual'&&selectedTempBand!==null&&selectedTempBand!==undefined&&selectedTempBand>=2){
+    items.push('Manual condition selected: '+(selectedTempBand>=3?'Extreme heat':'Hot'));
+  }
+  if(!items.length){box.style.display='none';box.innerHTML='';return;}
+  box.style.display='block';
+  box.innerHTML='<div style="background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #f59e0b;border-radius:10px;padding:12px;color:#92400e">'+
+    '<div style="font-size:14px;font-weight:800;margin-bottom:6px">Weather Awareness</div>'+
+    '<div style="font-size:13px;line-height:1.45;margin-bottom:6px">Current outdoor conditions may increase physical demands during your activity.</div>'+
+    '<div style="font-size:13px;font-weight:700;line-height:1.45">'+items.join('<br>')+'</div>'+
+    '<div style="font-size:12px;line-height:1.45;margin-top:6px;color:#78350f">Options remain available: continue, refresh weather, or change activity.</div>'+
+    '</div>';
 }
 function getActivityEventContextSnapshot(activityName){
   var ctx={capturedAt:new Date().toISOString(),activity:activityName||'',hydration:{todayOz:(typeof dailyFluid!=='undefined'?dailyFluid:null)},recentBP:null,recentSymptoms:[]};
   try{
-    if(B&&B.length){var bp=B[B.length-1];ctx.recentBP={time:bp.t||'',systolic:bp.s||null,diastolic:bp.d||null,pulse:bp.h||null};}
+    var bp=(typeof _getRecentBPReading==='function')?_getRecentBPReading():null;
+    if(bp){ctx.recentBP={time:bp.t||'',systolic:bp.s||null,diastolic:bp.d||null,pulse:bp.h||null,s:bp.s||null,d:bp.d||null,h:bp.h||null};}
     if(S&&S.length){ctx.recentSymptoms=S.slice(-5).map(function(x){return {time:x.t||'',symptom:x.symptom||x.name||'',severity:x.severity||x.level||''};});}
   }catch(e){}
   return ctx;
@@ -8451,7 +8550,7 @@ function getActivityEnvironmentFormData(){
 
 
 
-// v9.10.347.10 KISS: Cardiac Context display helpers (display only; no save/storage changes)
+// v9.10.347.116 KISS: Cardiac Context display helpers (display only; no save/storage changes)
 function clActivityEsc(v){
   return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
 }
@@ -8605,7 +8704,7 @@ function _isActivityFinishedForSave(){
   var isTimerMode=timerDisplay&&timerDisplay.style.display==='block';
   var isManualMode=manualInput&&manualInput.parentElement&&manualInput.parentElement.style.display==='block';
   if(isTimerMode){
-    // v9.10.347.10 KISS: Once the user taps Finish Activity, any positive elapsed time can be saved.
+    // v9.10.347.116 KISS: Once the user taps Finish Activity, any positive elapsed time can be saved.
     // Do not require the full 60 seconds to pass; short real-world activities still matter.
     return !!activityTimerStoppedForSave && activityElapsedSeconds>0 && !activityTimerInterval;
   }
@@ -8708,7 +8807,7 @@ var mins=Math.floor(elapsed/60);
 var secs=elapsed%60;
 var __tt=document.getElementById('timerTime');if(__tt){__tt.textContent=(mins<10?'0':'')+mins+':'+(secs<10?'0':'')+secs;}
 },100);
-// v9.10.347.10 KISS: Start Activity now uses the proven Minimize workflow.
+// v9.10.347.116 KISS: Start Activity now uses the proven Minimize workflow.
 // This creates/persists the activity pill, closes the modal, and starts the pill timer immediately.
 minimizeActivityLog();
 }
@@ -8744,7 +8843,7 @@ if(pauseBtn)pauseBtn.style.display='none';
 if(resumeBtn)resumeBtn.style.display='none';
 if(stopBtn)stopBtn.style.display='none';
 if(pausedLabel)pausedLabel.style.display='none';
-activityTimerStoppedForSave=(activityElapsedSeconds>0); // v9.10.347.10: Save unlocks after Stop for any positive elapsed time
+activityTimerStoppedForSave=(activityElapsedSeconds>0); // v9.10.347.116: Save unlocks after Stop for any positive elapsed time
 updateActivitySaveState();
 }
 
@@ -8757,6 +8856,66 @@ document.getElementById('exertion'+level).classList.add('selected');
 }
 
 // NEW: Store current activity info for BP linking
+var activityReturnStateForBP=null;
+function captureActivityReturnStateForBP(){
+  var sel=document.getElementById('activitySelect');
+  var notes=document.getElementById('activityNotes');
+  var dur=document.getElementById('durationMinutes');
+  return {
+    activityType: sel ? sel.value : '',
+    notes: notes ? notes.value : '',
+    exertion: selectedExertion,
+    tempBand: selectedTempBand,
+    activityWindow: selectedActivityWindow,
+    activityWindowMinutes: selectedActivityWindowMinutes,
+    destination: selectedDestination,
+    environmentalMode: selectedEnvironmentalMode,
+    environmentSnapshot: activityEnvironmentSnapshot,
+    activityContext: selectedActivityContext,
+    journeyRole: selectedJourneyRole,
+    journeyName: selectedJourneyName,
+    journeyId: selectedJourneyId,
+    manualMinutes: dur ? (dur.value||'') : ''
+  };
+}
+function restoreActivityAfterBP(state, bpLabel){
+  if(!state)return;
+  selectedActivityContext=state.activityContext||selectedActivityContext||getDefaultActivityContext(state.activityType||'');
+  logActivity(true);
+  setTimeout(function(){
+    selectedActivityContext=state.activityContext||selectedActivityContext||getDefaultActivityContext(state.activityType||'');
+    renderActivityContextButtons();
+    refreshActivityOptionsForContext();
+    updateActivitySectionsForContext();
+    var sel=document.getElementById('activitySelect');
+    if(sel&&state.activityType)sel.value=state.activityType;
+    handleActivitySelection();
+    var notes=document.getElementById('activityNotes');
+    if(notes)notes.value=state.notes||'';
+    if(state.exertion)selectExertion(state.exertion);
+    if(state.tempBand!==undefined&&state.tempBand!==null)selectTempBand(state.tempBand);
+    selectedActivityWindow=state.activityWindow||'';
+    selectedActivityWindowMinutes=state.activityWindowMinutes||null;
+    selectedDestination=state.destination||'';
+    selectedEnvironmentalMode=state.environmentalMode||selectedEnvironmentalMode||'manual';
+    activityEnvironmentSnapshot=state.environmentSnapshot||null;
+    selectedJourneyRole=state.journeyRole||'single';
+    selectedJourneyName=state.journeyName||'';
+    selectedJourneyId=state.journeyId||null;
+    var wSel=document.getElementById('activityWindowSelect');if(wSel&&selectedActivityWindowMinutes)wSel.value=String(selectedActivityWindowMinutes);
+    var dSel=document.getElementById('activityDestinationSelect');if(dSel&&selectedDestination)dSel.value=selectedDestination;
+    var jSel=document.getElementById('journeyRoleSelect');if(jSel)jSel.value=selectedJourneyRole;
+    var jName=document.getElementById('journeyNameInput');if(jName)jName.value=selectedJourneyName||'';
+    selectEnvironmentalMode(selectedEnvironmentalMode);
+    if(activityEnvironmentSnapshot)renderActivityEnvironmentStatus();
+    var dur=document.getElementById('durationMinutes');if(dur&&state.manualMinutes)dur.value=state.manualMinutes;
+    var bpStatus=document.getElementById('bpBeforeStatus');
+    var bpBtn=document.getElementById('takeBPBeforeBtn');
+    if(bpStatus&&bpLabel){bpStatus.textContent=bpLabel;bpStatus.style.display='block';}
+    if(bpBtn&&bpLabel)bpBtn.style.display='none';
+    updateActivityStartState();
+  },300);
+}
 var currentActivityForBP=null;
 var bpBeforeReading=null;
 var usingExistingBP=null;
@@ -8770,6 +8929,7 @@ if(!activityType){
 _showInlineError('⚠️ Please select an activity type first');
 return;
 }
+activityReturnStateForBP=captureActivityReturnStateForBP();
 currentActivityForBP={
 type:activityType,
 timing:'before'
@@ -8825,35 +8985,12 @@ if(currentActivityForBP){
 if(currentActivityForBP.timing==='before'){
 bpBeforeReading=reading;
 hideModal();
-// Reopen activity modal
+// Reopen the same activity setup instead of resetting to the first screen.
+var returnState=activityReturnStateForBP;
 setTimeout(function(){
-logActivity();
-// Restore form state with longer delay to ensure DOM is ready
-setTimeout(function(){
-// Set activity type
-var activitySelect=document.getElementById('activitySelect');
-if(activitySelect){
-activitySelect.value=currentActivityForBP.type;
-}
-// Switch to timer mode explicitly
-var timerBtn=document.getElementById('timerBtn');
-if(timerBtn){
-timerBtn.click(); // Use click to ensure full event handling
-}
-// Wait for mode switch to complete, then show BP status
-setTimeout(function(){
-var bpStatus=document.getElementById('bpBeforeStatus');
-var bpBtn=document.getElementById('takeBPBeforeBtn');
-if(bpStatus){
-bpStatus.textContent='✓ BP Before: '+s+'/'+d;
-bpStatus.style.display='block';
-}
-if(bpBtn){
-bpBtn.style.display='none';
-}
+restoreActivityAfterBP(returnState,'✓ BP Before: '+s+'/'+d);
+activityReturnStateForBP=null;
 currentActivityForBP=null;
-},200);
-},400);
 },300);
 }else{
 // After activity - link to saved activity
@@ -8880,9 +9017,11 @@ alert('✓ Blood pressure logged after activity: '+s+'/'+d+' mmHg');
 function cancelBPForActivity(){
 hideModal();
 if(currentActivityForBP&&currentActivityForBP.timing==='before'){
-// Reopen activity modal
+// Reopen the same activity setup instead of resetting to the first screen.
+var returnState=activityReturnStateForBP;
 setTimeout(function(){
-logActivity();
+restoreActivityAfterBP(returnState,'');
+activityReturnStateForBP=null;
 currentActivityForBP=null;
 },300);
 }else{
@@ -8913,7 +9052,7 @@ completeAndCloseModal();
 // ── Background Activity System (v9.10.36) ────────────────────────────────────
 
 
-// v9.10.347.10 KISS: activity pill state is created immediately when timer starts.
+// v9.10.347.116 KISS: activity pill state is created immediately when timer starts.
 // This is intentionally limited to the floating pill lifecycle; activity save/history/context logic is untouched.
 function _captureActivityPillStateFromForm(isTimerMode){
   var sel=document.getElementById('activitySelect');
@@ -8949,7 +9088,7 @@ function _captureActivityPillStateFromForm(isTimerMode){
   } catch(e) {}
 }
 
-// v9.10.347.10 KISS: prevent bottom floating controls from covering each other on iPhone.
+// v9.10.347.116 KISS: prevent bottom floating controls from covering each other on iPhone.
 function _layoutBottomPills(){
   var activity=document.getElementById('activityPillBtn');
   var status=document.getElementById('statusFab');
@@ -9077,32 +9216,37 @@ function restoreActivityLog(){
   _activityMinimized=false;
   _minimizedActivityState=null;
   _stopActivityPillTick();
+  try { localStorage.removeItem('CB_ACTIVITY_MINIMIZED'); } catch(e) {}
 
   // Rebuild the modal
-  logActivity();
+  selectedActivityContext=state.activityContext||selectedActivityContext||getDefaultActivityContext(state.activityType||'');
+  logActivity(true);
 
   // Restore form state after modal renders
   setTimeout(function(){
+    selectedActivityContext=state.activityContext||selectedActivityContext||getDefaultActivityContext(state.activityType||'');
+    renderActivityContextButtons();
+    refreshActivityOptionsForContext();
+    updateActivitySectionsForContext();
     var sel=document.getElementById('activitySelect');
     if(sel && state.activityType) sel.value=state.activityType;
+    handleActivitySelection();
     var notes=document.getElementById('activityNotes');
     if(notes && state.notes) notes.value=state.notes;
-    if(state.exertion) selectExertion(state.exertion);
-    if(state.tempBand!==undefined&&state.tempBand!==null) selectTempBand(state.tempBand);
     selectedActivityWindow=state.activityWindow||'';
     selectedActivityWindowMinutes=state.activityWindowMinutes||null;
     selectedDestination=state.destination||'';
     selectedEnvironmentalMode=state.environmentalMode||selectedEnvironmentalMode||'manual';
     activityEnvironmentSnapshot=state.environmentSnapshot||null;
-    selectedActivityContext=state.activityContext||selectedActivityContext||getDefaultActivityContext(state.activityType||'');
     selectedJourneyRole=state.journeyRole||'single';
     selectedJourneyName=state.journeyName||'';
     selectedJourneyId=state.journeyId||null;
     var jSel=document.getElementById('journeyRoleSelect');if(jSel)jSel.value=selectedJourneyRole;
     var jName=document.getElementById('journeyNameInput');if(jName&&selectedJourneyName)jName.value=selectedJourneyName;
-    renderActivityContextButtons();
     var wSel=document.getElementById('activityWindowSelect');if(wSel&&selectedActivityWindowMinutes)wSel.value=String(selectedActivityWindowMinutes);
     var dSel=document.getElementById('activityDestinationSelect');if(dSel&&selectedDestination)dSel.value=selectedDestination;
+    if(state.exertion) selectExertion(state.exertion);
+    if(state.tempBand!==undefined&&state.tempBand!==null) selectTempBand(state.tempBand);
     selectEnvironmentalMode(selectedEnvironmentalMode);
     if(activityEnvironmentSnapshot)renderActivityEnvironmentStatus();
     if(state.manualEnvironmentFactors&&state.manualEnvironmentFactors.length){state.manualEnvironmentFactors.forEach(function(label){var map={'Hot kitchen':'hotKitchen','Standing long time':'standingLong','After meal':'afterMeal','Stairs / hills':'stairsHills','Humid room':'humidRoom','Stressful':'stressful','After shower':'afterShower','Warm room':'warmRoom'};var el=document.getElementById('envCtx_'+map[label]);if(el)el.checked=true;});}
@@ -9154,7 +9298,7 @@ function restoreActivityLog(){
       if(manDur && state.manualMinutes) manDur.value=state.manualMinutes;
       updateActivitySaveState();
     }
-    // v9.10.347.10 KISS: returning from the Activity pill should land at the active timer/save area,
+    // v9.10.347.116 KISS: returning from the Activity pill should land at the active timer/save area,
     // not the top of the Log Activity setup modal.
     setTimeout(function(){
       var target=document.getElementById('activityTimingSection')||document.getElementById('timerDisplay')||document.getElementById('timerStartBtn');
@@ -9241,10 +9385,8 @@ return diff;
 function _showRecentBPCard(){
 var card=document.getElementById('recentBPCard');
 if(!card)return;
-if(!B||B.length===0){card.innerHTML='';return;}
-// Sort to find most recent by HH:MM string
-var sorted=B.slice().sort(function(a,b){return b.t.localeCompare(a.t);});
-var latest=sorted[0];
+var latest=(typeof _getRecentBPReading==='function')?_getRecentBPReading():null;
+if(!latest){card.innerHTML='';return;}
 // Already linked as before-reading for another activity?
 if(latest.activityId&&latest.activityTiming==='before'){
 card.innerHTML='<div style="background:#f3f4f6;border-left:4px solid #9ca3af;border-radius:8px;padding:10px 14px;font-size:14px;color:#6b7280;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center"><span>📊 Last reading ('+latest.s+'/'+latest.d+', HR '+latest.h+') already linked to a previous activity.</span><button type="button" onclick="document.getElementById(\'recentBPCard\').style.display=\'none\'" style="background:none;border:none;color:#6b7280;font-size:18px;cursor:pointer;padding:0 0 0 12px;line-height:1;flex-shrink:0">✕</button></div>';
@@ -9538,6 +9680,7 @@ function selectTempBand(level){
       btn.style.boxShadow='none';
     }
   }
+  renderActivityWeatherAwareness();
 }
 
 function getHeatSensitiveConditions(){
@@ -12422,14 +12565,70 @@ var _medSafetyBlockedMeds = [];
 window._medSafetyWarnState = null;
 
 
+// Returns today's BP readings through the BP/HR retrieval helper path
+function _getTodayBPReadings(){
+  return (B||[]).map(function(r){ return Object.assign({}, r); });
+}
+
+// Returns all BP readings from local storage plus today's session, preserving full history
+function _getAllBPReadings(){
+  var allBP=[];
+  var todayKey=getTodayKey();
+
+  // Prefer today's active session data when present.
+  if(B&&B.length>0){
+    B.forEach(function(r){ allBP.push(Object.assign({},r,{_date:todayKey})); });
+  }
+
+  try{
+    for(var i=0;i<localStorage.length;i++){
+      var key=localStorage.key(i);
+      if(key&&key.indexOf('BP_TRACKER_')===0&&key!=='BP_TRACKER_DAILY_DATA'){
+        var dateKey=key.replace('BP_TRACKER_','');
+        if(dateKey===todayKey&&B&&B.length>0)continue;
+        if(/^\d{4}-\d{2}-\d{2}$/.test(dateKey)){
+          var stored=localStorage.getItem(key);
+          if(stored){
+            var parsed=JSON.parse(stored);
+            if(parsed&&parsed.bp){
+              parsed.bp.forEach(function(r){ allBP.push(Object.assign({},r,{_date:dateKey})); });
+            }
+          }
+        }
+      }
+      else if(key&&key.indexOf('data-')===0){
+        var oldDateKey=key.replace('data-','');
+        if(oldDateKey===todayKey&&B&&B.length>0)continue;
+        if(/^\d{4}-\d{2}-\d{2}$/.test(oldDateKey)){
+          var oldStored=localStorage.getItem(key);
+          if(oldStored){
+            var oldParsed=JSON.parse(oldStored);
+            if(oldParsed&&oldParsed.B){
+              oldParsed.B.forEach(function(r){ allBP.push(Object.assign({},r,{_date:oldDateKey})); });
+            }
+          }
+        }
+      }
+    }
+  }catch(e){console.error('Failed to load all BP history:',e);}
+
+  allBP.sort(function(a,b){
+    var ak=(a._date||todayKey)+'T'+(a.t||'');
+    var bk=(b._date||todayKey)+'T'+(b.t||'');
+    return ak<bk?-1:ak>bk?1:0;
+  });
+  return allBP;
+}
+
 // Returns the most recent BP reading within 4 hours, or null
 function _getRecentBPReading(){
   var now = new Date();
   var cutoffMs = 4 * 60 * 60 * 1000; // 4 hours in ms
   var best = null;
   var bestDiff = Infinity;
-  for(var i=0; i<B.length; i++){
-    var r = B[i];
+  var bpData = (typeof _getTodayBPReadings === 'function') ? _getTodayBPReadings() : (B || []);
+  for(var i=0; i<bpData.length; i++){
+    var r = bpData[i];
     if(!r.s || !r.d || !r.h || !r.t) continue;
     // Parse reading time as today
     var parts = r.t.split(':');
@@ -12443,6 +12642,39 @@ function _getRecentBPReading(){
     }
   }
   return best;
+}
+
+// Returns recent HR values from BP readings, newest first
+function _getRecentHRReadings(limit){
+  var values=[];
+  limit=limit||3;
+  var bpData = (typeof _getTodayBPReadings === 'function') ? _getTodayBPReadings() : (B || []);
+  for(var i=bpData.length-1;i>=0&&values.length<limit;i--){
+    if(bpData[i]&&bpData[i].h) values.push(bpData[i].h);
+  }
+  return values;
+}
+
+// Returns today's HR readings from BP readings, oldest first
+function _getTodayHRReadings(){
+  var bpData = (typeof _getTodayBPReadings === 'function') ? _getTodayBPReadings() : (B || []);
+  return (typeof _getHRReadingsFromBP === 'function') ? _getHRReadingsFromBP(bpData) : bpData.filter(function(r){return r&&r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
+}
+
+// Returns HR readings from a supplied BP record set, preserving existing order
+function _getHRReadingsFromBP(records){
+  var values=[];
+  records=records||[];
+  for(var i=0;i<records.length;i++){
+    if(records[i]&&records[i].h&&records[i].h>0) values.push(Object.assign({},records[i],{hr:records[i].h}));
+  }
+  return values;
+}
+
+// Returns all HR readings from BP readings, preserving existing order
+function _getAllHRReadings(){
+  var bpData = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (B || []);
+  return _getHRReadingsFromBP(bpData);
 }
 
 // Returns minutes ago as formatted string
@@ -12684,10 +12916,7 @@ function _checkMedCondition(medName){
   var hrWarnThreshold = 80;
   var mipHR = mipGetApproved(medName, 'hr');
   if (mipHR && mipHR.warn) hrWarnThreshold = mipHR.warn;
-  var recentHRs = [];
-  for (var ri = B.length - 1; ri >= 0 && recentHRs.length < 3; ri--) {
-    if (B[ri].h) recentHRs.push(B[ri].h);
-  }
+  var recentHRs = (typeof _getRecentHRReadings === 'function') ? _getRecentHRReadings(3) : [];
   if (recentHRs.length >= 3) {
     var avgHR = recentHRs.reduce(function(a,b){ return a+b; },0) / recentHRs.length;
     var aboveCount = recentHRs.filter(function(v){ return v > hrWarnThreshold; }).length;
@@ -12821,7 +13050,7 @@ function _showRulesWarn(block) {
   h += '</div>';
   if(block.reading) h += _vitalsStatusHTML(block.reading);
   h += '</div>';
-  h += '<div style="font-size:14px;color:#374151;margin-bottom:16px;line-height:1.6">You can still log this dose — but consider whether these readings are safe for this medication right now. Discuss this pattern with your cardiologist.</div>';
+  h += '<div style="font-size:14px;color:#374151;margin-bottom:16px;line-height:1.6">You can still log this dose — these readings are outside the configured thresholds for this medication. Discuss this pattern with your cardiologist.</div>';
   h += '<div style="display:flex;flex-direction:column;gap:10px">';
   h += '<button onclick="_mipWarnProceed()" style="background:#d97706;color:#fff;border:none;border-radius:10px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;min-height:52px">⚠️ Log Anyway — I Understand the Risk</button>';
   h += '<button onclick="logMedicine()" style="background:#6b7280;color:#fff;border:none;border-radius:10px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;min-height:52px">← Back</button>';
@@ -12842,7 +13071,7 @@ function _showMIPWarn(block) {
   h += '</div>';
   if (block.reading) h += _vitalsStatusHTML(block.reading);
   h += '</div>';
-  h += '<div style="font-size:14px;color:#374151;margin-bottom:16px;line-height:1.6">You can still log this dose — but consider whether your ' + metricLabel.toLowerCase() + ' is too low for this medication right now. Discuss this threshold with your cardiologist.</div>';
+  h += '<div style="font-size:14px;color:#374151;margin-bottom:16px;line-height:1.6">You can still log this dose — your recorded ' + metricLabel.toLowerCase() + ' is below the configured caution threshold for this medication. Discuss this threshold with your cardiologist.</div>';
   h += '<div style="display:flex;flex-direction:column;gap:10px">';
   h += '<button onclick="_mipWarnProceed()" style="background:#d97706;color:#fff;border:none;border-radius:10px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;min-height:52px">⚠️ Log Anyway — I Understand the Risk</button>';
   h += '<button onclick="logMedicine()" style="background:#6b7280;color:#fff;border:none;border-radius:10px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;min-height:52px">← Back</button>';
@@ -12859,7 +13088,7 @@ function _showPPWarn(block) {
   h += '<div style="font-size:15px;color:#5b21b6;margin-bottom:4px">Your current pulse pressure is below your personal warn threshold.</div>';
   h += '<div style="font-size:15px;color:#4c1d95">Current PP: <strong>' + block.currentPP + ' mmHg</strong> &nbsp;·&nbsp; Warn below: <strong>' + block.ppWarn + ' mmHg</strong> &nbsp;·&nbsp; Recovery target: <strong>' + block.ppTarget + ' mmHg</strong></div>';
   h += '</div>';
-  h += '<div style="font-size:14px;color:#374151;margin-bottom:16px;line-height:1.6">This medication may further narrow your pulse pressure. Consider whether your PP is already too low for this dose. Your recovery target is ' + block.ppTarget + ' mmHg — discuss with your cardiologist.</div>';
+  h += '<div style="font-size:14px;color:#374151;margin-bottom:16px;line-height:1.6">Your current pulse pressure is below the configured caution threshold for this medication. Your recovery target is ' + block.ppTarget + ' mmHg — discuss this threshold with your cardiologist.</div>';
   h += '<div style="display:flex;flex-direction:column;gap:10px">';
   h += '<button onclick="_mipWarnProceed()" style="background:#7c3aed;color:#fff;border:none;border-radius:10px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;min-height:52px">⚠️ Log Anyway — I Understand</button>';
   h += '<button onclick="logMedicine()" style="background:#6b7280;color:#fff;border:none;border-radius:10px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;min-height:52px">← Back</button>';
@@ -12877,7 +13106,7 @@ function _showHRWarn(block) {
   h += '<div style="font-size:15px;color:#c2410c;margin-bottom:4px">' + _cnt + ' of your last 3 HR readings are above your target ceiling.</div>';
   h += '<div style="font-size:15px;color:#9a3412">Readings: <strong>' + block.recentHRs.join(', ') + ' bpm</strong> &nbsp;·&nbsp; Avg: ' + block.avgHR + ' bpm &nbsp;·&nbsp; Ceiling: <strong>' + block.hrWarnThreshold + ' bpm</strong></div>';
   h += '</div>';
-  h += '<div style="font-size:14px;color:#374151;margin-bottom:16px;line-height:1.6">Your HR is running above your doctor\'s target range across multiple readings. This medication may help — but a sustained pattern warrants a check before proceeding. Consider logging another BP/HR reading to confirm before deciding.</div>';
+  h += '<div style="font-size:14px;color:#374151;margin-bottom:16px;line-height:1.6">Your recorded HR is above your doctor\'s target range across multiple readings. Consider logging another BP/HR reading before deciding, and discuss sustained patterns with your cardiologist.</div>';
   h += '<div style="display:flex;flex-direction:column;gap:10px">';
   h += '<button onclick="_mipWarnProceed()" style="background:#ea580c;color:#fff;border:none;border-radius:10px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;min-height:52px">⚠️ Log Anyway — I Understand</button>';
   h += '<button onclick="logMedicine()" style="background:#6b7280;color:#fff;border:none;border-radius:10px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;min-height:52px">← Back</button>';
@@ -15701,7 +15930,7 @@ try{
 var saved=localStorage.getItem('BP_TRACKER_'+dateKey);
 if(!saved)return null;
 var data=JSON.parse(saved);
-var bp=data.B||[];
+var bp=(typeof _getAllBPReadings==='function')?_getAllBPReadings().filter(function(r){return r&&r._date===dateKey;}):(data.B||data.bp||[]);
 var symptoms=data.S||[];
 var medLog=data.medLog||[];
 // Start at GREEN
@@ -15970,19 +16199,12 @@ var CARD_LOG_FN = {
 // B2: Med Effectiveness tile tap handler — adapts to user's setup state
 function _openMedEffTile(){
   var hasMedData=medicineList&&medicineList.length>0;
-  var hasMedReadings=B&&B.some(function(r){return r.medicationRelated&&r.medicationTiming!=='none';});
-  // Scan historical BP_TRACKER localStorage keys for tagged readings
-  if(!hasMedReadings){
-    try{
-      var _lsKeys=Object.keys(localStorage);
-      for(var _ki=0;_ki<_lsKeys.length&&!hasMedReadings;_ki++){
-        if(_lsKeys[_ki].indexOf('BP_TRACKER_')===0){
-          var _day=JSON.parse(localStorage.getItem(_lsKeys[_ki])||'{}');
-          var _rds=_day.bp||_day.B||[];
-          if(_rds.some(function(r){return r.medicationRelated&&r.medicationTiming!=='none';})) hasMedReadings=true;
-        }
-      }
-    }catch(e){}
+  var hasMedReadings=false;
+  try{
+    var _bpReadings=(typeof _getAllBPReadings==='function')?_getAllBPReadings():[];
+    hasMedReadings=_bpReadings.some(function(r){return r&&r.medicationRelated&&r.medicationTiming&&r.medicationTiming!=='none';});
+  }catch(e){
+    hasMedReadings=false;
   }
   if(hasMedReadings){
     openMedicationEffectiveness();
@@ -15993,7 +16215,7 @@ function _openMedEffTile(){
     html+='<div style="background:#f0fdf4;border:2px solid #10b981;border-radius:12px;padding:20px;margin-bottom:16px;text-align:center">';
     html+='<div style="font-size:40px;margin-bottom:10px">📊</div>';
     html+='<div style="font-size:18px;font-weight:700;color:#166534;margin-bottom:10px">See how your medications affect your BP</div>';
-    html+='<div style="font-size:15px;color:#374151;line-height:1.6;margin-bottom:16px">Once you add your medications in Settings and tag a few BP readings as taken before or after a dose, CardiacLens shows you a before/after comparison for each drug. Your cardiologist can see at a glance whether each medication is doing its job — data they cannot get from an office visit alone.</div>';
+    html+='<div style="font-size:15px;color:#374151;line-height:1.6;margin-bottom:16px">Once you add your medications in Settings and tag a few BP readings as taken before or after a dose, CardiacLens shows you a before/after comparison for each drug. Your cardiologist can review before-and-after recorded measurements for each medication over time—context that is difficult to obtain from a single office visit alone.</div>';
     html+='<div style="font-size:14px;color:#6b7280;margin-bottom:16px">Takes about 3–4 tagged readings per medication to generate meaningful data.</div>';
     html+='</div>';
     html+='<div class="modal-actions">';
@@ -16157,14 +16379,15 @@ function buildSmartStatusMessage(zoneData) {
   var minuteOfDay = hour * 60 + now.getMinutes();
   var zone = zoneData ? zoneData.zone : null;
 
-  var bpCount       = B      ? B.length      : 0;
+  var todayBPData   = (typeof _getTodayBPReadings === 'function') ? _getTodayBPReadings() : (B || []);
+  var bpCount       = todayBPData.length;
   var weightCount   = W      ? W.length      : 0;
   var symptomCount  = S      ? S.length      : 0;
   var activityCount = A      ? A.length      : 0;
   var mealCount     = M      ? M.length      : 0;
   var notesCount    = notes  ? notes.length  : 0;
   var fluidEntries  = (fluidLog ? fluidLog.length : 0)
-                    + (B ? B.filter(function(r){return r.f>0;}).length : 0)
+                    + todayBPData.filter(function(r){return r.f>0;}).length
                     + (M ? M.filter(function(m){return m.mealFluidOz>0;}).length : 0);
   var medsSet = {};
   if(medLog){ medLog.forEach(function(e){ if(e.medicine) medsSet[e.medicine]=true; }); }
@@ -16205,11 +16428,11 @@ function buildSmartStatusMessage(zoneData) {
   var facts = [];
 
   // 1. BP in range with actual avg
-  if (bpCount > 0 && B && B.length > 0) {
+  if (bpCount > 0 && todayBPData.length > 0) {
     var totalSys = 0, totalDia = 0;
-    B.forEach(function(r){ totalSys += r.s; totalDia += r.d; });
-    var avgSys = Math.round(totalSys / B.length);
-    var avgDia = Math.round(totalDia / B.length);
+    todayBPData.forEach(function(r){ totalSys += r.s; totalDia += r.d; });
+    var avgSys = Math.round(totalSys / todayBPData.length);
+    var avgDia = Math.round(totalDia / todayBPData.length);
     facts.push('BP in range · avg ' + avgSys + '/' + avgDia);
   }
 
@@ -16311,7 +16534,7 @@ function _clWindCompass(deg){
 function _clGetWeatherCache(){try{var raw=localStorage.getItem(TODAY_WEATHER_CACHE_KEY);return raw?JSON.parse(raw):null;}catch(e){return null;}}
 function _clSetWeatherCache(obj){try{localStorage.setItem(TODAY_WEATHER_CACHE_KEY,JSON.stringify(obj));}catch(e){}}
 function _clResolveSavedWeatherZip(){
-  // v9.10.347.10: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
+  // v9.10.347.116: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
   // Today Weather must not fall back to GPS unless the user explicitly taps Use My Location.
   try{
     var z=String((settings&&settings.todayWeatherSavedZip)||'').trim();
@@ -16341,7 +16564,7 @@ function _clWeatherUpdatedLabel(c){
   return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+' ('+ageText+')';
 }
 function _clBuildWeatherUrl(lat,lon){
-  // v9.10.347.10: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
+  // v9.10.347.116: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
   // The app only needs current conditions + hourly forecast for rain/heat/wind guidance.
   return 'https://api.open-meteo.com/v1/forecast?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+
     '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=2'+
@@ -16349,7 +16572,7 @@ function _clBuildWeatherUrl(lat,lon){
     '&hourly=precipitation_probability,precipitation,rain,temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m';
 }
 
-// v9.10.347.10: Saved ZIP uses a direct local coordinate table first.
+// v9.10.347.116: Saved ZIP uses a direct local coordinate table first.
 // For Robert's normal area, 77340 always resolves directly to Huntsville coordinates.
 var CL_ZIP_COORDS={
   '77340':{lat:30.7235,lon:-95.5508,label:'Huntsville'},
@@ -16474,15 +16697,15 @@ function openTodayWeatherModal(){
   var html='<div class="modal-title" style="font-size:26px;margin-bottom:10px">☀️ Today\'s Weather</div><button type="button" onclick="hideModal();openHelpModal(\'weather\')" style="width:100%;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;border-radius:10px;padding:10px;font-size:14px;font-weight:800;margin-bottom:12px">How to use Today\'s Weather</button><div id="todayWeatherModalBody">'+_renderTodayWeatherBody(c,null,initialState)+'</div>';
   html+='<div class="modal-actions"><button class="modal-cancel" onclick="hideModal()">Close</button><button class="modal-ok" id="todayWeatherRefreshBtn" onclick="refreshTodayWeatherFromModal()">Refresh Weather</button></div>';
   showModal(html);
-  // v9.10.347.10: if cached weather is older than the user's refresh threshold, refresh automatically on open.
+  // v9.10.347.116: if cached weather is older than the user's refresh threshold, refresh automatically on open.
   // This keeps the weather pill, planner, and activity weather on the same fresh source without requiring a manual tap.
   if(stale){setTimeout(function(){
-    // v9.10.347.10: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
+    // v9.10.347.116: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
     refreshTodayWeatherFromModal(true,'zip');
   },100);}
 }
 
-// v9.10.347.10: Today's Weather banner must use the real weather state, not a stale/default activity flag.
+// v9.10.347.116: Today's Weather banner must use the real weather state, not a stale/default activity flag.
 function _clIsTodayWeatherAutomaticEnabled(c){
   try{
     if(typeof _clRestoreWeatherSettingsBackup==='function')_clRestoreWeatherSettingsBackup();
@@ -16577,7 +16800,7 @@ function useSavedZipWeather(){
   refreshTodayWeatherFromModal(false,'zip');
 }
 function refreshTodayWeatherFromModal(silent,source){
-  // v9.10.347.10: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
+  // v9.10.347.116: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
   source=(source==='location')?'location':'zip';
   if(source==='zip'){
     try{settings.todayWeatherSource='zip';settings.todayWeatherSavedZip=_clResolveSavedWeatherZip();localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
@@ -16801,12 +17024,13 @@ if(zoneData){
 }
 
 // ── Activity counts ────────────────────────────────────────────────────
-var bpCount   = B ? B.length : 0;
+var todayBPData = (typeof _getTodayBPReadings === 'function') ? _getTodayBPReadings() : (B || []);
+var bpCount   = todayBPData.length;
 var mealCount = M ? M.length : 0;
 
 // Total fluid entries (standalone fluidLog + BP fluid entries + meal fluid)
 var fluidEntries = (fluidLog ? fluidLog.length : 0)
-                 + (B ? B.filter(function(r){return r.f>0;}).length : 0)
+                 + todayBPData.filter(function(r){return r.f>0;}).length
                  + (M ? M.filter(function(m){return m.mealFluidOz>0;}).length : 0);
 
 // Unique medicines taken today (by name, de-dup)
@@ -16816,9 +17040,9 @@ var medsCount = Object.keys(medsSet).length;
 
 // ── Option C: Event completion — data-linked OR dismissed ─────────────
 // Build a Set of every eventId that appears in today's logged entries
-// (B, fluidLog, M, medLog, notes, S all support eventId)
+// (BP readings, fluidLog, M, medLog, notes, S all support eventId)
 var loggedEventIds = {};
-if(B)         B.forEach(function(r){ if(r.eventId) loggedEventIds[r.eventId]=true; });
+todayBPData.forEach(function(r){ if(r.eventId) loggedEventIds[r.eventId]=true; });
 if(fluidLog)  fluidLog.forEach(function(r){ if(r.eventId) loggedEventIds[r.eventId]=true; });
 if(M)         M.forEach(function(r){ if(r.eventId) loggedEventIds[r.eventId]=true; });
 if(medLog)    medLog.forEach(function(r){ if(r.eventId) loggedEventIds[r.eventId]=true; });
@@ -16931,7 +17155,13 @@ html+=tile('⚡', bpCount, 'HR Rate', '#f59e0b', 'rate');
 // B2: Med Effectiveness tile — always shown; behavior adapts to setup state
 (function(){
   var hasMedData=medicineList&&medicineList.length>0;
-  var hasMedReadings=B&&B.some(function(r){return r.medicationRelated&&r.medicationTiming!=='none';});
+  var hasMedReadings=false;
+  try{
+    var medTileBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():[];
+    hasMedReadings=medTileBP.some(function(r){return r&&r.medicationRelated&&r.medicationTiming&&r.medicationTiming!=='none';});
+  }catch(e){
+    hasMedReadings=false;
+  }
   html+='<div class="stat-tile" style="background:#10b98118;border:2.5px solid #10b981;box-shadow:0 4px 14px #10b98144;text-align:center;cursor:pointer;" onclick="_openMedEffTile()">'
        +'<div style="font-size:22px;font-weight:800;color:#10b981">'+(hasMedReadings?'📈':'💊')+'</div>'
        +'<div style="font-size:11px;color:#4b5563;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Med Effectiveness</div>'
@@ -18130,7 +18360,7 @@ html+='</div>';
 html+='</div>';
 html+='<div style="margin-bottom:20px">';
 html+='<label style="display:block;font-size:18px;font-weight:600;margin-bottom:4px">📉 Diastolic Blood Pressure Range</label>';
-html+='<p style="font-size:13px;color:#6b7280;margin-bottom:8px">The bottom number. Tracked alongside systolic on all charts. Low diastolic can indicate poor circulation; high diastolic alongside high systolic is a key pattern your doctor watches for.</p>';
+html+='<p style="font-size:13px;color:#6b7280;margin-bottom:8px">The bottom number. Tracked alongside systolic on all charts. Low or high diastolic values can be important context for your doctor, especially when reviewed alongside systolic readings.</p>';
 html+='<div style="display:flex;gap:12px">';
 html+='<div style="flex:1"><label style="font-size:13px;color:#6b7280">Min (mmHg)</label><input type="number" inputmode="numeric" id="settingDiaMin" class="modal-input" placeholder="e.g. 60" value="'+settings.diastolicMin+'" onblur="_sanitizeNumericInput(this)"/></div>';
 html+='<div style="flex:1"><label style="font-size:13px;color:#6b7280">Max (mmHg)</label><input type="number" inputmode="numeric" id="settingDiaMax" class="modal-input" placeholder="e.g. 90" value="'+settings.diastolicMax+'" onblur="_sanitizeNumericInput(this)"/></div>';
@@ -20528,7 +20758,8 @@ try{
 }
 
 function exportData(){
-if(B.length===0&&M.length===0&&medLog.length===0&&fluidLog.length===0&&notes.length===0){
+var bpData=(typeof _getTodayBPReadings==='function')?_getTodayBPReadings():(B||[]);
+if(bpData.length===0&&M.length===0&&medLog.length===0&&fluidLog.length===0&&notes.length===0){
 alert('No data to export');
 return;
 }
@@ -20540,34 +20771,35 @@ var tsv='Date\tType\tTime\tMeal Timing\tSystolic\tDiastolic\tPulse\tBarometric\t
 var today=new Date().toLocaleDateString('en-US');
 
 // Process BP readings with DROP calculations
-for(var i=0;i<B.length;i++){
+for(var i=0;i<bpData.length;i++){
+var r=bpData[i];
 var timing='';
 var dropSys='';
 var dropDia='';
 var preFluid='';
 var barometric='';
 var mealType='';
-if(B[i].meal){
-timing=B[i].meal+' '+B[i].type;
-mealType=B[i].meal;
-}else if(B[i].type){
-timing=B[i].type;
+if(r.meal){
+timing=r.meal+' '+r.type;
+mealType=r.meal;
+}else if(r.type){
+timing=r.type;
 }
-if(B[i].f>0){
-preFluid=B[i].f;
+if(r.f>0){
+preFluid=r.f;
 }
 // Calculate DROP values for "post" readings
-if(B[i].type==='post'){
+if(r.type==='post'){
 // Find the most recent "pre" reading for the same meal
 for(var j=i-1;j>=0;j--){
-if(B[j].meal===mealType&&B[j].type==='pre'){
-dropSys=B[i].s-B[j].s;
-dropDia=B[i].d-B[j].d;
+if(bpData[j].meal===mealType&&bpData[j].type==='pre'){
+dropSys=r.s-bpData[j].s;
+dropDia=r.d-bpData[j].d;
 break;
 }
 }
 }
-tsv+=today+'\tBP\t'+B[i].t+'\t'+timing+'\t'+B[i].s+'\t'+B[i].d+'\t'+B[i].h+'\t'+barometric+'\t'+preFluid+'\t'+dropSys+'\t'+dropDia+'\t\t\t\n';
+tsv+=today+'\tBP\t'+r.t+'\t'+timing+'\t'+r.s+'\t'+r.d+'\t'+r.h+'\t'+barometric+'\t'+preFluid+'\t'+dropSys+'\t'+dropDia+'\t\t\t\n';
 }
 
 // Process meals
@@ -20611,7 +20843,8 @@ document.getElementById('noChartData').style.display='block';
 document.getElementById('bpChart').style.display='none';
 return;
 }
-if(B.length<2){
+var bpChartData=(typeof _getTodayBPReadings==='function')?_getTodayBPReadings():(B||[]);
+if(bpChartData.length<2){
 document.getElementById('noChartData').style.display='block';
 document.getElementById('bpChart').style.display='none';
 return;
@@ -20622,11 +20855,11 @@ var times=[];
 var systolic=[];
 var diastolic=[];
 var hr=[];
-for(var i=0;i<B.length;i++){
-times.push(B[i].t);
-systolic.push(B[i].s);
-diastolic.push(B[i].d);
-hr.push(B[i].h);
+for(var i=0;i<bpChartData.length;i++){
+times.push(bpChartData[i].t);
+systolic.push(bpChartData[i].s);
+diastolic.push(bpChartData[i].d);
+hr.push(bpChartData[i].h);
 }
 var ctx=document.getElementById('bpChart').getContext('2d');
 if(bpChart){
@@ -20783,8 +21016,8 @@ var _hrHistMode = false;
 
 function showHRHistory(){
   _hrHistMode = true;
-  var histAll = getAllHistoricalData();
-  _hrHistAllData = (histAll.bp||[]).filter(function(r){ return r.h && r.h > 0; });
+  var allBP = (typeof _getAllBPReadings==='function') ? _getAllBPReadings() : ((getAllHistoricalData().bp)||[]);
+  _hrHistAllData = (typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(allBP):(allBP||[]).filter(function(r){ return r.h && r.h > 0; });
   var fDiv = document.getElementById('hrHistFiltersDiv');
   if(fDiv){ fDiv.style.display='none'; fDiv.innerHTML=''; }
   _hrHistRenderFilters();
@@ -20948,14 +21181,15 @@ function jumpToHRHistDate(dateStr){
 function renderRateDetector(){
 var card=document.getElementById('rateDetectorCard');
 if(card) card.style.display='block';
-if(B.length<2){
+var bpReadings=(typeof _getTodayBPReadings==='function')?_getTodayBPReadings():(B||[]);
+if(bpReadings.length<2){
 document.getElementById('rateDetectorBars').style.display='none';
 document.getElementById('rateDetectorNone').style.display='block';
 document.getElementById('hrInsightsPanel').style.display='none';
 return;
 }
 // Filter readings with HR data
-var hrReadings=B.filter(function(r){return r.h>0;});
+var hrReadings=(typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(bpReadings):bpReadings.filter(function(r){return r.h>0;});
 if(hrReadings.length===0){
 document.getElementById('rateDetectorBars').style.display='none';
 document.getElementById('rateDetectorNone').style.display='block';
@@ -21596,6 +21830,53 @@ var hrChart=null;
 
 var hrQuickStatsPeriod='today';
 
+function _getHRPeriodBounds(period){
+period=period||hrQuickStatsPeriod||'today';
+if(period==='all')return null;
+var todayKey=(typeof getTodayKey==='function')?getTodayKey():null;
+var base=todayKey?new Date(todayKey+'T12:00:00'):new Date();
+var startDate=new Date(base);
+var endDate=new Date(base);
+if(period==='week'){startDate.setDate(base.getDate()-6);}
+else if(period==='month'){startDate.setDate(base.getDate()-29);}
+startDate.setHours(0,0,0,0);
+endDate.setHours(23,59,59,999);
+return{startDate:startDate,endDate:endDate};
+}
+
+function _getHRExportPeriodLabel(period,readings){
+period=period||hrQuickStatsPeriod||'today';
+function fmt(d){return d.toLocaleDateString();}
+function readingDateOnly(r){
+var datePart=(r&&r._date)?String(r._date):((r&&r.date)?String(r.date):getTodayKey());
+var m=datePart.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+if(m)return new Date(parseInt(m[1],10),parseInt(m[2],10)-1,parseInt(m[3],10),12,0,0,0).toLocaleDateString();
+var d=new Date(datePart);
+return isNaN(d.getTime())?datePart:d.toLocaleDateString();
+}
+var bounds=(typeof _getHRPeriodBounds==='function')?_getHRPeriodBounds(period):null;
+if(bounds)return fmt(bounds.startDate)+' - '+fmt(bounds.endDate);
+if(readings&&readings.length){return readingDateOnly(readings[0])+' - '+readingDateOnly(readings[readings.length-1]);}
+return 'No data';
+}
+
+function _getHRReadingsForPeriod(period){
+period=period||hrQuickStatsPeriod||'today';
+var allBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():[];
+if(period==='all'){
+return (typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(allBP):allBP.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
+}
+var bounds=(typeof _getHRPeriodBounds==='function')?_getHRPeriodBounds(period):null;
+if(!bounds)return[];
+var filteredBP=allBP.filter(function(r){
+var datePart=(r&&r._date)?String(r._date):((r&&r.date)?String(r.date):getTodayKey());
+var timePart=(r&&r.t)?String(r.t):'12:00';
+var dt=new Date(datePart+'T'+timePart);
+return !isNaN(dt.getTime())&&dt>=bounds.startDate&&dt<=bounds.endDate;
+});
+return (typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(filteredBP):filteredBP.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
+}
+
 function setHRQuickStatsPeriod(period){
 hrQuickStatsPeriod=period;
 // Update button styles
@@ -21607,22 +21888,7 @@ if(p===period){btn.style.background='#7c3aed';btn.style.color='#fff';}
 else{btn.style.background='#e5e7eb';btn.style.color='#374151';}
 }
 });
-// Gather readings for chosen period
-var hrReadings=[];
-if(period==='today'){
-hrReadings=B.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
-}else{
-var endDate=new Date();endDate.setHours(23,59,59,999);
-var startDate=new Date();
-if(period==='week'){startDate.setDate(startDate.getDate()-7);}
-else if(period==='month'){startDate.setDate(startDate.getDate()-30);}
-else{startDate.setDate(startDate.getDate()-(typeof DATA_RETENTION_DAYS!=='undefined'?DATA_RETENTION_DAYS:90));}
-startDate.setHours(0,0,0,0);
-var allData=getHistoricalDataRange(startDate,endDate);
-if(allData&&allData.bp){
-hrReadings=allData.bp.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
-}
-}
+var hrReadings=_getHRReadingsForPeriod(period);
 if(hrReadings.length===0){
 var resultsArea=document.getElementById('hrQuickStatsGrid');
 if(resultsArea){resultsArea.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#6b7280;padding:20px 0">No heart rate data for this period</div>';}
@@ -21651,11 +21917,10 @@ function switchSCTab(tab){
 function buildSCTimeline(){
   var hist=getAllHistoricalData();
   var allSymsTL=hist.symptoms||[];
-  var allBPTL=hist.bp||[];
+  var allBPTL=(typeof _getAllBPReadings==='function')?_getAllBPReadings():(hist.bp||[]);
   var allWTL=hist.weight||[];
   var todayKey=getTodayKey();
   S.forEach(function(s){if(!allSymsTL.some(function(x){return x._date===todayKey&&x.symptom===s.symptom&&x.t===s.t;}))allSymsTL.push(Object.assign({},s,{_date:todayKey}));});
-  B.forEach(function(r){if(!allBPTL.some(function(x){return x._date===todayKey&&x.t===r.t;}))allBPTL.push(Object.assign({},r,{_date:todayKey}));});
   var now=new Date();
   var msDay=24*60*60*1000;
   var day60Key=new Date(now.getTime()-60*msDay).toISOString().split('T')[0];
@@ -21666,7 +21931,7 @@ function buildSCTimeline(){
   var dates=Object.keys(dateSet).sort();
   if(dates.length===0){document.getElementById('scTimeline').innerHTML='<div style="text-align:center;color:#6b7280;padding:20px">No data in last 60 days.</div>';return;}
   // HR patterns
-  var hrTL=allBPTL.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
+  var hrTL=(typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(allBPTL):allBPTL.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
   var hrPatsTL=hrTL.length>=6?detectPatterns(hrTL.slice().sort(function(a,b){var aStr=a._date?a._date+'T'+a.t+':00':'1970-01-01T'+a.t+':00';var bStr=b._date?b._date+'T'+b.t+':00':'1970-01-01T'+b.t+':00';return new Date(aStr)-new Date(bStr);})):[];
   var shiftDates={};
   hrPatsTL.filter(function(p){return p.type==='level_shift';}).forEach(function(p){shiftDates[p.splitDate]=p;});
@@ -21688,7 +21953,7 @@ function buildSCTimeline(){
   });
   // Render
   var html='<div style="font-size:13px;font-weight:700;color:#7c3aed;margin-bottom:8px">Cardiac Event Timeline \u2014 Last 60 Days</div>';
-  html+='<div style="font-size:12px;color:#6b7280;margin-bottom:10px">Highlighted rows = clinically significant events. Designed for your cardiologist appointment.</div>';
+  html+='<div style="font-size:12px;color:#6b7280;margin-bottom:10px">Highlighted rows = events meeting this report\'s configured threshold. Designed for your cardiologist appointment.</div>';
   html+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;font-size:11px">';
   html+='<span style="background:#fef2f2;border:1px solid #dc2626;padding:2px 6px;border-radius:4px;color:#dc2626">\🚨 HR Level Shift</span>';
   html+='<span style="background:#fef3c7;border:1px solid #f59e0b;padding:2px 6px;border-radius:4px;color:#92400e">\u26a0\ufe0f Rapid HR Change</span>';
@@ -21759,18 +22024,17 @@ function saveTimelineSnapshot(){
   // Build snapshot object
   var hist=getAllHistoricalData();
   var allSymsTL=hist.symptoms||[];
-  var allBPTL=hist.bp||[];
+  var allBPTL=(typeof _getAllBPReadings==='function')?_getAllBPReadings():(hist.bp||[]);
   var allWTL=hist.weight||[];
   var todayKey=getTodayKey();
   S.forEach(function(s){if(!allSymsTL.some(function(x){return x._date===todayKey&&x.symptom===s.symptom&&x.t===s.t;}))allSymsTL.push(Object.assign({},s,{_date:todayKey}));});
-  B.forEach(function(r){if(!allBPTL.some(function(x){return x._date===todayKey&&x.t===r.t;}))allBPTL.push(Object.assign({},r,{_date:todayKey}));});
 
   var now=new Date();
   var msDay=24*60*60*1000;
   var day60Key=new Date(now.getTime()-60*msDay).toISOString().split('T')[0];
 
   // HR patterns
-  var hrTLs=allBPTL.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
+  var hrTLs=(typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(allBPTL):allBPTL.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
   var hrPatsSnap=hrTLs.length>=6?detectPatterns(hrTLs.slice().sort(function(a,b){
     var aStr=a._date?a._date+'T'+a.t+':00':'1970-01-01T'+a.t+':00';
     var bStr=b._date?b._date+'T'+b.t+':00':'1970-01-01T'+b.t+':00';
@@ -22182,7 +22446,7 @@ function _dvBuildPPContent(dd, rd) {
     '</div>' +
     '<div style="background:white;border-radius:8px;padding:12px;border:1px solid #e5e7eb">' +
       '<div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:4px">Status: ' + (dd.statusTitle || 'Pulse Pressure Finding') + '</div>' +
-      '<div style="font-size:13px;color:#374151;line-height:1.6">Pulse pressure = systolic minus diastolic. A narrowing pulse pressure can indicate the heart is working harder to maintain output.</div>' +
+      '<div style="font-size:13px;color:#374151;line-height:1.6">Pulse pressure = systolic minus diastolic. CardiacLens tracks narrowing pulse pressure as a recorded BP pattern to review with your clinician.</div>' +
     '</div>' +
   '</div>';
   return html;
@@ -22236,9 +22500,14 @@ function _sentFmtShort(dateStr) {
 function _sentGetDay(dateStr) {
   try { return JSON.parse(localStorage.getItem('BP_TRACKER_' + dateStr) || 'null'); } catch(e) { return null; }
 }
-function _sentMetrics(day) {
+function _sentMetrics(day, dateStr) {
   if (!day) return null;
-  var bp   = day.bp       || [];
+  var bp = [];
+  if (dateStr && typeof _getAllBPReadings === 'function') {
+    bp = _getAllBPReadings().filter(function(r){ return (r._date || '') === dateStr; });
+  } else {
+    bp = day.bp || [];
+  }
   var syms = day.symptoms || [];
   var wt   = day.weight   || [];
   var bpValid = bp.filter(function(r){ return r.s && r.d; });
@@ -22266,7 +22535,7 @@ function _sentComputeBaseline() {
     var ds  = _sentDateStr(i);
     var day = _sentGetDay(ds);
     if (!day) continue;
-    var m = _sentMetrics(day);
+    var m = _sentMetrics(day, ds);
     if (!m || m.bpCount < 3) continue;
     candidates.push({ date: ds, m: m });
   }
@@ -22320,7 +22589,7 @@ function _sentComputeRecentAvg(activeStart) {
     var ds = _sentDateStr(i);
     if (activeStart && ds < activeStart) break;
     var day = _sentGetDay(ds);
-    var m   = _sentMetrics(day);
+    var m   = _sentMetrics(day, ds);
     if (m && m.bpCount >= 2) days.push({ date: ds, m: m });
     if (!activeStart && days.length >= 14) break;
   }
@@ -22342,7 +22611,7 @@ function _sentCurrentWindow() {
   for (var i = 0; i <= 2; i++) {
     var ds  = _sentDateStr(i);
     var day = _sentGetDay(ds);
-    var m   = _sentMetrics(day);
+    var m   = _sentMetrics(day, ds);
     if (m && m.bpCount >= 1) days.push({ date: ds, m: m });
   }
   return days;
@@ -22380,7 +22649,7 @@ function _sentDailySeries(metricKey, days) {
   for (var i = days - 1; i >= 0; i--) {
     var ds  = _sentDateStr(i);
     var day = _sentGetDay(ds);
-    var m   = _sentMetrics(day);
+    var m   = _sentMetrics(day, ds);
     series.push({ date: ds, value: m ? fn(m) : null });
   }
   return series;
@@ -22500,7 +22769,7 @@ function _sentExtractFootprints() {
       d.setDate(d.getDate() - i);
       var ds  = d.toISOString().slice(0, 10);
       var day = _sentGetDay(ds);
-      var m   = _sentMetrics(day);
+      var m   = _sentMetrics(day, ds);
       if (m && m.bpCount >= 2) preDays.push({ date: ds, m: m });
     }
     if (!preDays.length) return;
@@ -22721,7 +22990,7 @@ function _buildSentinelPPHSection() {
     if (typeof getAllHistoricalData !== 'function') return '';
     var hist = getAllHistoricalData();
     var meals = hist.meals || [];
-    var bp    = hist.bp    || [];
+    var bp    = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (hist.bp || []);
     if (meals.length < 3 || bp.length < 5) return '';
 
     var cutoff = new Date();
@@ -22785,7 +23054,7 @@ function _buildSentinelPPHSection() {
     var avgDrop = pairCount > 0 ? sysDropSum / pairCount : 0;
     if (pphCount < 3) return ''; // 3+ qualifying events is the only guard needed
 
-    // Pattern confirmed — build HTML
+    // Pattern threshold met — build HTML
     pphEvents.sort(function(a, b) { return b.date.localeCompare(a.date); });
     var avgEventDrop = 0;
     for (var ei = 0; ei < pphEvents.length; ei++) avgEventDrop += pphEvents[ei].drop;
@@ -22794,7 +23063,7 @@ function _buildSentinelPPHSection() {
     var h = '';
     h += '<div style="background:#fff7ed;border:2px solid #f97316;border-radius:12px;padding:18px;margin-bottom:20px">';
     h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px;flex-wrap:wrap">';
-    h +=   '<div style="font-size:17px;font-weight:900;color:#c2410c">\uD83C\uDF7D\uFE0F Post-Meal BP Pattern Confirmed</div>';
+    h +=   '<div style="font-size:17px;font-weight:900;color:#c2410c">\uD83C\uDF7D\uFE0F Post-Meal BP Pattern Threshold Met</div>';
     h +=   '<div style="background:#f97316;color:white;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:700;flex-shrink:0">' + pphCount + ' events / 30 days</div>';
     h += '</div>';
 
@@ -23476,7 +23745,7 @@ function toggleSCDrill(btn){
 function analyzeSymptomConvergence(){
   var hist=getAllHistoricalData();
   var allSymptoms=hist.symptoms||[];
-  var allBPSC=hist.bp||[];
+  var allBPSC=(typeof _getAllBPReadings==='function')?_getAllBPReadings():(hist.bp||[]);
   var allWeightSC=hist.weight||[];
   var todayKey=getTodayKey();
 
@@ -23776,15 +24045,7 @@ function togglePPDrill(btn){
 }
 
 function analyzePulsePressure(){
-  var hist=getAllHistoricalData();
-  var allBP=hist.bp||[];
-  // Include today
-  B.forEach(function(r){
-    var todayKey=getTodayKey();
-    if(!allBP.some(function(x){return x._date===todayKey&&x.t===r.t;})){
-      allBP.push(Object.assign({},r,{_date:todayKey}));
-    }
-  });
+  var allBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():[];
 
   // Only readings with both systolic and diastolic
   var validBP=allBP.filter(function(r){return r.s>0&&r.d>0;});
@@ -23850,27 +24111,27 @@ function analyzePulsePressure(){
     if(chronicNarrow&&trendStable){
       // Stable chronic baseline -- informational, not alarming
       statusColor='#0369a1';statusBg='#f0f9ff';statusEmoji='📊';
-      statusTitle='Chronically Narrow — Your Stable Baseline';
-      statusText='Your pulse pressure has averaged '+allPPAvg.toFixed(1)+' mmHg across '+ppReadings.length+' readings. This is below the textbook normal range (40–60 mmHg) but has been consistent across your readings. '+
-        'Current 7-day trend is stable ('+(trend>=0?'+':'')+trend.toFixed(1)+' mmHg). '+
+      statusTitle='Chronically Narrow — Similar to Your Recorded Baseline';
+      statusText='Your pulse pressure has averaged '+allPPAvg.toFixed(1)+' mmHg across '+ppReadings.length+' readings. This is below the report reference range (40–60 mmHg) and has been similar across your recorded readings. '+
+        'Current 7-day change is '+(trend>=0?'+':'')+trend.toFixed(1)+' mmHg. '+
         'Your cardiologist is the right person to contextualize this for your specific cardiac history. '+
         'The pattern worth watching: a decline from your own baseline, or new or worsening symptoms.';
     } else {
       // Newly narrow or no established baseline -- worth flagging
       statusColor='#d97706';statusBg='#fffbeb';statusEmoji='⚠️';
       statusTitle='Reduced Pulse Pressure';
-      statusText='Recent avg pulse pressure '+recentAvg.toFixed(1)+' mmHg is below the normal range (40–60 mmHg). '+
-        'Reduced pulse pressure can indicate the heart is working harder to maintain forward output. '+
+      statusText='Recent avg pulse pressure '+recentAvg.toFixed(1)+' mmHg is below the report reference range (40–60 mmHg). '+
+        'CardiacLens is reporting the recorded value only and is not assigning a cause. '+
         'This pattern is worth discussing with your cardiologist, especially if it represents a change from your recent readings.';
     }
   } else if(recentAvg!==null&&recentAvg<40){
     statusColor='#d97706';statusBg='#fffbeb';statusEmoji='⚠️';
     statusTitle='Narrow Pulse Pressure';
-    statusText='Recent avg pulse pressure '+recentAvg.toFixed(1)+' mmHg is below the normal range (40–60 mmHg). This is worth noting, though many cardiac patients have a lower personal baseline. Log consistently and mention this to your cardiologist at your next visit.';
+    statusText='Recent avg pulse pressure '+recentAvg.toFixed(1)+' mmHg is below the report reference range (40–60 mmHg). Compare this with your own recorded baseline and review it with your cardiologist at your next visit.';
   } else if(recentAvg!==null&&recentAvg>60){
     statusColor='#d97706';statusBg='#fffbeb';statusEmoji='⚠️';
     statusTitle='Wide Pulse Pressure';
-    statusText='Recent avg pulse pressure '+recentAvg.toFixed(1)+' mmHg is above the normal range (40–60 mmHg). A wider pulse pressure can be associated with arterial stiffness or other factors. Worth mentioning to your cardiologist, particularly if this is a change from your usual readings.';
+    statusText='Recent avg pulse pressure '+recentAvg.toFixed(1)+' mmHg is above the report reference range (40–60 mmHg). Review this recorded pattern with your cardiologist, particularly if it is a change from your usual readings.';
   } else if(trend!==null&&trend<=-5){
     statusColor='#d97706';statusBg='#fffbeb';statusEmoji='⚠️';
     statusTitle='Narrowing Trend';
@@ -23881,8 +24142,8 @@ function analyzePulsePressure(){
     statusText='Pulse pressure has widened '+trend.toFixed(1)+' mmHg over the last 7 days vs prior week. Monitor for further widening.';
   } else {
     statusColor='#059669';statusBg='#ecfdf5';statusEmoji='✅';
-    statusTitle='Normal Range';
-    statusText='Pulse pressure within normal range (40–60 mmHg) and stable. Continue monitoring.';
+    statusTitle='Within Reference Range';
+    statusText='Recorded pulse pressure is within the reference range (40–60 mmHg) for the selected period. Continue logging to build your personal history.';
   }
 
   // Render banner
@@ -23899,8 +24160,8 @@ function analyzePulsePressure(){
     {label:'Recent 7-Day Avg',value:recentAvg!==null?recentAvg.toFixed(1)+' mmHg':'N/A',sub:recentPP.length+' readings',color:statusColor},
     {label:'Prior 7-Day Avg',value:priorAvg!==null?priorAvg.toFixed(1)+' mmHg':'N/A',sub:priorPP.length+' readings',color:'#374151'},
     {label:'7-Day Trend',value:trend!==null?(trend>=0?'+':'')+trend.toFixed(1)+' mmHg':'N/A',sub:trend!==null?trendDir:'insufficient data',color:trend!==null&&Math.abs(trend)>=5?'#d97706':'#059669'},
-    {label:'Narrowest Reading',value:ppMin+' mmHg',sub:ppMin<40?'⚠️ Below normal':'✓',color:ppMin<40?'#dc2626':'#374151'},
-    {label:'Widest Reading',value:ppMax+' mmHg',sub:ppMax>60?'⚠️ Above normal':'✓',color:ppMax>60?'#d97706':'#374151'},
+    {label:'Narrowest Reading',value:ppMin+' mmHg',sub:ppMin<40?'⚠️ Below reference':'✓',color:ppMin<40?'#dc2626':'#374151'},
+    {label:'Widest Reading',value:ppMax+' mmHg',sub:ppMax>60?'⚠️ Above reference':'✓',color:ppMax>60?'#d97706':'#374151'},
   ];
 
   var statsHtml='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
@@ -23918,7 +24179,7 @@ function analyzePulsePressure(){
     '<div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:8px">Reading Distribution</div>'+
     '<div style="display:flex;gap:8px;font-size:13px">'+
     '<span style="color:#dc2626;font-weight:600">🔴 Narrow (<40): '+narrowCount+' ('+narrowPct+'%)</span>'+
-    '<span style="color:#059669;font-weight:600">🟢 Normal: '+(ppReadings.length-narrowCount-wideCount)+' ('+Math.round((ppReadings.length-narrowCount-wideCount)/ppReadings.length*100)+'%)</span>'+
+    '<span style="color:#059669;font-weight:600">🟢 Reference range: '+(ppReadings.length-narrowCount-wideCount)+' ('+Math.round((ppReadings.length-narrowCount-wideCount)/ppReadings.length*100)+'%)</span>'+
     '<span style="color:#d97706;font-weight:600">🟡 Wide (>60): '+wideCount+' ('+widePct+'%)</span>'+
     '</div></div>';
 
@@ -23926,15 +24187,15 @@ function analyzePulsePressure(){
   statsHtml+='<div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:14px">'+
     '<div style="font-size:13px;font-weight:700;color:#0369a1;margin-bottom:6px">📖 Clinical Context</div>'+
     '<div style="font-size:13px;color:#0c4a6e;line-height:1.6">'+
-    '<b>Normal range:</b> 40–60 mmHg<br>'+
-    '<b>Narrow (<40):</b> Heart may not be ejecting enough volume — common in CHF, reduced cardiac output<br>'+
-    '<b>Wide (>60):</b> Arterial stiffness or aortic regurgitation — common with CAD, aging, hypertension<br>'+
-    '<b>Narrowing trend:</b> Potential worsening cardiac output — watch alongside weight and HR<br>'+
-    '<b>Your conditions:</b> CHF + diastolic dysfunction make narrow PP particularly relevant'+
+    '<b>Report reference range:</b> 40–60 mmHg<br>'+
+    '<b>Narrow (<40):</b> Below this report reference range<br>'+
+    '<b>Wide (>60):</b> Above this report reference range<br>'+
+    '<b>Narrowing trend:</b> Compare with weight, HR, symptoms, and your prior readings<br>'+
+    '<b>Your conditions:</b> Review pulse pressure patterns with your clinician in the context of your known history'+
     '</div></div>';
 
   // Pull HR patterns from detectPatterns for cross-detector context
-  var hrForPatterns=allBP.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
+  var hrForPatterns=(typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(allBP):allBP.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
   var hrPatternsForPP=hrForPatterns.length>=6?detectPatterns(hrForPatterns.slice().sort(function(a,b){
     var aStr=a._date?a._date+'T'+a.t+':00':('1970-01-01T'+a.t+':00');
     var bStr=b._date?b._date+'T'+b.t+':00':('1970-01-01T'+b.t+':00');
@@ -23949,12 +24210,12 @@ function analyzePulsePressure(){
     crossContext='<div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:10px;padding:14px;margin-top:12px">';
     crossContext+='<div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:6px">⚠️ HR Rate Detector Events Found</div>';
     crossContext+='<div style="font-size:13px;color:#78350f;line-height:1.6">';
-    crossContext+='<b>Why this matters:</b> Cardiac Output = HR × Stroke Volume. When PP (stroke volume proxy) is narrow, a rising HR shift suggests your heart is compensating.<br><br>';
+    crossContext+='<b>Why this matters:</b> This view compares recorded HR changes with recorded pulse pressure patterns. It does not assign a cause.<br><br>';
     if(levelShifts.length>0){
       crossContext+='<b>Level Shift(s) detected:</b><br>';
       levelShifts.forEach(function(p){
         crossContext+='&nbsp;&nbsp;• Around <b>'+p.splitDate+'</b>: HR shifted '+p.beforeMean+' → '+p.afterMean+' bpm (Δ'+p.shiftMag+' bpm '+p.direction+')<br>';
-        crossContext+='&nbsp;&nbsp;&nbsp;&nbsp;With your PP at ~'+recentAvg.toFixed(1)+' mmHg, this '+(p.direction==='up'?'<b>suggests compensatory tachycardia</b> — heart beating faster to maintain output with narrow stroke volume':'may indicate improved cardiac efficiency')+'. Discuss at your next cardiology appointment.<br>';
+        crossContext+='&nbsp;&nbsp;&nbsp;&nbsp;With your PP at ~'+recentAvg.toFixed(1)+' mmHg, this '+(p.direction==='up'?'<b>shows a higher recorded heart rate than your recent average</b>':'shows a lower recorded heart rate than your recent average')+'. Discuss these recorded changes at your next cardiology appointment.<br>';
       });
     }
     if(rapidChanges.length>0){
@@ -23969,7 +24230,7 @@ function analyzePulsePressure(){
         var shiftDate=levelShifts[0].splitDate;
         var priorRapid=Object.keys(rapidByDate).filter(function(d){return d<shiftDate;});
         if(priorRapid.length>0){
-          crossContext+='<br><b>⚠️ Possible herald events:</b> Rapid HR changes on '+priorRapid.join(', ')+' occurred before the '+shiftDate+' level shift. These may represent early warning signals preceding the sustained change. Bring this timeline to your cardiologist.<br>';
+          crossContext+='<br><b>Earlier rapid-change events:</b> Rapid HR changes on '+priorRapid.join(', ')+' were recorded before the '+shiftDate+' level shift. Bring this timeline to your cardiologist.<br>';
         }
       }
     }
@@ -24011,7 +24272,7 @@ function analyzePulsePressure(){
 function updateAnalyticsBadges(){
   try{
     var hist=getAllHistoricalData();
-    var allBPB=hist.bp||[];
+    var allBPB=(typeof _getAllBPReadings==='function')?_getAllBPReadings():(hist.bp||[]);
     var allSymsB=hist.symptoms||[];
     var allWB=hist.weight||[];
     var todayKey=getTodayKey();
@@ -24040,7 +24301,7 @@ function updateAnalyticsBadges(){
         var ydR=wSorted.filter(function(w){return w._date===ydKey;});
         if(ydR.length>0&&(latest-(parseFloat(ydR[0].w)||0))>=2)decompCount++;
       }
-      var hrB=allBPB.filter(function(r){return r.h&&r.h>0;});
+      var hrB=(typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(allBPB):allBPB.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
       if(hrB.length>=6){
         var hrSB=hrB.slice().sort(function(a,b){return ((a._date||'')+(a.t||'')).localeCompare((b._date||'')+(b.t||''));});
         var rHR=hrSB.filter(function(r){return (r._date||'')>=day3Key;});
@@ -24074,7 +24335,7 @@ function updateAnalyticsBadges(){
         else if(recentPPAvgB<40)ppCount=1;
       }
       // HR patterns cross-detector
-      var hrPPB=allBPB.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
+      var hrPPB=(typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(allBPB):allBPB.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
       if(hrPPB.length>=6){
         var hrPatsBadge=detectPatterns(hrPPB.slice().sort(function(a,b){var aS=a._date?a._date+'T'+a.t+':00':'1970-01-01T'+a.t+':00';var bS=b._date?b._date+'T'+b.t+':00':'1970-01-01T'+b.t+':00';return new Date(aS)-new Date(bS);}));
         if(hrPatsBadge.some(function(p){return p.type==='level_shift';}))ppCount=Math.max(ppCount,1);
@@ -24113,7 +24374,7 @@ function updateAnalyticsBadges(){
 
     // ── HR RATE DETECTOR BADGE ─────────────────────────────────────────
     var hrCount=0;
-    var hrBadge=(allBPB.concat(B.map(function(r){return Object.assign({},r,{_date:todayKey});}))).filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
+    var hrBadge=(typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(allBPB):allBPB.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
     if(hrBadge.length>=6){
       var hrBSorted=hrBadge.slice().sort(function(a,b){var aS=a._date?a._date+'T'+a.t+':00':'1970-01-01T'+a.t+':00';var bS=b._date?b._date+'T'+b.t+':00':'1970-01-01T'+b.t+':00';return new Date(aS)-new Date(bS);});
       var hrBPats=detectPatterns(hrBSorted);
@@ -24167,7 +24428,7 @@ function toggleDecompDrill(btn,id){
 
 function analyzeDecompensation(){
   var hist=getAllHistoricalData();
-  var allBP=hist.bp||[];
+  var allBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():[];
   var allWeight=hist.weight||[];
   var allSymptoms=hist.symptoms||[];
   var now=new Date();
@@ -24213,7 +24474,7 @@ function analyzeDecompensation(){
 
   // ── SIGNAL 2: CARDIAC OUTPUT (HR + PULSE PRESSURE) ───────────────────
   var signal2={id:'hr',label:'Cardiac Output Signal',icon:'💓',status:'grey',detail:'Not enough data (need 3+ days of BP + HR)',points:0,drilldown:''};
-  var hrReadings=allBP.filter(function(r){return r.h&&r.h>0;});
+  var hrReadings=(typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(allBP):allBP.filter(function(r){return r.h&&r.h>0;});
   var ppReadingsS2=allBP.filter(function(r){return r.s>0&&r.d>0;});
 
   if(hrReadings.length>=6){
@@ -24260,32 +24521,32 @@ function analyzeDecompensation(){
 
       if(compensatoryPattern){
         signal2.status='red';signal2.points=2;
-        signal2.detail=hrLine+ppLine+' — ⚠️ Compensatory pattern: HR rising while PP narrow — heart may be compensating for reduced stroke volume';
+        signal2.detail=hrLine+ppLine+' — ⚠️ Recorded HR rose while PP was narrow or narrowing';
       } else if(hrHighRising){
         signal2.status='red';signal2.points=2;
-        signal2.detail=hrLine+ppLine+' — Significant HR rise, compensatory tachycardia possible';
+        signal2.detail=hrLine+ppLine+' — Significant recorded HR rise';
       } else if(hrRising||(ppNarrow&&ppNarrowing)){
         signal2.status='yellow';signal2.points=1;
         signal2.detail=hrLine+ppLine+' — '+(hrRising?'HR elevated':'PP narrowing')+' — Monitor closely';
       } else {
         signal2.status='green';signal2.points=0;
-        signal2.detail=hrLine+ppLine+' — Cardiac output signals stable ✓';
+        signal2.detail=hrLine+ppLine+' — Recorded HR/PP comparison changed less than this report\'s alert criteria';
       }
 
       // Drilldown
       var last6hr=hrSorted.slice(-6);
       signal2.drilldown=
-        '<b>Cardiac Output = Heart Rate × Stroke Volume</b><br>'+
-        'When stroke volume drops (narrow PP), heart compensates by beating faster (rising HR).<br><br>'+
+        '<b>HR and pulse pressure comparison</b><br>'+
+        'This section compares recorded HR changes with recorded pulse pressure patterns. It does not assign a cause.<br><br>'+
         '<b>HR Thresholds:</b> +5 bpm = caution · +10 bpm = alert<br>'+
-        '<b>PP Threshold:</b> <40 mmHg = narrow (reduced stroke volume)<br><br>'+
+        '<b>PP Threshold:</b> <40 mmHg = below the report reference range<br><br>'+
         '<b>HR — Prior 3 days ('+priorHR.length+' readings):</b> avg '+priorAvgStr+' bpm<br>'+
         '<b>HR — Recent 3 days ('+recentHR.length+' readings):</b> avg '+recentAvgStr+' bpm<br>'+
         '<b>HR Delta:</b> '+deltaStr+' bpm<br>'+
         (recentPPAvg!==null?'<b>PP — Recent 3-day avg:</b> '+recentPPAvg.toFixed(1)+' mmHg<br>':'')+ 
         (priorPPAvg!==null?'<b>PP — Prior 3-day avg:</b> '+priorPPAvg.toFixed(1)+' mmHg<br>':'')+
         (ppDeltaS2!==null?'<b>PP Delta:</b> '+(ppDeltaS2>=0?'+':'')+ppDeltaS2.toFixed(1)+' mmHg<br>':'')+
-        (compensatoryPattern?'<br><b>⚠️ Compensatory pattern detected:</b> HR rising while PP narrow — discuss with cardiologist<br>':'')+
+        (compensatoryPattern?'<br><b>⚠️ HR/PP pattern:</b> Recorded HR rose while PP was narrow or narrowing — discuss with cardiologist<br>':'')+
         '<br><b>Last 6 HR readings:</b><br>'+
         last6hr.map(function(r){
           var pp=r.s>0&&r.d>0?(r.s-r.d):null;
@@ -24638,13 +24899,10 @@ function analyzeDecompensation(){
 function openHRDetector(){
 cbBehavior.track('screens','hr_detector');
 hrQuickStatsPeriod='today';
-// Use today's session data first, fall back to historical if empty
-var hrReadings=B.filter(r=>r.h && r.h>0).map(r=>({...r,hr:r.h}));
-if(hrReadings.length===0){
-  // Fall back to historical data (e.g. Chromebook local file testing)
-  var hist=getAllHistoricalData();
-  var histBP=hist.bp||[];
-  hrReadings=histBP.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
+// Use HR SSOT period helper for the default view, preserving historical fallback if today has no readings
+var hrReadings=(typeof _getHRReadingsForPeriod==='function')?_getHRReadingsForPeriod('today'):[];
+if(hrReadings.length===0 && typeof _getHRReadingsForPeriod==='function'){
+  hrReadings=_getHRReadingsForPeriod('all');
 }
 if(hrReadings.length===0){
 alert('No heart rate data available. Please add blood pressure readings with heart rate measurements.');
@@ -25208,14 +25466,14 @@ hrChart.destroy();
 hrChart=null;
 }
 
-// Show up to 100 readings (was 50); scroll handles the rest
-const displayReadings=readings.slice(-100);
+// Show the full selected period; horizontal scroll handles larger data sets
+const displayReadings=readings;
 const isMultiDay=(typeof hrQuickStatsPeriod!=='undefined'&&hrQuickStatsPeriod!=='today');
 
 // Update info text
 const infoEl=document.getElementById('chartDataInfo');
 if(infoEl){
-var infoMsg=readings.length>100?'Showing last 100 of '+readings.length+' readings':readings.length+' reading'+(readings.length!==1?'s':'');
+var infoMsg=readings.length+' reading'+(readings.length!==1?'s':'');
 if(isMultiDay)infoMsg+=' · scroll chart →';
 infoEl.textContent=infoMsg;
 }
@@ -25360,12 +25618,7 @@ hrChart=new Chart(ctx,config);
 }
 
 function exportHRReport(){
-var hrReadings=B.filter(r=>r.h && r.h>0).map(r=>({...r,hr:r.h}));
-// Fall back to historical data if no live session readings (e.g. Chromebook local file)
-if(hrReadings.length===0){
-  var hist=getAllHistoricalData();
-  hrReadings=(hist.bp||[]).filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
-}
+var hrReadings=(typeof _getHRReadingsForPeriod==='function')?_getHRReadingsForPeriod(hrQuickStatsPeriod):[];
 if(hrReadings.length===0){
   // Show friendly inline message instead of a jarring browser alert
   var exportBtn=document.querySelector('#hr-section-quick-stats button[onclick="exportHRReport()"]');
@@ -25378,14 +25631,32 @@ if(hrReadings.length===0){
   }
   return;
 }
-const sortedReadings=[...hrReadings].sort((a,b)=>new Date(a.t)-new Date(b.t));
+function _hrExportDate(r){
+var datePart=(r&&r._date)?String(r._date):((r&&r.date)?String(r.date):getTodayKey());
+var timePart=(r&&r.t)?String(r.t):((r&&r.time)?String(r.time):'00:00');
+if(timePart.indexOf('T')!==-1||/^\d{4}-\d{2}-\d{2}/.test(timePart)){
+  var fullDate=new Date(timePart);
+  if(!isNaN(fullDate.getTime())) return fullDate;
+}
+var dateMatch=datePart.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+var timeMatch=timePart.match(/^(\d{1,2}):(\d{2})/);
+if(dateMatch&&timeMatch){
+  return new Date(parseInt(dateMatch[1],10),parseInt(dateMatch[2],10)-1,parseInt(dateMatch[3],10),parseInt(timeMatch[1],10),parseInt(timeMatch[2],10),0,0);
+}
+var fallbackDate=new Date(datePart+' '+timePart);
+return isNaN(fallbackDate.getTime())?new Date():fallbackDate;
+}
+function _hrExportDateOnly(r){return _hrExportDate(r).toLocaleDateString();}
+function _hrExportDateTime(r){return _hrExportDate(r).toLocaleString();}
+hrReadings=hrReadings.map(function(r){var copy=Object.assign({},r);copy._exportDate=_hrExportDate(copy);return copy;});
+const sortedReadings=[...hrReadings].sort((a,b)=>a._exportDate-b._exportDate);
 const stats=calculateHRStats(sortedReadings);
 const timeInZone=calculateTimeInZones(sortedReadings);
 const patterns=detectPatterns(sortedReadings);
 const report=[];
 report.push('=== HEART RATE ANALYSIS REPORT ===');
 report.push(`Generated: ${new Date().toLocaleString()}`);
-report.push(`Analysis Period: ${new Date(sortedReadings[0].t).toLocaleDateString()} - ${new Date(sortedReadings[sortedReadings.length-1].t).toLocaleDateString()}`);
+report.push(`Analysis Period: ${_getHRExportPeriodLabel(hrQuickStatsPeriod,sortedReadings)}`);
 report.push(`Total Readings: ${sortedReadings.length}`);
 report.push('');
 report.push('STATISTICAL SUMMARY:');
@@ -25432,7 +25703,7 @@ correlations.push({reading:r,correlations:corr});
 if(correlations.length>0){
 report.push('MEDICAL CONTEXT CORRELATIONS:');
 correlations.forEach(c=>{
-report.push(`${new Date(c.reading.t).toLocaleTimeString()} - HR: ${c.reading.hr} BPM`);
+report.push(`${c.reading._exportDate.toLocaleTimeString()} - HR: ${c.reading.hr} BPM`);
 c.correlations.forEach(corr=>{
 report.push(`   - ${corr.minutesAfter} min after ${corr.event} (${corr.type})`);
 });
@@ -25461,7 +25732,7 @@ report.push('✓ No immediate concerns noted in this analysis period');
 report.push('');
 report.push('DETAILED READINGS:');
 sortedReadings.forEach(r=>{
-report.push(`${new Date(r.t).toLocaleString()} - HR: ${r.hr} BPM, BP: ${r.s}/${r.d}, Position: ${r.pos}`);
+report.push(`${_hrExportDateTime(r)} - HR: ${r.hr} BPM, BP: ${r.s}/${r.d}, Position: ${r.pos}`);
 if(r.n)report.push(`   Notes: ${r.n}`);
 if(r.contextSymptoms&&r.contextSymptoms.length>0)report.push(`   Symptoms: ${r.contextSymptoms.join(', ')}`);
 if(r.contextActivity&&r.contextActivity.length>0)report.push(`   Context: ${r.contextActivity.join(', ')}`);
@@ -25528,7 +25799,8 @@ if(reportDateRange==='30'){
 startDate=new Date();
 startDate.setDate(startDate.getDate()-30);
 }else if(reportDateRange==='all'){
-const allDates=B.map(r=>new Date(r.t));
+const allBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():[];
+const allDates=allBP.map(r=>new Date((r._date||getTodayKey())+' '+(r.t||'00:00'))).filter(d=>!isNaN(d.getTime()));
 startDate=allDates.length>0?new Date(Math.min(...allDates)):new Date();
 }else if(reportDateRange==='custom'){
 const start=document.getElementById('reportStartDate').value;
@@ -25549,10 +25821,10 @@ if(!range)return;
 const{startDate,endDate}=range;
 cbTrack('doctors_report_opened', { range_days: Math.round((endDate - startDate) / (1000*60*60*24)) });
 
-// Get ALL historical data, not just today's
-const allData=getAllHistoricalData();
+// Get BP/HR through the authoritative retrieval helper
+const allBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():[];
 
-const filteredBP=allData.bp.filter(r=>{
+const filteredBP=allBP.filter(r=>{
 // Combine _date and t to create full datetime
 const readingDate=new Date(r._date+' '+r.t);
 const passes=readingDate>=startDate&&readingDate<=endDate;
@@ -25575,7 +25847,7 @@ actionButtons.forEach(btn=>btn.disabled=true);
 return;
 }
 const stats=calculateBPStats(filteredBP);
-const hrReadings=filteredBP.filter(r=>r.hr&&r.hr>0);
+const hrReadings=(typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(filteredBP):filteredBP.filter(r=>r.hr&&r.hr>0);
 let previewHTML=`<div style="background:#f0f9ff;border:2px solid #3b82f6;border-radius:12px;padding:20px;margin:16px 0">
 <div style="font-size:22px;font-weight:700;color:#1e3a8a;margin-bottom:16px;text-align:center">✓ Report Ready</div>
 
@@ -25635,9 +25907,9 @@ const range=getDateRangeData();
 if(!range)return;
 const{startDate,endDate}=range;
 
-// Get ALL historical data, not just today's
-const allData=getAllHistoricalData();
-const filteredBP=allData.bp.filter(r=>{
+// Get ALL BP/HR readings through the authoritative retrieval path
+const allBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():((getAllHistoricalData().bp)||[]);
+const filteredBP=allBP.filter(r=>{
 // Combine _date and t to create full datetime
 const readingDate=new Date(r._date+' '+r.t);
 return readingDate>=startDate&&readingDate<=endDate;
@@ -25664,7 +25936,7 @@ function generateComprehensiveReport(readings,startDate,endDate){
 const report=[];
 const sortedReadings=[...readings].sort((a,b)=>new Date(a.t)-new Date(b.t));
 const stats=calculateBPStats(sortedReadings);
-const hrReadings=sortedReadings.filter(r=>r.hr&&r.hr>0);
+const hrReadings=(typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(sortedReadings):sortedReadings.filter(r=>r.hr&&r.hr>0);
 report.push('═══════════════════════════════════════════════════════════');
 report.push('                    BP TRACKER v7.0');
 report.push('              MEDICAL-GRADE ANALYSIS REPORT');
@@ -25882,9 +26154,9 @@ const range=getDateRangeData();
 if(!range)return;
 const{startDate,endDate}=range;
 
-// Get ALL historical data, not just today's
-const allData=getAllHistoricalData();
-const filteredBP=allData.bp.filter(r=>{
+// Get BP/HR through the SSOT retrieval path
+const allBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():((getAllHistoricalData().bp)||[]);
+const filteredBP=allBP.filter(r=>{
 // Combine _date and t to create full datetime
 const readingDate=new Date(r._date+' '+r.t);
 return readingDate>=startDate&&readingDate<=endDate;
@@ -25925,9 +26197,9 @@ const range=getDateRangeData();
 if(!range)return;
 const{startDate,endDate}=range;
 
-// Get ALL historical data, not just today's
-const allData=getAllHistoricalData();
-const filteredBP=allData.bp.filter(r=>{
+// Get BP/HR through the SSOT retrieval path
+const allBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():[];
+const filteredBP=allBP.filter(r=>{
 // Combine _date and t to create full datetime
 const readingDate=new Date(r._date+' '+r.t);
 return readingDate>=startDate&&readingDate<=endDate;
@@ -26258,7 +26530,7 @@ return;
 var beforeReadings=[];
 var afterReadings=[];
 
-allData.bp.forEach(function(reading){
+allBP.forEach(function(reading){
 if(!reading._date){
 console.log('Skipping reading with no _date field');
 return;
@@ -26429,7 +26701,7 @@ var dChange=afterStats.diastolic-beforeStats.diastolic;
 var hChange=afterStats.hr-beforeStats.hr;
 
 if(Math.abs(sChange)<5&&Math.abs(dChange)<5&&Math.abs(hChange)<5){
-html+='<strong style="color:#10b981">✓ Stable Recovery:</strong> Your BP and HR are within normal range of pre-procedure values. This suggests good recovery progress.';
+html+='<strong style="color:#10b981">✓ Stable Recovery:</strong> Your recorded BP and HR are similar to your pre-procedure values. Review these observations with your clinician as part of your recovery follow-up.';
 }else if(sChange<-10||dChange<-10){
 html+='<strong style="color:#10b981">✓ Improved Readings:</strong> Your BP is lower than before the procedure, which may be positive depending on the procedure type.';
 }else if(sChange>10||dChange>10||hChange>15){
@@ -26561,7 +26833,8 @@ medReadings.push({s:reading.s,d:reading.d,h:reading.h,t:reading.t,medicationName
 });
 }
 if(medAnalysisPeriod==='today'){
-B.forEach(function(reading){
+var todayBPReadings=(typeof _getTodayBPReadings==='function')?_getTodayBPReadings():(B||[]);
+todayBPReadings.forEach(function(reading){
 if(reading.medicationRelated&&reading.medicationTiming&&reading.medicationTiming!=='none'){
 expandReading(reading,todayKey);
 }
@@ -26589,13 +26862,17 @@ startDate.setDate(startDate.getDate()-(typeof DATA_RETENTION_DAYS!=='undefined'?
 startDate.setHours(0,0,0,0);
 }
 
-var allData=getHistoricalDataRange(startDate,endDate);
+var allBPReadings=(typeof _getAllBPReadings==='function')?_getAllBPReadings():((getHistoricalDataRange(startDate,endDate).bp)||[]);
 
-if(!allData||!allData.bp||allData.bp.length===0){
+if(!allBPReadings||allBPReadings.length===0){
 return[];
 }
 
-allData.bp.forEach(function(reading){
+allBPReadings.forEach(function(reading){
+if(!reading||!reading._date)return;
+var readingDate=new Date(reading._date+'T00:00:00');
+readingDate.setHours(0,0,0,0);
+if(readingDate<startDate||readingDate>endDate)return;
 if(reading.medicationRelated&&reading.medicationTiming&&reading.medicationTiming!=='none'){
 expandReading(reading,reading._date||todayKey);
 }
@@ -27045,7 +27322,7 @@ populateMedicationHRData();
 }
 
 function populateMedicationHRData(){
-var allData=getAllHistoricalData();
+var allBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():((getAllHistoricalData().bp)||[]);
 var medReadings=[];
 var cutoffDate=null;
 
@@ -27071,8 +27348,8 @@ cutoffDate=null;
 
 console.log('HR Med period:',hrMedPeriod,'Cutoff date:',cutoffDate);
 
-// FIXED: allData is an object {bp: [...], weight: [...], ...}
-if(!allData||!allData.bp||allData.bp.length===0){
+// FIXED: BP readings come from the BP/HR SSOT path.
+if(!allBP||allBP.length===0){
 console.log('No BP data found for HR medication analysis');
 document.getElementById('hrMedicationResults').innerHTML=
 '<div style="padding:32px;text-align:center;background:#f0f9ff;border:2px solid #bae6fd;border-radius:12px">'+
@@ -27090,7 +27367,7 @@ return;
 }
 
 // Collect medication-related readings
-allData.bp.forEach(function(reading){
+allBP.forEach(function(reading){
 if(reading.medicationRelated&&reading.medicationTiming&&reading.medicationTiming!=='none'&&reading.h){
 // Get the date from the reading's _date property
 var readingDateStr=reading._date;
@@ -27385,7 +27662,7 @@ function buildDeepDiveSuggestions(){
   // ── Signal 4: Convergence spikes — run a quick convergence scan ───────────
   try{
     var histAll3 = getAllHistoricalData();
-    var allBP3 = histAll3.bp||[];
+    var allBP3 = (typeof _getAllBPReadings==='function') ? _getAllBPReadings() : (histAll3.bp||[]);
     var allS3  = histAll3.symptoms||[];
     var fluidTarget3 = settings.fluidMax||64;
     var allFluid3={};
@@ -27548,7 +27825,7 @@ function renderDeepDive(){
   // Gather all historical data
   var todayKey=getTodayKey();
   var histAll = getAllHistoricalData();
-  var allBP   = (histAll.bp||[]).filter(function(r){ return r._date>=_ddFrom&&r._date<=_ddTo; });
+  var allBP   = ((typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (histAll.bp||[])).filter(function(r){ return r._date>=_ddFrom&&r._date<=_ddTo; });
   var allW    = (histAll.weight||[]).filter(function(r){ return r._date>=_ddFrom&&r._date<=_ddTo; });
   var allS    = (histAll.symptoms||[]).filter(function(r){ return r._date>=_ddFrom&&r._date<=_ddTo; });
   var allA    = (histAll.activities||[]).filter(function(r){ return r._date>=_ddFrom&&r._date<=_ddTo; });
@@ -27568,7 +27845,7 @@ function renderDeepDive(){
       }
     });
   }
-  _ddPatchToday(allBP,  B,      function(r){ return r.t||''; });
+  if(typeof _getAllBPReadings !== 'function') _ddPatchToday(allBP,  B,      function(r){ return r.t||''; });
   _ddPatchToday(allW,   W,      function(r){ return r.t||''; });
   _ddPatchToday(allS,   S,      function(r){ return (r.symptom||'')+(r.t||''); });
   _ddPatchToday(allA,   A,      function(r){ return (r.activity||'')+(r.t||''); });
@@ -27603,7 +27880,7 @@ function renderDeepDive(){
   var totalDays=Math.round((toDate-fromDate)/(24*60*60*1000))+1;
 
   // ── BP Stats ─────────────────────────────────────────────────────────
-  var bpWithHR = allBP.filter(function(r){ return r.h>0; });
+  var bpWithHR = (typeof _getHRReadingsFromBP === 'function') ? _getHRReadingsFromBP(allBP) : allBP.filter(function(r){ return r.h>0; });
   var avgSys=0,avgDia=0,avgHR=0,inRangeCount=0;
   if(allBP.length>0){
     allBP.forEach(function(r){ avgSys+=r.s; avgDia+=r.d; });
@@ -28675,11 +28952,8 @@ function _breathRunContextGate() {
   var decompGhost   = window._decompGhostFire;
   var decompGhostActive = decompGhost && decompGhost.dateKey === today;
 
-  // Today's BP readings
-  var todayBP = (B || []).filter(function(r) {
-    return (r._date || today) === today;
-  });
-  var latestBP = todayBP.length ? todayBP[todayBP.length - 1] : null;
+  // Recent BP/HR reading — use existing BP SSOT candidate instead of recalculating latest BP here.
+  var latestBP = (typeof _getRecentBPReading === 'function') ? _getRecentBPReading() : null;
   var latestHR  = latestBP ? (latestBP.h || 0) : 0;
   var latestSys = latestBP ? (latestBP.s || 0) : 0;
 
@@ -28735,26 +29009,26 @@ function _breathRunContextGate() {
     });
   }
 
-  // Level 2c — very high HR on today's most recent reading
+  // Level 2c — very high HR on recent BP/HR reading
   if (latestHR >= 110) {
     advisories.push({
       level: 2,
       color: '#fef3c7', border: '#f59e0b', textSymbol: '#92400e',
       icon: '⚠️',
-      title: 'Elevated HR on today\'s most recent reading',
-      body: 'Your most recent BP reading today showed a heart rate of ' + latestHR + ' bpm. If this reflects your current resting HR — not activity-related — that elevation warrants a call to your cardiologist before using a breathing session as a response.',
+      title: 'Elevated HR on recent BP/HR reading',
+      body: 'Your recent BP/HR reading showed a heart rate of ' + latestHR + ' bpm. If this reflects your current resting HR — not activity-related — that elevation warrants a call to your cardiologist before using a breathing session as a response.',
       action: null, actionLabel: null
     });
   }
 
-  // Level 2d — hypertensive crisis BP today
+  // Level 2d — hypertensive crisis BP on recent BP/HR reading
   if (latestSys >= 180) {
     advisories.push({
       level: 2,
       color: '#fef2f2', border: '#dc2626', textSymbol: '#991b1b',
       icon: '🚨',
-      title: 'Very high systolic BP on today\'s reading',
-      body: 'Your most recent reading today shows a systolic BP of ' + latestSys + ' mmHg. A reading this high requires medical contact — not a breathing session. Call your cardiologist or go to the ER if you have additional symptoms.',
+      title: 'Very high systolic BP on recent reading',
+      body: 'Your recent BP/HR reading shows a systolic BP of ' + latestSys + ' mmHg. A reading this high requires medical contact — not a breathing session. Call your cardiologist or go to the ER if you have additional symptoms.',
       action: null, actionLabel: null
     });
   }
@@ -29377,7 +29651,7 @@ function renderBreathingComparison() {
   // Footer note
   if (Object.keys(byTech).length > 1) {
     html += '<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;font-size:13px;color:#1e40af">';
-    html += '💡 HR Drop = average reduction in heart rate per session. A larger drop indicates a stronger relaxation response for that technique.';
+    html += '💡 HR Drop = average reduction in heart rate per session. A larger recorded drop was observed for that technique during the selected sessions.';
     html += '</div>';
   }
 
@@ -29993,7 +30267,7 @@ html+=`</table></div>`;
 }
 
 
-// Activity & Cardiac Context Summary (v9.10.347.10)
+// Activity & Cardiac Context Summary (v9.10.347.116)
 if(settings.features&&settings.features.exercise&&data.activities&&data.activities.length>0){
 function _clDrEsc(v){return String(v===undefined||v===null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function _clDrDate(d){if(!d)return'';var parts=String(d).split('-');if(parts.length===3){var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return mo[parseInt(parts[1],10)-1]+' '+parseInt(parts[2],10);}return d;}
@@ -30110,11 +30384,11 @@ html+=`
 <ul style="margin:12px 0;padding-left:20px;line-height:1.8">`;
 
 if(avgSystolic>=140||avgDiastolic>=90){
-html+=`<li style="color:#dc2626;font-weight:600">⚠️ Average BP (${avgSystolic}/${avgDiastolic}) indicates hypertension (≥140/90)</li>`;
+html+=`<li style="color:#dc2626;font-weight:600">⚠️ Average BP (${avgSystolic}/${avgDiastolic}) is within the report threshold for values at or above 140/90</li>`;
 }else if(avgSystolic>=130||avgDiastolic>=80){
 html+=`<li style="color:#f59e0b">Average BP (${avgSystolic}/${avgDiastolic}) in Stage 1 range (130-139/80-89)</li>`;
 }else{
-html+=`<li style="color:#10b981">✓ Average BP (${avgSystolic}/${avgDiastolic}) within normal range (&lt;130/80)</li>`;
+html+=`<li style="color:#10b981">✓ Average BP (${avgSystolic}/${avgDiastolic}) is below this report's 130/80 reference threshold</li>`;
 }
 
 if(totalOutOfRange>=10){
@@ -30250,15 +30524,15 @@ var pphBorder=pphCount>=3?'#f97316':'#10b981';
 var pphColor=pphCount>=3?'#c2410c':'#065f46';
 html+=`<div class="report-section" style="background:${pphBg};border:1px solid ${pphBorder}">
 <div class="report-section-title" style="color:${pphColor}">🍽️ Post-Meal BP Pattern (PPH) <span style="font-size:13px;font-weight:400">(${pphEvts.length} meal pairs analyzed)</span></div>
-<p style="font-size:13px;color:${pphColor};margin:0 0 10px 0"><em>Clinical definition: ≥20 mmHg systolic drop within 2 hours of eating. Pre-meal = closest BP within 60 min before. Nadir = lowest systolic within 2 hours after. For pattern awareness and clinical discussion only.</em></p>
+<p style="font-size:13px;color:${pphColor};margin:0 0 10px 0"><em>Configured threshold: ≥20 mmHg systolic drop within 2 hours of eating. Pre-meal = closest BP within 60 min before. Nadir = lowest systolic within 2 hours after. For pattern awareness and clinical discussion only.</em></p>
 <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:10px">
 <tr style="background:${pphCount>=3?'#ffedd5':'#dcfce7'}"><th style="padding:6px;text-align:left">Metric</th><th style="padding:6px;text-align:left">Value</th></tr>
 <tr><td style="padding:6px;font-weight:600">Meal pairs analyzed:</td><td style="padding:6px">${pphEvts.length}</td></tr>
-<tr style="background:${pphBg}"><td style="padding:6px;font-weight:600">PPH events (≥20 mmHg drop):</td><td style="padding:6px;font-weight:700;color:${pphCount>0?'#dc2626':'#059669'}">${pphCount}${pphCount>=3?' — Pattern confirmed':pphCount>0?' — Below pattern threshold':' — None detected'}</td></tr>
+<tr style="background:${pphBg}"><td style="padding:6px;font-weight:600">PPH events (≥20 mmHg drop):</td><td style="padding:6px;font-weight:700;color:${pphCount>0?'#dc2626':'#059669'}">${pphCount}${pphCount>=3?' — Pattern threshold met':pphCount>0?' — Below pattern threshold':' — None detected'}</td></tr>
 <tr><td style="padding:6px;font-weight:600">Avg systolic change post-meal:</td><td style="padding:6px">${avgDrop>=0?'-'+avgDrop:'+'+Math.abs(avgDrop)} mmHg</td></tr>
 </table>`;
 if(pphCount>=3){
-html+=`<div style="font-size:13px;color:${pphColor};line-height:1.6;margin-bottom:8px"><strong>Pattern confirmed:</strong> ${pphCount} of ${pphEvts.length} analyzed meals produced a ≥20 mmHg systolic drop within 2 hours. This meets the clinical definition of Postprandial Hypotension. Recommend clinical review — autonomic dysfunction, medication timing, and meal composition are common contributing factors.</div>`;
+html+=`<div style="font-size:13px;color:${pphColor};line-height:1.6;margin-bottom:8px"><strong>Pattern threshold met:</strong> ${pphCount} of ${pphEvts.length} analyzed meals produced a ≥20 mmHg systolic drop within 2 hours. This meets CardiacLens\' configured post-meal BP pattern threshold. Review these recorded meal/BP pairs with your clinician.</div>`;
 var recentPPH=pphEvts.filter(function(e){return e.sysDrop>=20;}).sort(function(a,b){return b.date.localeCompare(a.date);}).slice(0,5);
 html+=`<div style="font-size:13px;color:#374151;margin-bottom:4px"><strong>Most recent PPH events:</strong></div>`;
 recentPPH.forEach(function(e){
@@ -30274,7 +30548,7 @@ html+=`</div>`;
 
 html+=`
 <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:2px solid #e5e7eb;color:#6b7280;font-size:14px">
-<p style="margin:0">CardiacLens v9.10.347.10 — Free & Source-Available</p>
+<p style="margin:0">CardiacLens v9.10.347.116 — Free & Source-Available</p>
 <p style="margin:4px 0 0 0">Report Generated: ${reportDate}</p>
 </div>`;
 
@@ -30288,12 +30562,19 @@ if(_pinned.length>0){
   html+='<div style="font-size:18px;font-weight:800;color:#92400e;margin-bottom:8px">📌 Pinned Significant Events</div>';
   html+='<div style="font-size:13px;color:#78350f;margin-bottom:16px;line-height:1.5">The following events were flagged by CardiacLens pattern detectors and permanently preserved. Math is directional, not definitive — these patterns are for clinical discussion, not diagnosis.</div>';
   _pinned.forEach(function(evt,i){
+    function _pinVal(v){ return (v===undefined||v===null||String(v).trim()===''||String(v).trim().toLowerCase()==='undefined') ? '' : String(v); }
     var _col=_sevColor[evt.severity]||'#6b7280';
     var _bg=_sevBg[evt.severity]||'#f9fafb';
+    var _title=_pinVal(evt.title)||'Pinned event';
+    var _summary=_pinVal(evt.summary)||'Details not available';
+    var _source=_pinVal(evt.sourceLabel);
+    var _eventDate=_pinVal(evt.eventDateDisplay)||_pinVal(evt.eventDate);
     html+='<div style="background:'+_bg+';border-left:4px solid '+_col+';padding:12px 14px;border-radius:6px;margin-bottom:10px">';
-    html+='<div style="font-size:14px;font-weight:700;color:'+_col+'">'+(i+1)+'. '+evt.title+'</div>';
-    html+='<div style="font-size:13px;color:#374151;margin-top:4px">'+evt.summary+'</div>';
-    html+='<div style="font-size:12px;color:#6b7280;margin-top:4px">Source: '+(evt.sourceLabel||'')+'&nbsp;·&nbsp;Event date: '+(evt.eventDateDisplay||evt.eventDate)+'</div>';
+    html+='<div style="font-size:14px;font-weight:700;color:'+_col+'">'+(i+1)+'. '+_title+'</div>';
+    html+='<div style="font-size:13px;color:#374151;margin-top:4px">'+_summary+'</div>';
+    if(_source||_eventDate){
+      html+='<div style="font-size:12px;color:#6b7280;margin-top:4px">'+(_source?'Source: '+_source:'')+((_source&&_eventDate)?'&nbsp;·&nbsp;':'')+(_eventDate?'Event date: '+_eventDate:'')+'</div>';
+    }
     if(evt.rawData&&evt.rawData.bp&&evt.rawData.bp.length){
       html+='<div style="font-size:12px;color:#6b7280;margin-top:2px">'+evt.rawData.bp.length+' BP reading(s) logged that day</div>';
     }
@@ -30478,7 +30759,7 @@ text+=`- ${type}: ${d.count} session(s), BP change ${sysChange>0?'+':''}${sysCha
 }
 
 
-// Activity & Cardiac Context Summary (v9.10.347.10)
+// Activity & Cardiac Context Summary (v9.10.347.116)
 if(settings.features&&settings.features.exercise&&data.activities&&data.activities.length>0){
 function _clTxtContext(a){var c=(a.activityContext||a.contextType||'').toString().toLowerCase();var es=a.environmentalSnapshot||{};if(!c&&es.context)c=String(es.context).toLowerCase();if(!c&&es.mode)c=String(es.mode).toLowerCase();if(c.indexOf('mixed')>=0)return'Mixed';if(c.indexOf('out')>=0)return'Outdoor';if(c.indexOf('in')>=0)return'Indoor';return'Not specified';}
 function _clTxtWeather(a){try{if(typeof clActivityWeatherText==='function')return clActivityWeatherText(a)||'';}catch(e){}var es=a.environmentalSnapshot||{};var ws=es.weatherSnapshot||es.weather||{};var out=[];if(ws.feelsLikeF||ws.feelsLike)out.push('Feels like '+(ws.feelsLikeF||ws.feelsLike)+'°');if(ws.precipChance!==undefined&&ws.precipChance!==null)out.push('Rain '+ws.precipChance+'%');if(ws.windMph)out.push('Wind '+ws.windMph+' mph');return out.join(' · ');}
@@ -30530,7 +30811,7 @@ CLINICAL ASSESSMENT
 `;
 
 if(avgSystolic>=140||avgDiastolic>=90){
-text+=`* WARNING: Average BP (${avgSystolic}/${avgDiastolic}) indicates hypertension (≥140/90)\n`;
+text+=`* WARNING: Average BP (${avgSystolic}/${avgDiastolic}) is within the report threshold for values at or above 140/90\n`;
 }else if(avgSystolic>=130||avgDiastolic>=80){
 text+=`* Average BP (${avgSystolic}/${avgDiastolic}) in Stage 1 range (130-139/80-89)\n`;
 }else{
@@ -30578,14 +30859,14 @@ text+=`
 POST-MEAL BP PATTERN (PPH ANALYSIS)
 ------------------------------------
 Meal pairs analyzed: ${pphEvtsT.length}
-PPH events (>=20 mmHg systolic drop): ${pphCountT}${pphCountT>=3?' — PATTERN CONFIRMED':pphCountT>0?' — Below pattern threshold':' — None detected'}
+PPH events (>=20 mmHg systolic drop): ${pphCountT}${pphCountT>=3?' — PATTERN THRESHOLD MET':pphCountT>0?' — Below pattern threshold':' — None detected'}
 Avg systolic change post-meal: ${avgDropT>=0?'-'+avgDropT:'+'+Math.abs(avgDropT)} mmHg
 Definition: Postprandial Hypotension = >=20 mmHg systolic drop within 2 hours of eating.
 Pre-meal baseline = closest BP within 60 min before meal. Nadir = lowest systolic within 2 hours after.
 `;
 if(pphCountT>=3){
-text+=`*** PPH PATTERN CONFIRMED: ${pphCountT} of ${pphEvtsT.length} meals produced a clinically significant drop.
-Recommend clinical review — autonomic dysfunction, medication timing, and meal composition are common contributing factors.\n`;
+text+=`*** PPH PATTERN THRESHOLD MET: ${pphCountT} of ${pphEvtsT.length} meals produced a ≥20 mmHg systolic drop.
+Review these recorded meal/BP pairs with your clinician.\n`;
 var recentT=pphEvtsT.filter(function(e){return e.sysDrop>=20;}).sort(function(a,b){return b.date.localeCompare(a.date);}).slice(0,5);
 recentT.forEach(function(e){text+=`  ${e.date} | ${e.mealName.substring(0,22)} | ${e.preSys}->${e.postSys} sys (-${e.sysDrop} mmHg)\n`;});
 }
@@ -30598,7 +30879,7 @@ Note: This report is based on patient self-tracked data. Clinical correlation
 and examination are essential for diagnosis and treatment decisions.
 
 ---
-CardiacLens v9.10.347.10 Medical Grade - Free
+CardiacLens v9.10.347.116 Medical Grade - Free
 Report Generated: ${reportDate}`;
 
 return text;
@@ -30717,7 +30998,7 @@ const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(
 // Check if this is today - if so, use current session data
 if(key===todayKey){
 // Include today's current data from global variables
-if(B.length>0)allData.bp.push(...B.map(r=>({...r,_date:key})));
+if(typeof _getAllBPReadings!=='function'&&B.length>0)allData.bp.push(...B.map(r=>({...r,_date:key})));
 if(W.length>0)allData.weight.push(...W.map(r=>({...r,_date:key})));
 if(S.length>0)allData.symptoms.push(...S.map(r=>({...r,_date:key})));
 if(A.length>0)allData.activities.push(...A.map(r=>({...r,_date:key})));
@@ -30732,7 +31013,7 @@ if(dayData){
 try{
 const parsed=JSON.parse(dayData);
 // Map to consistent property names
-if(parsed.bp)allData.bp.push(...parsed.bp.map(r=>({...r,_date:key})));
+if(typeof _getAllBPReadings!=='function'&&parsed.bp)allData.bp.push(...parsed.bp.map(r=>({...r,_date:key})));
 if(parsed.weight)allData.weight.push(...parsed.weight.map(r=>({...r,_date:key})));
 if(parsed.symptoms)allData.symptoms.push(...parsed.symptoms.map(r=>({...r,_date:key})));
 if(parsed.activities)allData.activities.push(...parsed.activities.map(r=>({...r,_date:key})));
@@ -30745,6 +31026,12 @@ console.error('Error parsing data for BP_TRACKER_'+key,e);
 }
 }
 }
+}
+if(typeof _getAllBPReadings==='function'){
+allData.bp=_getAllBPReadings().filter(function(r){
+const readingDate=new Date((r._date||todayKey)+' '+(r.t||'00:00'));
+return readingDate>=startDate&&readingDate<=endDate;
+});
 }
 return allData;
 }
@@ -31923,7 +32210,7 @@ function _flwStepB1(){
     {key:'cardiac',icon:'🫀',  label:'Other cardiac condition',             sub:'Arrhythmia, post-surgery, valve disease, hypertrophic'},
     {key:'renal',  icon:'🫘',  label:'Kidney / renal disease',              sub:'CKD, dialysis, renal insufficiency'},
     {key:'htn',    icon:'📈',  label:'High blood pressure (hypertension)',  sub:'Managing BP without a specific fluid restriction'},
-    {key:'other',  icon:'💧',  label:'General wellness / other',            sub:'Building healthy hydration habits'}
+    {key:'other',  icon:'💧',  label:'General wellness / other',            sub:'Building recorded hydration habits'}
   ];
   conditions.forEach(function(c){
     h+='<button onclick="_flwB1Select(\''+c.key+'\')" style="'+BG+'">';
@@ -33350,16 +33637,13 @@ function generateMorningPatternsPhase2(checkins, el) {
   // ─── CHART C: Sleep Quality vs. Morning BP ────────────────────────────────
   html += '<div style="background:#eff6ff;border:2px solid #bfdbfe;border-radius:10px;padding:14px;margin-bottom:14px">';
   html += '<div style="font-size:14px;font-weight:700;color:#1e40af;margin-bottom:4px">Chart C — Sleep Quality vs. Next-Morning Systolic BP</div>';
-  // Pull BP readings by date from data (passed via closure via checkins — we need to access the allData store)
+  // Pull BP readings by date through the BP/HR SSOT.
   var poorSleepBPs = []; var goodSleepBPs = [];
+  var sleepBPReadings = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : [];
   checkins.forEach(function(r) {
     if (!r.yesterday || !r.yesterday.sleep) return;
-    // Look up BP readings for the check-in date
     try {
-      var dayData = localStorage.getItem('BP_TRACKER_' + r.date);
-      if (!dayData) return;
-      var d = JSON.parse(dayData);
-      var bps = (d.bp||[]).filter(function(b){ return b.s && b.s > 0; });
+      var bps = sleepBPReadings.filter(function(b){ return b._date === r.date && b.s && b.s > 0; });
       if (bps.length === 0) return;
       var avgSys = Math.round(bps.reduce(function(sum,b){return sum+b.s;},0)/bps.length);
       if (r.yesterday.sleep === 'poor') poorSleepBPs.push(avgSys);
@@ -33493,7 +33777,7 @@ html+='<div style="background:white;border-radius:8px;padding:10px;text-align:ce
 html+='<div style="background:white;border-radius:8px;padding:10px;text-align:center"><div style="font-size:20px;font-weight:800;color:'+(avgSysDrop>10?'#f97316':'#374151')+'">'+(avgSysDrop>=0?'-'+avgSysDrop.toFixed(0):'+'+Math.abs(avgSysDrop).toFixed(0))+' mmHg</div><div style="font-size:11px;color:#6b7280">Avg systolic change</div></div>';
 html+='</div>';
 if(notable){
-html+='<div style="font-size:13px;color:'+sColor+';line-height:1.6">Your data shows <strong>'+pphEvents+' PPH events</strong> — systolic drops of ≥20 mmHg within 2 hours of eating ('+pctPPH+'% of tracked meals). This meets the clinical definition of Postprandial Hypotension and is worth discussing with your care team. Consider pinning this pattern for your next appointment.</div>';
+html+='<div style="font-size:13px;color:'+sColor+';line-height:1.6">Your data shows <strong>'+pphEvents+' post-meal BP events</strong> — systolic drops of ≥20 mmHg within 2 hours of eating ('+pctPPH+'% of tracked meals). This meets CardiacLens\' configured post-meal BP pattern threshold. Consider pinning this pattern for your next appointment.</div>';
 }else{
 html+='<div style="font-size:13px;color:'+sColor+';line-height:1.6">'+(pphEvents>0?pphEvents+' meal(s) showed a ≥20 mmHg drop — below the 3-event threshold for a confirmed pattern.':'No PPH events (≥20 mmHg systolic drop) detected across '+events.length+' analyzed meal pairs.')+' Average systolic change: '+(avgSysDrop>=0?'-':'+')+''+Math.abs(avgSysDrop).toFixed(1)+' mmHg.</div>';
 }
@@ -33561,7 +33845,10 @@ processReading(data,dateKey,time);
 }
 
 function processReading(data,dateKey,time){
-const bp=data.bp||[];
+const readingDateKey=(dateKey||'').replace('BP_TRACKER_','');
+const bp=(typeof _getAllBPReadings==='function')
+?_getAllBPReadings().filter(function(r){return (r._date||readingDateKey)===readingDateKey;})
+:(data.bp||[]);
 console.log('BP readings:',bp,'looking for time:',time);
 console.log('Available times in readings:',bp.map(r=>r.t));
 // Find the specific reading by time
@@ -33840,6 +34127,18 @@ function loadAnchorWindowData(anchorDate){
   // Load morning check-ins
   var mciRecords = loadMorningCheckins ? loadMorningCheckins() : [];
 
+  // BP/HR SSOT: pre-load window BP/HR readings once, grouped by date.
+  var ssotBPByDate = {};
+  if(typeof _getAllBPReadings === 'function'){
+    _getAllBPReadings().forEach(function(r){
+      var rd = r && r._date;
+      if(rd && byDate[rd]){
+        if(!ssotBPByDate[rd]) ssotBPByDate[rd] = [];
+        ssotBPByDate[rd].push(Object.assign({}, r));
+      }
+    });
+  }
+
   // Fill each date
   dates.forEach(function(key){
     // Morning check-in
@@ -33848,7 +34147,7 @@ function loadAnchorWindowData(anchorDate){
 
     if(key === todayKey){
       // Today: use in-memory globals
-      byDate[key].bp          = (typeof B !== 'undefined' ? B : []).slice();
+      byDate[key].bp          = ssotBPByDate[key] || ((typeof _getAllBPReadings === 'function') ? [] : (typeof B !== 'undefined' ? B : []).slice());
       byDate[key].weight      = (typeof W !== 'undefined' ? W : []).slice();
       byDate[key].symptoms    = (typeof S !== 'undefined' ? S : []).slice();
       byDate[key].activities  = (typeof A !== 'undefined' ? A : []).slice();
@@ -33861,7 +34160,7 @@ function loadAnchorWindowData(anchorDate){
       if(raw){
         try{
           var d = JSON.parse(raw);
-          byDate[key].bp          = d.bp       || d.B || [];
+          byDate[key].bp          = ssotBPByDate[key] || ((typeof _getAllBPReadings === 'function') ? [] : (d.bp || d.B || []));
           byDate[key].weight      = d.weight   || d.W || [];
           byDate[key].symptoms    = d.symptoms || d.S || [];
           byDate[key].activities  = d.activities || d.A || [];
@@ -34717,7 +35016,7 @@ report.push(notes);
 report.push('');
 }
 report.push('═══════════════════════════════════════════════════════════');
-report.push('This report was generated by CardiacLens v9.10.347.10 Medical Grade - Free');
+report.push('This report was generated by CardiacLens v9.10.347.116 Medical Grade - Free');
 report.push('Advanced Analytics Dashboard - Phase 3 Implementation');
 report.push('═══════════════════════════════════════════════════════════');
 const blob=new Blob([report.join('\n')],{type:'text/plain'});
@@ -34807,7 +35106,7 @@ ${periodHTML}
 <h2>Key Insights</h2>
 ${insightsHTML}
 <div style="margin-top:40px;padding:20px;background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:8px">
-<strong>CardiacLens v9.10.347.10 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
+<strong>CardiacLens v9.10.347.116 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
 This report is not a substitute for professional medical advice.
 </div>
 </body>
@@ -36388,7 +36687,8 @@ return html;
 function createSummarySection(data,startDate,endDate){
 const avgSys=data.bp.length>0?data.bp.reduce((sum,r)=>sum+r.s,0)/data.bp.length:0;
 const avgDia=data.bp.length>0?data.bp.reduce((sum,r)=>sum+r.d,0)/data.bp.length:0;
-const avgHR=data.bp.filter(r=>r.h).length>0?data.bp.filter(r=>r.h).reduce((sum,r)=>sum+r.h,0)/data.bp.filter(r=>r.h).length:0;
+const hrReadings=_getHRReadingsFromBP(data.bp);
+const avgHR=hrReadings.length>0?hrReadings.reduce((sum,r)=>sum+r.hr,0)/hrReadings.length:0;
 let html='<div class="no-break">';
 html+='<div class="section-title">📋 Executive Summary</div>';
 html+='<table><tr>';
@@ -36414,7 +36714,7 @@ function createStatisticsSection(data){
 // Calculate detailed statistics
 const systolic=data.bp.map(r=>r.s);
 const diastolic=data.bp.map(r=>r.d);
-const heartRates=data.bp.filter(r=>r.h).map(r=>r.h);
+const heartRates=(typeof _getHRReadingsFromBP==='function'?_getHRReadingsFromBP(data.bp):data.bp.filter(r=>r.h).map(r=>({hr:r.h}))).map(function(r){return r.hr;});
 let html='<div class="no-break">';
 html+='<div class="section-title">📊 Detailed Statistics</div>';
 html+='<table>';
@@ -38305,21 +38605,15 @@ function _mipCollect(days) {
   cutoff.setDate(cutoff.getDate() - days);
   var cutoffStr = cutoff.toISOString().slice(0,10);
   var sys=[], dia=[], hr=[], pp=[];
-  for (var i=0; i<localStorage.length; i++) {
-    var k = localStorage.key(i);
-    if (!k || !k.match(/^BP_TRACKER_(\d{4}-\d{2}-\d{2})$/)) continue;
-    var dateStr = k.replace('BP_TRACKER_','');
-    if (dateStr < cutoffStr) continue;
-    try {
-      var d = JSON.parse(localStorage.getItem(k));
-      (d.bp || []).forEach(function(r) {
-        if (r.s) sys.push(r.s);
-        if (r.d) dia.push(r.d);
-        if (r.h) hr.push(r.h);
-        if (r.s && r.d) pp.push(r.s - r.d);
-      });
-    } catch(e) {}
-  }
+  var allBP = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : [];
+  (allBP || []).forEach(function(r) {
+    var dateStr = r._date || '';
+    if (!dateStr || dateStr < cutoffStr) return;
+    if (r.s) sys.push(r.s);
+    if (r.d) dia.push(r.d);
+    if (r.h) hr.push(r.h);
+    if (r.s && r.d) pp.push(r.s - r.d);
+  });
   return {
     systolic:  _mipStats(sys),
     diastolic: _mipStats(dia),
@@ -39389,23 +39683,23 @@ function _buildPinWhatToSay(evt) {
         lines.push(
           'My app flagged a cardiac output signal on ' + edDisplay +
           ': my heart rate has been increasing but my pulse pressure has not widened proportionally. ' +
-          'I wanted to ask specifically about hemodynamic decompensation.'
+          'I wanted to ask whether this recorded pattern is clinically relevant.'
         );
       } else {
         lines.push(
-          'My app flagged a high-level decompensation warning on ' + edDisplay +
+          'My app flagged a high-level multi-signal pattern on ' + edDisplay +
           ' with multiple converging signals: ' + sigStr +
           '. I am not in acute distress, but I wanted to report this to you directly rather than wait for my next scheduled appointment.'
         );
       }
     } else if (pts >= 3) {
       lines.push(
-        'My app flagged multiple decompensation signals converging on ' + edDisplay + ': ' + sigStr +
+        'My app flagged multiple recorded signals converging on ' + edDisplay + ': ' + sigStr +
         '. These signals appeared at the same time. I have been monitoring closely and wanted to bring this to your attention.'
       );
     } else {
       lines.push(
-        'My app flagged an early decompensation indicator on ' + edDisplay + ': ' + sigStr +
+        'My app flagged an early recorded pattern on ' + edDisplay + ': ' + sigStr +
         '. This was a single signal and has not escalated. I am logging it for your awareness.'
       );
     }
@@ -39419,13 +39713,13 @@ function _buildPinWhatToSay(evt) {
     if (isChronic) {
       lines.push(
         'My pulse pressure \u2014 the difference between my systolic and diastolic readings \u2014 has been persistently narrow across my entire tracking history. My average pulse pressure is ' + avgPP +
-        ' mmHg. Narrowing pulse pressure can be worth discussing as a possible indicator of reduced cardiac output.'
+        ' mmHg. Narrowing pulse pressure can be worth discussing as a recorded BP pattern.'
       );
     } else if (stTitle.indexOf('Narrowing') !== -1 || stTitle.indexOf('Reduced') !== -1 || stTitle.indexOf('Narrow') !== -1) {
       lines.push(
         'My app flagged a narrowing pulse pressure pattern on ' + edDisplay +
         '. My recent average pulse pressure is ' + avgPP +
-        ' mmHg. I understand narrowing pulse pressure can sometimes reflect changes in cardiac output and I wanted to flag this as a persistent pattern.'
+        ' mmHg. I wanted to flag this narrowing pulse pressure as a persistent recorded pattern.'
       );
     } else {
       lines.push(
@@ -40159,8 +40453,7 @@ function _injectPPPins() {
     var el2=document.getElementById('pp-pin-section');if(el2)el2.style.display='none';return;
   }
 
-  var hist = getAllHistoricalData();
-  var allBP = (hist.bp||[]).filter(function(r){return r.s>0&&r.d>0;}).sort(function(a,b){
+  var allBP = ((typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : ((getAllHistoricalData().bp)||[])).filter(function(r){return r.s>0&&r.d>0;}).sort(function(a,b){
     var da=a._date||'';var db=b._date||'';return da<db?1:da>db?-1:0;
   });
   var eventDate = allBP.length>0 ? allBP[0]._date : getTodayKey();
@@ -40366,7 +40659,7 @@ function _setTierGate(storageKey) {
 // ── Shared data loader (lightweight — no UI side effects) ─────────────────────
 function _loadTierData() {
   var hist = getAllHistoricalData();
-  var allBP     = (hist.bp      || []).slice().sort(function(a,b){ return (a._date+a.t).localeCompare(b._date+b.t); });
+  var allBP     = ((typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (hist.bp || [])).slice().sort(function(a,b){ return (a._date+a.t).localeCompare(b._date+b.t); });
   var allWeight = (hist.weight  || []).slice().sort(function(a,b){ return (a._date+(a.t||'')).localeCompare(b._date+(b.t||'')); });
   var allSyms   = (hist.symptoms|| []).slice().sort(function(a,b){ return (a._date+(a.t||'')).localeCompare(b._date+(b.t||'')); });
   var now = new Date();
@@ -40417,15 +40710,15 @@ function _tcWeightRising(d) {
 // Signal B: HR elevated ≥5 bpm above 30-day baseline for 3+ consecutive days
 function _tcHRElevated(d) {
   var hrDays = {};
-  d.allBP.filter(function(r){return r.h&&r.h>0;}).forEach(function(r){
+  _getHRReadingsFromBP(d.allBP).forEach(function(r){
     if(!hrDays[r._date])hrDays[r._date]=[];
-    hrDays[r._date].push(r.h);
+    hrDays[r._date].push(r.hr);
   });
   var hrDatesSorted = Object.keys(hrDays).sort();
   if(hrDatesSorted.length < 6) return null;
 
   // 30-day baseline avg (all readings)
-  var allHR = d.allBP.filter(function(r){return r.h&&r.h>0;}).map(function(r){return r.h;});
+  var allHR = _getHRReadingsFromBP(d.allBP).map(function(r){return r.hr;});
   var baseline = allHR.reduce(function(s,v){return s+v;},0)/allHR.length;
 
   // Check last 14 days for streak
@@ -40567,8 +40860,7 @@ function _tdScore(d) {
   var scores = [];
 
   // Domain 1: HR level shift
-  var hrReadings = d.allBP.filter(function(r){return r.h&&r.h>0;})
-    .map(function(r){return Object.assign({},r,{hr:r.h});});
+  var hrReadings = _getHRReadingsFromBP(d.allBP);
   if(hrReadings.length >= 6) {
     var hrPats = detectPatterns(hrReadings);
     var shifts = hrPats.filter(function(p){return p.type==='level_shift';});
@@ -41255,7 +41547,7 @@ var cbBehavior = (function() {
         try {
           var hAll = (typeof getAllHistoricalData === 'function') ? getAllHistoricalData() : {};
           var pphMeals = hAll.meals || [];
-          var pphBP = hAll.bp || [];
+          var pphBP = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (hAll.bp || []);
           if (pphMeals.length < 3 || pphBP.length < 5) return false;
           var cutoff30 = new Date(); cutoff30.setDate(cutoff30.getDate() - 30);
           var pphCount = 0;
@@ -41282,7 +41574,7 @@ var cbBehavior = (function() {
         } catch(e) { return false; }
       },
       pools: [
-        'Your Post-Meal BP Patterns show 3 or more episodes where blood pressure dropped 20+ mmHg within 2 hours of eating — the clinical definition of Postprandial Hypotension. This is a pattern worth bringing to your cardiologist.',
+        'Your Post-Meal BP Patterns show 3 or more episodes where blood pressure dropped 20+ mmHg within 2 hours of eating. This meets CardiacLens\' configured post-meal BP pattern threshold and is worth bringing to your cardiologist.',
         'CardiacLens has detected a PPH pattern in your data: 3+ meals in the last 30 days produced a significant post-meal BP drop. Check Post-Meal BP Patterns in Advanced Analytics, then consider pinning it for your next appointment.',
         "A consistent post-meal blood pressure drop pattern has been detected. Three or more readings show drops of 20 mmHg or more after eating. Your Doctor's Report now includes a PPH summary — worth discussing at your next visit."
       ],
@@ -41381,8 +41673,8 @@ var cbBehavior = (function() {
         return d.screens.pulse_pressure.visits === 0;
       },
       pools: [
-        'You have enough BP data for the Pulse Pressure detector — and you\'ve never opened it. Pulse pressure is one of the most sensitive early indicators of cardiac stress. Find it in Advanced Analytics.',
-        'Twenty readings logged, conditions on file, but the Pulse Pressure detector hasn\'t been opened yet. For cardiac patients it reflects stroke volume efficiency — worth a look in Advanced Analytics.',
+        'You have enough BP data for the Pulse Pressure detector — and you\'ve never opened it. Pulse pressure can be useful context to review alongside your other BP readings. Find it in Advanced Analytics.',
+        'Twenty readings logged, conditions on file, but the Pulse Pressure detector hasn\'t been opened yet. For cardiac patients it can be useful context alongside systolic and diastolic readings — worth a look in Advanced Analytics.',
         'Pulse Pressure is a detector your cardiologist will recognize immediately. With your data and conditions, it\'s ready to run. Find it in Advanced Analytics.'
       ]
     },
@@ -41646,7 +41938,8 @@ var cbBehavior = (function() {
         // Require HR data — breathing sessions are only meaningful if HR is being tracked
         try {
           var hAll = (typeof getAllHistoricalData === 'function') ? getAllHistoricalData() : {};
-          var hrReadings = (hAll.bp || []).filter(function(r){ return r.h && r.h > 0; });
+          var allBP = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (hAll.bp || []);
+          var hrReadings = (typeof _getHRReadingsFromBP === 'function') ? _getHRReadingsFromBP(allBP) : allBP.filter(function(r){ return r.h && r.h > 0; });
           if (hrReadings.length < 5) return false;
         } catch(e) { return false; }
         // No breathing sessions ever logged
@@ -41954,10 +42247,9 @@ function _silentDecompScore() {
       var prev   = wArr[wArr.length - 2].weight;
       if (latest - prev >= 2) score++;
     }
-    var bpCount = B ? B.filter(function(r){ return r.s && r.d; }).length : 0;
-    if (bpCount >= 3) {
-      var recent3 = B.slice(-3);
-      var avgHR = recent3.reduce(function(a,r){ return a + (r.h||0); }, 0) / 3;
+    var recentHRs = (typeof _getRecentHRReadings === 'function') ? _getRecentHRReadings(3) : [];
+    if (recentHRs.length >= 3) {
+      var avgHR = recentHRs.reduce(function(a,r){ return a + r; }, 0) / recentHRs.length;
       var settings2 = typeof settings !== 'undefined' ? settings : {};
       var hrHigh = settings2.hrHigh || 100;
       if (avgHR > hrHigh) score++;
@@ -42979,7 +43271,7 @@ function buildAskContext(dateFrom, dateTo) {
 
   // BP readings
   try {
-    var bArr = (typeof B !== 'undefined') ? B : [];
+    var bArr = (typeof _getTodayBPReadings === 'function') ? _getTodayBPReadings() : [];
     if (bArr.length > 0) {
       ctx.push('BP readings today (' + bArr.length + '):');
       bArr.forEach(function(r, i) {
@@ -43108,49 +43400,10 @@ function buildAskContext(dateFrom, dateTo) {
   ctx.push('\n=== BLOOD PRESSURE HISTORY (' + windowLabel + ') ===');
   try {
     var hAll = (typeof getAllHistoricalData === 'function') ? getAllHistoricalData() : {};
-    var allBP = hAll.bp || [];
+    var allBP = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (hAll.bp || []);
 
-    // DIRECT SUPPLEMENT: for every date in the query window, read localStorage directly.
-    // getAllHistoricalData() uses its own 90-day cutoff which can miss dates that inWindow()
-    // correctly includes. Direct read guarantees no readings are skipped for the queried window.
-    var _directDates = {};
-    allBP.forEach(function(r){ if(r._date) _directDates[r._date] = true; });
-    try {
-      var _todayKeyDirect = (typeof getTodayKey === 'function') ? getTodayKey() : '';
-      for (var _di = 0; _di < localStorage.length; _di++) {
-        var _dk = localStorage.key(_di);
-        if (!_dk || !_dk.startsWith('BP_TRACKER_') || _dk === 'BP_TRACKER_DAILY_DATA') continue;
-        var _dd = _dk.replace('BP_TRACKER_', '');
-        if (!_dd.match(/^\d{4}-\d{2}-\d{2}$/) || _dd === _todayKeyDirect) continue;
-        if (!inWindow(_dd)) continue;  // only read dates that are in the query window
-        // Always read directly for dates in the window — do not skip based on _directDates
-        // because getAllHistoricalData may have loaded them with a wrong _date value
-        var _dRaw = localStorage.getItem(_dk);
-        if (_dRaw) {
-          try {
-            var _dData = JSON.parse(_dRaw);
-            (_dData.bp || []).forEach(function(item){
-              item._date = _dd;
-            });
-            // Replace any existing entries for this date from getAllHistoricalData with direct read
-            allBP = allBP.filter(function(r){ return r._date !== _dd; });
-            (_dData.bp || []).forEach(function(item){
-              allBP.push(item);
-            });
-          } catch(e3) {}
-        }
-      }
-      // Also add today's B array readings if today is in window
-      if (inWindow(today)) {
-        allBP = allBP.filter(function(r){ return r._date !== today; });
-        if (typeof B !== 'undefined') {
-          B.forEach(function(item){
-            var copy = Object.assign({}, item, {_date: today});
-            allBP.push(copy);
-          });
-        }
-      }
-    } catch(e2) {}
+    // BP/HR history is supplied by the SSOT helper. Do not supplement from raw
+    // localStorage BP arrays or today's in-memory B array here.
 
     var windowBP = allBP.filter(function(r){ return inWindow(r._date); });
     ctx.push('Total BP readings on record: ' + allBP.length + ' | In period: ' + windowBP.length);
@@ -43279,33 +43532,38 @@ function buildAskContext(dateFrom, dateTo) {
   } catch(e) { ctx.push('Blood pressure history: unavailable'); }
 
   // Monthly statistics — pre-computed per-month averages for BP, HR, and weight.
-  // Allows accurate answers to "average HR by month" without AI computing from raw data.
-  ctx.push('\n=== MONTHLY STATISTICS (' + windowLabel + ') ===');
+  // Uses all available BP/HR history so "by month" answers are not limited by the default Ask window.
+  ctx.push('\n=== MONTHLY STATISTICS (all available data) ===');
   try {
     var _monthMap = {};
-    // Process today's in-memory BP readings
+    // Process BP/HR readings through the SSOT retrieval path across the full stored history.
+    var _monthlyBP = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : [];
+    (_monthlyBP || []).forEach(function(r){
+      if(!r || !r._date) return;
+      var _mMonthKey = r._date.slice(0, 7);
+      if (!_monthMap[_mMonthKey]) _monthMap[_mMonthKey] = { sys:[], dia:[], hr:[], wt:[] };
+      if(r.s>0&&r.d>0){_monthMap[_mMonthKey].sys.push(r.s);_monthMap[_mMonthKey].dia.push(r.d);}
+      if(r.h>0) _monthMap[_mMonthKey].hr.push(r.h);
+    });
+
+    // Process today's in-memory weight readings
     var _todayMonthKey = today.slice(0, 7); // "YYYY-MM"
-    if (typeof B !== 'undefined' && B.length > 0 && inWindow(today)) {
-      if (!_monthMap[_todayMonthKey]) _monthMap[_todayMonthKey] = { sys:[], dia:[], hr:[], wt:[] };
-      B.forEach(function(r){ if(r.s>0&&r.d>0){_monthMap[_todayMonthKey].sys.push(r.s);_monthMap[_todayMonthKey].dia.push(r.d);} if(r.h>0) _monthMap[_todayMonthKey].hr.push(r.h); });
-    }
-    if (typeof W !== 'undefined' && W.length > 0 && inWindow(today)) {
+    if (typeof W !== 'undefined' && W.length > 0) {
       if (!_monthMap[_todayMonthKey]) _monthMap[_todayMonthKey] = { sys:[], dia:[], hr:[], wt:[] };
       W.forEach(function(w){ if(w.w>0) _monthMap[_todayMonthKey].wt.push(w.w); });
     }
-    // Process historical data from localStorage
+    // Process historical weight data from localStorage across the full stored history.
     for (var _mi = 0; _mi < localStorage.length; _mi++) {
       var _mk = localStorage.key(_mi);
       if (!_mk || !_mk.startsWith('BP_TRACKER_') || _mk === 'BP_TRACKER_DAILY_DATA') continue;
       var _mDate = _mk.replace('BP_TRACKER_', '');
-      if (!_mDate.match(/^\d{4}-\d{2}-\d{2}$/) || !inWindow(_mDate)) continue;
+      if (!_mDate.match(/^\d{4}-\d{2}-\d{2}$/)) continue;
       var _mMonthKey = _mDate.slice(0, 7);
       if (!_monthMap[_mMonthKey]) _monthMap[_mMonthKey] = { sys:[], dia:[], hr:[], wt:[] };
       try {
         var _mRaw = localStorage.getItem(_mk);
         if (_mRaw) {
           var _mDay = JSON.parse(_mRaw);
-          (_mDay.bp||[]).forEach(function(r){ if(r.s>0&&r.d>0){_monthMap[_mMonthKey].sys.push(r.s);_monthMap[_mMonthKey].dia.push(r.d);} if(r.h>0) _monthMap[_mMonthKey].hr.push(r.h); });
           (_mDay.weight||[]).forEach(function(w){ if(w.w>0) _monthMap[_mMonthKey].wt.push(w.w); });
         }
       } catch(e2){}
@@ -43472,7 +43730,7 @@ function buildAskContext(dateFrom, dateTo) {
   ctx.push('\n=== MEDICATION EFFECTIVENESS (all available data) ===');
   try {
     var hAllMedEff = (typeof getAllHistoricalData === 'function') ? getAllHistoricalData() : {};
-    var allBPMed = hAllMedEff.bp || [];
+    var allBPMed = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (hAllMedEff.bp || []);
     // Separate before/after readings by medication name
     var _medBefore = {}, _medAfter = {};
     allBPMed.forEach(function(r) {
@@ -43556,7 +43814,7 @@ function buildAskContext(dateFrom, dateTo) {
   try {
     var hAllPPH = (typeof getAllHistoricalData === 'function') ? getAllHistoricalData() : {};
     var pphAllMeals = hAllPPH.meals || [];
-    var pphAllBP = hAllPPH.bp || [];
+    var pphAllBP = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (hAllPPH.bp || []);
     if (pphAllMeals.length >= 3 && pphAllBP.length >= 5) {
       var pphAskEvts = [];
       var cutoff30 = new Date(); cutoff30.setDate(cutoff30.getDate() - 30);
@@ -43577,7 +43835,7 @@ function buildAskContext(dateFrom, dateTo) {
       });
       var pphAskCount = pphAskEvts.filter(function(e) { return e.sysDrop >= 20; }).length;
       ctx.push('Meal pairs analyzed (last 30 days): ' + pphAskEvts.length);
-      ctx.push('PPH events (>=20 mmHg systolic drop): ' + pphAskCount + (pphAskCount >= 3 ? ' - PATTERN CONFIRMED' : pphAskCount > 0 ? ' - below pattern threshold' : ' - none detected'));
+      ctx.push('PPH events (>=20 mmHg systolic drop): ' + pphAskCount + (pphAskCount >= 3 ? ' - pattern threshold met' : pphAskCount > 0 ? ' - below pattern threshold' : ' - none detected'));
       if (pphAskEvts.length > 0) {
         var avgDropAsk = Math.round(pphAskEvts.reduce(function(s,e){return s+e.sysDrop;},0)/pphAskEvts.length);
         ctx.push('Avg post-meal systolic change: ' + (avgDropAsk >= 0 ? '-' : '+') + Math.abs(avgDropAsk) + ' mmHg');
@@ -43931,7 +44189,7 @@ function _buildAskSystemPrompt(dataContext) {
   _spRef+='LAST-WEEKDAY REFERENCE (CardiacLens pre-computed — use these exact dates for any "last [day of week]" query, never compute independently):\n';
   for(var _spi=0;_spi<7;_spi++){var _spDf=_spDow-_spi;if(_spDf<=0)_spDf+=7;var _spRd=new Date(_spy,_spm-1,_spdt-_spDf);_spRef+='  Last '+_spDns[_spi]+' = '+_spRd.getFullYear()+'-'+_spPad(_spRd.getMonth()+1)+'-'+_spPad(_spRd.getDate())+'\n';}
   _spRef+='\n';
-  return 'You are the CardiacLens Ask assistant — a knowledgeable, compassionate helper built into CardiacLens, a free cardiac health monitoring app for cardiac patients. You know every feature of CardiacLens and have full access to the user\'s logged data (provided below).\n\nYOUR ROLE:\n- Answer questions about how CardiacLens features work\n- Answer questions about the user\'s own logged data (fluid, BP, HR, weight, symptoms, notes, medications, meals, activities)\n- Answer questions about activity context snapshots: weather, feels-like temperature, rain, wind, hot kitchen/warm room, standing time, after-meal timing, fluids at save, recent BP, and recent symptoms\n- Perform cross-stream pattern analysis: identify temporal correlations across data streams and report what the logged data shows\n- Mine notes text — symptom notes, general notes, morning check-in notes — for contextual patterns (body position, timing, activity state, emotional context, meal proximity) and report what patterns appear in the text\n- Help users understand patterns they see in the app\n- Help users log correctly and get the most from the app\n- Ask follow-up clarifications when a question is genuinely ambiguous\n\nDATA OBSERVATION GUIDANCE:\nWhen asked about correlations or patterns (e.g. "what happens before my HR exceeds 75?", "what triggers my cough?", "does fluid affect my BP?"):\n1. Filter readings to the target condition (e.g. HR > 75)\n2. For each qualifying reading, examine what was logged in the preceding 1-4 hours: meals, fluid entries with notes, activities, medications, symptoms, standalone notes\n3. Look at time-of-day distribution\n4. For activity/weather questions, compare activity context snapshots with nearby BP/HR, fluids, symptoms, meals, and notes; report only logged-data observations\n5. Scan symptom note text for repeated words or phrases: position words (laying, sitting, standing), timing words (after eating, waking, exercise), state words (anxious, stressed, tired)\n5. Report findings as structured data observations: "Of your 12 HR readings above 75 in this period, 9 occurred within 2 hours of waking. Your symptom notes mention \'laying down\' in 14 of 23 cough entries."\nAlways frame as: "The data shows...", "Looking at your logged entries...", "Of X readings in this period...", "Your notes frequently mention..."\n\nCLEAR BOUNDARY — YOU NEVER:\n- Interpret what patterns mean for the user\'s health or prognosis\n- Suggest changing medications, dosing, or care plans\n- Diagnose or suggest diagnoses\n- Replace medical advice\nWhen a finding moves from data observation toward clinical meaning, say: "That pattern is worth noting for your cardiologist — it would make a good Pinned Event for your next appointment." Never alarm the user.\n\nTONE: Calm, warm, clear, never alarming. These are cardiac patients who may be worried. Be the reassuring, knowledgeable friend who knows the app inside-out and the data clearly.\n\nINTENT CLARIFICATION FORMAT (use ONLY when the question is genuinely unclear):\n[CLARIFY]\nOption 1: (clearer version)\nOption 2: (another interpretation)\nOption 3: (another interpretation if applicable)\n[/CLARIFY]\n\nRESPONSE GUIDELINES:\n- Mobile app for seniors — keep answers clear and reasonably concise\n- Plain English, no jargon unless explaining a CardiacLens feature\n- For data answers, present facts plainly with structure where helpful\n- Accuracy is paramount — if you are not certain about a data answer, say so clearly\n- When notes text contains clinically interesting context (position, timing, triggers), surface it explicitly as a data finding\n- DATA WINDOW BOUNDARY — CRITICAL: The context header shows the exact analysis period (e.g. "ANALYSIS PERIOD: 2026-02-01 to 2026-03-05" or "last 14 days"). You MUST ONLY report statistics, counts, percentages, and averages from data within that window. NEVER produce numbers for a time period not represented in the context. If the user asks about a period that does not match the context window, respond: "The data I can see covers [period from context header]. I cannot compute accurate statistics for [requested period] from this context — please ask again and the data for that period will be loaded." Do not attempt to answer with data from the wrong period. Wrong medical statistics are dangerous.\n- HR THRESHOLD QUERIES — CRITICAL: When asked how many readings are "above X bpm" or "below X bpm", you MUST use the pre-computed "Pre-computed readings STRICTLY ABOVE X bpm" table in the context. NEVER count manually from the raw readings list — manual counting produces errors. If the exact threshold X is in the table, read the answer directly. If X falls between two table values, sum the relevant rows. State the answer as a verified fact from the table, not as an estimate. If your manually counted result differs from the pre-computed table, the TABLE IS CORRECT — discard your count.\n- FLUID DAILY TOTALS — CRITICAL: When asked about daily fluid intake amounts for any specific date or period, you MUST use the pre-computed "Daily fluid totals in period" list in the FLUID STATISTICS section. NEVER reconstruct daily totals by summing individual timed entries — that method produces incorrect results because entries span multiple sources and partial amounts. The individual timed entries section is provided only for timing and correlation analysis (e.g. "when did I drink on April 1?"). For any question about how much fluid was consumed on a given day, read the answer directly from the verified daily totals list. If a date is not in that list, the data was not logged for that day.\n- FLUID VS NEXT MORNING BP — CRITICAL: When asked to correlate fluid intake with next-morning BP, you MUST use the pre-computed FLUID VS NEXT MORNING BP table in the context. Each row already pairs the correct fluid date with the FIRST BP reading of the FOLLOWING day (date+1). NEVER construct this pairing yourself from raw data — off-by-one errors are guaranteed. Read the answer directly from that table.\n- N-WEEKS-AGO QUERIES: When the ANALYSIS PERIOD covers a multi-day range (e.g. "2026-04-21 to 2026-04-28") and the user asked "N weeks ago", that range IS the answer period. Report statistics for THE ENTIRE PERIOD shown in the ANALYSIS PERIOD, not just the anchor date. Do not describe it as "that specific date" — it is a 7-day window. Report total readings, averages, and days covered for the full period.\n- DATE WINDOW CONFIRMATION: Whenever your answer includes specific numbers derived from a time period (counts, averages, percentages, ranges), begin your response by stating the exact window you are analyzing, e.g. "Looking at all data through March 5, 2026..." or "For the period March 6 to today...". This lets the user catch any mismatch before reading statistics.\n- AMBIGUOUS DATE QUERIES — READ CAREFULLY: The date window in the context header was pre-computed by CardiacLens before this conversation. If the header shows ANY specific date (e.g. \"ANALYSIS PERIOD: 2026-05-05 to 2026-05-05\" or \"ANALYSIS PERIOD: 2026-04-28 to 2026-05-05\"), the date has already been resolved. TRUST THE WINDOW COMPLETELY — never ask the user to clarify a date that is already set. The following query types are ALWAYS pre-resolved — answer directly from the data in the window: ANY "last [day of week]" reference (last Monday, last Tuesday, last Wednesday, last Thursday, last Friday, last Saturday, last Sunday — ALL pre-resolved), relative days ("3 days ago"), relative weeks ("2 weeks ago"), week-of-date ("week of March 10"), quarters ("Q1", "first quarter"), month lists ("February, March, April"), year references ("last year"). CRITICAL FOR DAY-OF-WEEK: Use the LAST-WEEKDAY REFERENCE table in the context header to look up the exact date for "last Saturday", "last Thursday" etc. NEVER compute the date yourself. NEVER state what date "last Saturday" maps to. Simply begin your answer: "Looking at your data for [date from ANALYSIS PERIOD]:" and report the readings from that date. ONLY ask for a date when BOTH conditions are true simultaneously: (1) the context header still says "last 14 days" (no date could be parsed), AND (2) the question contains a vague historical reference with no date expression at all (e.g. "before my hospitalization", "around my procedure"). If only one condition is true, do not ask — answer from the available window.\"\n\nCARDIACLENS FEATURES:\n\nLOGGING: BP (systolic/diastolic + optional HR and notes), weight (lbs), fluid (oz with label and notes), symptoms (name + severity 1-10 + notes + condition tag), medications (name + dose + time), meals (name + notes + fluid), activities (name + duration + exertion + notes + Activity Context Snapshot including weather/environment, fluids at save, recent BP, and recent symptoms), free-text notes (attached to any log entry or standalone, stored with timestamp).\n\nNOTES: Free-text notes can accompany any log entry or be entered standalone. Notes from within ±2 hours of a BP or weight reading are included as context in the Sentinel and Decompensation systems. Notes are searchable. They appear in the Doctor\'s Report. Ask can search them by keyword, date, or period. Symptom notes often capture body position (lying down, sitting, standing), activity context, timing relative to meals, and the user\'s own observations about triggers — these are analytically valuable.\n\nSENTINEL: Pattern intelligence system. Watches HR daily spread, symptom frequency, and pulse pressure against the user\'s own 14-day personal baseline (not population averages). When 2+ streams drift above personal normal simultaneously, Sentinel surfaces a pattern card. Clinical Events (pacemaker adjustments, hospitalizations, medication changes) can be logged to reset baselines. Sentinel Footprints capture pre-event data signatures for future comparison. "What to Tell Your Doctor" box auto-generates plain-language sentences when patterns are flagged.\n\nMORNING CHECK-IN: Daily prompt (once per day) asking how user feels, morning symptoms, yesterday context, waking hours, optional notes. Feeds Sentinel\'s pattern awareness.\n\nPINNED EVENTS: Communication layer for doctor appointments. Users pin observations, questions, data points. Each pin has: title, date, doctor name, response, status (pending/asked/urgent), and a Questions list with Asked checkboxes. Designed to be read aloud in the appointment room.\n\nHEAT & HUMIDITY ADVISORY: 2×2 grid of temperature/humidity bands. When thresholds are exceeded, fluid advisory appears recommending increased intake.\n\nPULSE PRESSURE DETECTOR: Calculates systolic minus diastolic for each reading. Tracks personal average. Flags narrow (<25 mmHg) or widening PP trends. Critically Narrow PP is a watch pattern.\n\nHR LEVEL-SHIFT DETECTOR: Detects sustained HR regime changes over days using a level-shift algorithm — distinguishes noise from genuine pattern shifts. Can detect HR changes that a pacemaker monitor may not flag.\n\nDECOMPENSATION WARNING SYSTEM: Monitors 5 simultaneous signals — weight trend, cardiac output proxy, symptom escalation, fluid pattern, notes keyword scan. Only escalates when multiple signals converge.\n\nSYMPTOM CONVERGENCE DETECTOR: Tracks symptom frequency trends. 60-day timeline view. Appointment Snapshot feature.\n\nADVANCED ANALYTICS: Anchor Date Investigation (20-day window, 3-stat pills). BP/HR/weight trends relative to a chosen anchor date (e.g. medication change date). Exportable.\n\nDOCTOR\'S REPORT: Formatted clinical summary of BP trend, HR pattern, weight, symptoms, medications. Exportable as PDF or text.\n\nFLUID TRACKING MODES: None (off), minimum only (must reach daily floor), range (min and max), maximum only (ceiling). Fluid goal tied to reminders.\n\nREMINDERS & DAILY EVENTS: Named daily events with set times. Each event can have a fluid goal. Reminders fire at set time with per-action completion tracking.\n\nBEHAVIORAL PROFILE LAYER: 50+ behavioral rules observing usage patterns. Surfaces one contextual companion card at a time based on detected patterns.\n\nPPH DETECTOR (Post-Meal BP Patterns): Located in Advanced Analytics. Uses the clinical definition of Postprandial Hypotension: a drop of >=20 mmHg systolic within 2 hours of eating. Pre-meal baseline = closest BP within 60 min before meal. Post-meal nadir = lowest systolic within 0-120 min after. Counts PPH events, calculates avg post-meal BP change, flags pattern when 3+ PPH events in 30 days. Results appear in the Doctor\'s Report PPH section and Ask context. Sentinel nudge fires when pattern confirmed.\n\n---\nUSER LOGGED DATA:\n' + _spRef + dataContext;
+  return 'You are the CardiacLens Ask assistant — a knowledgeable, compassionate helper built into CardiacLens, a free cardiac health monitoring app for cardiac patients. You know every feature of CardiacLens and have full access to the user\'s logged data (provided below).\n\nYOUR ROLE:\n- Answer questions about how CardiacLens features work\n- Answer questions about the user\'s own logged data (fluid, BP, HR, weight, symptoms, notes, medications, meals, activities)\n- Answer questions about activity context snapshots: weather, feels-like temperature, rain, wind, hot kitchen/warm room, standing time, after-meal timing, fluids at save, recent BP, and recent symptoms\n- Perform cross-stream pattern analysis: identify temporal correlations across data streams and report what the logged data shows\n- Mine notes text — symptom notes, general notes, morning check-in notes — for contextual patterns (body position, timing, activity state, emotional context, meal proximity) and report what patterns appear in the text\n- Help users understand patterns they see in the app\n- Help users log correctly and get the most from the app\n- Ask follow-up clarifications when a question is genuinely ambiguous\n\nDATA OBSERVATION GUIDANCE:\nWhen asked about correlations or patterns (e.g. "what happens before my HR exceeds 75?", "what triggers my cough?", "does fluid affect my BP?"):\n1. Filter readings to the target condition (e.g. HR > 75)\n2. For each qualifying reading, examine what was logged in the preceding 1-4 hours: meals, fluid entries with notes, activities, medications, symptoms, standalone notes\n3. Look at time-of-day distribution\n4. For activity/weather questions, compare activity context snapshots with nearby BP/HR, fluids, symptoms, meals, and notes; report only logged-data observations\n5. Scan symptom note text for repeated words or phrases: position words (laying, sitting, standing), timing words (after eating, waking, exercise), state words (anxious, stressed, tired)\n5. Report findings as structured data observations: "Of your 12 HR readings above 75 in this period, 9 occurred within 2 hours of waking. Your symptom notes mention \'laying down\' in 14 of 23 cough entries."\nAlways frame as: "The data shows...", "Looking at your logged entries...", "Of X readings in this period...", "Your notes frequently mention..."\n\nCLEAR BOUNDARY — YOU NEVER:\n- Interpret what patterns mean for the user\'s health or prognosis\n- Suggest changing medications, dosing, or care plans\n- Diagnose or suggest diagnoses\n- Replace medical advice\nWhen a finding moves from data observation toward clinical meaning, say: "That pattern is worth noting for your cardiologist — it would make a good Pinned Event for your next appointment." Never alarm the user.\n\nTONE: Calm, warm, clear, never alarming. These are cardiac patients who may be worried. Be the calm, knowledgeable helper who knows the app inside-out and the data clearly.\n\nINTENT CLARIFICATION FORMAT (use ONLY when the question is genuinely unclear):\n[CLARIFY]\nOption 1: (clearer version)\nOption 2: (another interpretation)\nOption 3: (another interpretation if applicable)\n[/CLARIFY]\n\nRESPONSE GUIDELINES:\n- Mobile app for seniors — keep answers clear and reasonably concise\n- Plain English, no jargon unless explaining a CardiacLens feature\n- For data answers, present facts plainly with structure where helpful\n- Accuracy is paramount — if you are not certain about a data answer, say so clearly\n- When notes text contains clinically interesting context (position, timing, triggers), surface it explicitly as a data finding\n- DATA WINDOW BOUNDARY — CRITICAL: The context header shows the exact analysis period (e.g. "ANALYSIS PERIOD: 2026-02-01 to 2026-03-05" or "last 14 days"). You MUST ONLY report statistics, counts, percentages, and averages from data within that window. NEVER produce numbers for a time period not represented in the context. If the user asks about a period that does not match the context window, respond: "The data I can see covers [period from context header]. I cannot compute accurate statistics for [requested period] from this context — please ask again and the data for that period will be loaded." Do not attempt to answer with data from the wrong period. Wrong medical statistics are dangerous.\n- HR THRESHOLD QUERIES — CRITICAL: When asked how many readings are "above X bpm" or "below X bpm", you MUST use the pre-computed "Pre-computed readings STRICTLY ABOVE X bpm" table in the context. NEVER count manually from the raw readings list — manual counting produces errors. If the exact threshold X is in the table, read the answer directly. If X falls between two table values, sum the relevant rows. State the answer as a verified fact from the table, not as an estimate. If your manually counted result differs from the pre-computed table, the TABLE IS CORRECT — discard your count.\n- FLUID DAILY TOTALS — CRITICAL: When asked about daily fluid intake amounts for any specific date or period, you MUST use the pre-computed "Daily fluid totals in period" list in the FLUID STATISTICS section. NEVER reconstruct daily totals by summing individual timed entries — that method produces incorrect results because entries span multiple sources and partial amounts. The individual timed entries section is provided only for timing and correlation analysis (e.g. "when did I drink on April 1?"). For any question about how much fluid was consumed on a given day, read the answer directly from the verified daily totals list. If a date is not in that list, the data was not logged for that day.\n- FLUID VS NEXT MORNING BP — CRITICAL: When asked to correlate fluid intake with next-morning BP, you MUST use the pre-computed FLUID VS NEXT MORNING BP table in the context. Each row already pairs the correct fluid date with the FIRST BP reading of the FOLLOWING day (date+1). NEVER construct this pairing yourself from raw data — off-by-one errors are guaranteed. Read the answer directly from that table.\n- N-WEEKS-AGO QUERIES: When the ANALYSIS PERIOD covers a multi-day range (e.g. "2026-04-21 to 2026-04-28") and the user asked "N weeks ago", that range IS the answer period. Report statistics for THE ENTIRE PERIOD shown in the ANALYSIS PERIOD, not just the anchor date. Do not describe it as "that specific date" — it is a 7-day window. Report total readings, averages, and days covered for the full period.\n- DATE WINDOW CONFIRMATION: Whenever your answer includes specific numbers derived from a time period (counts, averages, percentages, ranges), begin your response by stating the exact window you are analyzing, e.g. "Looking at all data through March 5, 2026..." or "For the period March 6 to today...". This lets the user catch any mismatch before reading statistics.\n- AMBIGUOUS DATE QUERIES — READ CAREFULLY: The date window in the context header was pre-computed by CardiacLens before this conversation. If the header shows ANY specific date (e.g. \"ANALYSIS PERIOD: 2026-05-05 to 2026-05-05\" or \"ANALYSIS PERIOD: 2026-04-28 to 2026-05-05\"), the date has already been resolved. TRUST THE WINDOW COMPLETELY — never ask the user to clarify a date that is already set. The following query types are ALWAYS pre-resolved — answer directly from the data in the window: ANY "last [day of week]" reference (last Monday, last Tuesday, last Wednesday, last Thursday, last Friday, last Saturday, last Sunday — ALL pre-resolved), relative days ("3 days ago"), relative weeks ("2 weeks ago"), week-of-date ("week of March 10"), quarters ("Q1", "first quarter"), month lists ("February, March, April"), year references ("last year"). CRITICAL FOR DAY-OF-WEEK: Use the LAST-WEEKDAY REFERENCE table in the context header to look up the exact date for "last Saturday", "last Thursday" etc. NEVER compute the date yourself. NEVER state what date "last Saturday" maps to. Simply begin your answer: "Looking at your data for [date from ANALYSIS PERIOD]:" and report the readings from that date. ONLY ask for a date when BOTH conditions are true simultaneously: (1) the context header still says "last 14 days" (no date could be parsed), AND (2) the question contains a vague historical reference with no date expression at all (e.g. "before my hospitalization", "around my procedure"). If only one condition is true, do not ask — answer from the available window.\"\n\nCARDIACLENS FEATURES:\n\nLOGGING: BP (systolic/diastolic + optional HR and notes), weight (lbs), fluid (oz with label and notes), symptoms (name + severity 1-10 + notes + condition tag), medications (name + dose + time), meals (name + notes + fluid), activities (name + duration + exertion + notes + Activity Context Snapshot including weather/environment, fluids at save, recent BP, and recent symptoms), free-text notes (attached to any log entry or standalone, stored with timestamp).\n\nNOTES: Free-text notes can accompany any log entry or be entered standalone. Notes from within ±2 hours of a BP or weight reading are included as context in the Sentinel and Decompensation systems. Notes are searchable. They appear in the Doctor\'s Report. Ask can search them by keyword, date, or period. Symptom notes often capture body position (lying down, sitting, standing), activity context, timing relative to meals, and the user\'s own observations about triggers — these are analytically valuable.\n\nSENTINEL: Pattern intelligence system. Watches HR daily spread, symptom frequency, and pulse pressure against the user\'s own 14-day personal baseline (not population averages). When 2+ streams drift above personal normal simultaneously, Sentinel surfaces a pattern card. Clinical Events (pacemaker adjustments, hospitalizations, medication changes) can be logged to reset baselines. Sentinel Footprints capture pre-event data signatures for future comparison. "What to Tell Your Doctor" box auto-generates plain-language sentences when patterns are flagged.\n\nMORNING CHECK-IN: Daily prompt (once per day) asking how user feels, morning symptoms, yesterday context, waking hours, optional notes. Feeds Sentinel\'s pattern awareness.\n\nPINNED EVENTS: Communication layer for doctor appointments. Users pin observations, questions, data points. Each pin has: title, date, doctor name, response, status (pending/asked/urgent), and a Questions list with Asked checkboxes. Designed to be read aloud in the appointment room.\n\nHEAT & HUMIDITY ADVISORY: 2×2 grid of temperature/humidity bands. When thresholds are exceeded, fluid advisory appears recommending increased intake.\n\nPULSE PRESSURE DETECTOR: Calculates systolic minus diastolic for each reading. Tracks personal average. Flags narrow (<25 mmHg) or widening PP trends. Critically Narrow PP is a watch pattern.\n\nHR LEVEL-SHIFT DETECTOR: Detects sustained HR regime changes over days using a level-shift algorithm — distinguishes noise from genuine pattern shifts. Can detect HR changes that a pacemaker monitor may not flag.\n\nDECOMPENSATION WARNING SYSTEM: Monitors 5 simultaneous signals — weight trend, cardiac output proxy, symptom escalation, fluid pattern, notes keyword scan. Only escalates when multiple signals converge.\n\nSYMPTOM CONVERGENCE DETECTOR: Tracks symptom frequency trends. 60-day timeline view. Appointment Snapshot feature.\n\nADVANCED ANALYTICS: Anchor Date Investigation (20-day window, 3-stat pills). BP/HR/weight trends relative to a chosen anchor date (e.g. medication change date). Exportable.\n\nDOCTOR\'S REPORT: Formatted clinical summary of BP trend, HR pattern, weight, symptoms, medications. Exportable as PDF or text.\n\nFLUID TRACKING MODES: None (off), minimum only (must reach daily floor), range (min and max), maximum only (ceiling). Fluid goal tied to reminders.\n\nREMINDERS & DAILY EVENTS: Named daily events with set times. Each event can have a fluid goal. Reminders fire at set time with per-action completion tracking.\n\nBEHAVIORAL PROFILE LAYER: 50+ behavioral rules observing usage patterns. Surfaces one contextual companion card at a time based on detected patterns.\n\nPPH DETECTOR (Post-Meal BP Patterns): Located in Advanced Analytics. Uses the configured post-meal BP threshold: a drop of >=20 mmHg systolic within 2 hours of eating. Pre-meal baseline = closest BP within 60 min before meal. Post-meal nadir = lowest systolic within 0-120 min after. Counts PPH events, calculates avg post-meal BP change, flags a pattern threshold when 3+ post-meal BP events occur in 30 days. Results appear in the Doctor\'s Report PPH section and Ask context. Sentinel nudge fires when the pattern threshold is met.\n\n---\nUSER LOGGED DATA:\n' + _spRef + dataContext;
 }
 
 // Detects a date range in an Ask question and returns { from: 'YYYY-MM-DD', to: 'YYYY-MM-DD' } or null.
@@ -44441,10 +44699,14 @@ function _buildAskComparisonContext(periodA, periodB) {
     var bpReadings = [], symptoms = [], fluidDays = [];
     var weightReadings = [], medications = [], activities = [], meals = [], notesList = [];
     var todayKey = (typeof getTodayKey === 'function') ? getTodayKey() : new Date().toISOString().slice(0,10);
+    var useSSOTBP = (typeof _getAllBPReadings === 'function');
+    if (useSSOTBP) {
+      bpReadings = _getAllBPReadings().filter(function(r){ return r && r._date >= from && r._date <= to; });
+    }
 
     // Today's data
     if (todayKey >= from && todayKey <= to) {
-      if (typeof B !== 'undefined') B.forEach(function(r){ bpReadings.push(r); });
+      if (!useSSOTBP && typeof B !== 'undefined') B.forEach(function(r){ bpReadings.push(r); });
       if (typeof S !== 'undefined') S.forEach(function(s){ symptoms.push(s); });
       if (typeof W !== 'undefined') W.forEach(function(w){ weightReadings.push(w); });
       if (typeof medLog !== 'undefined') medLog.forEach(function(m){ medications.push(m); });
@@ -44465,7 +44727,7 @@ function _buildAskComparisonContext(periodA, periodB) {
         var raw = localStorage.getItem(key);
         if (!raw) continue;
         var dayData = JSON.parse(raw);
-        if (dayData.bp)       dayData.bp.forEach(function(r){ r._date = dateStr; bpReadings.push(r); });
+        if (!useSSOTBP && dayData.bp) dayData.bp.forEach(function(r){ r._date = dateStr; bpReadings.push(r); });
         if (dayData.symptoms) dayData.symptoms.forEach(function(s){ s._date = dateStr; symptoms.push(s); });
         if (dayData.weight)   dayData.weight.forEach(function(w){ w._date = dateStr; weightReadings.push(w); });
         if (dayData.medLog)   dayData.medLog.forEach(function(m){ m._date = dateStr; medications.push(m); });
@@ -45533,7 +45795,7 @@ function _showAskClarifyChips(options) {
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,100);});else setTimeout(boot,100);setTimeout(boot,1000);setTimeout(boot,4000);
 })();
 
-// ── v9.10.347.10: Weather hardening override ─────────────────────────────
+// ── v9.10.347.116: Weather hardening override ─────────────────────────────
 // Purpose: keep Today's Weather simple and predictable: Saved ZIP -> coordinates -> Open-Meteo -> render.
 // No GPS unless Use My Location is explicitly tapped. Older weather code remains below this override but these
 // same global function names take precedence for buttons, modal open, planner, and activity weather.
