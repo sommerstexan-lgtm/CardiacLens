@@ -1,7 +1,7 @@
 {
-  "version": "v9.10.347.123",
+  "version": "v9.10.347.125",
   "date": "2026-06-30",
-  "notes": "GitHub upload readiness repair: fixes four-part version comparison, synchronizes all.js/index.html version constants, updates manifest and reset cache repair wording, and preserves the GPS Activity Structure workflow.",
-  "label": "GPSUpdateReadinessRepair",
+  "notes": "Destination save state repair: fixes Log Activity custom destination add flow without rebuilding/resetting the modal, normalizes legacy string destinations, preserves activity/purpose/context state, and keeps GPS transportation pause/resume workflow.",
+  "label": "GPSDestinationStateRepair",
   "updated": "2026-06-30"
 }
