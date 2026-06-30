@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- CardiacLens versioned archive: v9.10.347.116 - deploy reference copy -->
+<!-- CardiacLens versioned archive: v9.10.347.123 - deploy reference copy -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -28,7 +28,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.116' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.123' }, params || {}));
       }
     } catch(e) {}
   };
@@ -910,7 +910,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.347.116';
+    var GD_VERSION   = 'v9.10.347.123';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1447,7 +1447,7 @@
   // -- End CL_SEC_COLOR migration ---------------------------------------------
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
-<title>CardiacLens v9.10.347.116</title>
+<title>CardiacLens v9.10.347.123</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
@@ -2156,7 +2156,7 @@ input[type="time"].modal-input,input[type="time"]{-webkit-appearance:auto;appear
 
 @keyframes askPulse{0%,100%{opacity:0.3}50%{opacity:1}}
 
-/* ── SECURE ACCESS LOCK SCREEN (v9.10.347.116 letter + symbol keypad) ─────────────────────────────── */
+/* ── SECURE ACCESS LOCK SCREEN (v9.10.347.123 letter + symbol keypad) ─────────────────────────────── */
 #clSecureLock{position:fixed;inset:0;z-index:9999999;background:#f0f4f8;display:flex;align-items:flex-start;justify-content:center;padding:16px;padding-top:calc(16px + env(safe-area-inset-top));padding-bottom:calc(16px + env(safe-area-inset-bottom));font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow-y:auto}
 #clSecureLock .cl-lock-inner{width:100%;max-width:430px;display:flex;flex-direction:column;align-items:center;margin:auto}
 #clSecureLock .cl-lock-logo{display:flex;align-items:center;gap:10px;margin-bottom:2px}
@@ -2334,7 +2334,7 @@ input[type="time"].modal-input,input[type="time"]{-webkit-appearance:auto;appear
     <!-- Version + clock row -->
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid rgba(255,255,255,0.15);padding-top:12px">
       <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px">
-        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.347.116 · Medical Grade - Free</span>
+        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.347.123 · Medical Grade - Free</span>
         <span id="cl-gd-heartbeat" style="font-size:11px;color:rgba(125,211,252,0.55);font-weight:500;letter-spacing:0.01em">ð Eyes open...</span>
         <!-- ═══════════════════════════════════════════════════════════════════
              VERSION UPDATE CHECKLIST — update ALL 8 locations every release:
@@ -2535,7 +2535,7 @@ input[type="time"].modal-input,input[type="time"]{-webkit-appearance:auto;appear
                   check and a final READY TO ZIP or DO NOT ZIP summary. That
                   output must be shown to the user before the ZIP is built.
              ═══════════════════════════════════════════════════════════════════ -->
-        <span style="font-size:12px;color:#94a3b8;font-weight:400">Updated June 26, 2026</span>
+        <span style="font-size:12px;color:#94a3b8;font-weight:400">Updated June 30, 2026</span>
       </div>
       <div id="t" style="font-size:14px;color:#94a3b8;text-align:right;font-weight:600"></div>
     </div>
@@ -3271,6 +3271,8 @@ Custom Range
             <li><strong>Indoor</strong> keeps the workflow focused on activity type, BP-before, effort, notes, and time tracking.</li>
             <li><strong>Outdoor</strong> adds today's weather and outside time-window fields.</li>
             <li><strong>Mixed</strong> adds weather, trip/destination context, and journey fields for activities with both indoor and outdoor portions.</li>
+            <li><strong>GPS Distance</strong> may appear for supported Outdoor or Mixed distance activities such as Walking, Cycling, E-bike, Shopping trips, Doctor visits, Church trips, or car travel. GPS starts only when the activity timer starts and stops when the activity is finished, saved, or canceled.</li>
+            <li>For a Mixed errand such as riding an e-bike to HEB, shopping inside, then riding home, leave GPS running from Start to Finish. Stationary indoor time should not add meaningful distance.</li>
             <li>Weather Awareness may appear for Outdoor or Mixed activities when captured conditions deserve attention. It is observational and does not stop you from continuing.</li>
           </ul>
         </div>
@@ -3280,7 +3282,7 @@ Custom Range
           <ol style="margin:10px 0 0 0;padding-left:20px;font-size:14px;color:#065f46;line-height:1.9">
             <li>Tap the <strong>🔍 Deep Dive tile</strong> in Today's Status — set the date range to cover since your last visit. Read the plain English summary at the top, then check the Convergence section for days where multiple concerns appeared together. These are the most important things to discuss.</li>
             <li>Tap <strong>Ask CardiacLens About This Period</strong> at the bottom of Deep Dive — the AI has full context for your selected date range and can help you prepare specific questions for your doctor.</li>
-            <li>Open <strong>Advanced Analytics</strong> — tap <strong>🩺 Doctor's Report</strong> for a formatted clinical summary of BP trends, medication adherence, symptoms, fluid behavior, morning patterns, and <strong>Activity &amp; Cardiac Context</strong>. Activity context helps your doctor quickly see what you were doing, for how long, indoor/outdoor/mixed conditions, weather when captured, fluids, notes, and whether before/after BP was available. It generates immediately for the selected date range (or the last 30 days if none is selected) — no need to run Generate Analysis first.</li>
+            <li>Open <strong>Advanced Analytics</strong> — tap <strong>🩺 Doctor's Report</strong> for a formatted clinical summary of BP trends, medication adherence, symptoms, fluid behavior, morning patterns, and <strong>Activity &amp; Environment Context</strong>. Activity context helps your doctor quickly see what you were doing, for how long, indoor/outdoor/mixed conditions, weather when captured, fluids, notes, and whether before/after BP was available. It generates immediately for the selected date range (or the last 30 days if none is selected) — no need to run Generate Analysis first.</li>
             <li>Review your <strong>📌 Pinned Events</strong> — bring any pinned findings to the appointment. The Pinned Events viewer shows the full context of each finding.</li>
           </ol>
         </div>
@@ -3306,7 +3308,7 @@ Custom Range
             <li>Set your BP target ranges in Settings so the app can color-code readings correctly.</li>
             <li>The Fluid Budget Dashboard lets you allocate your daily fluid goal across events so you pace intake throughout the day.</li>
             <li>Log symptoms with a severity rating — the Doctor's Report uses this to flag high-severity episodes for your cardiologist.</li>
-            <li><strong>Activity Timer:</strong> Use the timer in Log Activity to time workouts in real time. Tap <strong>⏸ Pause</strong> to freeze the clock if interrupted — a PAUSED label confirms it's stopped. Tap <strong>▶ Resume</strong> to continue, then <strong>⏹ Stop &amp; Use</strong> to save the full elapsed time.</li><li><strong>Activity &amp; Cardiac Context in Doctor's Report:</strong> Activities now help show lifestyle demand even when BP was not recorded. The report separates what was done (activity, duration, exertion, indoor/outdoor/mixed context, weather, fluids, notes) from cardiovascular response (before/after BP when available), so doctors can scan significant activity context without treating missing BP as a failed record.</li>
+            <li><strong>Activity Timer:</strong> Use the timer in Log Activity to time workouts in real time. Tap <strong>⏸ Pause</strong> to freeze the clock if interrupted — a PAUSED label confirms it's stopped. Tap <strong>▶ Resume</strong> to continue, then <strong>⏹ Stop &amp; Use</strong> to save the full elapsed time.</li><li><strong>Activity &amp; Environment Context in Doctor's Report:</strong> Activities now help show lifestyle demand even when BP was not recorded. The report separates what was done (activity, duration, exertion, indoor/outdoor/mixed context, weather, fluids, notes) from cardiovascular response (before/after BP when available), so doctors can scan significant activity context without treating missing BP as a failed record.</li>
             <li><strong>HR Rate Detector — Quick Stats:</strong> Open HR Rate Detector and use the Today / 7 Days / 30 Days / All Time buttons to analyse your heart rate trends across any time window. The chart scrolls horizontally for multi-day views and shows date labels so you can pinpoint when patterns occurred.</li>
             <li><strong>What are cards?</strong> Cards are the main sections on your home screen — Blood Pressure, Weight Tracking, Symptom Tracking, Activity, Meals, Medicines Taken, Fluid Intake, HR Rate Detector, and Notes. Each card shows today's data by default. Tap a tile in Today's Status to open its card. Tap <strong>▲ Collapse</strong> to close it again.</li>
             <li><strong>Viewing history for any card:</strong> Each card has a <strong>📋 View History</strong> button in its header. Tap it to see up to 90 days of entries with filters, search, and sort options. Tap <strong>← Back to Today</strong> to return. Only one card shows history at a time.</li>
@@ -4169,7 +4171,7 @@ Custom Range
             <li>Never creates an account, requires login, or tracks your identity</li>
             <li>Never sells, shares, or monetizes your information in any form</li>
             <li>Never displays advertisements</li>
-            <li>Never requires an internet connection to function — works fully offline after first load</li><li>Optional Today's Weather can use either a Saved ZIP Code or current location. The Saved ZIP Code can be set in Settings → Activity & Today's Weather. Current location is only requested when you tap Use My Location or choose Current Location as the Weather Source. Health data is not sent to the weather provider. By default, CardiacLens stores the weather snapshot with the activity, not your coordinates. The home weather line is tappable and opens without requesting location. Outdoor Planner can compare best times or analyze a planned trip using leave-home and return-home times. Planned-trip results translate forecast data into Stay Dry Confidence, Heat Stress, Wind, and an Overall rating. Destination is optional; users may choose Anywhere or add their own destinations.</li>
+            <li>Never requires an internet connection to function — works fully offline after first load</li><li>Optional Today's Weather can use either a Saved ZIP Code or current location. The Saved ZIP Code can be set in Settings → Activity & Today's Weather. Current location is only requested when you tap Use My Location or choose Current Location as the Weather Source. Health data is not sent to the weather provider. By default, CardiacLens stores the weather snapshot with the activity, not your coordinates. The home weather line is tappable and opens without requesting location. Outdoor Planner can compare best times or analyze a planned trip using leave-home and return-home times. Planned-trip results translate forecast data into Stay Dry Confidence, Heat Stress, Wind, and an Overall rating. Destination is optional; users may choose Anywhere or add their own destinations.</li><li>Optional GPS Distance Tracking is separate from weather. It is used only for supported Log Activity sessions when the user enables it. It checks GPS readiness when turned on, then records distance, average speed, max speed, elevation gain/loss when available, GPS point count, and last accuracy after Start Activity. It does not save route points or coordinates in Phase 1 unless the user later chooses that in Settings. If permission or signal is not ready, Log Activity shows Permission Needed, Searching, or Needs Attention with Show Me How and Try Again guidance.</li>
           </ul>
         </div>
 
@@ -4215,7 +4217,7 @@ Custom Range
         </div>
 
         <div style="background:#f3f4f6;border-radius:10px;padding:14px;font-size:13px;color:#6b7280;line-height:1.7">
-          CardiacLens v9.10.347.116 · Free &amp; Source-Available · Built by a cardiac patient, for cardiac patients · cardiaclens.com<br>
+          CardiacLens v9.10.347.123 · Free &amp; Source-Available · Built by a cardiac patient, for cardiac patients · cardiaclens.com<br>
           No ads · No account · No subscription · Your data stays on your device · Always free
         </div>
       </section>
@@ -4374,10 +4376,14 @@ Custom Range
         <p style="font-size:14px;color:#6b7280;margin-bottom:16px">For new features and capabilities, see the <strong>Planned Features</strong> tab.</p>
 
         <div style="background:#ecfdf5;border-left:4px solid #10b981;padding:14px 16px;border-radius:8px;margin-bottom:12px">
-          <strong style="font-size:16px">✅ Stable in v9.10.347.116 &mdash; June 26, 2026</strong>
+          <strong style="font-size:16px">✅ Stable in v9.10.347.123 &mdash; June 30, 2026</strong>
+          <ul style="margin:8px 0 0 20px;line-height:1.5">
+            <li><strong>GPS readiness help.</strong> Log Activity now checks GPS permission/readiness when the GPS distance option is turned on, shows clear Ready/Searching/Permission Needed states, and provides Show Me How/Try Again guidance for iPhone/Safari location settings.</li>
+            <li><strong>Log Activity clarity.</strong> Activity Type and purpose drive the recommended Environment Context, while GPS remains limited to supported outdoor or mixed distance activities.</li>
+          </ul>
           <ul style="font-size:14px;margin:6px 0 0 0;padding-left:18px;color:#064e3b;line-height:1.8">
-            <li><strong>Cardiac Context v1.0 locked for activity testing.</strong> Activity logging supports Indoor, Outdoor, and Mixed context, saves weather/environment, fluid total, recent BP/HR when available, Activity History context details, Ask About Activity, and Analysis Completeness. v347.10 updates Ask guidance so activity answers treat weather/environment as part of the saved Cardiac Context Snapshot instead of claiming there is no weather-impact field.</li>
-            <li><strong>iOS update safety.</strong> Service-worker registration continues to use the iOS-compatible <code>./sw.js</code> URL with <code>updateViaCache:'none'</code>; the cache name was bumped to v9.10.347.116 so GitHub/iPhone installs do not keep serving an older shell.</li>
+            <li><strong>Environment Context v1.0 locked for activity testing.</strong> Activity logging supports Indoor, Outdoor, and Mixed context, saves weather/environment, fluid total, recent BP/HR when available, Activity History context details, Ask About Activity, and Analysis Completeness. Earlier environment-context work updated Ask guidance so activity answers treat weather/environment as part of the saved Environment Context Snapshot instead of claiming there is no weather-impact field.</li>
+            <li><strong>iOS update safety.</strong> Service-worker registration continues to use the iOS-compatible <code>./sw.js</code> URL with <code>updateViaCache:'none'</code>; the cache name was bumped to v9.10.347.123 so GitHub/iPhone installs do not keep serving an older shell.</li>
           </ul>
         </div>
 
@@ -7035,7 +7041,7 @@ Custom Range
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.347.116';
+  var CURRENT='v9.10.347.123';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -7573,13 +7579,17 @@ notes:true
 dailyEvents:[],
 customActivities:[], // User-defined custom physical activities
 securityProfile:null, // Secure Access mirror for update persistence
-// Activity / Today's Weather settings (v9.10.347.116)
+// Activity / Today's Weather settings (v9.10.347.123)
 activityWeatherMode:'manual', // off | manual | internet
 activityWeatherStoreSnapshot:true,
 activityWeatherRainThresholdPct:40,
 activityWeatherDefaultWindowMin:30,
 activityWeatherAskOnOutdoor:true,
 activityWeatherStoreCoordinates:false,
+activityGpsMode:'ask', // off | ask | auto
+activityGpsRememberChoice:true,
+activityGpsStoreCoordinates:false,
+activityGpsPreferences:{},
 todayWeatherPillEnabled:true,
 todayWeatherCacheMinutes:20,
 todayWeatherSource:'zip',
@@ -13409,6 +13419,11 @@ var defaultActivityTypes=[
 'E-bike',
 'Swimming',
 'Yoga',
+'Treadmill',
+'Stationary Bike',
+'Elliptical',
+'Rowing Machine',
+'Stretching / Yoga',
 'Weight Training',
 'Sports',
 'Yard Work',
@@ -13418,6 +13433,7 @@ var defaultActivityTypes=[
 'Shopping',
 'Doctor Visit',
 'Church',
+'Car Travel',
 'Manual Work',
 'Other'
 ];
@@ -13432,20 +13448,9 @@ types=types.concat(settings.customActivities);
 return types;
 }
 
-// Activity Type options are filtered by the user-selected Cardiac Context.
-// Custom activities remain available in every context because CardiacLens cannot safely infer user intent from custom names.
+// v9.10.347.123 KISS: users choose activity/purpose first; CardiacLens highlights the recommended context, then allows plausible override.
 function getActivityTypesForContext(ctx){
-ctx=(ctx||'').toLowerCase();
-var map={
-  indoor:['Yoga','Weight Training','Cooking','House Cleaning','Laundry','Other'],
-  outdoor:['Walking','Running','Cycling','E-bike','Swimming','Sports','Yard Work','Manual Work','Other'],
-  mixed:['Walking','Cycling','E-bike','Shopping','Doctor Visit','Church','Other']
-};
-var types=map[ctx]||[];
-if(settings.customActivities&&settings.customActivities.length>0){
-  types=types.concat(settings.customActivities);
-}
-return types;
+return getActivityTypes();
 }
 function buildActivityOptionsHTML(ctx){
 var html='<option value="">-- Choose Activity --</option>';
@@ -13477,27 +13482,34 @@ var activityTypes=defaultActivityTypes;
 
 var selectedExertion='';
 var selectedTempBand=null;
-// Activity environment/window state (v9.10.347.116)
+// Activity environment/window state (v9.10.347.123)
 var selectedActivityWindow='';
 var selectedActivityWindowMinutes=null;
 var selectedDestination='';
 var selectedEnvironmentalMode='manual';
 var activityEnvironmentSnapshot=null;
-// Today's Weather request guard (v9.10.347.116) — one location/weather request per activity modal/window.
+// Today's Weather request guard (v9.10.347.123) — one location/weather request per activity modal/window.
 // Prevents repeated browser location prompts when Automatic is selected and the user changes fields.
 var activityEnvironmentFetchInFlight=false;
 var activityEnvironmentFetchKey='';
 var activityEnvironmentFetchFailedKey='';
-// Activity context / journey state (v9.10.347.116)
+// Activity context / journey state (v9.10.347.123)
 var selectedActivityContext='';
 var selectedJourneyRole='single';
 var selectedJourneyName='';
 var selectedJourneyId=null;
+var selectedActivityPurpose=''; // exercise | transportation | other
+// GPS distance tracking state (v9.10.347.123)
+var activityGpsSelected=false;
+var activityGpsWatchId=null;
+var activityGpsStartTime=null;
+var activityGpsLastPoint=null;
+var activityGpsMetrics={distanceMiles:0,elevationGainFt:0,elevationLossFt:0,pointCount:0,maxSpeedMph:null,lastAccuracy:null,status:'off',error:'',permissionState:'unknown',readinessChecked:false};
 var activityTimerInterval=null;
 var activityStartTime=null;
 var activityElapsedSeconds=0;
 var activityTimerPaused=false;
-var activityTimerStoppedForSave=false; // v9.10.347.116: Save unlocks only after activity is finished
+var activityTimerStoppedForSave=false; // v9.10.347.123: Save unlocks only after activity is finished
 
 // Background activity state (v9.10.36) — set when user minimizes the activity modal
 var _activityMinimized=false;
@@ -13536,17 +13548,16 @@ if(_activityMinimized && _minimizedActivityState){
   showModal(html);
   return;
 }
-if(!preserveActivityContext)selectedActivityContext='';
+if(!preserveActivityContext){selectedActivityContext='';selectedActivityPurpose='';}
 var html='<div class="modal-title">Log Activity Setup</div>';
-html+=buildActivityContextHTML();
-html+='<div id="activityDetailsAfterContext" style="display:none">';
+html+='<div id="activityDetailsAfterContext" style="display:block">';
 html+='<div id="recentBPCard" style="margin-bottom:12px"></div>';
 
 html+='<div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:12px;margin-bottom:14px">';
 html+='<div style="font-size:13px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">1. What are you doing?</div>';
 html+='<label style="display:block;font-size:18px;font-weight:600;margin-bottom:8px">Activity Type <span style="color:#dc2626">*</span>:</label>';
 html+='<select id="activitySelect" class="modal-input" style="font-size:20px" onchange="handleActivitySelection();updateActivityStartState()">';
-html+=buildActivityOptionsHTML(selectedActivityContext);
+html+=buildActivityOptionsHTML('');
 var customActivities=settings.customActivities||[];
 html+='</select>';
 if(customActivities.length>0){
@@ -13555,6 +13566,8 @@ html+='<button type="button" onclick="openActivityManager()" style="margin-top:8
 html+='<div id="manualWorkDesc" style="display:none;margin-top:12px">';
 html+='<input type="text" id="workDescription" class="modal-input" placeholder="Describe manual work (e.g., gardening, moving boxes)" />';
 html+='</div>';
+html+='<div id="activityPurposeSection" style="display:none">'+buildActivityPurposeHTML()+'</div>';
+html+=buildActivityContextHTML();
 html+='<div id="activityJourneySection" style="display:none">'+buildJourneyHTML()+'</div>';
 html+='<div id="activityWindowSection" style="display:none">'+buildActivityWindowHTML()+'</div>';
 html+='<div id="activityDestinationSection" style="display:none">'+buildDestinationHTML()+'</div>';
@@ -13578,6 +13591,8 @@ html+='<div id="internetEnvironmentStatus" style="display:none;margin-bottom:12p
 html+='<div id="activityWeatherAwareness" style="display:none;margin-bottom:12px"></div>';
 html+=buildTempBandHTML();
 html+='</div>';
+
+html+='<div id="activityGpsSection" style="display:none;background:#eef2ff;border:1px solid #c7d2fe;border-radius:12px;padding:12px;margin-bottom:14px">'+buildActivityGpsHTML()+'</div>';
 
 html+='<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:12px;margin-bottom:14px">';
 html+='<div style="font-size:13px;font-weight:800;color:#9a3412;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">4. Effort and notes</div>';
@@ -13604,7 +13619,7 @@ html+='<div id="timerDisplay" style="display:none;text-align:center;padding:20px
 html+='<div id="timerTime" style="font-size:48px;font-weight:bold;color:#10b981;font-family:monospace">00:00</div>';
 html+='<div id="timerPausedLabel" style="display:none;font-size:13px;font-weight:700;color:#f59e0b;letter-spacing:1px;margin-top:4px">⏸ PAUSED</div>';
 html+='<div style="display:flex;gap:10px;justify-content:center;margin-top:12px">';
-html+='<button type="button" id="timerStartBtn" class="modal-btn" onclick="startActivityTimer()" disabled title="Select Activity Type and Cardiac Context first" style="background:#10b981;color:#fff;opacity:0.45;cursor:not-allowed">▶ Start Activity</button>';
+html+='<button type="button" id="timerStartBtn" class="modal-btn" onclick="startActivityTimer()" disabled title="Select Activity Type, Purpose if shown, and confirm Environment Context" style="background:#10b981;color:#fff;opacity:0.45;cursor:not-allowed">▶ Start Activity</button>';
 html+='<button type="button" id="timerPauseBtn" class="modal-btn" onclick="pauseActivityTimer()" style="background:#f59e0b;color:#fff;display:none">⏸ Pause</button>';
 html+='<button type="button" id="timerResumeBtn" class="modal-btn" onclick="startActivityTimer()" style="background:#10b981;color:#fff;display:none">▶ Resume</button>';
 html+='<button type="button" id="timerStopBtn" class="modal-btn" onclick="stopActivityTimer()" style="background:#ef4444;color:#fff;display:none">⏹ Finish Activity</button>';
@@ -13635,6 +13650,19 @@ select.value=''; // Reset selection
 return;
 }
 activityName=activityName.trim();
+var destAdvice=_customActivityDestinationAdvice(activityName);
+if(destAdvice){
+  var move=confirm(destAdvice+'\n\nPress OK to move this to Destination and choose an activity instead.\nPress Cancel to keep it as a custom Activity.');
+  if(move){
+    if(!settings.activityDestinations)settings.activityDestinations=[];
+    if(settings.activityDestinations.indexOf(activityName)===-1){settings.activityDestinations.push(activityName);localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}
+    selectedDestination=activityName;
+    select.value='';
+    alert('Saved as destination: '+activityName+'\n\nNow choose what you are doing, such as E-bike, Walking, Car Travel, Shopping, or Doctor Visit.');
+    updateActivityStartState();
+    return;
+  }
+}
 // Check if already exists
 if(!settings.customActivities)settings.customActivities=[];
 if(defaultActivityTypes.includes(activityName)){
@@ -13662,51 +13690,195 @@ if(desc)desc.style.display='block';
 }else{
 if(desc)desc.style.display='none';
 }
-// Activity context is intentionally chosen by the user; Indoor / Outdoor / Mixed controls which sections appear.
+// v9.10.347.123: Activity Type comes first; purpose next when needed; then CardiacLens suggests context.
+if(!_activityNeedsPurpose(select.value)){selectedActivityPurpose='';}
+selectedActivityContext='';
+updateActivityPurposeSection();
+suggestActivityContextFromCurrentSelection();
 renderActivityContextButtons();
+updateActivityGpsSection();
 updateActivitySectionsForContext();
 updateActivityStartState();
 }
 
-function getDefaultActivityContext(activity){
-  activity=(activity||'').toLowerCase();
-  if(activity.indexOf('cooking')>=0||activity.indexOf('clean')>=0||activity.indexOf('laundry')>=0||activity.indexOf('yoga')>=0||activity.indexOf('weight')>=0||activity.indexOf('indoor')>=0)return 'indoor';
-  if(activity.indexOf('doctor')>=0||activity.indexOf('church')>=0||activity.indexOf('store')>=0||activity.indexOf('shop')>=0||activity.indexOf('restaurant')>=0||activity.indexOf('visit')>=0)return 'mixed';
-  if(activity.indexOf('walk')>=0||activity.indexOf('run')>=0||activity.indexOf('cycling')>=0||activity.indexOf('e-bike')>=0||activity.indexOf('yard')>=0||activity.indexOf('manual')>=0||activity.indexOf('sports')>=0)return 'outdoor';
-  return selectedActivityContext||'';
+function _customActivityDestinationAdvice(name){
+  var n=(name||'').trim().toLowerCase();
+  if(!n)return '';
+  var known=['heb','walmart','kroger','aldi','cvs','walgreens','pharmacy','clinic','hospital','doctor','church','home','work','office','restaurant','mcdonald','sonic','dollar general','dollar tree','target','lowes','home depot','post office','bank'];
+  for(var i=0;i<known.length;i++){if(n===known[i]||n.indexOf(known[i])>=0)return '“'+name+'” looks like a destination, not an activity. Activity means what you are doing. Destination means where you are going.';}
+  if(/^(dr\.?|doctor|heb|cvs|walgreens|walmart)/i.test(name))return '“'+name+'” looks like a destination, not an activity. Activity means what you are doing. Destination means where you are going.';
+  return '';
 }
-function buildActivityContextHTML(){
-  var h='<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin:12px 0">';
-  h+='<div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:8px">❤️ Cardiac Context <span style="color:#dc2626">*</span></div>';
-  h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">';
-  [['indoor','Indoor'],['outdoor','Outdoor'],['mixed','Mixed']].forEach(function(x){
-    h+='<button type="button" id="actCtx_'+x[0]+'" onclick="selectActivityContext(\''+x[0]+'\')" style="border:2px solid #cbd5e1;background:#fff;color:#0f172a;border-radius:8px;padding:10px 6px;font-size:14px;font-weight:700;cursor:pointer">'+x[1]+'</button>';
-  });
+function _activityPrereqsMet(){
+  var sel=document.getElementById('activitySelect');
+  if(!sel||!sel.value||sel.value==='__ADD_NEW__')return false;
+  if(_activityNeedsPurpose(sel.value)&&!selectedActivityPurpose)return false;
+  return true;
+}
+function _activityNeedsPurpose(activity){
+  activity=(activity||'').toLowerCase();
+  return activity==='e-bike'||activity==='cycling'||activity==='car travel';
+}
+function buildActivityPurposeHTML(){
+  var h='<div style="background:#eef6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px;margin:12px 0">';
+  h+='<div style="font-size:14px;font-weight:800;color:#1e40af;margin-bottom:8px">Purpose for this activity</div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  h+='<button type="button" id="actPurpose_exercise" onclick="selectActivityPurpose(&quot;exercise&quot;)" style="border:2px solid #cbd5e1;background:#fff;color:#0f172a;border-radius:8px;padding:10px 6px;font-size:14px;font-weight:700;cursor:pointer">Exercise / recreation</button>';
+  h+='<button type="button" id="actPurpose_transportation" onclick="selectActivityPurpose(&quot;transportation&quot;)" style="border:2px solid #cbd5e1;background:#fff;color:#0f172a;border-radius:8px;padding:10px 6px;font-size:14px;font-weight:700;cursor:pointer">Transportation / errands</button>';
   h+='</div>';
-  h+='<div style="font-size:12px;color:#64748b;margin-top:6px">Choose one to open only the sections that apply. Indoor hides outdoor/trip fields. Outdoor adds weather/window. Mixed adds weather, trip, and destination.</div>';
+  h+='<div style="font-size:12px;color:#475569;margin-top:6px;line-height:1.45">Transportation usually means Mixed Environment because plans can change, stops happen, and you may go inside before traveling again.</div>';
   h+='</div>';
   return h;
 }
-function selectActivityContext(ctx){
-  selectedActivityContext=ctx;
+function updateActivityPurposeSection(){
+  var sel=document.getElementById('activitySelect');
+  var sec=document.getElementById('activityPurposeSection');
+  if(!sec||!sel)return;
+  if(_activityNeedsPurpose(sel.value)){sec.style.display='block';if(!selectedActivityPurpose)selectedActivityContext='';}
+  else{sec.style.display='none';selectedActivityPurpose='';}
+  renderActivityPurposeButtons();
+}
+function selectActivityPurpose(purpose){
+  selectedActivityPurpose=purpose||'';
+  renderActivityPurposeButtons();
+  suggestActivityContextFromCurrentSelection(true);
   renderActivityContextButtons();
-  refreshActivityOptionsForContext();
+  updateActivitySectionsForContext();
+  updateActivityStartState();
+}
+function renderActivityPurposeButtons(){
+  ['exercise','transportation'].forEach(function(p){var b=document.getElementById('actPurpose_'+p);if(!b)return;b.style.borderColor=(selectedActivityPurpose===p?'#0369a1':'#cbd5e1');b.style.background=(selectedActivityPurpose===p?'#dbeafe':'#fff');});
+}
+function suggestActivityContextFromCurrentSelection(force){
+  var sel=document.getElementById('activitySelect');
+  var activity=sel?sel.value:'';
+  if(!activity||activity==='__ADD_NEW__')return;
+  var ready=_activityPrereqsMet();
+  var suggested=ready?getDefaultActivityContext(activity):'';
+  if(suggested && (!selectedActivityContext||force)){selectedActivityContext=suggested;}
+  var note=document.getElementById('activityContextSuggestion');
+  if(note){
+    if(!ready){
+      note.innerHTML=_activityNeedsPurpose(activity)?'Choose the activity purpose next. CardiacLens will then recommend the most likely context.':'Select an activity type first. CardiacLens will recommend the most likely context.';
+    }else{
+      var label=suggested?_activityContextLabel(suggested):'choose one';
+      var reason=_activityContextReason(activity,suggested);
+      note.innerHTML='<strong>CardiacLens recommends: '+label+'</strong>'+reason+'<div style="margin-top:4px;color:#64748b">The highlighted option is the recommended context. You can change it if today is different.</div>';
+    }
+  }
+}
+function getDefaultActivityContext(activity){
+  activity=(activity||'').toLowerCase();
+  if(activity.indexOf('cooking')>=0||activity.indexOf('clean')>=0||activity.indexOf('laundry')>=0||activity.indexOf('yoga')>=0||activity.indexOf('treadmill')>=0||activity.indexOf('stationary')>=0||activity.indexOf('elliptical')>=0||activity.indexOf('rowing machine')>=0||activity.indexOf('weight')>=0||activity.indexOf('stretch')>=0||activity.indexOf('indoor')>=0)return 'indoor';
+  if(activity.indexOf('doctor')>=0||activity.indexOf('church')>=0||activity.indexOf('store')>=0||activity.indexOf('shop')>=0||activity.indexOf('restaurant')>=0||activity.indexOf('visit')>=0)return 'mixed';
+  if(activity==='car travel')return 'mixed';
+  if(activity==='e-bike'||activity==='cycling')return selectedActivityPurpose==='transportation'?'mixed':(selectedActivityPurpose==='exercise'?'outdoor':'');
+  if(activity.indexOf('walk')>=0||activity.indexOf('run')>=0||activity.indexOf('yard')>=0||activity.indexOf('manual')>=0||activity.indexOf('sports')>=0||activity.indexOf('swim')>=0)return 'outdoor';
+  return selectedActivityContext||'';
+}
+function _activityContextReason(activity,suggested){
+  activity=(activity||'').toLowerCase();
+  if(!suggested)return '';
+  if((activity==='e-bike'||activity==='cycling')&&selectedActivityPurpose==='transportation'){
+    return '<div style="margin-top:4px;color:#334155">Reason: transportation/errands may include outdoor travel, indoor destination time, stops, weather exposure, and plan changes. This recommends the environment context, not the whole activity structure.</div>';
+  }
+  if((activity==='e-bike'||activity==='cycling')&&selectedActivityPurpose==='exercise'){
+    return '<div style="margin-top:4px;color:#334155">Reason: exercise/recreation cycling is usually a continuous outdoor activity.</div>';
+  }
+  if(suggested==='indoor')return '<div style="margin-top:4px;color:#334155">Reason: this activity is usually done indoors, so GPS/weather/trip fields usually are not needed.</div>';
+  if(suggested==='outdoor')return '<div style="margin-top:4px;color:#334155">Reason: this activity is usually done outside, where weather and outdoor window context may matter.</div>';
+  if(suggested==='mixed')return '<div style="margin-top:4px;color:#334155">Reason: this activity commonly includes both indoor and outdoor exposure. Trip structure is handled separately below.</div>';
+  return '';
+}
+function _activityContextLabel(c){
+  c=(c||'').toLowerCase();
+  if(c==='indoor')return 'Indoor';
+  if(c==='outdoor')return 'Outdoor';
+  if(c==='mixed')return 'Mixed Environment';
+  return c?c.charAt(0).toUpperCase()+c.slice(1):'';
+}
+function _activityStructureSuggestion(){
+  var sel=document.getElementById('activitySelect');
+  var activity=(sel?sel.value:'').toLowerCase();
+  if(selectedActivityPurpose==='transportation'||activity==='car travel')return 'Transportation with possible stops';
+  return 'Continuous activity';
+}
+function buildActivityContextHTML(){
+  var h='<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin:12px 0">';
+  h+='<div style="font-size:14px;font-weight:800;color:#374151;margin-bottom:8px">❤️ CardiacLens Environment Recommendation <span style="color:#dc2626">*</span></div>';
+  h+='<div id="activityContextSuggestion" style="font-size:13px;color:#475569;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:8px;margin-bottom:8px">Select an activity type first. CardiacLens will recommend the most likely context.</div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">';
+  [['indoor','Indoor'],['outdoor','Outdoor'],['mixed','Mixed Environment']].forEach(function(x){
+    h+='<button type="button" id="actCtx_'+x[0]+'" onclick="selectActivityContext(&quot;'+x[0]+'&quot;)" disabled style="border:2px solid #cbd5e1;background:#f1f5f9;color:#94a3b8;border-radius:8px;padding:10px 6px;font-size:14px;font-weight:700;cursor:not-allowed">'+x[1]+'</button>';
+  });
+  h+='</div>';
+  h+='<div style="font-size:12px;color:#64748b;margin-top:6px">Highlighted = recommended. This is environment context only: Indoor, Outdoor, or Mixed Environment (indoor + outdoor exposure). Trip flow is handled separately below.</div>';
+  h+='</div>';
+  return h;
+}
+function _activityContextMismatchMessage(chosen,suggested){
+  var sel=document.getElementById('activitySelect');
+  var act=sel?sel.value:'this activity';
+  if(!chosen||!suggested||chosen===suggested)return '';
+  if(chosen==='indoor'&&(suggested==='outdoor'||suggested==='mixed'))return act+' is usually not Indoor. Outdoor or Mixed Environment keeps weather, GPS, destination, and travel context available when appropriate.';
+  if(chosen==='outdoor'&&suggested==='mixed')return act+' with transportation/errands is usually Mixed Environment because plans can change, stops happen, and you may go inside before traveling again.';
+  if(chosen==='mixed'&&suggested==='indoor')return act+' is usually Indoor. Mixed Environment may add trip, destination, weather, and GPS fields that may not apply.';
+  return act+' usually fits '+_activityContextLabel(suggested)+'.';
+}
+function selectActivityContext(ctx){
+  if(!_activityPrereqsMet()){
+    _showInlineError('⚠️ Choose Activity Type first. If CardiacLens asks for purpose, choose that next. Then review the suggested Environment Context.');
+    renderActivityContextButtons();
+    updateActivityStartState();
+    return;
+  }
+  var suggested=getDefaultActivityContext((document.getElementById('activitySelect')||{}).value||'');
+  if(suggested&&ctx!==suggested){
+    var msg=_activityContextMismatchMessage(ctx,suggested);
+    if(msg&&!confirm(msg+'\n\nUse '+_activityContextLabel(suggested)+' instead?\n\nOK = use suggested context. Cancel = keep my selection.')){
+      selectedActivityContext=ctx;
+    }else if(msg){
+      selectedActivityContext=suggested;
+    }else{
+      selectedActivityContext=ctx;
+    }
+  }else{
+    selectedActivityContext=ctx;
+  }
+  renderActivityContextButtons();
+  suggestActivityContextFromCurrentSelection(false);
   updateActivitySectionsForContext();
   updateActivityStartState();
 }
 function renderActivityContextButtons(){
-  ['indoor','outdoor','mixed'].forEach(function(c){var b=document.getElementById('actCtx_'+c);if(!b)return;b.style.borderColor=(selectedActivityContext===c?'#0369a1':'#cbd5e1');b.style.background=(selectedActivityContext===c?'#e0f2fe':'#fff');});
+  var ready=_activityPrereqsMet();
+  var suggested=ready?getDefaultActivityContext((document.getElementById('activitySelect')||{}).value||''):'';
+  ['indoor','outdoor','mixed'].forEach(function(c){
+    var b=document.getElementById('actCtx_'+c);if(!b)return;
+    var isSelected=(selectedActivityContext===c);
+    var isSuggested=(suggested===c);
+    b.disabled=!ready;
+    b.style.cursor=ready?'pointer':'not-allowed';
+    b.style.color=ready?(isSelected?'#ffffff':'#0f172a'):'#94a3b8';
+    b.style.borderColor=isSelected?'#0369a1':(isSuggested?'#22c55e':'#cbd5e1');
+    b.style.background=isSelected?'#0369a1':(isSuggested?'#dcfce7':(ready?'#fff':'#f1f5f9'));
+    b.style.boxShadow=(isSuggested&&ready)?'0 0 0 3px rgba(34,197,94,.22)':'none';
+    b.innerHTML=_activityContextLabel(c)+(isSuggested?' ✓':'');
+  });
 }
 function updateActivitySectionsForContext(){
   var ctx=selectedActivityContext||'';
   var details=document.getElementById('activityDetailsAfterContext');
-  if(details)details.style.display=ctx?'block':'none';
-  if(ctx&&document.getElementById('recentBPCard'))_showRecentBPCard();
-  var weather=document.getElementById('activityWeatherSection');
+  if(details)details.style.display='block';
+  if(document.getElementById('recentBPCard'))_showRecentBPCard();
+  var gps=document.getElementById('activityGpsSection');
+var weather=document.getElementById('activityWeatherSection');
   var windowSec=document.getElementById('activityWindowSection');
   var dest=document.getElementById('activityDestinationSection');
   var journey=document.getElementById('activityJourneySection');
   if(weather)weather.style.display=(ctx==='outdoor'||ctx==='mixed')?'block':'none';
+if(gps)gps.style.display=_activityGpsAllowed()?'block':'none';
+  updateActivityGpsSection();
   if(windowSec)windowSec.style.display=(ctx==='outdoor'||ctx==='mixed')?'block':'none';
   if(dest)dest.style.display=(ctx==='mixed')?'block':'none';
   if(journey)journey.style.display=(ctx==='mixed')?'block':'none';
@@ -13738,19 +13910,20 @@ function clearActiveJourney(){
 function buildJourneyHTML(){
   var active=_getActiveJourney();
   var h='<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin-bottom:12px">';
-  h+='<div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:6px">🧭 Journey / Trip</div>';
+  h+='<div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:6px">🧭 Activity Structure / Trip Flow</div>';
+  h+='<div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:8px;margin-bottom:8px;font-size:13px;color:#475569;line-height:1.4"><strong>Suggested structure: '+_activityStructureSuggestion()+'</strong><br>Environment Context says where exposure occurs. Activity Structure says whether this is one continuous activity or several saved trip segments.</div>';
   if(active){
-    h+='<div id="activeJourneyNotice" style="background:#eff6ff;border-radius:8px;padding:8px;margin-bottom:8px;font-size:13px;color:#1e40af;font-weight:700">Active journey available: '+active.name+'<br><span style="font-weight:500;color:#475569">Only used if you choose Continue/Return/Complete below.</span><br><button type="button" onclick="clearActiveJourney()" style="margin-top:6px;background:#fff;color:#dc2626;border:1px solid #fecaca;border-radius:6px;padding:5px 8px;font-size:12px;font-weight:700">Clear active journey</button></div>';
+    h+='<div id="activeJourneyNotice" style="background:#eff6ff;border-radius:8px;padding:8px;margin-bottom:8px;font-size:13px;color:#1e40af;font-weight:700">Active multi-part trip available: '+active.name+'<br><span style="font-weight:500;color:#475569">Only used if today is part of a multi-part trip log.</span><br><button type="button" onclick="clearActiveJourney()" style="margin-top:6px;background:#fff;color:#dc2626;border:1px solid #fecaca;border-radius:6px;padding:5px 8px;font-size:12px;font-weight:700">Clear active journey</button></div>';
   }
   h+='<select id="journeyRoleSelect" class="modal-input" onchange="handleJourneyRoleSelection()" style="font-size:16px;margin-bottom:8px">';
-  h+='<option value="single">Single activity / destination only</option>';
-  h+='<option value="outbound">Start new journey — outbound segment</option>';
-  h+='<option value="segment">Continue active journey — middle segment</option>';
-  h+='<option value="return">Continue active journey — return segment</option>';
-  h+='<option value="complete">Complete active journey with this segment</option>';
+  h+='<option value="single">Continuous activity or one destination</option>';
+  h+='<option value="outbound">Start multi-part trip — outbound travel</option>';
+  h+='<option value="segment">Continue multi-part trip — stop or next segment</option>';
+  h+='<option value="return">Continue multi-part trip — return travel</option>';
+  h+='<option value="complete">Finish multi-part trip with this segment</option>';
   h+='</select>';
-  h+='<input type="text" id="journeyNameInput" class="modal-input" placeholder="Journey name only if this is a multi-part trip" oninput="selectedJourneyName=this.value.trim()" />';
-  h+='<div style="font-size:12px;color:#64748b;margin-top:6px">Single activity saves as its own activity. Journey is only for multi-part trips: ride there, appointment, ride home.</div>';
+  h+='<input type="text" id="journeyNameInput" class="modal-input" placeholder="Trip name only if saving several separate segments" oninput="selectedJourneyName=this.value.trim()" />';
+  h+='<div style="font-size:12px;color:#64748b;margin-top:6px">Most transportation errands can stay as one activity from Start to Finish. Use multi-part trip only when you intentionally want separate saved segments such as ride there, appointment, ride home.</div>';
   h+='</div>';
   return h;
 }
@@ -13790,7 +13963,7 @@ function getJourneyFormData(activityName){
 }
 
 
-// Weather settings persistence guard (v9.10.347.116)
+// Weather settings persistence guard (v9.10.347.123)
 var CARDIACLENS_WEATHER_SETTINGS_KEY='CARDIACLENS_WEATHER_SETTINGS';
 function _clMergeDestinations(a,b){
   var out=[],seen={};
@@ -13835,7 +14008,7 @@ function _clWeatherSettingsSnapshot(){
   };}catch(e){return null;}
 }
 function _clSaveWeatherSettingsBackup(){
-  // v9.10.347.116: current saved settings win; backup only fills missing weather fields.
+  // v9.10.347.123: current saved settings win; backup only fills missing weather fields.
   try{
     var snap=_clWeatherSettingsSnapshot(); if(!snap)return;
     var prior=null;
@@ -13857,14 +14030,14 @@ function _clSaveWeatherSettingsBackup(){
   }catch(e){}
 }
 function _clRestoreWeatherSettingsBackup(){
-  // v9.10.347.116: restore defensively. Blank/default backup fields must not erase current settings.
+  // v9.10.347.123: restore defensively. Blank/default backup fields must not erase current settings.
   try{
     var raw=localStorage.getItem(CARDIACLENS_WEATHER_SETTINGS_KEY); if(!raw)return;
     var w=JSON.parse(raw); if(!w||typeof w!=='object')return;
-    var fields=['activityWeatherMode','activityEnvironmentalMode','activityWeatherStoreSnapshot','activityWeatherRainThresholdPct','activityWeatherDefaultWindowMin','activityWeatherAskOnOutdoor','activityWeatherStoreCoordinates','todayWeatherPillEnabled','todayWeatherCacheMinutes','todayWeatherSavedZip','todayWeatherSource','pickupPlannerDefaultDate','activityWindows','activityDestinations'];
+    var fields=['activityWeatherMode','activityEnvironmentalMode','activityWeatherStoreSnapshot','activityWeatherRainThresholdPct','activityWeatherDefaultWindowMin','activityWeatherAskOnOutdoor','activityWeatherStoreCoordinates','todayWeatherPillEnabled','todayWeatherCacheMinutes','todayWeatherSavedZip','todayWeatherSource','pickupPlannerDefaultDate','activityWindows','activityDestinations','activityGpsMode','activityGpsRememberChoice','activityGpsStoreCoordinates','activityGpsPreferences'];
     fields.forEach(function(k){
       if(w[k]===undefined||w[k]===null)return;
-      // v9.10.347.116: current Saved ZIP settings must not be overwritten by older backup values.
+      // v9.10.347.123: current Saved ZIP settings must not be overwritten by older backup values.
       // Backup is only a fill-in source, not the authority when current settings are explicit.
       if(k==='todayWeatherSource'){
         var curSource=settings&&settings.todayWeatherSource;
@@ -13899,15 +14072,15 @@ function _ensureActivityEnvSettings(){
     {label:'Medium — 1 hr',minutes:60},{label:'Long — 2 hr',minutes:120}
   ];}
   if(!settings.activityDestinations){settings.activityDestinations=[];}
-  // v9.10.347.116: remove legacy/test destination presets that were seeded during weather testing.
+  // v9.10.347.123: remove legacy/test destination presets that were seeded during weather testing.
   if(!settings.activityDestinationLegacyCleanupV309){
     var legacyNames={'Doctor':true,'Store':true,'Church':true,'Aggarwala':true,'HEB':true};
     settings.activityDestinations=(settings.activityDestinations||[]).filter(function(d){return d&&d.label&&!legacyNames[d.label];});
     settings.activityDestinationLegacyCleanupV309=true;
-    // v9.10.347.116: do not write defaults from _ensureActivityEnvSettings().
+    // v9.10.347.123: do not write defaults from _ensureActivityEnvSettings().
     // This function may run during startup before saved settings are loaded.
   }
-  // v9.10.347.116: no baked-in destinations. Users add their own.
+  // v9.10.347.123: no baked-in destinations. Users add their own.
   if(settings.activityEnvironmentalMode&&!settings.activityWeatherMode)settings.activityWeatherMode=settings.activityEnvironmentalMode;
   if(!settings.activityWeatherMode)settings.activityWeatherMode='manual';
   settings.activityEnvironmentalMode=settings.activityWeatherMode; // backwards-compatible alias
@@ -13916,6 +14089,10 @@ function _ensureActivityEnvSettings(){
   if(settings.activityWeatherDefaultWindowMin===undefined)settings.activityWeatherDefaultWindowMin=30;
   if(settings.activityWeatherAskOnOutdoor===undefined)settings.activityWeatherAskOnOutdoor=true;
   if(settings.activityWeatherStoreCoordinates===undefined)settings.activityWeatherStoreCoordinates=false;
+  if(settings.activityGpsMode===undefined)settings.activityGpsMode='ask';
+  if(settings.activityGpsRememberChoice===undefined)settings.activityGpsRememberChoice=true;
+  if(settings.activityGpsStoreCoordinates===undefined)settings.activityGpsStoreCoordinates=false;
+  if(!settings.activityGpsPreferences)settings.activityGpsPreferences={};
   if(settings.todayWeatherPillEnabled===undefined)settings.todayWeatherPillEnabled=true;
   if(settings.todayWeatherCacheMinutes===undefined)settings.todayWeatherCacheMinutes=20;
   if(!settings.todayWeatherSource)settings.todayWeatherSource='zip'; // zip | location
@@ -14143,13 +14320,165 @@ function getActivityEnvironmentFormData(){
   return {mode:mode,destination:selectedDestination||'',outsideWindowLabel:selectedActivityWindow||'',outsideWindowMinutes:selectedActivityWindowMinutes||null,manualConditionBand:selectedTempBand,manualEnvironmentFactors:manualFactors,manualEnvironmentOther:(other?other.value.trim():''),weatherSnapshot:((mode==='internet'&&settings.activityWeatherStoreSnapshot!==false)?activityEnvironmentSnapshot:null),contextSnapshot:getActivityEventContextSnapshot(document.getElementById('activitySelect')?document.getElementById('activitySelect').value:'')};
 }
 
+
+function _activityGpsActivityType(){var el=document.getElementById('activitySelect');return el?(el.value||''):'';}
+function _activityGpsAllowed(){
+  var ctx=(selectedActivityContext||'').toLowerCase();
+  var act=(_activityGpsActivityType()||'').toLowerCase();
+  if(!(ctx==='outdoor'||ctx==='mixed'))return false;
+  return /walking|running|cycling|e-bike|ebike|hiking|car|travel|shopping|doctor|church/.test(act);
+}
+function _activityGpsPrefKey(){return ((selectedActivityContext||'')+'|'+(_activityGpsActivityType()||'')).toLowerCase();}
+function _activityGpsDefaultOn(){
+  if(!_activityGpsAllowed())return false;
+  _ensureActivityEnvSettings();
+  var prefs=settings.activityGpsPreferences||{};
+  var key=_activityGpsPrefKey();
+  if(prefs[key]===true||prefs[key]===false)return !!prefs[key];
+  return (settings.activityGpsMode==='auto');
+}
+function buildActivityGpsHTML(){
+  var h='';
+  h+='<div style="font-size:13px;font-weight:800;color:#3730a3;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">GPS Distance</div>';
+  h+='<label style="display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid #c7d2fe;border-radius:10px;padding:12px;margin-bottom:8px"><input type="checkbox" id="activityGpsToggle" onchange="setActivityGpsChoice(this.checked,true)" style="width:20px;height:20px;margin-top:2px"><div><strong>Use phone GPS for distance, speed, and elevation</strong><div style="font-size:13px;color:#475569;margin-top:3px;line-height:1.5">GPS starts only when you tap Start Activity and stops when you Finish, Save, or Cancel. CardiacLens does not save the route or GPS coordinates unless you turn that on in Settings.</div></div></label>';
+  h+='<div id="activityGpsHint" style="font-size:13px;color:#3730a3;line-height:1.5;margin-bottom:8px"></div>';
+  h+='<div id="activityGpsStatus" style="display:none;background:#fff;border-radius:8px;padding:10px;font-size:14px;color:#1f2937;line-height:1.5"></div>';
+  return h;
+}
+function setActivityGpsChoice(on,remember){
+  activityGpsSelected=!!on;
+  if(remember&&settings.activityGpsRememberChoice!==false){
+    if(!settings.activityGpsPreferences)settings.activityGpsPreferences={};
+    settings.activityGpsPreferences[_activityGpsPrefKey()]=!!on;
+    try{localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
+  }
+  if(activityGpsSelected){checkActivityGpsReadiness();}else{updateActivityGpsStatus();}
+}
+function showActivityGpsHelp(){
+  alert('GPS tracking help:\n\n1. iPhone: open Settings.\n2. Tap Privacy & Security.\n3. Tap Location Services.\n4. Make sure Location Services is On.\n5. Find Safari Websites or CardiacLens.\n6. Choose While Using or Ask Next Time.\n7. Turn Precise Location On for best distance/elevation accuracy.\n\nCardiacLens uses GPS only during a timed supported activity after you start it. GPS stops when you Finish, Save, Cancel, or close the activity.');
+}
+function checkActivityGpsReadiness(){
+  if(!activityGpsSelected){updateActivityGpsStatus();return;}
+  if(!navigator.geolocation){activityGpsMetrics.status='unavailable';activityGpsMetrics.error='GPS is not available in this browser.';updateActivityGpsStatus();return;}
+  activityGpsMetrics.status='checking';activityGpsMetrics.error='';activityGpsMetrics.readinessChecked=true;updateActivityGpsStatus();
+  if(navigator.permissions&&navigator.permissions.query){
+    try{navigator.permissions.query({name:'geolocation'}).then(function(p){activityGpsMetrics.permissionState=p.state||'unknown';updateActivityGpsStatus();if(p.state==='denied'){activityGpsMetrics.status='permission_needed';activityGpsMetrics.error='Location permission is denied for this browser/app.';updateActivityGpsStatus();}}).catch(function(){});}catch(e){}
+  }
+  navigator.geolocation.getCurrentPosition(function(pos){
+    var c=(pos&&pos.coords)||{};
+    activityGpsMetrics.status='ready';activityGpsMetrics.error='';activityGpsMetrics.lastAccuracy=(typeof c.accuracy==='number'?c.accuracy:null);activityGpsMetrics.permissionState='granted';updateActivityGpsStatus();
+  },function(err){
+    var code=err&&err.code;
+    if(code===1){activityGpsMetrics.status='permission_needed';activityGpsMetrics.error='CardiacLens does not have location permission.';}
+    else if(code===2){activityGpsMetrics.status='signal_needed';activityGpsMetrics.error='GPS location is unavailable right now. Move outdoors or check Location Services.';}
+    else if(code===3){activityGpsMetrics.status='searching';activityGpsMetrics.error='GPS is still searching. Move outdoors for a stronger signal.';}
+    else {activityGpsMetrics.status='error';activityGpsMetrics.error=(err&&err.message)?err.message:'GPS permission denied or unavailable.';}
+    updateActivityGpsStatus();
+  },{enableHighAccuracy:true,maximumAge:0,timeout:10000});
+}
+function updateActivityGpsSection(){
+  var sec=document.getElementById('activityGpsSection');
+  if(!sec)return;
+  var allowed=_activityGpsAllowed();
+  sec.style.display=allowed?'block':'none';
+  if(!allowed){activityGpsSelected=false;return;}
+  activityGpsSelected=_activityGpsDefaultOn();
+  var cb=document.getElementById('activityGpsToggle');if(cb)cb.checked=!!activityGpsSelected;
+  var hint=document.getElementById('activityGpsHint');
+  if(hint){
+    var ctx=(selectedActivityContext||'').toLowerCase();
+    hint.innerHTML=(ctx==='mixed')?'Transportation tip: for errands like e-bike to HEB, you can leave GPS running from Start to Finish. Indoor shopping or standing still should not add meaningful distance. Mixed Environment only means indoor + outdoor exposure.':'Outdoor distance activity: GPS can fill distance automatically when the timer runs.';
+  }
+  updateActivityGpsStatus();
+}
+function _activityGpsReset(){
+  var perm=(activityGpsMetrics&&activityGpsMetrics.permissionState)||'unknown';
+  activityGpsLastPoint=null;activityGpsStartTime=null;
+  activityGpsMetrics={distanceMiles:0,elevationGainFt:0,elevationLossFt:0,pointCount:0,maxSpeedMph:null,lastAccuracy:null,status:'off',error:'',permissionState:perm,readinessChecked:false};
+}
+function _activityGpsDistanceMiles(a,b){
+  var R=3958.7613, toRad=Math.PI/180;
+  var dLat=(b.lat-a.lat)*toRad, dLon=(b.lon-a.lon)*toRad;
+  var lat1=a.lat*toRad, lat2=b.lat*toRad;
+  var h=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)*Math.sin(dLon/2);
+  return 2*R*Math.asin(Math.min(1,Math.sqrt(h)));
+}
+function startActivityGpsTracking(){
+  if(!activityGpsSelected||!_activityGpsAllowed())return;
+  if(!navigator.geolocation){activityGpsMetrics.status='unavailable';activityGpsMetrics.error='GPS is not available in this browser.';updateActivityGpsStatus();return;}
+  if(activityGpsWatchId!==null)return;
+  _activityGpsReset();activityGpsStartTime=Date.now();activityGpsMetrics.status='searching';updateActivityGpsStatus();
+  activityGpsWatchId=navigator.geolocation.watchPosition(function(pos){
+    var c=pos.coords||{};
+    var p={lat:c.latitude,lon:c.longitude,alt:(typeof c.altitude==='number'?c.altitude:null),t:pos.timestamp||Date.now(),acc:(typeof c.accuracy==='number'?c.accuracy:null),speed:(typeof c.speed==='number'?c.speed:null)};
+    activityGpsMetrics.status='tracking';activityGpsMetrics.lastAccuracy=p.acc;activityGpsMetrics.pointCount++;
+    if(activityGpsLastPoint){
+      var step=_activityGpsDistanceMiles(activityGpsLastPoint,p);
+      var seconds=Math.max(1,(p.t-activityGpsLastPoint.t)/1000);
+      var stepSpeed=step/(seconds/3600);
+      if(step>0.003 && (!p.acc || p.acc<=100)){activityGpsMetrics.distanceMiles+=step;}
+      if(p.speed!==null){activityGpsMetrics.maxSpeedMph=Math.max(activityGpsMetrics.maxSpeedMph||0,p.speed*2.236936);} else if(stepSpeed<80){activityGpsMetrics.maxSpeedMph=Math.max(activityGpsMetrics.maxSpeedMph||0,stepSpeed);}
+      if(p.alt!==null&&activityGpsLastPoint.alt!==null){
+        var dFt=(p.alt-activityGpsLastPoint.alt)*3.28084;
+        if(Math.abs(dFt)>=6){if(dFt>0)activityGpsMetrics.elevationGainFt+=dFt;else activityGpsMetrics.elevationLossFt+=Math.abs(dFt);}
+      }
+    }
+    activityGpsLastPoint=p;updateActivityGpsStatus();
+  },function(err){
+    activityGpsMetrics.status='error';activityGpsMetrics.error=(err&&err.message)?err.message:'GPS permission denied or unavailable.';updateActivityGpsStatus();
+  },{enableHighAccuracy:true,maximumAge:5000,timeout:20000});
+}
+function stopActivityGpsTracking(){
+  if(activityGpsWatchId!==null&&navigator.geolocation){try{navigator.geolocation.clearWatch(activityGpsWatchId);}catch(e){}}
+  activityGpsWatchId=null;
+  if(activityGpsMetrics.status==='tracking'||activityGpsMetrics.status==='searching')activityGpsMetrics.status='stopped';
+  updateActivityGpsStatus();
+}
+function updateActivityGpsStatus(){
+  var box=document.getElementById('activityGpsStatus'); if(!box)return;
+  if(!activityGpsSelected){box.style.display='none';return;}
+  box.style.display='block';
+  var dist=activityGpsMetrics.distanceMiles||0;
+  var avg='—';
+  var elapsed=(activityGpsStartTime?((Date.now()-activityGpsStartTime)/3600000):(activityElapsedSeconds/3600));
+  if(elapsed>0&&dist>0)avg=(dist/elapsed).toFixed(1)+' mph';
+  var elev=(activityGpsMetrics.pointCount>1)?(Math.round(activityGpsMetrics.elevationGainFt||0)+' ft gain'):'waiting for elevation';
+  var acc=(activityGpsMetrics.lastAccuracy?(' · accuracy ~'+Math.round(activityGpsMetrics.lastAccuracy)+' m'):'');
+  var status=activityGpsMetrics.status||'ready';
+  if(status==='off')status='ready';
+  var label='GPS Ready';
+  var color='#166534', bg='#f0fdf4', border='#bbf7d0';
+  if(status==='checking'){label='Checking GPS Permission';color='#3730a3';bg='#eef2ff';border='#c7d2fe';}
+  else if(status==='searching'){label='GPS Searching';color='#92400e';bg='#fffbeb';border='#fde68a';}
+  else if(status==='tracking'){label='GPS Tracking';color='#166534';bg='#f0fdf4';border='#bbf7d0';}
+  else if(status==='stopped'){label='GPS Stopped';color='#334155';bg='#f8fafc';border='#cbd5e1';}
+  else if(status==='permission_needed'){label='GPS Permission Needed';color='#991b1b';bg='#fef2f2';border='#fecaca';}
+  else if(status==='signal_needed'||status==='unavailable'||status==='error'){label='GPS Needs Attention';color='#92400e';bg='#fffbeb';border='#fde68a';}
+  box.style.background=bg;box.style.border='1px solid '+border;box.style.color=color;
+  var msg='';
+  if(status==='ready')msg='Location permission and GPS are ready. Tracking starts when you tap Start Activity.';
+  else if(status==='checking')msg='CardiacLens is checking whether this browser/app can use location.';
+  else if(status==='permission_needed')msg='Location permission is not enabled for CardiacLens/Safari.';
+  else if(status==='searching')msg='GPS is searching. Best results usually require being outdoors with the app open.';
+  else if(status==='signal_needed')msg='GPS signal is not available right now. Move outdoors or check Location Services.';
+  else if(status==='tracking')msg='GPS is active for this activity only.';
+  else if(status==='stopped')msg='GPS tracking has stopped for this activity.';
+  box.innerHTML='<strong>'+label+'</strong>'+acc+'<br><span style="font-size:13px">'+msg+'</span><br>Distance: <strong>'+dist.toFixed(2)+' mi</strong> · Avg speed: <strong>'+avg+'</strong> · Elevation: <strong>'+elev+'</strong>'+(activityGpsMetrics.error?'<br><span style="color:#b45309">'+activityGpsMetrics.error+'</span>':'')+((status==='permission_needed'||status==='signal_needed'||status==='unavailable'||status==='error')?'<br><button type="button" onclick="showActivityGpsHelp()" style="margin-top:8px;background:#fff;color:#1d4ed8;border:1px solid #93c5fd;border-radius:8px;padding:8px 10px;font-weight:800;cursor:pointer">Show Me How</button> <button type="button" onclick="checkActivityGpsReadiness()" style="margin-top:8px;background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:8px 10px;font-weight:800;cursor:pointer">Try Again</button>':'');
+}
+function getActivityGpsSaveData(){
+  if(!activityGpsSelected && !(activityGpsMetrics&&activityGpsMetrics.pointCount))return null;
+  var dist=activityGpsMetrics.distanceMiles||0;
+  var hrs=activityElapsedSeconds>0?(activityElapsedSeconds/3600):0;
+  return {enabled:!!activityGpsSelected,status:activityGpsMetrics.status||'off',distanceMiles:Math.round(dist*100)/100,averageSpeedMph:(hrs>0&&dist>0)?Math.round((dist/hrs)*10)/10:null,maxSpeedMph:activityGpsMetrics.maxSpeedMph?Math.round(activityGpsMetrics.maxSpeedMph*10)/10:null,elevationGainFt:Math.round(activityGpsMetrics.elevationGainFt||0),elevationLossFt:Math.round(activityGpsMetrics.elevationLossFt||0),pointCount:activityGpsMetrics.pointCount||0,lastAccuracyMeters:activityGpsMetrics.lastAccuracy?Math.round(activityGpsMetrics.lastAccuracy):null,source:'Phone GPS',coordinatesStored:false};
+}
+
 function _isActivityFinishedForSave(){
   var timerDisplay=document.getElementById('timerDisplay');
   var manualInput=document.getElementById('durationMinutes');
   var isTimerMode=timerDisplay&&timerDisplay.style.display==='block';
   var isManualMode=manualInput&&manualInput.parentElement&&manualInput.parentElement.style.display==='block';
   if(isTimerMode){
-    // v9.10.347.116 KISS: Once the user taps Finish Activity, any positive elapsed time can be saved.
+    // v9.10.347.123 KISS: Once the user taps Finish Activity, any positive elapsed time can be saved.
     // Do not require the full 60 seconds to pass; short real-world activities still matter.
     return !!activityTimerStoppedForSave && activityElapsedSeconds>0 && !activityTimerInterval;
   }
@@ -14210,8 +14539,7 @@ updateActivitySaveState();
 
 
 function _isActivityStartReady(){
-  var sel=document.getElementById('activitySelect');
-  return !!(sel && sel.value && selectedActivityContext);
+  return !!(_activityPrereqsMet() && selectedActivityContext);
 }
 
 function updateActivityStartState(){
@@ -14221,12 +14549,12 @@ function updateActivityStartState(){
   btn.disabled=!ready;
   btn.style.opacity=ready?'1':'0.45';
   btn.style.cursor=ready?'pointer':'not-allowed';
-  btn.title=ready?'Start activity and show activity pill':'Select Activity Type and Cardiac Context first';
+  btn.title=ready?'Start activity and show activity pill':'Select Activity Type, Purpose if shown, and confirm Environment Context';
 }
 
 function startActivityTimer(){
 if(!_isActivityStartReady()){
-  _showInlineError('⚠️ Please select Activity Type and Cardiac Context before starting.');
+  _showInlineError('⚠️ Please select Activity Type, choose Purpose if shown, and confirm Environment Context before starting.');
   updateActivityStartState();
   return;
 }
@@ -14238,6 +14566,7 @@ if(activityTimerInterval){
 activityTimerPaused=false;
 activityTimerStoppedForSave=false;
 activityStartTime=Date.now()-(activityElapsedSeconds*1000);
+startActivityGpsTracking();
 console.log('Starting timer, elapsed seconds:',activityElapsedSeconds);
 document.getElementById('timerStartBtn').style.display='none';
 document.getElementById('timerPauseBtn').style.display='inline-block';
@@ -14252,7 +14581,7 @@ var mins=Math.floor(elapsed/60);
 var secs=elapsed%60;
 var __tt=document.getElementById('timerTime');if(__tt){__tt.textContent=(mins<10?'0':'')+mins+':'+(secs<10?'0':'')+secs;}
 },100);
-// v9.10.347.116 KISS: Start Activity now uses the proven Minimize workflow.
+// v9.10.347.123 KISS: Start Activity now uses the proven Minimize workflow.
 // This creates/persists the activity pill, closes the modal, and starts the pill timer immediately.
 minimizeActivityLog();
 }
@@ -14278,6 +14607,7 @@ activityTimerInterval=null;
 console.log('Timer stopped, total elapsed seconds:',activityElapsedSeconds,'minutes:',Math.floor(activityElapsedSeconds/60));
 }
 activityTimerPaused=false;
+stopActivityGpsTracking();
 var startBtn=document.getElementById('timerStartBtn');
 var pauseBtn=document.getElementById('timerPauseBtn');
 var resumeBtn=document.getElementById('timerResumeBtn');
@@ -14288,7 +14618,7 @@ if(pauseBtn)pauseBtn.style.display='none';
 if(resumeBtn)resumeBtn.style.display='none';
 if(stopBtn)stopBtn.style.display='none';
 if(pausedLabel)pausedLabel.style.display='none';
-activityTimerStoppedForSave=(activityElapsedSeconds>0); // v9.10.347.116: Save unlocks after Stop for any positive elapsed time
+activityTimerStoppedForSave=(activityElapsedSeconds>0); // v9.10.347.123: Save unlocks after Stop for any positive elapsed time
 updateActivitySaveState();
 }
 
@@ -14317,6 +14647,7 @@ function captureActivityReturnStateForBP(){
     environmentalMode: selectedEnvironmentalMode,
     environmentSnapshot: activityEnvironmentSnapshot,
     activityContext: selectedActivityContext,
+    activityPurpose: selectedActivityPurpose,
     journeyRole: selectedJourneyRole,
     journeyName: selectedJourneyName,
     journeyId: selectedJourneyId,
@@ -14326,15 +14657,19 @@ function captureActivityReturnStateForBP(){
 function restoreActivityAfterBP(state, bpLabel){
   if(!state)return;
   selectedActivityContext=state.activityContext||selectedActivityContext||getDefaultActivityContext(state.activityType||'');
+  selectedActivityPurpose=state.activityPurpose||selectedActivityPurpose||'';
   logActivity(true);
   setTimeout(function(){
     selectedActivityContext=state.activityContext||selectedActivityContext||getDefaultActivityContext(state.activityType||'');
+    selectedActivityPurpose=state.activityPurpose||selectedActivityPurpose||'';
     renderActivityContextButtons();
     refreshActivityOptionsForContext();
     updateActivitySectionsForContext();
     var sel=document.getElementById('activitySelect');
     if(sel&&state.activityType)sel.value=state.activityType;
     handleActivitySelection();
+    updateActivityPurposeSection();
+    renderActivityPurposeButtons();
     var notes=document.getElementById('activityNotes');
     if(notes)notes.value=state.notes||'';
     if(state.exertion)selectExertion(state.exertion);
@@ -14481,7 +14816,7 @@ activityStartTime=null;
 activityTimerStoppedForSave=false;
 selectedExertion='';
 selectedTempBand=null;
-selectedActivityWindow='';selectedActivityWindowMinutes=null;selectedDestination='';activityEnvironmentSnapshot=null;activityEnvironmentFetchInFlight=false;activityEnvironmentFetchKey='';activityEnvironmentFetchFailedKey='';selectedActivityContext='';selectedJourneyRole='single';selectedJourneyName='';selectedJourneyId=null;
+selectedActivityWindow='';selectedActivityWindowMinutes=null;selectedDestination='';activityEnvironmentSnapshot=null;stopActivityGpsTracking();_activityGpsReset();activityEnvironmentFetchInFlight=false;activityEnvironmentFetchKey='';activityEnvironmentFetchFailedKey='';selectedActivityContext='';selectedActivityPurpose='';selectedJourneyRole='single';selectedJourneyName='';selectedJourneyId=null;
 usingExistingBP=null;
 // Also clear any minimized state
 _activityMinimized=false;
@@ -14497,7 +14832,7 @@ completeAndCloseModal();
 // ── Background Activity System (v9.10.36) ────────────────────────────────────
 
 
-// v9.10.347.116 KISS: activity pill state is created immediately when timer starts.
+// v9.10.347.123 KISS: activity pill state is created immediately when timer starts.
 // This is intentionally limited to the floating pill lifecycle; activity save/history/context logic is untouched.
 function _captureActivityPillStateFromForm(isTimerMode){
   var sel=document.getElementById('activitySelect');
@@ -14517,6 +14852,7 @@ function _captureActivityPillStateFromForm(isTimerMode){
     manualEnvironmentFactors:(function(){var a=[];[['hotKitchen','Hot kitchen'],['standingLong','Standing long time'],['afterMeal','After meal'],['stairsHills','Stairs / hills'],['humidRoom','Humid room'],['stressful','Stressful'],['afterShower','After shower'],['warmRoom','Warm room']].forEach(function(x){var el=document.getElementById('envCtx_'+x[0]);if(el&&el.checked)a.push(x[1]);});return a;})(),
     manualEnvironmentOther:(function(){var el=document.getElementById('envCtxOther');return el?el.value.trim():'';})(),
     activityContext:selectedActivityContext,
+    activityPurpose:selectedActivityPurpose,
     journeyRole:selectedJourneyRole,
     journeyName:selectedJourneyName,
     journeyId:selectedJourneyId,
@@ -14533,7 +14869,7 @@ function _captureActivityPillStateFromForm(isTimerMode){
   } catch(e) {}
 }
 
-// v9.10.347.116 KISS: prevent bottom floating controls from covering each other on iPhone.
+// v9.10.347.123 KISS: prevent bottom floating controls from covering each other on iPhone.
 function _layoutBottomPills(){
   var activity=document.getElementById('activityPillBtn');
   var status=document.getElementById('statusFab');
@@ -14597,6 +14933,7 @@ function minimizeActivityLog(){
     manualEnvironmentFactors:(function(){var a=[];[['hotKitchen','Hot kitchen'],['standingLong','Standing long time'],['afterMeal','After meal'],['stairsHills','Stairs / hills'],['humidRoom','Humid room'],['stressful','Stressful'],['afterShower','After shower'],['warmRoom','Warm room']].forEach(function(x){var el=document.getElementById('envCtx_'+x[0]);if(el&&el.checked)a.push(x[1]);});return a;})(),
     manualEnvironmentOther:(function(){var el=document.getElementById('envCtxOther');return el?el.value.trim():'';})(),
     activityContext:selectedActivityContext,
+    activityPurpose:selectedActivityPurpose,
     journeyRole:selectedJourneyRole,
     journeyName:selectedJourneyName,
     journeyId:selectedJourneyId,
@@ -14665,17 +15002,21 @@ function restoreActivityLog(){
 
   // Rebuild the modal
   selectedActivityContext=state.activityContext||selectedActivityContext||getDefaultActivityContext(state.activityType||'');
+  selectedActivityPurpose=state.activityPurpose||selectedActivityPurpose||'';
   logActivity(true);
 
   // Restore form state after modal renders
   setTimeout(function(){
     selectedActivityContext=state.activityContext||selectedActivityContext||getDefaultActivityContext(state.activityType||'');
+    selectedActivityPurpose=state.activityPurpose||selectedActivityPurpose||'';
     renderActivityContextButtons();
     refreshActivityOptionsForContext();
     updateActivitySectionsForContext();
     var sel=document.getElementById('activitySelect');
     if(sel && state.activityType) sel.value=state.activityType;
     handleActivitySelection();
+    updateActivityPurposeSection();
+    renderActivityPurposeButtons();
     var notes=document.getElementById('activityNotes');
     if(notes && state.notes) notes.value=state.notes;
     selectedActivityWindow=state.activityWindow||'';
@@ -14743,7 +15084,7 @@ function restoreActivityLog(){
       if(manDur && state.manualMinutes) manDur.value=state.manualMinutes;
       updateActivitySaveState();
     }
-    // v9.10.347.116 KISS: returning from the Activity pill should land at the active timer/save area,
+    // v9.10.347.123 KISS: returning from the Activity pill should land at the active timer/save area,
     // not the top of the Log Activity setup modal.
     setTimeout(function(){
       var target=document.getElementById('activityTimingSection')||document.getElementById('timerDisplay')||document.getElementById('timerStartBtn');
@@ -14993,6 +15334,7 @@ activityName=activity+' ('+workDesc+')';
 // Generate unique ID for activity
 var activityId='act_'+Date.now()+'_'+Math.floor(Math.random()*1000);
 var envData=getActivityEnvironmentFormData();
+var gpsData=getActivityGpsSaveData();
 var journeyData=getJourneyFormData(activityName);
 var activityContext=selectedActivityContext||getDefaultActivityContext(activityName);
 cbTrack('log_activity', { exertion: selectedExertion, duration_min: duration });
@@ -15011,12 +15353,20 @@ activityWindowMinutes:(envData.outsideWindowMinutes||null),
 activityWindowLabel:(envData.outsideWindowLabel||''),
 destination:(envData.destination||''),
 activityContext:activityContext,
+activityPurpose:selectedActivityPurpose||'',
 journeyRole:journeyData.role,
 journeyId:journeyData.journeyId,
 journeyName:journeyData.journeyName,
 environmentalMode:(envData.mode||'manual'),
 environmentalSnapshot:envData,
 eventContextSnapshot:(envData.contextSnapshot||null),
+gpsTracking:gpsData,
+distanceMiles:(gpsData&&gpsData.distanceMiles)||null,
+distanceSource:(gpsData&&gpsData.distanceMiles!==null)?'Phone GPS':'',
+averageSpeedMph:(gpsData&&gpsData.averageSpeedMph)||null,
+maxSpeedMph:(gpsData&&gpsData.maxSpeedMph)||null,
+elevationGainFt:(gpsData&&gpsData.elevationGainFt)||null,
+elevationLossFt:(gpsData&&gpsData.elevationLossFt)||null,
 linkedBP:{before:null,after:null}
 });
 // Save BP before reading if it exists
@@ -15046,7 +15396,7 @@ activityStartTime=null;
 activityTimerStoppedForSave=false;
 selectedExertion='';
 selectedTempBand=null;
-selectedActivityWindow='';selectedActivityWindowMinutes=null;selectedDestination='';activityEnvironmentSnapshot=null;activityEnvironmentFetchInFlight=false;activityEnvironmentFetchKey='';activityEnvironmentFetchFailedKey='';selectedActivityContext='';selectedJourneyRole='single';selectedJourneyName='';selectedJourneyId=null;
+selectedActivityWindow='';selectedActivityWindowMinutes=null;selectedDestination='';activityEnvironmentSnapshot=null;stopActivityGpsTracking();_activityGpsReset();activityEnvironmentFetchInFlight=false;activityEnvironmentFetchKey='';activityEnvironmentFetchFailedKey='';selectedActivityContext='';selectedActivityPurpose='';selectedJourneyRole='single';selectedJourneyName='';selectedJourneyId=null;
 // Clear background activity state (v9.10.36)
 _activityMinimized=false;
 _minimizedActivityState=null;
@@ -15299,7 +15649,7 @@ function _actHistRenderFilters(){
 }
 
 
-// v9.10.347.116 KISS: Cardiac Context display helpers (display only; no save/storage changes)
+// v9.10.347.123 KISS: Environment Context display helpers (display only; no save/storage changes)
 function clActivityEsc(v){
   return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
 }
@@ -15327,6 +15677,7 @@ function clActivityContextLines(a){
   if(manual.length) lines.push('Environment: '+manual.join(', '));
   var w=clActivityWeatherText(a);
   if(w) lines.push('Weather: '+w);
+  if(a.distanceMiles){ lines.push('GPS distance: '+a.distanceMiles+' mi'+(a.averageSpeedMph?' · avg '+a.averageSpeedMph+' mph':'')+(a.elevationGainFt!==null&&a.elevationGainFt!==undefined?' · gain '+a.elevationGainFt+' ft':'')); }
   if(cs.hydration&&cs.hydration.todayOz!==null&&cs.hydration.todayOz!==undefined) lines.push('Fluid today at save: '+cs.hydration.todayOz+' oz');
   if(cs.recentBP) lines.push('Recent BP: '+cs.recentBP.systolic+'/'+cs.recentBP.diastolic+' HR '+cs.recentBP.pulse+(cs.recentBP.time?' at '+cs.recentBP.time:''));
   if(cs.recentSymptoms&&cs.recentSymptoms.length){
@@ -15360,6 +15711,7 @@ function clActivityAnalysisCompleteness(a){
   if(a.duration) captured.push('Duration'); else missing.push('Duration');
   if(es.mode||a.activityContext||a.environmentalMode) captured.push('Environment mode'); else missing.push('Environment mode');
   if(weather) captured.push('Weather snapshot'); else missing.push('Weather snapshot');
+  if(a.distanceMiles) captured.push('GPS distance/elevation');
   if(cs.hydration && cs.hydration.todayOz!==null && cs.hydration.todayOz!==undefined) captured.push('Fluid total at save'); else missing.push('Fluid total at save');
   if(cs.recentBP) captured.push('Recent BP/HR'); else missing.push('Recent BP/HR');
   if(before) captured.push('Before activity BP'); else missing.push('Before activity BP');
@@ -15400,7 +15752,7 @@ function _clActivityContextHtml(a){
   var lines=clActivityContextLines(a);
   if(!lines.length)return '';
   var html='<details style="margin-top:12px;background:#ecfeff;border-left:4px solid #0891b2;border-radius:8px;padding:10px;color:#164e63;font-size:14px">';
-  html+='<summary style="font-weight:900;cursor:pointer">▼ Cardiac Context</summary>';
+  html+='<summary style="font-weight:900;cursor:pointer">▼ Environment Context</summary>';
   html+='<div style="margin-top:8px;line-height:1.6">'+lines.map(clActivityEsc).join('<br>')+'</div>';
   html+='</details>';
   return html;
@@ -15408,7 +15760,7 @@ function _clActivityContextHtml(a){
 function openActivityContextDetailsFor(a){
   if(!a){alert('Activity not found');return;}
   var lines=clActivityContextLines(a);
-  var html='<div class="modal-title">Cardiac Context Details</div>';
+  var html='<div class="modal-title">Environment Context Details</div>';
   html+='<div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-bottom:12px">';
   html+='<div style="font-size:22px;font-weight:900;color:#0f172a;margin-bottom:4px">'+clActivityEsc(a.activity||'Activity')+'</div>';
   html+='<div style="font-size:15px;color:#475569">'+clActivityEsc(a._date||a.date||'')+' '+clActivityEsc(a.t||'')+' · '+clActivityEsc(a.duration||'')+' min · '+clActivityEsc(a.exertion||'')+' exertion</div>';
@@ -15431,7 +15783,7 @@ function openActivityContextDetailsHistorical(dateKey,timeKey){
 }
 function askActivityContextFor(a){
   if(!a){alert('Activity not found');return;}
-  var q='Explain this saved activity using only my CardiacLens data. Treat the saved activity as a Cardiac Context Snapshot, not as a simple activity record. Activity: '+(a.activity||'Activity')+'. Logged: '+(a._date||a.date||'')+' '+(a.t||'unknown time')+'. Use the snapshot fields when present: activity, duration, exertion, Indoor/Outdoor/Mixed environment, weather snapshot, feels-like temperature, rain/wind context, fluid total at save, recent BP/HR, symptoms, notes, before/after BP if available, and analysis completeness. Never say weather or weather-impact context is unavailable when a saved weather snapshot or environmental context exists; instead say what was captured and what additional data would strengthen analysis. '+clActivityCompletenessText(a)+' Do not diagnose; summarize what is known, what is missing, and what would be useful to discuss with my doctor.';
+  var q='Explain this saved activity using only my CardiacLens data. Treat the saved activity as a Environment Context Snapshot, not as a simple activity record. Activity: '+(a.activity||'Activity')+'. Logged: '+(a._date||a.date||'')+' '+(a.t||'unknown time')+'. Use the snapshot fields when present: activity, duration, exertion, Indoor/Outdoor/Mixed environment, weather snapshot, feels-like temperature, rain/wind context, fluid total at save, recent BP/HR, symptoms, notes, before/after BP if available, and analysis completeness. Never say weather or weather-impact context is unavailable when a saved weather snapshot or environmental context exists; instead say what was captured and what additional data would strengthen analysis. '+clActivityCompletenessText(a)+' Do not diagnose; summarize what is known, what is missing, and what would be useful to discuss with my doctor.';
   try{hideModal();}catch(e){}
   openAskPanel();
   setTimeout(function(){var inp=document.getElementById('askInput');if(inp){inp.value=q;inp.style.height='120px';}if(typeof submitAskQuestion==='function')submitAskQuestion();},350);
@@ -15471,6 +15823,7 @@ function _actHistRenderReadings(data){
     h+='<div style="margin-top:12px;padding:12px;background:#f0fdf4;border-left:4px solid '+exertionColor+';border-radius:6px">';
     h+='<div style="font-size:16px;font-weight:600;color:'+exertionColor+'">'+r.exertion+' Exertion</div></div>';
     if(r.notes){ h+='<div style="margin-top:12px;padding:12px;background:#f3f4f6;border-radius:6px;font-size:16px;color:#374151"><strong>Notes:</strong> '+r.notes+'</div>'; }
+    if(r.distanceMiles){ h+='<div style="margin-top:12px;padding:12px;background:#eef2ff;border-left:4px solid #6366f1;border-radius:6px;font-size:15px;color:#312e81"><strong>GPS:</strong> '+r.distanceMiles+' mi'+(r.averageSpeedMph?' · avg '+r.averageSpeedMph+' mph':'')+(r.elevationGainFt!==null&&r.elevationGainFt!==undefined?' · elevation gain '+r.elevationGainFt+' ft':'')+'</div>'; }
     var ctxHtml=_clActivityContextHtml(r);
     if(ctxHtml){
       h+=ctxHtml;
@@ -19084,7 +19437,7 @@ function _checkDisclaimerAccepted(){
 
 function _acceptDisclaimer(){
   try{
-    var rec = {accepted: true, ts: new Date().toISOString(), version: 'v9.10.347.116'};
+    var rec = {accepted: true, ts: new Date().toISOString(), version: 'v9.10.347.123'};
     // Checksum the acknowledgment record
     rec._cs = _cbHash(rec.ts + '|' + rec.version + '|' + CB_TAMPER_SALT);
     localStorage.setItem(CB_DISCLAIMER_KEY, JSON.stringify(rec));
@@ -22106,7 +22459,7 @@ function buildSmartStatusMessage(zoneData) {
 }
 
 
-// ── Home Today's Weather pill + pickup/trip planner (v9.10.347.116) ─────────────
+// ── Home Today's Weather pill + pickup/trip planner (v9.10.347.123) ─────────────
 var TODAY_WEATHER_CACHE_KEY='CARDIACLENS_TODAY_WEATHER_CACHE';
 var todayWeatherFetchInFlight=false;
 var todayWeatherModalRequestSeq=0;
@@ -22120,7 +22473,7 @@ function _clWindCompass(deg){
 function _clGetWeatherCache(){try{var raw=localStorage.getItem(TODAY_WEATHER_CACHE_KEY);return raw?JSON.parse(raw):null;}catch(e){return null;}}
 function _clSetWeatherCache(obj){try{localStorage.setItem(TODAY_WEATHER_CACHE_KEY,JSON.stringify(obj));}catch(e){}}
 function _clResolveSavedWeatherZip(){
-  // v9.10.347.116: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
+  // v9.10.347.123: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
   // Today Weather must not fall back to GPS unless the user explicitly taps Use My Location.
   try{
     var z=String((settings&&settings.todayWeatherSavedZip)||'').trim();
@@ -22150,7 +22503,7 @@ function _clWeatherUpdatedLabel(c){
   return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+' ('+ageText+')';
 }
 function _clBuildWeatherUrl(lat,lon){
-  // v9.10.347.116: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
+  // v9.10.347.123: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
   // The app only needs current conditions + hourly forecast for rain/heat/wind guidance.
   return 'https://api.open-meteo.com/v1/forecast?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+
     '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=2'+
@@ -22158,7 +22511,7 @@ function _clBuildWeatherUrl(lat,lon){
     '&hourly=precipitation_probability,precipitation,rain,temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m';
 }
 
-// v9.10.347.116: Saved ZIP uses a direct local coordinate table first.
+// v9.10.347.123: Saved ZIP uses a direct local coordinate table first.
 // For Robert's normal area, 77340 always resolves directly to Huntsville coordinates.
 var CL_ZIP_COORDS={
   '77340':{lat:30.7235,lon:-95.5508,label:'Huntsville'},
@@ -22283,15 +22636,15 @@ function openTodayWeatherModal(){
   var html='<div class="modal-title" style="font-size:26px;margin-bottom:10px">☀️ Today\'s Weather</div><button type="button" onclick="hideModal();openHelpModal(\'weather\')" style="width:100%;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;border-radius:10px;padding:10px;font-size:14px;font-weight:800;margin-bottom:12px">How to use Today\'s Weather</button><div id="todayWeatherModalBody">'+_renderTodayWeatherBody(c,null,initialState)+'</div>';
   html+='<div class="modal-actions"><button class="modal-cancel" onclick="hideModal()">Close</button><button class="modal-ok" id="todayWeatherRefreshBtn" onclick="refreshTodayWeatherFromModal()">Refresh Weather</button></div>';
   showModal(html);
-  // v9.10.347.116: if cached weather is older than the user's refresh threshold, refresh automatically on open.
+  // v9.10.347.123: if cached weather is older than the user's refresh threshold, refresh automatically on open.
   // This keeps the weather pill, planner, and activity weather on the same fresh source without requiring a manual tap.
   if(stale){setTimeout(function(){
-    // v9.10.347.116: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
+    // v9.10.347.123: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
     refreshTodayWeatherFromModal(true,'zip');
   },100);}
 }
 
-// v9.10.347.116: Today's Weather banner must use the real weather state, not a stale/default activity flag.
+// v9.10.347.123: Today's Weather banner must use the real weather state, not a stale/default activity flag.
 function _clIsTodayWeatherAutomaticEnabled(c){
   try{
     if(typeof _clRestoreWeatherSettingsBackup==='function')_clRestoreWeatherSettingsBackup();
@@ -22386,7 +22739,7 @@ function useSavedZipWeather(){
   refreshTodayWeatherFromModal(false,'zip');
 }
 function refreshTodayWeatherFromModal(silent,source){
-  // v9.10.347.116: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
+  // v9.10.347.123: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
   source=(source==='location')?'location':'zip';
   if(source==='zip'){
     try{settings.todayWeatherSource='zip';settings.todayWeatherSavedZip=_clResolveSavedWeatherZip();localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
@@ -24262,7 +24615,7 @@ html+=lbBadge;
 html+='<div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">';
 html+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
 html+='<div>';
-html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.347.116</span></div>';
+html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.347.123</span></div>';
 html+='<div id="settingsVersionStatus" style="font-size:13px;color:#6b7280;margin-top:3px">Tap "Check for Updates" to see if a newer version is available</div>';
 html+='</div>';
 html+='<button onclick="checkForUpdates(true)" id="checkUpdateBtn" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">🔍 Check for Updates</button>';
@@ -24421,7 +24774,7 @@ html+='</div>';// close settings-section
   html+='</div></div>';
 })();
 
-// ── v9.10.347.116: Activity & Today's Weather Settings ─────────────────────────
+// ── v9.10.347.123: Activity & Today's Weather Settings ─────────────────────────
 (function(){
   _ensureActivityEnvSettings();
   var wm=settings.activityWeatherMode||'manual';
@@ -24454,6 +24807,7 @@ html+='</div>';// close settings-section
   html+='<label style="display:flex;align-items:flex-start;gap:10px;padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:10px"><input type="checkbox" id="settingActivityStoreCoords" '+(settings.activityWeatherStoreCoordinates===true?'checked':'')+' style="width:18px;height:18px;margin-top:2px"><div><strong>Store approximate lookup coordinates</strong><div style="font-size:13px;color:#64748b;margin-top:3px">Off by default. Automatic weather works without storing coordinates.</div></div></label>';
   html+='<label style="display:flex;align-items:flex-start;gap:10px;padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:10px"><input type="checkbox" id="settingTodayWeatherPill" '+(settings.todayWeatherPillEnabled!==false?'checked':'')+' style="width:18px;height:18px;margin-top:2px"><div><strong>Show Today\'s Weather on the home page</strong><div style="font-size:13px;color:#64748b;margin-top:3px">Adds a tappable line beside hydration: actual temperature and Feels Like.</div></div></label>';
   html+='<div style="margin-bottom:14px"><label class="settings-label">Weather refresh age (minutes)</label><input type="number" inputmode="numeric" id="settingTodayWeatherCacheMinutes" class="settings-input" value="'+(settings.todayWeatherCacheMinutes||20)+'" min="5" max="120" onblur="_sanitizeNumericInput(this)"/><div style="font-size:12px;color:#64748b;margin-top:4px">Home page uses cached weather until this many minutes old.</div></div>';
+  html+='<div style="background:#eef2ff;border:2px solid #c7d2fe;border-radius:12px;padding:14px;margin:0 0 16px 0"><div style="font-size:17px;font-weight:900;color:#3730a3;margin-bottom:8px">GPS Distance Tracking</div><div style="font-size:13px;color:#3730a3;line-height:1.5;margin-bottom:10px"><strong>Privacy:</strong> GPS is not always on. CardiacLens checks permission only when you enable GPS for a supported Log Activity session, then tracks only after Start Activity and stops on Finish, Save, or Cancel.</div><label class="settings-label">Default for supported outdoor/mixed distance activities</label><select id="settingActivityGpsMode" class="settings-input"><option value="off" '+((settings.activityGpsMode||'ask')==='off'?'selected':'')+'>Off</option><option value="ask" '+((settings.activityGpsMode||'ask')==='ask'?'selected':'')+'>Ask / use remembered choices</option><option value="auto" '+((settings.activityGpsMode||'ask')==='auto'?'selected':'')+'>On for supported outdoor and mixed distance activities</option></select><label style="display:flex;align-items:flex-start;gap:10px;margin-top:8px"><input type="checkbox" id="settingActivityGpsRemember" '+(settings.activityGpsRememberChoice!==false?'checked':'')+' style="width:18px;height:18px;margin-top:2px"><div><strong>Remember GPS choices by activity</strong><div style="font-size:13px;color:#64748b;margin-top:3px">Example: remember GPS On for Outdoor E-bike and Walking, Ask for Mixed errands.</div></div></label><label style="display:flex;align-items:flex-start;gap:10px;margin-top:8px"><input type="checkbox" id="settingActivityGpsCoords" '+(settings.activityGpsStoreCoordinates===true?'checked':'')+' style="width:18px;height:18px;margin-top:2px"><div><strong>Store GPS coordinates / route points</strong><div style="font-size:13px;color:#64748b;margin-top:3px">Off by default. Phase 1 stores distance, speed, and elevation only. Leave off unless you intentionally want route points later.</div></div></label><div style="background:#fff;border:1px solid #c7d2fe;border-radius:10px;padding:10px;margin-top:10px;font-size:13px;color:#334155;line-height:1.5"><strong>If GPS does not work:</strong> Log Activity will show Permission Needed, Searching, or Needs Attention, with Show Me How and Try Again. On iPhone, check Settings → Privacy & Security → Location Services → Safari Websites/CardiacLens, and turn Precise Location on for best distance/elevation accuracy.</div></div>';
   html+='<div style="background:#fffbeb;border-left:4px solid #f59e0b;border-radius:8px;padding:10px 12px;font-size:13px;color:#92400e;line-height:1.5;margin-bottom:14px"><strong>ZIP vs GPS</strong><br>Saved ZIP is best for normal local planning. Current Location is best when you are away from home, traveling, or your route covers a different weather area.</div>';
   html+='<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin-bottom:12px">';
   html+='<div style="font-size:15px;font-weight:800;color:#374151;margin-bottom:8px">Expected outside time presets</div>';
@@ -24707,6 +25061,9 @@ try{
   var tws=document.querySelector('input[name="todayWeatherSourceSetting"]:checked');if(tws)settings.todayWeatherSource=tws.value;
   var twz=document.getElementById('settingTodayWeatherZip');if(twz)settings.todayWeatherSavedZip=String(twz.value||'').trim();
   var twc=document.getElementById('settingTodayWeatherCacheMinutes');if(twc)settings.todayWeatherCacheMinutes=Math.min(120,Math.max(5,parseInt(twc.value)||20));
+  var agm=document.getElementById('settingActivityGpsMode');if(agm)settings.activityGpsMode=agm.value;
+  var agr=document.getElementById('settingActivityGpsRemember');if(agr)settings.activityGpsRememberChoice=!!agr.checked;
+  var agc=document.getElementById('settingActivityGpsCoords');if(agc)settings.activityGpsStoreCoordinates=!!agc.checked;
   _clSaveWeatherSettingsBackup();
 }catch(e){}
 try{
@@ -25314,6 +25671,19 @@ if(!activityName||!activityName.trim()){
 return;
 }
 activityName=activityName.trim();
+var destAdvice=_customActivityDestinationAdvice(activityName);
+if(destAdvice){
+  var move=confirm(destAdvice+'\n\nPress OK to move this to Destination and choose an activity instead.\nPress Cancel to keep it as a custom Activity.');
+  if(move){
+    if(!settings.activityDestinations)settings.activityDestinations=[];
+    if(settings.activityDestinations.indexOf(activityName)===-1){settings.activityDestinations.push(activityName);localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}
+    selectedDestination=activityName;
+    select.value='';
+    alert('Saved as destination: '+activityName+'\n\nNow choose what you are doing, such as E-bike, Walking, Car Travel, Shopping, or Doctor Visit.');
+    updateActivityStartState();
+    return;
+  }
+}
 // Check if already exists
 if(!settings.customActivities)settings.customActivities=[];
 if(defaultActivityTypes.includes(activityName)){
@@ -35851,7 +36221,7 @@ html+=`</table></div>`;
 }
 
 
-// Activity & Cardiac Context Summary (v9.10.347.116)
+// Activity & Environment Context Summary (v9.10.347.123)
 if(settings.features&&settings.features.exercise&&data.activities&&data.activities.length>0){
 function _clDrEsc(v){return String(v===undefined||v===null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function _clDrDate(d){if(!d)return'';var parts=String(d).split('-');if(parts.length===3){var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return mo[parseInt(parts[1],10)-1]+' '+parseInt(parts[2],10);}return d;}
@@ -35873,7 +36243,7 @@ var typeCounts={};acts.forEach(function(a){var t=(a.activity||a.type||'Activity'
 var topTypes=Object.keys(typeCounts).sort(function(a,b){return typeCounts[b]-typeCounts[a]||a.localeCompare(b);}).slice(0,4).map(function(t){return _clDrEsc(t)+' ('+typeCounts[t]+')';}).join(', ');
 var notable=acts.slice().sort(function(a,b){return _clDrScore(b)-_clDrScore(a);}).slice(0,4);
 html+=`<div class="report-section" style="background:#f8fafc;border:2px solid #0f766e">
-<div class="report-section-title" style="color:#0f766e">🏃 Activity & Cardiac Context Summary <span style="font-size:13px;font-weight:400">(${totalActs} logged)</span></div>
+<div class="report-section-title" style="color:#0f766e">🏃 Activity & Environment Context Summary <span style="font-size:13px;font-weight:400">(${totalActs} logged)</span></div>
 <p style="font-size:13px;color:#475569;margin:0 0 10px 0;line-height:1.5"><strong>Why this helps:</strong> Activities show lifestyle demand even when BP was not recorded. BP adds cardiovascular response; context still shows what the patient was doing, for how long, under what environment, with fluids, symptoms, and notes when available.</p>
 <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:10px">
 <tr style="background:#ccfbf1"><th style="padding:6px;text-align:left">Metric</th><th style="padding:6px;text-align:left">Value</th></tr>
@@ -36132,7 +36502,7 @@ html+=`</div>`;
 
 html+=`
 <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:2px solid #e5e7eb;color:#6b7280;font-size:14px">
-<p style="margin:0">CardiacLens v9.10.347.116 — Free & Source-Available</p>
+<p style="margin:0">CardiacLens v9.10.347.123 — Free & Source-Available</p>
 <p style="margin:4px 0 0 0">Report Generated: ${reportDate}</p>
 </div>`;
 
@@ -36343,7 +36713,7 @@ text+=`- ${type}: ${d.count} session(s), BP change ${sysChange>0?'+':''}${sysCha
 }
 
 
-// Activity & Cardiac Context Summary (v9.10.347.116)
+// Activity & Environment Context Summary (v9.10.347.123)
 if(settings.features&&settings.features.exercise&&data.activities&&data.activities.length>0){
 function _clTxtContext(a){var c=(a.activityContext||a.contextType||'').toString().toLowerCase();var es=a.environmentalSnapshot||{};if(!c&&es.context)c=String(es.context).toLowerCase();if(!c&&es.mode)c=String(es.mode).toLowerCase();if(c.indexOf('mixed')>=0)return'Mixed';if(c.indexOf('out')>=0)return'Outdoor';if(c.indexOf('in')>=0)return'Indoor';return'Not specified';}
 function _clTxtWeather(a){try{if(typeof clActivityWeatherText==='function')return clActivityWeatherText(a)||'';}catch(e){}var es=a.environmentalSnapshot||{};var ws=es.weatherSnapshot||es.weather||{};var out=[];if(ws.feelsLikeF||ws.feelsLike)out.push('Feels like '+(ws.feelsLikeF||ws.feelsLike)+'°');if(ws.precipChance!==undefined&&ws.precipChance!==null)out.push('Rain '+ws.precipChance+'%');if(ws.windMph)out.push('Wind '+ws.windMph+' mph');return out.join(' · ');}
@@ -36354,7 +36724,7 @@ function _clTxtScore(a){var score=0;if(a.notes)score+=50;if(/help|assist|rescue|
 var actsTxt=data.activities.slice().sort(function(a,b){var da=(a._date||'')+' '+(a.t||'');var db=(b._date||'')+' '+(b.t||'');return da<db?1:da>db?-1:0;});
 var ctxTxt={Indoor:0,Outdoor:0,Mixed:0,'Not specified':0};var withCtxTxt=0,withWeatherTxt=0,withBPTxt=0,withNotesTxt=0;var minTxt=0;
 actsTxt.forEach(function(a){minTxt+=(parseInt(a.duration,10)||0);var c=_clTxtContext(a);ctxTxt[c]=(ctxTxt[c]||0)+1;if(c!=='Not specified')withCtxTxt++;if(_clTxtWeather(a))withWeatherTxt++;if(_clTxtBP(a,'before')&&_clTxtBP(a,'after'))withBPTxt++;if(a.notes)withNotesTxt++;});
-text+=`\nACTIVITY & CARDIAC CONTEXT SUMMARY\n-----------------------------------\nActivities logged: ${actsTxt.length} (${minTxt} total minutes)\nEnvironment: Indoor ${ctxTxt.Indoor||0}, Outdoor ${ctxTxt.Outdoor||0}, Mixed ${ctxTxt.Mixed||0}\nContext captured: ${withCtxTxt} environment, ${withWeatherTxt} weather, ${withBPTxt} before/after BP, ${withNotesTxt} notes\nNote: Activity without paired BP is still useful lifestyle context; it simply means cardiovascular response cannot be calculated.\n`;
+text+=`\nACTIVITY & ENVIRONMENT CONTEXT SUMMARY\n-----------------------------------\nActivities logged: ${actsTxt.length} (${minTxt} total minutes)\nEnvironment: Indoor ${ctxTxt.Indoor||0}, Outdoor ${ctxTxt.Outdoor||0}, Mixed ${ctxTxt.Mixed||0}\nContext captured: ${withCtxTxt} environment, ${withWeatherTxt} weather, ${withBPTxt} before/after BP, ${withNotesTxt} notes\nNote: Activity without paired BP is still useful lifestyle context; it simply means cardiovascular response cannot be calculated.\n`;
 actsTxt.slice().sort(function(a,b){return _clTxtScore(b)-_clTxtScore(a);}).slice(0,4).forEach(function(a,i){var before=_clTxtBP(a,'before'),after=_clTxtBP(a,'after');var bp=(before&&after)?(`BP ${before.s}/${before.d}${before.h?' HR '+before.h:''} -> ${after.s}/${after.d}${after.h?' HR '+after.h:''}`):'Cardiovascular response: no before/after BP paired';text+=`${i+1}. ${a._date||''} ${a.t||''} - ${a.activity||a.type||'Activity'} - ${parseInt(a.duration,10)||0} min - ${a.exertion||''}\n   Context: ${_clTxtContext(a)}${_clTxtWeather(a)?' - '+_clTxtWeather(a):''}${_clTxtFluid(a)?' - Fluids '+_clTxtFluid(a):''}\n   ${bp}${a.notes?'\n   Patient note: "'+String(a.notes).substring(0,150)+'"':''}\n`;});
 }
 
@@ -36463,7 +36833,7 @@ Note: This report is based on patient self-tracked data. Clinical correlation
 and examination are essential for diagnosis and treatment decisions.
 
 ---
-CardiacLens v9.10.347.116 Medical Grade - Free
+CardiacLens v9.10.347.123 Medical Grade - Free
 Report Generated: ${reportDate}`;
 
 return text;
@@ -40600,7 +40970,7 @@ report.push(notes);
 report.push('');
 }
 report.push('═══════════════════════════════════════════════════════════');
-report.push('This report was generated by CardiacLens v9.10.347.116 Medical Grade - Free');
+report.push('This report was generated by CardiacLens v9.10.347.123 Medical Grade - Free');
 report.push('Advanced Analytics Dashboard - Phase 3 Implementation');
 report.push('═══════════════════════════════════════════════════════════');
 const blob=new Blob([report.join('\n')],{type:'text/plain'});
@@ -40690,7 +41060,7 @@ ${periodHTML}
 <h2>Key Insights</h2>
 ${insightsHTML}
 <div style="margin-top:40px;padding:20px;background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:8px">
-<strong>CardiacLens v9.10.347.116 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
+<strong>CardiacLens v9.10.347.123 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
 This report is not a substitute for professional medical advice.
 </div>
 </body>
@@ -41663,7 +42033,7 @@ alert(`🏃 Activity Summary\n\n` +
 var VERSION_JSON_URL = 'https://cardiaclens.com/version.json';
 var VERSION_CHECK_KEY = 'CARDIACLENS_LAST_VERSION_CHECK';
 var VERSION_DISMISSED_KEY = 'CARDIACLENS_UPDATE_DISMISSED';
-var CURRENT_VERSION = 'v9.10.347.116';
+var CURRENT_VERSION = 'v9.10.347.123';
 var _latestVersionData = null; // cached from last fetch
 
 // Detect whether running as an installed Home Screen PWA on iOS
@@ -41672,8 +42042,8 @@ function isHomeScreenPWA() {
          (window.matchMedia('(display-mode: standalone)').matches);
 }
 
-function _parseVer(v){var m=(v||'').replace(/^v/,'').split('.');return[parseInt(m[0]||0,10),parseInt(m[1]||0,10),parseInt(m[2]||0,10)];}
-function _isNewerVer(remote,local){var r=_parseVer(remote),l=_parseVer(local);for(var i=0;i<3;i++){if(r[i]>l[i])return true;if(r[i]<l[i])return false;}return false;}
+function _parseVer(v){var m=(v||'').replace(/^v/,'').split('.');return m.map(function(x){var n=parseInt(x||0,10);return isNaN(n)?0:n;});}
+function _isNewerVer(remote,local){var r=_parseVer(remote),l=_parseVer(local);var len=Math.max(r.length,l.length,4);for(var i=0;i<len;i++){var rv=r[i]||0,lv=l[i]||0;if(rv>lv)return true;if(rv<lv)return false;}return false;}
 
 // Run once per day at startup — silent unless update found
 function checkForUpdatesOnStartup() {
@@ -44164,7 +44534,7 @@ function _clMedIntelTime(rec){
   try{ return rec&&rec.approvedAt ? (new Date(rec.approvedAt).getTime()||0) : 0; }catch(e){ return 0; }
 }
 function _clCanonicalizeMedIntelStorage(){
-  // v9.10.347.116: one source of truth for Medication Intelligence.
+  // v9.10.347.123: one source of truth for Medication Intelligence.
   // Older code wrote/read both CLINBRIDGE_MED_INTEL and CARDIACLENS_MED_INTEL.
   // Merge both safely, keeping the newest approvedAt for each medicine+metric,
   // then write the same canonical object to both keys so old/new readers agree.
@@ -44216,7 +44586,7 @@ function _mipMarkWeeklyReviewComplete(){
     var stamp=new Date().toISOString();
     localStorage.setItem('CARDIACLENS_MIP_WEEKLY_REVIEWED_AT',stamp);
     if(!medIntelData||typeof medIntelData!=='object')medIntelData={};
-    medIntelData._weeklyReview={completedAt:stamp,version:'v9.10.347.116'};
+    medIntelData._weeklyReview={completedAt:stamp,version:'v9.10.347.123'};
     _mipSave();
   }catch(e){}
 }
@@ -44357,7 +44727,7 @@ function _mipRecordHistory(medName, metric, entry) {
 // or its approvedAt is 7+ days old. Returns one entry per medicine+metric,
 // plus a PP entry, in the same drug-class/name order as the MIP panel.
 function _mipDueItems() {
-  // v9.10.347.116: global weekly-review completion guard.
+  // v9.10.347.123: global weekly-review completion guard.
   // The per-threshold approvedAt values are still the source of truth, but this
   // prevents the red weekly-review card from reappearing immediately after a
   // version update/import when the user has already completed the full queue
@@ -51644,7 +52014,7 @@ function _showAskClarifyChips(options) {
 /* CardiacLens Secure Access Takeover v9.10.287
    Reliability pass: pointer-event tap handling, preserved app tab for email, exact cooldown thresholds. */
 (function(){
-  var VERSION='v9.10.347.116';
+  var VERSION='v9.10.347.123';
   var KEY='CL_SEC_KEY', COLOR='CL_SEC_COLOR', Q='CL_SEC_Q', A='CL_SEC_A', DONE='CL_SEC_DONE';
   var FAILS='CL_SEC_FAILS', COOL='CL_SEC_COOL_UNTIL';
   var COLORS={red:'#e53935',blue:'#1565c0',green:'#2e7d32',orange:'#e65100',purple:'#6a1b9a',teal:'#00695c',pink:'#c2185b',gold:'#f57f17'};
@@ -51802,7 +52172,7 @@ function _showAskClarifyChips(options) {
   // attachment state. This review screen never auto-attaches images; it gives the
   // user a visible message to copy, then opens email from a direct button tap.
   function installFeedbackReviewOverrides(){
-    function currentVersion(){return (typeof CURRENT_VERSION!=='undefined')?CURRENT_VERSION:'v9.10.347.116';}
+    function currentVersion(){return (typeof CURRENT_VERSION!=='undefined')?CURRENT_VERSION:'v9.10.347.123';}
     function deviceLine(){try{return (navigator.userAgent||'').slice(0,180);}catch(e){return '';}}
     function feedbackStamp(){try{var d=new Date();function z(n){return String(n).padStart(2,'0');}return 'ID '+d.getFullYear()+z(d.getMonth()+1)+z(d.getDate())+'-'+z(d.getHours())+z(d.getMinutes())+z(d.getSeconds());}catch(e){return 'ID '+Date.now();}}
     function supportPayload(){
@@ -51888,7 +52258,7 @@ function _showAskClarifyChips(options) {
 
 
 
-  // v9.10.347.116: Final tappable email contact workflow
+  // v9.10.347.123: Final tappable email contact workflow
   // Purpose: keep feedback simple while still opening the user's default mail app.
   // Primary action is a real mailto: link to robert@cardiaclens.com. Copy remains as fallback.
   (function installPlainSupportContactOverride(){
@@ -52016,7 +52386,7 @@ function _showAskClarifyChips(options) {
   function boot(){installCss();takeoverFunctions();var c=cfg();if(c.active)show();document.addEventListener('click',function(e){var t=e.target;if(t&&(t.id==='clPrivacyLockPill'||(t.closest&&t.closest('#clPrivacyLockPill')))){e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation();unlocked=false;show();return false;}},true);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,100);});else setTimeout(boot,100);setTimeout(boot,1000);setTimeout(boot,4000);
 })();
-// ── v9.10.347.116: Weather hardening override ─────────────────────────────
+// ── v9.10.347.123: Weather hardening override ─────────────────────────────
 // Purpose: keep Today's Weather simple and predictable: Saved ZIP -> coordinates -> Open-Meteo -> render.
 // No GPS unless Use My Location is explicitly tapped. Older weather code remains below this override but these
 // same global function names take precedence for buttons, modal open, planner, and activity weather.

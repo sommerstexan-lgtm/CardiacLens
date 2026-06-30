@@ -1,7 +1,7 @@
 {
-  "version": "v9.10.347.116",
-  "date": "2026-06-26",
-  "notes": "Final deploy-readiness pass: update main-page date, align version metadata, verify syntax, and remove non-deploy grep artifact",
-  "label": "FinalDeployReadiness",
-  "updated": "2026-06-26"
+  "version": "v9.10.347.123",
+  "date": "2026-06-30",
+  "notes": "GitHub upload readiness repair: fixes four-part version comparison, synchronizes all.js/index.html version constants, updates manifest and reset cache repair wording, and preserves the GPS Activity Structure workflow.",
+  "label": "GPSUpdateReadinessRepair",
+  "updated": "2026-06-30"
 }
