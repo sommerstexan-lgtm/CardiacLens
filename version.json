@@ -1,7 +1,7 @@
 {
-  "version": "v9.10.347.125",
-  "date": "2026-06-30",
-  "notes": "Destination save state repair: fixes Log Activity custom destination add flow without rebuilding/resetting the modal, normalizes legacy string destinations, preserves activity/purpose/context state, and keeps GPS transportation pause/resume workflow.",
-  "label": "GPSDestinationStateRepair",
-  "updated": "2026-06-30"
+  "version": "v9.10.347.128",
+  "date": "2026-07-01",
+  "notes": "Pre-ride route preview: destination selection now shows prior same-destination GPS route observations before starting, including lowest climb, shortest distance, fastest moving time, and coolest captured ride when available.",
+  "label": "GPSPreRideRoutePreview",
+  "updated": "2026-07-01"
 }
