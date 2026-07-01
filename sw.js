@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.129-gps-preride-update-repair';
+const CACHE_NAME = 'cardiaclens-v9.10.347.130-gps-ask-activity-snapshot-repair';
 self.addEventListener('install', event => { self.skipWaiting(); });
 self.addEventListener('activate', event => { event.waitUntil(self.clients.claim()); });
 self.addEventListener('fetch', event => {

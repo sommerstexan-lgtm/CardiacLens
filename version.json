@@ -1,19 +1,19 @@
 {
-  "version": "v9.10.347.129",
+  "version": "v9.10.347.130",
   "date": "2026-07-01",
-  "notes": "Update readiness repair for v9.10.347.128 delivery: version/cache metadata refreshed everywhere, service worker uses a v9.10.347.129 cache name, HTML navigation requests bypass stale cache, and help wording documents the current GPS transportation workflow, concise Ask summaries, and pre-ride route preview.",
-  "summary": "Update readiness repair, GPS workflow/help clarity, and pre-ride route preview delivery hardening.",
-  "label": "GPSPreRideRoutePreviewUpdateRepair",
+  "notes": "Ask Activity accuracy repair: summaries now prioritize the saved activity weather snapshot and activity-centered fluids before/during/after the activity. This prevents old heat-context values from appearing when the saved snapshot shows different conditions and keeps daily fluid total as supporting context only.",
+  "summary": "Ask Activity weather/hydration accuracy repair.",
+  "label": "GPSAskActivitySnapshotHydrationRepair",
   "releaseDate": "July 1, 2026",
   "updated": "2026-07-01",
   "whatsNew": [
-    "Pre-ride route preview remains available after destination selection when prior same-destination GPS observations exist.",
-    "Transportation activities use Start once / Finish once; GPS estimates movement, stopped time, stops, distance, and elevation.",
-    "Ask Activity is guided to provide a short one-screen summary first, with details only when useful."
+    "Ask Activity now uses the saved weather snapshot for the specific activity instead of historical heat context.",
+    "Activity hydration now summarizes fluids in the 60 minutes before, during, and 30 minutes after the activity, with daily total as supporting context.",
+    "Ask Activity wording is tightened to avoid medical reassurance, symptom speculation, and long narrative responses."
   ],
   "fixes": [
-    "Refreshed version metadata across index.html, all.js, manifest.json, sw.js, reset.html, and version.json.",
-    "Updated the service worker to use the v9.10.347.129 cache name and bypass stale cached HTML navigation responses.",
-    "Help/known-issues wording now reflects the current GPS transportation and route-preview behavior."
+    "Prevented Ask Activity from mentioning heat advisory or 112\u00b0F unless that value exists in the activity's saved weather snapshot.",
+    "Added activity fluid-window capture to saved Activity Context Snapshots.",
+    "Updated GPS/settings/help wording to clarify current Ask Activity weather and hydration behavior."
   ]
 }

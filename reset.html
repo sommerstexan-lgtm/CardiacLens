@@ -1,16 +1,16 @@
 <!doctype html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CardiacLens Cache Repair v9.10.347.129</title>
+<title>CardiacLens Cache Repair v9.10.347.130</title>
 <style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0f172a;color:#e5e7eb;margin:0;padding:24px;line-height:1.45}.card{max-width:680px;margin:30px auto;background:#111827;border:1px solid #334155;border-radius:16px;padding:20px}button{font-size:18px;font-weight:700;border:0;border-radius:12px;padding:14px 18px;background:#22c55e;color:#052e16;width:100%;margin-top:16px}pre{white-space:pre-wrap;background:#020617;border-radius:12px;padding:12px;color:#d1d5db;font-size:13px}.warn{color:#fde68a}</style>
-</head><body><div class="card"><h1>CardiacLens Cache Repair</h1><p>This clears old CardiacLens service workers and cached app files. It does <strong>not</strong> erase your CardiacLens data/localStorage.</p><p class="warn">Use this only after your backup is saved.</p><button id="runBtn">Repair Cache</button><pre id="log">Ready for v9.10.347.129.</pre></div>
+</head><body><div class="card"><h1>CardiacLens Cache Repair</h1><p>This clears old CardiacLens service workers and cached app files. It does <strong>not</strong> erase your CardiacLens data/localStorage.</p><p class="warn">Use this only after your backup is saved.</p><button id="runBtn">Repair Cache</button><pre id="log">Ready for v9.10.347.130.</pre></div>
 <script>
 (function(){
 var logEl=document.getElementById('log');function log(m){logEl.textContent+='\n'+m;}
-async function repair(){logEl.textContent='Starting cache repair for v9.10.347.129...';try{
+async function repair(){logEl.textContent='Starting cache repair for v9.10.347.130...';try{
 if('serviceWorker' in navigator){var regs=await navigator.serviceWorker.getRegistrations();log('Service workers found: '+regs.length);for(var i=0;i<regs.length;i++){try{if(regs[i].active)regs[i].active.postMessage({type:'CARDIACLENS_CLEAR_CACHES'});}catch(e){}var ok=await regs[i].unregister();log('Unregistered service worker '+(i+1)+': '+ok);}}
 if('caches' in window){var keys=await caches.keys();log('Caches found: '+keys.length);for(var j=0;j<keys.length;j++){var deleted=await caches.delete(keys[j]);log('Deleted cache: '+keys[j]+' = '+deleted);}}
-try{await fetch('/sw.js?repair='+Date.now(),{cache:'reload'});await fetch('/index.html?repair='+Date.now(),{cache:'reload'});await fetch('/version.json?repair='+Date.now(),{cache:'reload'});log('Fetched fresh v9.10.347.129 files.');}catch(e){log('Fresh fetch warning: '+e.message);}
-log('DONE. Opening fresh CardiacLens...');setTimeout(function(){location.href='/?v=9.10.347.129-'+Date.now();},1200);
+try{await fetch('/sw.js?repair='+Date.now(),{cache:'reload'});await fetch('/index.html?repair='+Date.now(),{cache:'reload'});await fetch('/version.json?repair='+Date.now(),{cache:'reload'});log('Fetched fresh v9.10.347.130 files.');}catch(e){log('Fresh fetch warning: '+e.message);}
+log('DONE. Opening fresh CardiacLens...');setTimeout(function(){location.href='/?v=9.10.347.130-'+Date.now();},1200);
 }catch(err){log('ERROR: '+(err&&err.message?err.message:String(err)));}}
 document.getElementById('runBtn').addEventListener('click',repair);
 })();
