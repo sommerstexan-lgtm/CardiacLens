@@ -1,20 +1,20 @@
 {
-  "version": "v9.10.347.138",
+  "version": "v9.10.347.139",
   "date": "2026-07-02",
-  "notes": "Activity stop note, symptom capture, and GPS retry handling repair.",
-  "summary": "Adds in-stop symptom entry and improves iOS/PWA GPS retry handling without changing the activity workflow.",
-  "label": "ActivityStopNoteSymptomGpsRetryRepair",
+  "notes": "GPS immediate map marker and active stop note/symptom access repair.",
+  "summary": "Shows current-location marker as soon as activity starts, keeps GPS listening on signal timeouts, and makes active stop note/symptom entry easier to reach during a running activity.",
+  "label": "GpsMapMarkerStopNoteSymptomAccessRepair",
   "releaseDate": "July 2, 2026",
   "updated": "2026-07-02",
   "whatsNew": [
-    "Active stop logging now includes optional symptom text in addition to stop note, fluid, and snack/food.",
-    "Stop entries saved with the completed activity now include symptom details.",
-    "GPS permission/error handling now uses clearer iOS/PWA wording and allows Try Again to restart tracking during a running activity.",
-    "Version number, date, service worker cache, manifest, FAQ, and help text updated for v9.10.347.138."
+    "Live Route Map now shows the current-location indicator immediately on Start Activity when a readiness fix exists.",
+    "Running activities now show a direct Stop Note / Symptom button beside Finish Activity.",
+    "GPS watch handling keeps listening during signal/timeouts instead of prematurely stopping the watch.",
+    "Version number, date, service worker cache, manifest, FAQ, and help text updated for v9.10.347.139."
   ],
   "fixes": [
-    "Fixes missing symptom capture during in-activity stops.",
-    "Clarifies GPS permission/fix failures so users are not incorrectly blamed after settings have been verified.",
-    "Fixes GPS watch retry path by clearing a failed watch and restarting tracking after a successful Try Again fix during an active timer."
+    "Fixes lack of an immediate map location marker after Start Activity.",
+    "Fixes active-stop access by adding a visible Stop Note / Symptom control while timer is running.",
+    "Fixes GPS timeout handling so the active watch is not cleared for ordinary signal/searching errors."
   ]
 }

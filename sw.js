@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.138-activity-stop-note-symptom-gps-retry';
+const CACHE_NAME = 'cardiaclens-v9.10.347.139-gps-map-marker-stop-note-symptom-access';
 self.addEventListener('install', event => { self.skipWaiting(); });
 self.addEventListener('activate', event => { event.waitUntil(self.clients.claim()); });
 self.addEventListener('fetch', event => {
