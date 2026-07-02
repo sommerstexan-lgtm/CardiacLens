@@ -1,21 +1,20 @@
 {
-  "version": "v9.10.347.137",
+  "version": "v9.10.347.138",
   "date": "2026-07-02",
-  "notes": "Certified phone-test build for waypoint stop logging. Save Stop & Resume now returns to the blue activity pill, persists the stop entry immediately, and preserves final activity save behavior.",
-  "summary": "Activity waypoint stop log phone-test certification build.",
-  "label": "ActivityWaypointStopLogPhoneTestCertified",
+  "notes": "Activity stop note, symptom capture, and GPS retry handling repair.",
+  "summary": "Adds in-stop symptom entry and improves iOS/PWA GPS retry handling without changing the activity workflow.",
+  "label": "ActivityStopNoteSymptomGpsRetryRepair",
   "releaseDate": "July 2, 2026",
   "updated": "2026-07-02",
   "whatsNew": [
-    "Save Stop & Resume returns to the blue activity pill during a running activity.",
-    "Stop time, elapsed activity time, optional note, optional fluid ounces, and optional snack/food text persist immediately.",
-    "Final activity save includes all waypoint stop entries.",
-    "Stop fluids are added to the daily fluid log when the activity is saved.",
-    "Version number, date, service worker cache, manifest, and help text updated for this certified phone-test build."
+    "Active stop logging now includes optional symptom text in addition to stop note, fluid, and snack/food.",
+    "Stop entries saved with the completed activity now include symptom details.",
+    "GPS permission/error handling now uses clearer iOS/PWA wording and allows Try Again to restart tracking during a running activity.",
+    "Version number, date, service worker cache, manifest, FAQ, and help text updated for v9.10.347.138."
   ],
   "fixes": [
-    "Fixes Save Stop & Resume remaining in the modal instead of returning to the active activity pill.",
-    "Fixes stale manifest short_name from the prior package.",
-    "Fixes activity save feedback using cleared exertion state after save."
+    "Fixes missing symptom capture during in-activity stops.",
+    "Clarifies GPS permission/fix failures so users are not incorrectly blamed after settings have been verified.",
+    "Fixes GPS watch retry path by clearing a failed watch and restarting tracking after a successful Try Again fix during an active timer."
   ]
 }
