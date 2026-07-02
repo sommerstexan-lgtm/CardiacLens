@@ -1,19 +1,21 @@
 {
-  "version": "v9.10.347.130",
-  "date": "2026-07-01",
-  "notes": "Ask Activity accuracy repair: summaries now prioritize the saved activity weather snapshot and activity-centered fluids before/during/after the activity. This prevents old heat-context values from appearing when the saved snapshot shows different conditions and keeps daily fluid total as supporting context only.",
-  "summary": "Ask Activity weather/hydration accuracy repair.",
-  "label": "GPSAskActivitySnapshotHydrationRepair",
-  "releaseDate": "July 1, 2026",
-  "updated": "2026-07-01",
+  "version": "v9.10.347.137",
+  "date": "2026-07-02",
+  "notes": "Certified phone-test build for waypoint stop logging. Save Stop & Resume now returns to the blue activity pill, persists the stop entry immediately, and preserves final activity save behavior.",
+  "summary": "Activity waypoint stop log phone-test certification build.",
+  "label": "ActivityWaypointStopLogPhoneTestCertified",
+  "releaseDate": "July 2, 2026",
+  "updated": "2026-07-02",
   "whatsNew": [
-    "Ask Activity now uses the saved weather snapshot for the specific activity instead of historical heat context.",
-    "Activity hydration now summarizes fluids in the 60 minutes before, during, and 30 minutes after the activity, with daily total as supporting context.",
-    "Ask Activity wording is tightened to avoid medical reassurance, symptom speculation, and long narrative responses."
+    "Save Stop & Resume returns to the blue activity pill during a running activity.",
+    "Stop time, elapsed activity time, optional note, optional fluid ounces, and optional snack/food text persist immediately.",
+    "Final activity save includes all waypoint stop entries.",
+    "Stop fluids are added to the daily fluid log when the activity is saved.",
+    "Version number, date, service worker cache, manifest, and help text updated for this certified phone-test build."
   ],
   "fixes": [
-    "Prevented Ask Activity from mentioning heat advisory or 112\u00b0F unless that value exists in the activity's saved weather snapshot.",
-    "Added activity fluid-window capture to saved Activity Context Snapshots.",
-    "Updated GPS/settings/help wording to clarify current Ask Activity weather and hydration behavior."
+    "Fixes Save Stop & Resume remaining in the modal instead of returning to the active activity pill.",
+    "Fixes stale manifest short_name from the prior package.",
+    "Fixes activity save feedback using cleared exertion state after save."
   ]
 }
