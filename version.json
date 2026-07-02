@@ -1,20 +1,20 @@
 {
-  "version": "v9.10.347.139",
+  "version": "v9.10.347.140",
   "date": "2026-07-02",
-  "notes": "GPS immediate map marker and active stop note/symptom access repair.",
-  "summary": "Shows current-location marker as soon as activity starts, keeps GPS listening on signal timeouts, and makes active stop note/symptom entry easier to reach during a running activity.",
-  "label": "GpsMapMarkerStopNoteSymptomAccessRepair",
+  "notes": "GPS pipeline trace and first-fix map marker repair.",
+  "summary": "Adds GPS startup tracing, forces a first-fix request on Start Activity, keeps the map marker synced with the latest GPS fix, and avoids presenting the Huntsville fallback map as live location.",
+  "label": "GpsPipelineTraceFirstFixMapMarkerRepair",
   "releaseDate": "July 2, 2026",
   "updated": "2026-07-02",
   "whatsNew": [
-    "Live Route Map now shows the current-location indicator immediately on Start Activity when a readiness fix exists.",
-    "Running activities now show a direct Stop Note / Symptom button beside Finish Activity.",
-    "GPS watch handling keeps listening during signal/timeouts instead of prematurely stopping the watch.",
-    "Version number, date, service worker cache, manifest, FAQ, and help text updated for v9.10.347.139."
+    "Live Route Map now labels the fallback map as a preview until a real GPS point is received.",
+    "Start Activity now requests an immediate first GPS fix and starts watchPosition for continuous tracking.",
+    "The latest readiness GPS fix is drawn when the Leaflet map finishes loading.",
+    "GPS status now includes a short trace showing readiness, start, watch, first-fix, and error events."
   ],
   "fixes": [
-    "Fixes lack of an immediate map location marker after Start Activity.",
-    "Fixes active-stop access by adding a visible Stop Note / Symptom control while timer is running.",
-    "Fixes GPS timeout handling so the active watch is not cleared for ordinary signal/searching errors."
+    "Fixes map loading on the Huntsville fallback without drawing the actual current-location marker.",
+    "Fixes missing delayed marker drawing when Leaflet loads after GPS readiness succeeds.",
+    "Fixes misleading permission-denied wording when GPS has not yet delivered a live point."
   ]
 }
