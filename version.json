@@ -1,20 +1,20 @@
 {
-  "version": "v9.10.347.144",
+  "version": "v9.10.347.146",
   "date": "2026-07-02",
-  "notes": "CardiacLens user-facing Location Status / Check My Location proof test.",
-  "summary": "Adds a clear Location Status section in Log Activity so users can confirm CardiacLens can receive live latitude/longitude before starting GPS activity tracking.",
-  "label": "LocationStatusProofTest",
+  "notes": "Activity logging recovery with GPS as optional add-on. Outdoor activities can be saved accurately even if GPS route capture fails.",
+  "summary": "Keeps Log Activity usable while GPS/map work continues: duration, exertion, notes, fluids, snacks, symptoms, and stop entries save even when GPS is not captured. GPS data is marked not captured instead of saving fake 0.00-mile distance.",
+  "label": "ActivityLoggingRecoveryGpsOptional",
   "releaseDate": "July 2, 2026",
   "updated": "2026-07-02",
   "whatsNew": [
-    "Renames the GPS proof workflow to user-facing Location Status / Check My Location.",
-    "Check My Location displays CardiacLens latitude, longitude, accuracy, and timestamp when a live coordinate is received.",
-    "The map marker is shown only from live CardiacLens latitude/longitude, not the fallback map preview.",
-    "Adds clear privacy wording that location is used only when the user checks location or enables GPS for supported outdoor/mixed activity tracking."
+    "GPS route/distance is now additive and no longer treated as required for a valid activity log.",
+    "If GPS fails, the activity can still be saved with duration, effort, notes, fluids, snacks, symptoms, and stop entries.",
+    "GPS save data now records captured/not captured status so missing GPS is not mistaken for a real 0.00-mile route.",
+    "Location Status text now explains that health logging continues while GPS is searching or unavailable."
   ],
   "fixes": [
-    "Check My Location no longer turns on the activity GPS tracking checkbox by itself.",
-    "Improves user-facing wording so the feature is useful for real users, not just engineering testing.",
-    "Keeps GPS route tracking separate from the manual location check."
+    "Prevents failed GPS from skewing activity records with fake zero-distance GPS data.",
+    "Keeps distanceSource blank unless a real GPS point was captured.",
+    "Adds user-facing help for saving outdoor activities when GPS is unavailable."
   ]
 }

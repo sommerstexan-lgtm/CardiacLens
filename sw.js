@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.144-location-status-proof-test';
+const CACHE_NAME = 'cardiaclens-v9.10.347.146-activity-logging-recovery-gps-optional';
 self.addEventListener('install', event => { self.skipWaiting(); });
 self.addEventListener('activate', event => { event.waitUntil(self.clients.claim()); });
 self.addEventListener('fetch', event => {
