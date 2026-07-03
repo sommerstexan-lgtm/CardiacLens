@@ -1,20 +1,19 @@
 {
-  "version": "9.10.347.147",
+  "version": "9.10.347.148",
   "date": "2026-07-02",
-  "notes": "GPS permission lifecycle repair: location is requested only from Check My Location or Start Activity. Activity logging remains accurate if GPS is not captured.",
-  "summary": "Direct user-action GPS requests; no background readiness GPS calls; Start can reuse a verified fix; GPS remains optional for saved activities.",
-  "label": "ActivityLoggingRecoveryGpsOptional",
+  "notes": "GPS active code path sync repair: index.html now runs the same GPS lifecycle code as all.js; old cached/nearby readiness code removed from the active app screen.",
+  "summary": "Active app screen synchronized with corrected GPS permission lifecycle; GPS remains optional and activity logs still save when GPS is not captured.",
+  "label": "GpsActiveCodePathSyncRepair",
   "releaseDate": "July 2, 2026",
   "updated": "2026-07-02",
   "whatsNew": [
-    "GPS route/distance is now additive and no longer treated as required for a valid activity log.",
-    "If GPS fails, the activity can still be saved with duration, effort, notes, fluids, snacks, symptoms, and stop entries.",
-    "GPS save data now records captured/not captured status so missing GPS is not mistaken for a real 0.00-mile route.",
-    "Location Status text now explains that health logging continues while GPS is searching or unavailable."
+    "Corrected the active Log Activity GPS code path so the app screen no longer runs older cached/nearby GPS readiness code.",
+    "Location requests remain user-controlled from Check My Location or Start Activity.",
+    "Activity logging remains valid and saveable even when GPS is not captured."
   ],
   "fixes": [
-    "Prevents failed GPS from skewing activity records with fake zero-distance GPS data.",
-    "Keeps distanceSource blank unless a real GPS point was captured.",
-    "Adds user-facing help for saving outdoor activities when GPS is unavailable."
+    "Synchronizes index.html GPS lifecycle code with all.js.",
+    "Removes stale active GPS acquisition code that could produce misleading permission failures.",
+    "Keeps GPS route/distance additive rather than required for a valid activity log."
   ]
 }

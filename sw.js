@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.147-activity-logging-recovery-gps-optional';
+const CACHE_NAME = 'cardiaclens-v9.10.347.148-gps-active-code-path-sync-repair';
 self.addEventListener('install', event => { self.skipWaiting(); });
 self.addEventListener('activate', event => { event.waitUntil(self.clients.claim()); });
 self.addEventListener('fetch', event => {
