@@ -1,8 +1,8 @@
 {
-  "version": "v9.10.347.146",
+  "version": "9.10.347.147",
   "date": "2026-07-02",
-  "notes": "Activity logging recovery with GPS as optional add-on. Outdoor activities can be saved accurately even if GPS route capture fails.",
-  "summary": "Keeps Log Activity usable while GPS/map work continues: duration, exertion, notes, fluids, snacks, symptoms, and stop entries save even when GPS is not captured. GPS data is marked not captured instead of saving fake 0.00-mile distance.",
+  "notes": "GPS permission lifecycle repair: location is requested only from Check My Location or Start Activity. Activity logging remains accurate if GPS is not captured.",
+  "summary": "Direct user-action GPS requests; no background readiness GPS calls; Start can reuse a verified fix; GPS remains optional for saved activities.",
   "label": "ActivityLoggingRecoveryGpsOptional",
   "releaseDate": "July 2, 2026",
   "updated": "2026-07-02",
