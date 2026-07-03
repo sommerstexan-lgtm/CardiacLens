@@ -1,7 +1,7 @@
 {
-  "version": "9.10.347.149",
+  "version": "9.10.347.150",
   "date": "2026-07-02",
-  "notes": "GPS first-touch permission repair: Check My Location now makes the geolocation request before map/status DOM work so iOS can treat it as a direct user action.",
+  "notes": "Log Activity GPS controls removed; activity logging preserved with optional manual distance, stops, notes, symptoms, fluids, snacks, and weather/context.",
   "summary": "Check My Location uses a first-touch geolocation request; GPS remains optional and activity logs still save when GPS is not captured.",
   "label": "GpsFirstTouchPermissionRepair",
   "releaseDate": "July 2, 2026",
@@ -15,5 +15,6 @@
     "Removes map reset/map initialization/status DOM work before the Check My Location geolocation request.",
     "Keeps the Location Status test focused on direct current-position proof for iOS permission behavior.",
     "Keeps GPS route/distance additive rather than required for a valid activity log."
-  ]
+  ],
+  "name": "CardiacLens v9.10.347.150"
 }

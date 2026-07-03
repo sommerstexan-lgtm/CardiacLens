@@ -1,6 +1,6 @@
 {
-  "name": "CardiacLens v9.10.347.149",
-  "short_name": "CL v347.149",
+  "name": "CardiacLens v9.10.347.150",
+  "short_name": "CardiacLens",
   "description": "Cardiac health tracking for patients, by a patient.",
   "start_url": "./index.html",
   "display": "standalone",
