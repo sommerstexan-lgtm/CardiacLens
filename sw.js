@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.149-gps-first-touch-permission-repair';
+const CACHE_NAME = 'cardiaclens-v9.10.347.152-log-activity-open-google-maps';
 self.addEventListener('install', event => { self.skipWaiting(); });
 self.addEventListener('activate', event => { event.waitUntil(self.clients.claim()); });
 self.addEventListener('fetch', event => {

@@ -1,20 +1,20 @@
 {
-  "version": "9.10.347.150",
-  "date": "2026-07-02",
-  "notes": "Log Activity GPS controls removed; activity logging preserved with optional manual distance, stops, notes, symptoms, fluids, snacks, and weather/context.",
-  "summary": "Check My Location uses a first-touch geolocation request; GPS remains optional and activity logs still save when GPS is not captured.",
-  "label": "GpsFirstTouchPermissionRepair",
-  "releaseDate": "July 2, 2026",
-  "updated": "2026-07-02",
+  "version": "9.10.347.152",
+  "date": "2026-07-03",
+  "notes": "Milestone B: adds a single optional Open Google Maps button to Log Activity without GPS dependency.",
+  "summary": "Log Activity now includes a lightweight Google Maps escape hatch for navigation/location help while keeping CardiacLens focused on health logging.",
+  "label": "LogActivityOpenGoogleMaps",
+  "releaseDate": "July 3, 2026",
+  "updated": "2026-07-03",
   "whatsNew": [
-    "Check My Location now sends the browser geolocation request as the first action after the tap.",
-    "Map/status updates happen only after the first-touch request succeeds or fails.",
-    "Activity logging remains valid and saveable even when GPS is not captured."
+    "Adds one optional Open Google Maps button inside Log Activity.",
+    "Opens https://www.google.com/maps in a new tab/app when available.",
+    "Keeps activity logging independent from GPS and Google Maps success or failure."
   ],
   "fixes": [
-    "Removes map reset/map initialization/status DOM work before the Check My Location geolocation request.",
-    "Keeps the Location Status test focused on direct current-position proof for iOS permission behavior.",
-    "Keeps GPS route/distance additive rather than required for a valid activity log."
+    "Does not request GPS permissions.",
+    "Does not stop or interrupt the activity timer.",
+    "Does not save, capture, or depend on location data."
   ],
-  "name": "CardiacLens v9.10.347.150"
+  "name": "CardiacLens v9.10.347.152"
 }
