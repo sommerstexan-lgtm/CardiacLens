@@ -1,20 +1,19 @@
 {
-  "version": "9.10.347.152",
+  "version": "9.10.347.153",
   "date": "2026-07-03",
-  "notes": "Milestone B: adds a single optional Open Google Maps button to Log Activity without GPS dependency.",
-  "summary": "Log Activity now includes a lightweight Google Maps escape hatch for navigation/location help while keeping CardiacLens focused on health logging.",
-  "label": "LogActivityOpenGoogleMaps",
+  "notes": "Milestone C: adds optional Google Maps Summary fields to Log Activity and fixes clipped Log Activity choice buttons on iPhone.",
+  "summary": "Log Activity can now store route name, distance, average speed, and elevation gain/loss copied from Google Maps while keeping Maps optional. Activity choice buttons resize cleanly on iPhone.",
+  "label": "LogActivityGoogleMapsSummary",
   "releaseDate": "July 3, 2026",
   "updated": "2026-07-03",
   "whatsNew": [
-    "Adds one optional Open Google Maps button inside Log Activity.",
-    "Opens https://www.google.com/maps in a new tab/app when available.",
-    "Keeps activity logging independent from GPS and Google Maps success or failure."
+    "Adds an optional Google Maps Summary section inside Log Activity.",
+    "Stores route name, distance, average speed, and elevation gain/loss when manually entered.",
+    "Keeps Google Maps optional; CardiacLens continues to log activities without Maps or GPS."
   ],
   "fixes": [
-    "Does not request GPS permissions.",
-    "Does not stop or interrupt the activity timer.",
-    "Does not save, capture, or depend on location data."
+    "Resizes the Light / Moderate / Vigorous Log Activity buttons so they fit on iPhone screens.",
+    "Updates activity history and Ask/context summaries to include the Google Maps route summary when present."
   ],
-  "name": "CardiacLens v9.10.347.152"
+  "name": "CardiacLens v9.10.347.153"
 }
