@@ -1,19 +1,19 @@
 {
-  "version": "9.10.347.148",
+  "version": "9.10.347.149",
   "date": "2026-07-02",
-  "notes": "GPS active code path sync repair: index.html now runs the same GPS lifecycle code as all.js; old cached/nearby readiness code removed from the active app screen.",
-  "summary": "Active app screen synchronized with corrected GPS permission lifecycle; GPS remains optional and activity logs still save when GPS is not captured.",
-  "label": "GpsActiveCodePathSyncRepair",
+  "notes": "GPS first-touch permission repair: Check My Location now makes the geolocation request before map/status DOM work so iOS can treat it as a direct user action.",
+  "summary": "Check My Location uses a first-touch geolocation request; GPS remains optional and activity logs still save when GPS is not captured.",
+  "label": "GpsFirstTouchPermissionRepair",
   "releaseDate": "July 2, 2026",
   "updated": "2026-07-02",
   "whatsNew": [
-    "Corrected the active Log Activity GPS code path so the app screen no longer runs older cached/nearby GPS readiness code.",
-    "Location requests remain user-controlled from Check My Location or Start Activity.",
+    "Check My Location now sends the browser geolocation request as the first action after the tap.",
+    "Map/status updates happen only after the first-touch request succeeds or fails.",
     "Activity logging remains valid and saveable even when GPS is not captured."
   ],
   "fixes": [
-    "Synchronizes index.html GPS lifecycle code with all.js.",
-    "Removes stale active GPS acquisition code that could produce misleading permission failures.",
+    "Removes map reset/map initialization/status DOM work before the Check My Location geolocation request.",
+    "Keeps the Location Status test focused on direct current-position proof for iOS permission behavior.",
     "Keeps GPS route/distance additive rather than required for a valid activity log."
   ]
 }
