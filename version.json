@@ -1,20 +1,20 @@
 {
-  "version": "v9.10.347.140",
+  "version": "v9.10.347.144",
   "date": "2026-07-02",
-  "notes": "GPS pipeline trace and first-fix map marker repair.",
-  "summary": "Adds GPS startup tracing, forces a first-fix request on Start Activity, keeps the map marker synced with the latest GPS fix, and avoids presenting the Huntsville fallback map as live location.",
-  "label": "GpsPipelineTraceFirstFixMapMarkerRepair",
+  "notes": "CardiacLens user-facing Location Status / Check My Location proof test.",
+  "summary": "Adds a clear Location Status section in Log Activity so users can confirm CardiacLens can receive live latitude/longitude before starting GPS activity tracking.",
+  "label": "LocationStatusProofTest",
   "releaseDate": "July 2, 2026",
   "updated": "2026-07-02",
   "whatsNew": [
-    "Live Route Map now labels the fallback map as a preview until a real GPS point is received.",
-    "Start Activity now requests an immediate first GPS fix and starts watchPosition for continuous tracking.",
-    "The latest readiness GPS fix is drawn when the Leaflet map finishes loading.",
-    "GPS status now includes a short trace showing readiness, start, watch, first-fix, and error events."
+    "Renames the GPS proof workflow to user-facing Location Status / Check My Location.",
+    "Check My Location displays CardiacLens latitude, longitude, accuracy, and timestamp when a live coordinate is received.",
+    "The map marker is shown only from live CardiacLens latitude/longitude, not the fallback map preview.",
+    "Adds clear privacy wording that location is used only when the user checks location or enables GPS for supported outdoor/mixed activity tracking."
   ],
   "fixes": [
-    "Fixes map loading on the Huntsville fallback without drawing the actual current-location marker.",
-    "Fixes missing delayed marker drawing when Leaflet loads after GPS readiness succeeds.",
-    "Fixes misleading permission-denied wording when GPS has not yet delivered a live point."
+    "Check My Location no longer turns on the activity GPS tracking checkbox by itself.",
+    "Improves user-facing wording so the feature is useful for real users, not just engineering testing.",
+    "Keeps GPS route tracking separate from the manual location check."
   ]
 }

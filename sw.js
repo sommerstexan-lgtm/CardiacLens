@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.140-gps-pipeline-trace-first-fix-map-marker';
+const CACHE_NAME = 'cardiaclens-v9.10.347.144-location-status-proof-test';
 self.addEventListener('install', event => { self.skipWaiting(); });
 self.addEventListener('activate', event => { event.waitUntil(self.clients.claim()); });
 self.addEventListener('fetch', event => {
