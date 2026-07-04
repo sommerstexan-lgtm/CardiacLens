@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.159-windy-single-tab-radar-fix';
+const CACHE_NAME = 'cardiaclens-v9.10.347.163-medication-intelligence-deploy-cleanup';
 self.addEventListener('install', event => { self.skipWaiting(); });
 self.addEventListener('activate', event => { event.waitUntil(self.clients.claim()); });
 self.addEventListener('fetch', event => {

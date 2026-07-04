@@ -11,7 +11,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.159' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.163' }, params || {}));
       }
     } catch(e) {}
   };
@@ -893,7 +893,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.347.159';
+    var GD_VERSION   = 'v9.10.347.163';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1438,7 +1438,7 @@
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.347.159';
+  var CURRENT='v9.10.347.163';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -1976,7 +1976,7 @@ notes:true
 dailyEvents:[],
 customActivities:[], // User-defined custom physical activities
 securityProfile:null, // Secure Access mirror for update persistence
-// Activity / Today's Weather settings (v9.10.347.159)
+// Activity / Today's Weather settings (v9.10.347.163)
 activityWeatherMode:'manual', // off | manual | internet
 activityWeatherStoreSnapshot:true,
 activityWeatherRainThresholdPct:40,
@@ -3424,7 +3424,7 @@ function renderFAQ() {
     },
     {
       q: 'Can I still save an outdoor activity if GPS fails?',
-      a: 'No. GPS has been removed from Log Activity in v9.10.347.159. Activity logging remains useful with duration, exertion, notes, fluids, snacks, symptoms, stop entries, and optional manual distance. GPS fields are no longer shown in Log Activity.'
+      a: 'No. GPS has been removed from Log Activity in v9.10.347.163. Activity logging remains useful with duration, exertion, notes, fluids, snacks, symptoms, stop entries, and optional manual distance. GPS fields are no longer shown in Log Activity.'
     },
     {
       q: 'Can I use voice dictation to enter data?',
@@ -7854,7 +7854,7 @@ types=types.concat(settings.customActivities);
 return types;
 }
 
-// v9.10.347.159 KISS: users choose activity/purpose first; CardiacLens highlights the recommended context, then allows plausible override.
+// v9.10.347.163 KISS: users choose activity/purpose first; CardiacLens highlights the recommended context, then allows plausible override.
 function getActivityTypesForContext(ctx){
 return getActivityTypes();
 }
@@ -7888,42 +7888,42 @@ var activityTypes=defaultActivityTypes;
 
 var selectedExertion='';
 var selectedTempBand=null;
-// Activity environment/window state (v9.10.347.159)
+// Activity environment/window state (v9.10.347.163)
 var selectedActivityWindow='';
 var selectedActivityWindowMinutes=null;
 var selectedDestination='';
 var selectedEnvironmentalMode='manual';
 var activityEnvironmentSnapshot=null;
-// Today's Weather request guard (v9.10.347.159) — one location/weather request per activity modal/window.
+// Today's Weather request guard (v9.10.347.163) — one location/weather request per activity modal/window.
 // Prevents repeated browser location prompts when Automatic is selected and the user changes fields.
 var activityEnvironmentFetchInFlight=false;
 var activityEnvironmentFetchKey='';
 var activityEnvironmentFetchFailedKey='';
-// Activity context / journey state (v9.10.347.159)
+// Activity context / journey state (v9.10.347.163)
 var selectedActivityContext='';
 var selectedJourneyRole='single';
 var selectedJourneyName='';
 var selectedJourneyId=null;
 var selectedActivityPurpose=''; // exercise | transportation | other
-// v9.10.347.159 KISS transportation workflow: Start once, Finish once; GPS derives movement/stops automatically.
+// v9.10.347.163 KISS transportation workflow: Start once, Finish once; GPS derives movement/stops automatically.
 var activityTravelState='traveling'; // legacy display only
 var activityTravelEvents=[]; // legacy compatibility; no longer user-managed
 var activityGpsMotion={state:'unknown',lastMoveTs:null,lastStopTs:null,currentStopStart:null,movingSeconds:0,stoppedSeconds:0,stopCount:0,lastTs:null};
-// GPS distance tracking state (v9.10.347.159)
+// GPS distance tracking state (v9.10.347.163)
 var activityGpsSelected=false;
 var activityGpsWatchId=null;
 var activityGpsStartTime=null;
 var activityGpsLastPoint=null;
-var activityGpsLastFix=null; // v9.10.347.159: readiness/current-location seed for immediate map marker on Start
+var activityGpsLastFix=null; // v9.10.347.163: readiness/current-location seed for immediate map marker on Start
 var activityGpsMetrics={distanceMiles:0,elevationGainFt:0,elevationLossFt:0,pointCount:0,maxSpeedMph:null,lastAccuracy:null,status:'off',error:'',permissionState:'unknown',readinessChecked:false};
-// GPS live route map state (v9.10.347.159)
+// GPS live route map state (v9.10.347.163)
 var activityGpsRoutePoints=[];
 var activityGpsMap=null;
 var activityGpsMapMarker=null;
 var activityGpsMapRoute=null;
 var activityGpsMapLoadState='idle';
 var activityGpsDiagnostics=[];
-// v9.10.347.159: increments whenever the GPS proof/activity lifecycle is restarted or cancelled.
+// v9.10.347.163: increments whenever the GPS proof/activity lifecycle is restarted or cancelled.
 // Async geolocation callbacks from a prior activity are ignored if their lifecycle id is stale.
 var activityGpsLifecycleId=0;
 function _activityGpsTrace(msg){try{activityGpsDiagnostics.push((new Date()).toLocaleTimeString()+': '+msg);if(activityGpsDiagnostics.length>6)activityGpsDiagnostics=activityGpsDiagnostics.slice(-6);}catch(e){}}
@@ -7931,8 +7931,8 @@ var activityTimerInterval=null;
 var activityStartTime=null;
 var activityElapsedSeconds=0;
 var activityTimerPaused=false;
-var activityTimerStoppedForSave=false; // v9.10.347.159: Save unlocks only after activity is finished
-var activityStopLog=[]; // v9.10.347.159: optional in-activity stop/waypoint notes saved with final activity
+var activityTimerStoppedForSave=false; // v9.10.347.163: Save unlocks only after activity is finished
+var activityStopLog=[]; // v9.10.347.163: optional in-activity stop/waypoint notes saved with final activity
 
 // Background activity state (v9.10.36) — set when user minimizes the activity modal
 var _activityMinimized=false;
@@ -7996,7 +7996,7 @@ html+='<div id="activityWindowSection" style="display:none">'+buildActivityWindo
 html+='<div id="activityDestinationSection" style="display:none">'+buildDestinationHTML()+'</div>';
 html+='</div>';
 
-// v9.10.347.159 KISS: optional Google Maps escape hatch only. No GPS permission, no data capture, no save dependency.
+// v9.10.347.163 KISS: optional Google Maps escape hatch only. No GPS permission, no data capture, no save dependency.
 html+='<div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:12px;padding:12px;margin-bottom:14px">';
 html+='<div style="font-size:13px;font-weight:800;color:#3730a3;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Navigation help (optional)</div>';
 html+='<div style="font-size:14px;color:#475569;line-height:1.45;margin-bottom:10px">Need navigation or location help? Open Google Maps. CardiacLens keeps logging even if Maps is unavailable.</div>';
@@ -8114,7 +8114,7 @@ setTimeout(function(){renderActivityContextButtons();updateActivitySectionsForCo
 
 
 function openGoogleMapsFromActivity(){
-// v9.10.347.159 KISS: open Maps only. Do not request GPS, do not save data, do not affect the activity timer.
+// v9.10.347.163 KISS: open Maps only. Do not request GPS, do not save data, do not affect the activity timer.
 try{
   var mapsUrl='https://www.google.com/maps';
   var opened=window.open(mapsUrl,'_blank','noopener');
@@ -8178,7 +8178,7 @@ if(desc)desc.style.display='block';
 }else{
 if(desc)desc.style.display='none';
 }
-// v9.10.347.159: Activity Type comes first; purpose next when needed; then CardiacLens suggests context.
+// v9.10.347.163: Activity Type comes first; purpose next when needed; then CardiacLens suggests context.
 if(!_activityNeedsPurpose(select.value)){selectedActivityPurpose='';}
 selectedActivityContext='';
 updateActivityPurposeSection();
@@ -8396,7 +8396,7 @@ function clearActiveJourney(){
   if(wrap)wrap.style.display='none';
 }
 function buildJourneyHTML(){
-  // v9.10.347.159: no user-managed trip-flow dropdown.
+  // v9.10.347.163: no user-managed trip-flow dropdown.
   // CardiacLens records transportation flow from the Start / Start / Finish / Finish Activity buttons.
   var h='<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin-bottom:12px">';
   h+='<div style="font-size:14px;font-weight:800;color:#374151;margin-bottom:6px">🧭 Transportation Flow</div>';
@@ -8410,13 +8410,13 @@ function buildJourneyHTML(){
   return h;
 }
 function handleJourneyRoleSelection(){
-  // v9.10.347.159: retained for compatibility with older restore code; no visible dropdown remains.
+  // v9.10.347.163: retained for compatibility with older restore code; no visible dropdown remains.
   selectedJourneyRole='single';
   var name=document.getElementById('journeyNameInput');
   selectedJourneyName=(name&&name.value?name.value.trim():selectedJourneyName||'');
 }
 function getJourneyFormData(activityName){
-  // v9.10.347.159: transportation trips save as one activity unless the user later chooses to describe details in notes.
+  // v9.10.347.163: transportation trips save as one activity unless the user later chooses to describe details in notes.
   var nameEl=document.getElementById('journeyNameInput');
   var name=(nameEl&&nameEl.value.trim())||selectedJourneyName||'';
   return {role:'single',journeyId:null,journeyName:name,active:false};
@@ -8453,7 +8453,7 @@ function updateActivityTimerWorkflowButtons(){
 }
 
 function toggleActivityTravelState(){
-  // v9.10.347.159: transportation is Start -> Finish only. GPS derives stops automatically.
+  // v9.10.347.163: transportation is Start -> Finish only. GPS derives stops automatically.
   return;
 }
 function getActivityTravelEvents(){
@@ -8464,7 +8464,7 @@ function getActivityTravelEvents(){
 // Weather settings persistence guard
 
 
-// Weather settings persistence guard (v9.10.347.159)
+// Weather settings persistence guard (v9.10.347.163)
 var CARDIACLENS_WEATHER_SETTINGS_KEY='CARDIACLENS_WEATHER_SETTINGS';
 function _clMergeDestinations(a,b){
   var out=[],seen={};
@@ -8512,7 +8512,7 @@ function _clWeatherSettingsSnapshot(){
   };}catch(e){return null;}
 }
 function _clSaveWeatherSettingsBackup(){
-  // v9.10.347.159: current saved settings win; backup only fills missing weather fields.
+  // v9.10.347.163: current saved settings win; backup only fills missing weather fields.
   try{
     var snap=_clWeatherSettingsSnapshot(); if(!snap)return;
     var prior=null;
@@ -8534,14 +8534,14 @@ function _clSaveWeatherSettingsBackup(){
   }catch(e){}
 }
 function _clRestoreWeatherSettingsBackup(){
-  // v9.10.347.159: restore defensively. Blank/default backup fields must not erase current settings.
+  // v9.10.347.163: restore defensively. Blank/default backup fields must not erase current settings.
   try{
     var raw=localStorage.getItem(CARDIACLENS_WEATHER_SETTINGS_KEY); if(!raw)return;
     var w=JSON.parse(raw); if(!w||typeof w!=='object')return;
     var fields=['activityWeatherMode','activityEnvironmentalMode','activityWeatherStoreSnapshot','activityWeatherRainThresholdPct','activityWeatherDefaultWindowMin','activityWeatherAskOnOutdoor','activityWeatherStoreCoordinates','todayWeatherPillEnabled','todayWeatherCacheMinutes','todayWeatherSavedZip','todayWeatherSource','pickupPlannerDefaultDate','activityWindows','activityDestinations','activityGpsMode','activityGpsRememberChoice','activityGpsStoreCoordinates','activityGpsPreferences'];
     fields.forEach(function(k){
       if(w[k]===undefined||w[k]===null)return;
-      // v9.10.347.159: current Saved ZIP settings must not be overwritten by older backup values.
+      // v9.10.347.163: current Saved ZIP settings must not be overwritten by older backup values.
       // Backup is only a fill-in source, not the authority when current settings are explicit.
       if(k==='todayWeatherSource'){
         var curSource=settings&&settings.todayWeatherSource;
@@ -8576,15 +8576,15 @@ function _ensureActivityEnvSettings(){
     {label:'Medium — 1 hr',minutes:60},{label:'Long — 2 hr',minutes:120}
   ];}
   if(!settings.activityDestinations){settings.activityDestinations=[];}
-  // v9.10.347.159: remove legacy/test destination presets that were seeded during weather testing.
+  // v9.10.347.163: remove legacy/test destination presets that were seeded during weather testing.
   if(!settings.activityDestinationLegacyCleanupV309){
     var legacyNames={'Doctor':true,'Store':true,'Church':true,'Aggarwala':true,'HEB':true};
     settings.activityDestinations=(settings.activityDestinations||[]).filter(function(d){return d&&d.label&&!legacyNames[d.label];});
     settings.activityDestinationLegacyCleanupV309=true;
-    // v9.10.347.159: do not write defaults from _ensureActivityEnvSettings().
+    // v9.10.347.163: do not write defaults from _ensureActivityEnvSettings().
     // This function may run during startup before saved settings are loaded.
   }
-  // v9.10.347.159: no baked-in destinations. Users add their own.
+  // v9.10.347.163: no baked-in destinations. Users add their own.
   if(settings.activityEnvironmentalMode&&!settings.activityWeatherMode)settings.activityWeatherMode=settings.activityEnvironmentalMode;
   if(!settings.activityWeatherMode)settings.activityWeatherMode='manual';
   settings.activityEnvironmentalMode=settings.activityWeatherMode; // backwards-compatible alias
@@ -8899,7 +8899,7 @@ function getActivityEventContextSnapshot(activityName){
 }
 
 
-// v9.10.347.159 KISS: activity-centered hydration helpers for Ask/activity summaries.
+// v9.10.347.163 KISS: activity-centered hydration helpers for Ask/activity summaries.
 // Daily total remains supporting context; the activity window is before/during/after the activity.
 function clActivityTimeToMinutes(t){
   if(!t)return null;
@@ -8990,7 +8990,7 @@ function getActivityEnvironmentFormData(){
 
 
 
-// v9.10.347.159 KISS: Environment Context display helpers (display only; no save/storage changes)
+// v9.10.347.163 KISS: Environment Context display helpers (display only; no save/storage changes)
 function clActivityEsc(v){
   return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
 }
@@ -9230,7 +9230,7 @@ function _activityGpsPointFromPosition(pos){
 }
 function _activityGpsAcquireCurrentPosition(success,failure,label){
   if(!navigator.geolocation){failure({code:0,message:'GPS is not available in this browser/app.'});return;}
-  // v9.10.347.159: iOS/PWA-safe acquisition.
+  // v9.10.347.163: iOS/PWA-safe acquisition.
   // Use one direct browser location request per user action. Multiple chained requests
   // can produce inconsistent iOS PWA permission behavior and confusing duplicate errors.
   var attempts=[
@@ -9270,7 +9270,7 @@ function _activityGpsDescribeErrors(err){
   return out;
 }
 function testActivityGpsCoordinateProof(){
-  // v9.10.347.159: first-touch permission request.
+  // v9.10.347.163: first-touch permission request.
   // Keep the geolocation call as the first browser action after the user taps Check My Location.
   var geo=navigator.geolocation;
   if(!geo){
@@ -9319,7 +9319,7 @@ function testActivityGpsCoordinateProof(){
   },{enableHighAccuracy:false,maximumAge:600000,timeout:20000});
 }
 function checkActivityGpsReadiness(){
-  // v9.10.347.159: non-invasive readiness only.
+  // v9.10.347.163: non-invasive readiness only.
   // Do not call getCurrentPosition() from readiness/render paths. On iOS/PWA, GPS prompts
   // must be tied to an obvious user action such as Check My Location or Start Activity.
   if(!activityGpsSelected){updateActivityGpsStatus();return;}
@@ -9363,7 +9363,7 @@ function _activityGpsDestroyMap(){
   activityGpsMap=null;activityGpsMapMarker=null;activityGpsMapRoute=null;activityGpsRoutePoints=[];
 }
 function _activityGpsReset(){
-  // v9.10.347.159: full lifecycle reset. This is used after Cancel/Save/Finish-new-session so
+  // v9.10.347.163: full lifecycle reset. This is used after Cancel/Save/Finish-new-session so
   // a second Log Activity starts like a fresh app launch without requiring the user to close/reopen.
   activityGpsLifecycleId++;
   try{if(activityGpsWatchId!==null&&navigator.geolocation)navigator.geolocation.clearWatch(activityGpsWatchId);}catch(e){}
@@ -9697,7 +9697,7 @@ function saveActivityStopEntry(){
   hideActivityStopEditor();
   renderActivityStopLogList();
   if(activityTimerInterval && !activityTimerStoppedForSave){
-    // v9.10.347.159: Save Stop & Resume should return the user to the blue activity pill
+    // v9.10.347.163: Save Stop & Resume should return the user to the blue activity pill
     // and persist the new stop entry immediately for the iPhone/minimize workflow.
     minimizeActivityLog();
     showToast('Stop saved — activity still running');
@@ -9737,7 +9737,7 @@ function _sumActivityStopFluid(){
 }
 
 function getActivityGpsSaveData(){
-  // v9.10.347.159 KISS: GPS is additive. Activity logging must remain accurate even when GPS fails.
+  // v9.10.347.163 KISS: GPS is additive. Activity logging must remain accurate even when GPS fails.
   // If no live coordinate was captured, save GPS status/diagnostics but do not save fake 0.00-mile GPS distance.
   var pts=(activityGpsMetrics&&activityGpsMetrics.pointCount)?activityGpsMetrics.pointCount:0;
   if(!activityGpsSelected && !pts)return null;
@@ -9781,7 +9781,7 @@ function _isActivityFinishedForSave(){
   var isTimerMode=timerDisplay&&timerDisplay.style.display==='block';
   var isManualMode=manualInput&&manualInput.parentElement&&manualInput.parentElement.style.display==='block';
   if(isTimerMode){
-    // v9.10.347.159 KISS: Once the user taps Finish Activity, any positive elapsed time can be saved.
+    // v9.10.347.163 KISS: Once the user taps Finish Activity, any positive elapsed time can be saved.
     // Do not require the full 60 seconds to pass; short real-world activities still matter.
     return !!activityTimerStoppedForSave && activityElapsedSeconds>0 && !activityTimerInterval;
   }
@@ -9889,7 +9889,7 @@ var mins=Math.floor(elapsed/60);
 var secs=elapsed%60;
 var __tt=document.getElementById('timerTime');if(__tt){__tt.textContent=(mins<10?'0':'')+mins+':'+(secs<10?'0':'')+secs;}
 },100);
-// v9.10.347.159 KISS: Start Activity now uses the proven Minimize workflow.
+// v9.10.347.163 KISS: Start Activity now uses the proven Minimize workflow.
 // This creates/persists the activity pill, closes the modal, and starts the pill timer immediately.
 minimizeActivityLog();
 }
@@ -9931,7 +9931,7 @@ if(stopLogBtn)stopLogBtn.style.display='none';
 if(travelBtn)travelBtn.style.display='none';
 _setActivityStopLogVisible(activityStopLog&&activityStopLog.length>0);
 if(pausedLabel)pausedLabel.style.display='none';
-activityTimerStoppedForSave=(activityElapsedSeconds>0); // v9.10.347.159: Save unlocks after Stop for any positive elapsed time
+activityTimerStoppedForSave=(activityElapsedSeconds>0); // v9.10.347.163: Save unlocks after Stop for any positive elapsed time
 updateActivitySaveState();
 }
 
@@ -10176,7 +10176,7 @@ completeAndCloseModal();
 // ── Background Activity System (v9.10.36) ────────────────────────────────────
 
 
-// v9.10.347.159 KISS: activity pill state is created immediately when timer starts.
+// v9.10.347.163 KISS: activity pill state is created immediately when timer starts.
 // This is intentionally limited to the floating pill lifecycle; activity save/history/context logic is untouched.
 function _captureActivityPillStateFromForm(isTimerMode){
   var sel=document.getElementById('activitySelect');
@@ -10226,7 +10226,7 @@ function _captureActivityPillStateFromForm(isTimerMode){
   } catch(e) {}
 }
 
-// v9.10.347.159 KISS: prevent bottom floating controls from covering each other on iPhone.
+// v9.10.347.163 KISS: prevent bottom floating controls from covering each other on iPhone.
 function _layoutBottomPills(){
   var activity=document.getElementById('activityPillBtn');
   var status=document.getElementById('statusFab');
@@ -10469,7 +10469,7 @@ function restoreActivityLog(){
       updateActivitySaveState();
       _setActivityStopLogVisible(activityStopLog&&activityStopLog.length>0);
     }
-    // v9.10.347.159 KISS: returning from the Activity pill should land at the active timer/save area,
+    // v9.10.347.163 KISS: returning from the Activity pill should land at the active timer/save area,
     // not the top of the Log Activity setup modal.
     setTimeout(function(){
       var target=document.getElementById('activityTimingSection')||document.getElementById('timerDisplay')||document.getElementById('timerStartBtn');
@@ -10878,7 +10878,7 @@ gpsTracking:null,
 distanceMiles:activityManualDistanceMiles||null,
 distanceSource:activityManualDistanceMiles?'Google Maps / manual entry':'',
 gpsCaptured:false,
-gpsCaptureNote:'GPS removed from Log Activity in v9.10.347.159. Activity saved with duration, effort, notes, stops, fluids, snacks, symptoms, and optional manual distance.',
+gpsCaptureNote:'GPS removed from Log Activity in v9.10.347.163. Activity saved with duration, effort, notes, stops, fluids, snacks, symptoms, and optional manual distance.',
 averageSpeedMph:manualAverageSpeed,
 maxSpeedMph:null,
 elevationGainFt:activityMapsElevationGainFt,
@@ -12930,6 +12930,7 @@ function _medsHistRenderReadings(data){
     if(entry.eventId){ var evt=getEventById(entry.eventId); if(evt){ h+='<div style="display:inline-block;padding:4px 10px;background:#f0fdf4;border:1px solid #86efac;border-radius:6px;font-size:13px;font-weight:600;color:#166534;margin-bottom:8px">'+evt.icon+' '+evt.name+'</div><br>'; } }
     h+='<div style="font-weight:bold;font-size:20px;color:#f97316">'+entry.medicine+'</div>';
     h+='<div style="font-size:16px;color:#6b7280;margin-top:4px">'+entry.timing+'</div>';
+    h+=_renderMedicationIntelligenceHTML(entry.medicine);
     if(entry.override){h+='<div style="margin-top:8px;padding:8px 10px;background:#fef3c7;border-left:3px solid #d97706;border-radius:6px;font-size:14px;color:#92400e"><strong>⚠️ Override logged</strong><br>'+entry.override.reason;if(entry.override.freeText)h+='<br><em>'+entry.override.freeText+'</em>';if(entry.override.vitals)h+='<br><span style="font-size:13px;color:#78350f">Vitals: '+entry.override.vitals.s+'/'+entry.override.vitals.d+' mmHg · HR '+entry.override.vitals.h+' bpm</span>';h+='</div>';}
     h+=_renderWarnProceedHTML(entry);
     if(entry.notes){ h+='<div style="margin-top:8px;font-size:15px;color:#6b7280">📝 '+entry.notes+'</div>'; }
@@ -13069,6 +13070,106 @@ function deleteMedHistorical(dateKey, timeKey){
   });
   _medsHistRenderReadings(_medsHistAllData);
   alert('✓ Medicine entry deleted');
+}
+
+
+// ── Medication Intelligence Milestone B helpers (v9.10.347.163) ─────────────
+function _miFindMedicine(medName){
+  for(var i=0;i<(medicineList||[]).length;i++){
+    var m=medicineList[i];
+    if(typeof m==='object'&&m.name===medName)return m;
+  }
+  return null;
+}
+function _miEsc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function _miDoctorRuleText(med){
+  return (med&&typeof med==='object')?String(med.doctorRule||med.doctorInstructions||'').trim():'';
+}
+function _miIsFormulaRule(rule){
+  var label=String((rule&&rule.label)||'').toLowerCase();
+  return label.indexOf('mip-approved')===0||label.indexOf('mip pp warn')===0||label.indexOf('medication intelligence panel')!==-1||label.indexOf('mip-approved pp')===0;
+}
+function _miIsFormulaConditionNote(note){
+  var n=String(note||'').toLowerCase();
+  return n.indexOf('mip-approved')!==-1||n.indexOf('medication intelligence panel')!==-1||n.indexOf('pulse pressure')!==-1&&n.indexOf('warn')!==-1;
+}
+function _miDoctorRules(med){
+  var out=[];
+  if(!med)return out;
+  var doctorText=_miDoctorRuleText(med);
+  if(doctorText)out.push({text:doctorText});
+  if(med.conditionRules&&med.conditionRules.length){
+    for(var i=0;i<med.conditionRules.length;i++){
+      var r=med.conditionRules[i];
+      if(!_miIsFormulaRule(r))out.push(r);
+    }
+  }else if(med.conditionMetric && !_miIsFormulaConditionNote(med.conditionNote)){
+    out.push({metric:med.conditionMetric,threshold:med.conditionThreshold,direction:med.conditionDirection||'below',outcome:'block',label:med.conditionNote||''});
+  }
+  return out;
+}
+function _miMedCategory(medName,med){
+  var s=(((med&&med.drugClass)||'')+' '+(medName||'')).toLowerCase();
+  if(/losartan|metoprolol|beta|arb|ace inhibitor|calcium channel|amlodipine|lisinopril|carvedilol|atenolol/.test(s))return 'bp_hr';
+  if(/farxiga|dapagliflozin|sglt2|diuretic|furosemide|hydrochlorothiazide|hctz|spironolactone/.test(s))return 'hydration';
+  if(/eliquis|apixaban|warfarin|xarelto|rivaroxaban|plavix|clopidogrel|aspirin|anticoagulant|antiplatelet/.test(s))return 'bleeding';
+  return 'monitoring';
+}
+function _miRuleSentence(rule){
+  if(rule&&rule.text)return _miEsc(rule.text).replace(/\n/g,'<br>');
+  var metric=_medMetricLabel(rule.metric||'');
+  var unit=_medMetricUnit(rule.metric||'');
+  var dir=(rule.direction==='above')?'above':'below';
+  var verb=(rule.outcome==='warn')?'Awareness if':'Hold if';
+  if(rule.label&&!_miIsFormulaRule(rule))return _miEsc(rule.label);
+  return verb+' '+metric.toLowerCase()+' '+dir+' '+rule.threshold+(unit?' '+unit:'');
+}
+function _miRecentBP(){try{return (typeof _getRecentBPReading==='function')?_getRecentBPReading():null;}catch(e){return null;}}
+function _miTodaySymptomsText(){
+  var a=[];try{(S||[]).forEach(function(x){a.push(String(x.symptom||x.name||x.text||x.notes||'').toLowerCase());});}catch(e){}
+  return a.join(' ');
+}
+function _miExtremeHeatNow(){
+  try{var c=(typeof _clGetWeatherCache==='function')?_clGetWeatherCache():null;var f=c&&c.current&&typeof c.current.feelsLike==='number'?c.current.feelsLike:null;return f!==null&&f>=100;}catch(e){return false;}
+}
+function _miTodaysAwarenessItems(medName){
+  var med=_miFindMedicine(medName);var cat=_miMedCategory(medName,med);var items=[];var sym=_miTodaySymptomsText();
+  function add(x){if(x&&items.indexOf(x)===-1&&items.length<3)items.push(x);}
+  if((cat==='hydration'||cat==='bp_hr')&&settings&&settings.fluidMode&&settings.fluidMode!=='none'&&settings.fluidMin&&dailyFluid<settings.fluidMin)add('Hydration below goal');
+  if((cat==='bp_hr'||cat==='hydration')&&_miExtremeHeatNow())add('Extreme heat today');
+  if((cat==='bp_hr'||cat==='hydration')&&/dizz|lightheaded|faint|weak/.test(sym))add('Recent dizziness or weakness logged today');
+  if(cat==='bp_hr'){
+    var bp=_miRecentBP();
+    var rules=_miDoctorRules(med);
+    for(var i=0;bp&&i<rules.length&&items.length<3;i++){
+      var r=rules[i],v=_medMetricVal(bp,r.metric); if(v===null)continue;
+      if(r.direction==='above'&&v>r.threshold)add('Recent '+_medMetricLabel(r.metric).toLowerCase()+' above doctor rule');
+      if(r.direction!=='above'&&v<r.threshold)add('Recent '+_medMetricLabel(r.metric).toLowerCase()+' below doctor rule');
+    }
+  }
+  if(cat==='bleeding'&&/bleed|bruise|black stool|nosebleed/.test(sym))add('Bleeding-related symptom logged today');
+  return items;
+}
+function _miPersonalPatternSentence(medName){
+  var txt='';
+  try{var hist=getAllHistoricalData();
+    var lower=String(medName||'').toLowerCase();
+    var medCount=(hist.medicines||[]).filter(function(x){return String(x.medicine||'').toLowerCase()===lower;}).length;
+    var dizzy=(hist.symptoms||[]).filter(function(x){return /dizz|lightheaded|faint|weak/.test(String(x.symptom||x.name||x.text||x.notes||'').toLowerCase());}).length;
+    if(medCount>=3&&dizzy>=3)txt='Observed medication logs and dizziness-related entries on multiple days; review the timing details with your clinician.';
+  }catch(e){}
+  return txt||'No consistent personal pattern identified.';
+}
+function _renderMedicationIntelligenceHTML(medName){
+  var med=_miFindMedicine(medName);var rules=_miDoctorRules(med);var items=_miTodaysAwarenessItems(medName);var h='';
+  h+='<div style="margin-top:10px;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;background:#f9fafb">';
+  if(rules.length){h+='<div style="padding:10px 12px;border-bottom:1px solid #e5e7eb;background:#fff"><div style="font-size:13px;font-weight:800;color:#1e3a8a;margin-bottom:4px">Doctor Rule</div>';rules.forEach(function(r){h+='<div style="font-size:14px;color:#374151;line-height:1.5">• '+_miRuleSentence(r)+'</div>';});h+='</div>';}
+  h+='<div style="padding:10px 12px;border-bottom:1px solid #e5e7eb;background:#fff"><div style="font-size:13px;font-weight:800;color:#1e3a8a;margin-bottom:4px">Today\'s Awareness</div>';
+  if(items.length){items.forEach(function(it){h+='<div style="font-size:14px;color:#374151;line-height:1.5">• '+it+'</div>';});}else{h+='<div style="font-size:14px;color:#6b7280;line-height:1.5">No special awareness items today.</div>';}
+  h+='</div><div style="padding:10px 12px;background:#fff"><div style="font-size:13px;font-weight:800;color:#1e3a8a;margin-bottom:4px">Personal Pattern</div><div style="font-size:14px;color:#374151;line-height:1.5">'+_miPersonalPatternSentence(medName)+'</div></div></div>';
+  return h;
 }
 
 function showMedicines(){
@@ -13823,8 +13924,10 @@ html+='<input type="checkbox" class="medCheckbox" value="'+medName+'" '+_preChec
 html+='<div style="flex:1">';
 html+='<div style="font-size:17px;font-weight:600;color:#111827">'+medName+statusBadge+'</div>';
 html+='<div style="font-size:13px;color:#6b7280;margin-top:2px">'+scheduleNote+'</div>';
-var medCondNote=typeof med==='object'&&med.conditionNote?med.conditionNote:'';
-if(medCondNote&&medCondNote!=='As needed'){html+='<div style="font-size:13px;color:#92400e;background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;padding:4px 8px;margin-top:4px;font-weight:600">⚠️ '+medCondNote+'</div>';}
+var medDoctorRules=(typeof _miDoctorRules==='function')?_miDoctorRules(med):[];
+if(medDoctorRules&&medDoctorRules.length){
+  html+='<div style="font-size:13px;color:#1e3a8a;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:4px 8px;margin-top:4px;font-weight:600">Doctor Rule: '+_miRuleSentence(medDoctorRules[0])+(medDoctorRules.length>1?' + '+(medDoctorRules.length-1)+' more':'')+'</div>';
+}
 html+='</div>';
 html+='</label>';
 }
@@ -14081,8 +14184,8 @@ function _evalRule(rule, reading) {
 }
 
 // ── Multi-condition medication rule engine ──────────────────────────
-// Evaluates conditionRules array with OR / AND / COMBINED logic.
-// Falls through to MIP layer, PP warn, and HR warn exactly as before.
+// Evaluates physician-defined conditionRules array with OR / AND / COMBINED logic.
+// Formula-generated MIP, PP, and HR warning layers are not evaluated in Milestone B.
 function _checkMedCondition(medName){
   // Step 1 — tamper check
   if(!_runTamperCheck()) return null;
@@ -14111,6 +14214,9 @@ function _checkMedCondition(medName){
       return null; // no condition set — pass
     }
   }
+
+  rules = rules.filter(function(rule){ return !_miIsFormulaRule(rule); });
+  if(!rules || !rules.length) return null; // no physician-defined rule set — pass
 
   var logic = med.conditionLogic || 'OR';
 
@@ -14204,69 +14310,8 @@ function _checkMedCondition(medName){
     };
   }
 
-  // Step 7 — MIP layer (unchanged — runs after rule set passes)
-  // Check MIP for each metric that has an approved threshold
-  var mipMetrics = ['systolic','diastolic','hr'];
-  for (var mi = 0; mi < mipMetrics.length; mi++) {
-    var mMet = mipMetrics[mi];
-    var mipApproved = mipGetApproved(medName, mMet);
-    if (mipApproved) {
-      var mipActual = _medMetricVal(reading, mMet);
-      if (mipActual !== null) {
-        if (mipActual < mipApproved.block) {
-          return {
-            type: 'condition_not_met',
-            medName: medName, med: med, reading: reading,
-            metric: mMet, threshold: mipApproved.block,
-            direction: 'below', actual: mipActual, fromMIP: true
-          };
-        }
-        if (mipActual < mipApproved.warn) {
-          return {
-            type: 'mip_warn',
-            medName: medName, med: med, reading: reading,
-            metric: mMet, warnThreshold: mipApproved.warn,
-            blockThreshold: mipApproved.block, actual: mipActual
-          };
-        }
-      }
-    }
-  }
-
-  // Step 8 — PP warn from __pp__ (unchanged)
-  var ppApproved = mipGetApproved('__pp__', 'pp');
-  if (ppApproved && ppApproved.warn && reading.s && reading.d) {
-    var currentPP = reading.s - reading.d;
-    if (currentPP < ppApproved.warn) {
-      return {
-        type: 'pp_warn',
-        medName: medName, med: med, reading: reading,
-        currentPP: currentPP, ppWarn: ppApproved.warn,
-        ppTarget: ppApproved.target || 34
-      };
-    }
-  }
-
-  // Step 9 — HR warn: requires 2 of last 3 readings above threshold (v9.10.189)
-  // Changed from average-based to majority-based to prevent a single spike reading
-  // from triggering a warn when the other two readings are within range.
-  var hrWarnThreshold = 80;
-  var mipHR = mipGetApproved(medName, 'hr');
-  if (mipHR && mipHR.warn) hrWarnThreshold = mipHR.warn;
-  var recentHRs = (typeof _getRecentHRReadings === 'function') ? _getRecentHRReadings(3) : [];
-  if (recentHRs.length >= 3) {
-    var avgHR = recentHRs.reduce(function(a,b){ return a+b; },0) / recentHRs.length;
-    var aboveCount = recentHRs.filter(function(v){ return v > hrWarnThreshold; }).length;
-    if (aboveCount >= 2) {
-      return {
-        type: 'hr_warn',
-        medName: medName, med: med, reading: reading,
-        avgHR: Math.round(avgHR * 10) / 10,
-        hrWarnThreshold: hrWarnThreshold, recentHRs: recentHRs,
-        aboveCount: aboveCount
-      };
-    }
-  }
+  // Medication Intelligence Milestone B: formula-generated MIP, PP, and HR warning layers removed.
+  // Only physician-defined condition rules are evaluated at log time.
 
   return null; // all checks passed
 }
@@ -14395,62 +14440,6 @@ function _showRulesWarn(block) {
   showModal(h);
 }
 
-// Show MIP warn screen — amber warning, user can proceed or cancel
-function _showMIPWarn(block) {
-  var metricLabel = block.metric==='systolic'?'Systolic BP':block.metric==='diastolic'?'Diastolic BP':'Heart Rate';
-  var unit = block.metric==='hr'?'bpm':'mmHg';
-  var h = '<div style="background:#fffbeb;border-radius:12px;padding:20px;margin-bottom:16px">';
-  h += '<div style="font-size:22px;font-weight:700;color:#92400e;margin-bottom:8px">⚠️ Low ' + metricLabel + ' — Caution</div>';
-  h += '<div style="font-size:16px;font-weight:700;color:#78350f;margin-bottom:12px">' + block.medName + '</div>';
-  h += '<div style="background:#fef3c7;border-radius:8px;padding:12px;margin-bottom:10px">';
-  h += '<div style="font-size:15px;color:#92400e;margin-bottom:4px">Your ' + metricLabel.toLowerCase() + ' is in the caution range.</div>';
-  h += '<div style="font-size:15px;color:#78350f">Current: <strong>' + block.actual + ' ' + unit + '</strong> &nbsp;·&nbsp; Warn below: <strong>' + block.warnThreshold + ' ' + unit + '</strong> &nbsp;·&nbsp; Block below: <strong>' + block.blockThreshold + ' ' + unit + '</strong></div>';
-  h += '</div>';
-  if (block.reading) h += _vitalsStatusHTML(block.reading);
-  h += '</div>';
-  h += '<div style="font-size:14px;color:#374151;margin-bottom:16px;line-height:1.6">You can still log this dose — your recorded ' + metricLabel.toLowerCase() + ' is below the configured caution threshold for this medication. Discuss this threshold with your cardiologist.</div>';
-  h += '<div style="display:flex;flex-direction:column;gap:10px">';
-  h += '<button onclick="_mipWarnProceed()" style="background:#d97706;color:#fff;border:none;border-radius:10px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;min-height:52px">⚠️ Log Anyway — I Understand the Risk</button>';
-  h += '<button onclick="logMedicine()" style="background:#6b7280;color:#fff;border:none;border-radius:10px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;min-height:52px">← Back</button>';
-  h += '</div>';
-  showModal(h);
-}
-
-// Show PP warn screen
-function _showPPWarn(block) {
-  var h = '<div style="background:#f5f3ff;border-radius:12px;padding:20px;margin-bottom:16px">';
-  h += '<div style="font-size:22px;font-weight:700;color:#5b21b6;margin-bottom:8px">⚠️ Narrow Pulse Pressure</div>';
-  h += '<div style="font-size:16px;font-weight:700;color:#4c1d95;margin-bottom:12px">' + block.medName + '</div>';
-  h += '<div style="background:#ede9fe;border-radius:8px;padding:12px;margin-bottom:10px">';
-  h += '<div style="font-size:15px;color:#5b21b6;margin-bottom:4px">Your current pulse pressure is below your personal warn threshold.</div>';
-  h += '<div style="font-size:15px;color:#4c1d95">Current PP: <strong>' + block.currentPP + ' mmHg</strong> &nbsp;·&nbsp; Warn below: <strong>' + block.ppWarn + ' mmHg</strong> &nbsp;·&nbsp; Recovery target: <strong>' + block.ppTarget + ' mmHg</strong></div>';
-  h += '</div>';
-  h += '<div style="font-size:14px;color:#374151;margin-bottom:16px;line-height:1.6">Your current pulse pressure is below the configured caution threshold for this medication. Your recovery target is ' + block.ppTarget + ' mmHg — discuss this threshold with your cardiologist.</div>';
-  h += '<div style="display:flex;flex-direction:column;gap:10px">';
-  h += '<button onclick="_mipWarnProceed()" style="background:#7c3aed;color:#fff;border:none;border-radius:10px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;min-height:52px">⚠️ Log Anyway — I Understand</button>';
-  h += '<button onclick="logMedicine()" style="background:#6b7280;color:#fff;border:none;border-radius:10px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;min-height:52px">← Back</button>';
-  h += '</div>';
-  showModal(h);
-}
-
-// Show HR warn screen (v9.10.189: updated for 2-of-3 majority logic)
-function _showHRWarn(block) {
-  var _cnt = block.aboveCount || 2;
-  var h = '<div style="background:#fff7ed;border-radius:12px;padding:20px;margin-bottom:16px">';
-  h += '<div style="font-size:22px;font-weight:700;color:#c2410c;margin-bottom:8px">⚠️ Elevated Heart Rate</div>';
-  h += '<div style="font-size:16px;font-weight:700;color:#9a3412;margin-bottom:12px">' + block.medName + '</div>';
-  h += '<div style="background:#ffedd5;border-radius:8px;padding:12px;margin-bottom:10px">';
-  h += '<div style="font-size:15px;color:#c2410c;margin-bottom:4px">' + _cnt + ' of your last 3 HR readings are above your target ceiling.</div>';
-  h += '<div style="font-size:15px;color:#9a3412">Readings: <strong>' + block.recentHRs.join(', ') + ' bpm</strong> &nbsp;·&nbsp; Avg: ' + block.avgHR + ' bpm &nbsp;·&nbsp; Ceiling: <strong>' + block.hrWarnThreshold + ' bpm</strong></div>';
-  h += '</div>';
-  h += '<div style="font-size:14px;color:#374151;margin-bottom:16px;line-height:1.6">Your recorded HR is above your doctor\'s target range across multiple readings. Consider logging another BP/HR reading before deciding, and discuss sustained patterns with your cardiologist.</div>';
-  h += '<div style="display:flex;flex-direction:column;gap:10px">';
-  h += '<button onclick="_mipWarnProceed()" style="background:#ea580c;color:#fff;border:none;border-radius:10px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;min-height:52px">⚠️ Log Anyway — I Understand</button>';
-  h += '<button onclick="logMedicine()" style="background:#6b7280;color:#fff;border:none;border-radius:10px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;min-height:52px">← Back</button>';
-  h += '</div>';
-  showModal(h);
-}
-
 // Plain-language summary of what triggered a warn-tier block, for display
 // in the warn-proceed (caution acknowledgement) record. Mirrors the detail
 // shown on the warn screen itself, in a single line.
@@ -14465,17 +14454,6 @@ function _warnDetailSummary(block){
       }).join('; ');
     }
     return 'Rule(s) triggered';
-  }
-  if(block.type === 'mip_warn'){
-    var metricLabel = block.metric==='systolic'?'Systolic BP':block.metric==='diastolic'?'Diastolic BP':'Heart Rate';
-    var unit = block.metric==='hr'?'bpm':'mmHg';
-    return metricLabel + ' ' + block.actual + ' ' + unit + ' (warn below ' + block.warnThreshold + ', block below ' + block.blockThreshold + ' ' + unit + ')';
-  }
-  if(block.type === 'pp_warn'){
-    return 'Pulse Pressure ' + block.currentPP + ' mmHg (warn below ' + block.ppWarn + ' mmHg, recovery target ' + block.ppTarget + ' mmHg)';
-  }
-  if(block.type === 'hr_warn'){
-    return (block.aboveCount||2) + ' of last 3 HR readings (' + (block.recentHRs||[]).join(', ') + ' bpm, avg ' + block.avgHR + ') above ceiling ' + block.hrWarnThreshold + ' bpm';
   }
   return '';
 }
@@ -14851,7 +14829,7 @@ function _checkDisclaimerAccepted(){
 
 function _acceptDisclaimer(){
   try{
-    var rec = {accepted: true, ts: new Date().toISOString(), version: 'v9.10.347.159'};
+    var rec = {accepted: true, ts: new Date().toISOString(), version: 'v9.10.347.163'};
     // Checksum the acknowledgment record
     rec._cs = _cbHash(rec.ts + '|' + rec.version + '|' + CB_TAMPER_SALT);
     localStorage.setItem(CB_DISCLAIMER_KEY, JSON.stringify(rec));
@@ -14947,9 +14925,6 @@ for(var ci=0; ci<selectedMeds.length; ci++){
       _mipWarnAckedMeds[_warnKey] = true; // mark before showing so _mipWarnProceed passes this med
       window._pendingWarnBlock = _block; // captured for _mipWarnProceed to record vitals/detail
       if(_block.type === 'rules_warn') { _showRulesWarn(_block); return; }
-      if(_block.type === 'mip_warn')  { _showMIPWarn(_block); return; }
-      if(_block.type === 'pp_warn')   { _showPPWarn(_block);  return; }
-      if(_block.type === 'hr_warn')   { _showHRWarn(_block);  return; }
     }
   }
 }
@@ -15100,6 +15075,11 @@ function _medContextFieldsHTML(prefix, med){
 
   var h='<div style="border-top:2px solid #e5e7eb;margin-top:20px;padding-top:16px">';
   h+='<div style="font-size:15px;font-weight:700;color:#374151;margin-bottom:12px">📋 Medicine Context <span style="font-size:12px;font-weight:400;color:#6b7280">— helps Deep Dive show accurate adherence</span></div>';
+
+  var doctorRuleText = med&&typeof med==='object' ? String(med.doctorRule||med.doctorInstructions||'') : '';
+  h+='<label style="display:block;font-size:15px;font-weight:700;margin-bottom:6px;color:#1e3a8a">Doctor Rule / Instructions:</label>';
+  h+='<div style="font-size:12px;color:#6b7280;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 10px;margin-bottom:6px">Enter only instructions your clinician gave you, such as “Hold if systolic &lt;100,” “Take with food,” “Morning only,” or “Split tablet.” Leave blank if none were given.</div>';
+  h+='<textarea id="'+id+'DoctorRule" class="modal-input" rows="2" maxlength="240" placeholder="e.g. Hold if systolic &lt;100; take with food" style="font-size:16px;min-height:70px;resize:none;margin-bottom:12px">'+_miEsc(doctorRuleText)+'</textarea>';
 
   // Status — required
   h+='<label style="display:block;font-size:15px;font-weight:600;margin-bottom:6px;color:#374151">Status: <span style="color:#ef4444">*</span></label>';
@@ -15392,6 +15372,8 @@ function _medContextFieldsRead(prefix){
   var startDate = (document.getElementById(prefix+'MedStartDate') ||{}).value||'';
   var linkedTo  = (document.getElementById(prefix+'MedLinkedTo')  ||{}).value||'';
   var discDate  = (document.getElementById(prefix+'MedDiscDate')  ||{}).value||'';
+  var doctorRuleEl = document.getElementById(prefix+'DoctorRule');
+  var doctorRule = doctorRuleEl ? doctorRuleEl.value.trim() : '';
   // Drug class
   var drugClassEl = document.getElementById(prefix+'DrugClass');
   var drugClass   = drugClassEl ? (drugClassEl.value || '') : '';
@@ -15403,6 +15385,7 @@ function _medContextFieldsRead(prefix){
   conditionRules = conditionRules.filter(function(r){ return r.threshold !== null && !isNaN(r.threshold); });
   if(!conditionLogic) conditionLogic = 'OR';
   return {status:status, startDate:startDate, linkedTo:linkedTo, discDate:discDate,
+          doctorRule:doctorRule,
           drugClass:drugClass,
           conditionRules:conditionRules, conditionLogic:conditionLogic};
 }
@@ -15463,8 +15446,9 @@ var medStatus=typeof med==='object'&&med.status?med.status:'active';
 var _displayStatus=(medStatus==='conditional')?'active':medStatus;
 var statusBadge={active:'<span style="background:#d1fae5;color:#065f46;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:700">✅ Active</span>',discontinued:'<span style="background:#fee2e2;color:#991b1b;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:700">🛑 Discontinued</span>'}[_displayStatus]||'';
 html+='<div style="margin-bottom:4px">'+statusBadge;
-// Show auto-generated condition note for any medicine that has one
-if(typeof med==='object'&&med.conditionNote) html+=' <span style="font-size:13px;color:#92400e;font-style:italic">'+med.conditionNote+'</span>';
+// Show only physician-defined Doctor Rules here; hide formula-generated MIP/PP/HR notes.
+var medDoctorRules2=(typeof _miDoctorRules==='function')?_miDoctorRules(med):[];
+if(medDoctorRules2&&medDoctorRules2.length) html+=' <span style="font-size:13px;color:#1e3a8a;font-style:italic">Doctor Rule: '+_miRuleSentence(medDoctorRules2[0])+(medDoctorRules2.length>1?' + '+(medDoctorRules2.length-1)+' more':'')+'</span>';
 if(typeof med==='object'&&med.linkedTo) html+=' <span style="font-size:12px;color:#3b82f6">🔗 Same drug as: '+med.linkedTo+'</span>';
 html+='</div>';
 var nextDueStr='';
@@ -15774,6 +15758,7 @@ medObject.status=ctx.status;
 if(ctx.startDate)          medObject.startDate=ctx.startDate;
 if(ctx.linkedTo)           medObject.linkedTo=ctx.linkedTo;
 if(ctx.discDate)           medObject.discDate=ctx.discDate;
+if(ctx.doctorRule)         medObject.doctorRule=ctx.doctorRule;
 if(ctx.drugClass)          medObject.drugClass=ctx.drugClass;
 // Condition rules (multi-rule engine)
 medObject.conditionRules = ctx.conditionRules || [];
@@ -15866,6 +15851,7 @@ medObject.status=ctx.status;
 if(ctx.startDate)          medObject.startDate=ctx.startDate;
 if(ctx.linkedTo)           medObject.linkedTo=ctx.linkedTo;
 if(ctx.discDate)           medObject.discDate=ctx.discDate;
+if(ctx.doctorRule)         medObject.doctorRule=ctx.doctorRule;
 if(ctx.drugClass)          medObject.drugClass=ctx.drugClass;
 // Condition rules — use new rules from UI; fall back to existing if builder not present
 var existingMed=typeof medicineList[index]==='object'?medicineList[index]:{};
@@ -17857,7 +17843,7 @@ function buildSmartStatusMessage(zoneData) {
 }
 
 
-// ── Home Today's Weather pill + pickup/trip planner (v9.10.347.159) ─────────────
+// ── Home Today's Weather pill + pickup/trip planner (v9.10.347.163) ─────────────
 var TODAY_WEATHER_CACHE_KEY='CARDIACLENS_TODAY_WEATHER_CACHE';
 var todayWeatherFetchInFlight=false;
 var todayWeatherModalRequestSeq=0;
@@ -17871,7 +17857,7 @@ function _clWindCompass(deg){
 function _clGetWeatherCache(){try{var raw=localStorage.getItem(TODAY_WEATHER_CACHE_KEY);return raw?JSON.parse(raw):null;}catch(e){return null;}}
 function _clSetWeatherCache(obj){try{localStorage.setItem(TODAY_WEATHER_CACHE_KEY,JSON.stringify(obj));}catch(e){}}
 function _clResolveSavedWeatherZip(){
-  // v9.10.347.159: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
+  // v9.10.347.163: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
   // Today Weather must not fall back to GPS unless the user explicitly taps Use My Location.
   try{
     var z=String((settings&&settings.todayWeatherSavedZip)||'').trim();
@@ -17901,7 +17887,7 @@ function _clWeatherUpdatedLabel(c){
   return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+' ('+ageText+')';
 }
 function _clBuildWeatherUrl(lat,lon){
-  // v9.10.347.159: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
+  // v9.10.347.163: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
   // The app only needs current conditions + hourly forecast for rain/heat/wind guidance.
   return 'https://api.open-meteo.com/v1/forecast?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+
     '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=2'+
@@ -17909,7 +17895,7 @@ function _clBuildWeatherUrl(lat,lon){
     '&hourly=precipitation_probability,precipitation,rain,temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m';
 }
 
-// v9.10.347.159: Saved ZIP uses a direct local coordinate table first.
+// v9.10.347.163: Saved ZIP uses a direct local coordinate table first.
 // For Robert's normal area, 77340 always resolves directly to Huntsville coordinates.
 var CL_ZIP_COORDS={
   '77340':{lat:30.7235,lon:-95.5508,label:'Huntsville'},
@@ -18034,15 +18020,15 @@ function openTodayWeatherModal(){
   var html='<div class="modal-title" style="font-size:26px;margin-bottom:10px">☀️ Today\'s Weather</div><button type="button" onclick="hideModal();openHelpModal(\'weather\')" style="width:100%;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;border-radius:10px;padding:10px;font-size:14px;font-weight:800;margin-bottom:12px">How to use Today\'s Weather</button><div id="todayWeatherModalBody">'+_renderTodayWeatherBody(c,null,initialState)+'</div>';
   html+='<div class="modal-actions"><button class="modal-cancel" onclick="hideModal()">Close</button><button class="modal-ok" id="todayWeatherRefreshBtn" onclick="refreshTodayWeatherFromModal()">Refresh Weather</button></div>';
   showModal(html);
-  // v9.10.347.159: if cached weather is older than the user's refresh threshold, refresh automatically on open.
+  // v9.10.347.163: if cached weather is older than the user's refresh threshold, refresh automatically on open.
   // This keeps the weather pill, planner, and activity weather on the same fresh source without requiring a manual tap.
   if(stale){setTimeout(function(){
-    // v9.10.347.159: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
+    // v9.10.347.163: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
     refreshTodayWeatherFromModal(true,'zip');
   },100);}
 }
 
-// v9.10.347.159: Today's Weather banner must use the real weather state, not a stale/default activity flag.
+// v9.10.347.163: Today's Weather banner must use the real weather state, not a stale/default activity flag.
 function _clIsTodayWeatherAutomaticEnabled(c){
   try{
     if(typeof _clRestoreWeatherSettingsBackup==='function')_clRestoreWeatherSettingsBackup();
@@ -18095,7 +18081,7 @@ function _clWindyRadarFallback(pendingWindow){
 }
 
 function openWindyLiveRainRadar(){
-  /* v9.10.347.159 KISS: open exactly one Windy radar tab/window.
+  /* v9.10.347.163 KISS: open exactly one Windy radar tab/window.
      Use a named pending window (without noopener) so the later GPS callback
      updates that same tab instead of leaving about:blank and opening a second tab. */
   var pending=null;
@@ -18194,7 +18180,7 @@ function useSavedZipWeather(){
   refreshTodayWeatherFromModal(false,'zip');
 }
 function refreshTodayWeatherFromModal(silent,source){
-  // v9.10.347.159: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
+  // v9.10.347.163: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
   source=(source==='location')?'location':'zip';
   if(source==='zip'){
     try{settings.todayWeatherSource='zip';settings.todayWeatherSavedZip=_clResolveSavedWeatherZip();localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
@@ -18601,21 +18587,8 @@ if(zoneData&&zoneData.reasons.length>0){
 
 html+='</div>';
 
-// ── v9.10.208: Action items — generic alert-box stack ──────────────────
-// Currently surfaces "medication thresholds due for weekly review" (MIP).
-// Renders as a stack of red/amber boxes above the zone summary; empty
-// stack = nothing rendered. Designed to be extended with other event
-// types later, but kept to this single use until proven out.
-(function(){
-  var dueCount = 0;
-  try { dueCount = _mipDueItems().length; } catch(e) {}
-  if (dueCount > 0) {
-    html += '<div onclick="openMipReviewQueue()" style="background:#fef2f2;border:3px solid #dc2626;border-radius:14px;padding:14px 18px;margin-bottom:16px;cursor:pointer">';
-    html += '<div style="font-size:15px;font-weight:800;color:#991b1b">💊 ' + dueCount + ' medication threshold' + (dueCount===1?'':'s') + ' due for weekly review</div>';
-    html += '<div style="font-size:13px;color:#7f1d1d;margin-top:4px;line-height:1.4">Tap to review suggested updates based on your last 7 days of data</div>';
-    html += '</div>';
-  }
-})();
+// v9.10.347.163: Medication Intelligence is observational only.
+// Do not surface calculated medication-threshold review banners.
 
 html+='</div>';
 zoneDiv.innerHTML=html;
@@ -20071,7 +20044,7 @@ html+=lbBadge;
 html+='<div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">';
 html+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
 html+='<div>';
-html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.347.159</span></div>';
+html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.347.163</span></div>';
 html+='<div id="settingsVersionStatus" style="font-size:13px;color:#6b7280;margin-top:3px">Tap "Check for Updates" to see if a newer version is available</div>';
 html+='</div>';
 html+='<button onclick="checkForUpdates(true)" id="checkUpdateBtn" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">🔍 Check for Updates</button>';
@@ -20230,7 +20203,7 @@ html+='</div>';// close settings-section
   html+='</div></div>';
 })();
 
-// ── v9.10.347.159: Activity & Today's Weather Settings ─────────────────────────
+// ── v9.10.347.163: Activity & Today's Weather Settings ─────────────────────────
 (function(){
   _ensureActivityEnvSettings();
   var wm=settings.activityWeatherMode||'manual';
@@ -31678,7 +31651,7 @@ html+=`</table></div>`;
 }
 
 
-// Activity & Environment Context Summary (v9.10.347.159)
+// Activity & Environment Context Summary (v9.10.347.163)
 if(settings.features&&settings.features.exercise&&data.activities&&data.activities.length>0){
 function _clDrEsc(v){return String(v===undefined||v===null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function _clDrDate(d){if(!d)return'';var parts=String(d).split('-');if(parts.length===3){var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return mo[parseInt(parts[1],10)-1]+' '+parseInt(parts[2],10);}return d;}
@@ -31959,7 +31932,7 @@ html+=`</div>`;
 
 html+=`
 <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:2px solid #e5e7eb;color:#6b7280;font-size:14px">
-<p style="margin:0">CardiacLens v9.10.347.159 — Free & Source-Available</p>
+<p style="margin:0">CardiacLens v9.10.347.163 — Free & Source-Available</p>
 <p style="margin:4px 0 0 0">Report Generated: ${reportDate}</p>
 </div>`;
 
@@ -32170,7 +32143,7 @@ text+=`- ${type}: ${d.count} session(s), BP change ${sysChange>0?'+':''}${sysCha
 }
 
 
-// Activity & Environment Context Summary (v9.10.347.159)
+// Activity & Environment Context Summary (v9.10.347.163)
 if(settings.features&&settings.features.exercise&&data.activities&&data.activities.length>0){
 function _clTxtContext(a){var c=(a.activityContext||a.contextType||'').toString().toLowerCase();var es=a.environmentalSnapshot||{};if(!c&&es.context)c=String(es.context).toLowerCase();if(!c&&es.mode)c=String(es.mode).toLowerCase();if(c.indexOf('mixed')>=0)return'Mixed';if(c.indexOf('out')>=0)return'Outdoor';if(c.indexOf('in')>=0)return'Indoor';return'Not specified';}
 function _clTxtWeather(a){try{if(typeof clActivityWeatherText==='function')return clActivityWeatherText(a)||'';}catch(e){}var es=a.environmentalSnapshot||{};var ws=es.weatherSnapshot||es.weather||{};var out=[];if(ws.feelsLikeF||ws.feelsLike)out.push('Feels like '+(ws.feelsLikeF||ws.feelsLike)+'°');if(ws.precipChance!==undefined&&ws.precipChance!==null)out.push('Rain '+ws.precipChance+'%');if(ws.windMph)out.push('Wind '+ws.windMph+' mph');return out.join(' · ');}
@@ -32290,7 +32263,7 @@ Note: This report is based on patient self-tracked data. Clinical correlation
 and examination are essential for diagnosis and treatment decisions.
 
 ---
-CardiacLens v9.10.347.159 Medical Grade - Free
+CardiacLens v9.10.347.163 Medical Grade - Free
 Report Generated: ${reportDate}`;
 
 return text;
@@ -36427,7 +36400,7 @@ report.push(notes);
 report.push('');
 }
 report.push('═══════════════════════════════════════════════════════════');
-report.push('This report was generated by CardiacLens v9.10.347.159 Medical Grade - Free');
+report.push('This report was generated by CardiacLens v9.10.347.163 Medical Grade - Free');
 report.push('Advanced Analytics Dashboard - Phase 3 Implementation');
 report.push('═══════════════════════════════════════════════════════════');
 const blob=new Blob([report.join('\n')],{type:'text/plain'});
@@ -36517,7 +36490,7 @@ ${periodHTML}
 <h2>Key Insights</h2>
 ${insightsHTML}
 <div style="margin-top:40px;padding:20px;background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:8px">
-<strong>CardiacLens v9.10.347.159 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
+<strong>CardiacLens v9.10.347.163 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
 This report is not a substitute for professional medical advice.
 </div>
 </body>
@@ -37490,7 +37463,7 @@ alert(`🏃 Activity Summary\n\n` +
 var VERSION_JSON_URL = 'https://cardiaclens.com/version.json';
 var VERSION_CHECK_KEY = 'CARDIACLENS_LAST_VERSION_CHECK';
 var VERSION_DISMISSED_KEY = 'CARDIACLENS_UPDATE_DISMISSED';
-var CURRENT_VERSION = 'v9.10.347.159';
+var CURRENT_VERSION = 'v9.10.347.163';
 var _latestVersionData = null; // cached from last fetch
 
 // Detect whether running as an installed Home Screen PWA on iOS
@@ -39989,7 +39962,7 @@ function _mipMarkWeeklyReviewComplete(){
     var stamp=new Date().toISOString();
     localStorage.setItem('CARDIACLENS_MIP_WEEKLY_REVIEWED_AT',stamp);
     if(!medIntelData||typeof medIntelData!=='object')medIntelData={};
-    medIntelData._weeklyReview={completedAt:stamp,version:'v9.10.347.159'};
+    medIntelData._weeklyReview={completedAt:stamp,version:'v9.10.347.163'};
     _mipSave();
   }catch(e){}
 }
@@ -40125,7 +40098,7 @@ function _mipRecordHistory(medName, metric, entry) {
 // or its approvedAt is 7+ days old. Returns one entry per medicine+metric,
 // plus a PP entry, in the same drug-class/name order as the MIP panel.
 function _mipDueItems() {
-  // v9.10.347.159: global weekly-review completion guard.
+  // v9.10.347.163: global weekly-review completion guard.
   // The per-threshold approvedAt values are still the source of truth, but this
   // prevents the red weekly-review card from reappearing immediately after a
   // version update/import when the user has already completed the full queue
@@ -40295,11 +40268,12 @@ function _mipApplyPPThresholds(warnVal, targetVal, actionType) {
 var _mipSearchQuery = '';
 
 function openMedIntel() {
-  var computed = _mipComputeAll();
+  // v9.10.347.163: KISS cleanup. This panel is observational only.
+  // It must not show formula-generated thresholds, SD, approval controls,
+  // PP warning setup, or MIP block/warn activation values.
   var meds = (medicineList || []).filter(function(m) {
     return typeof m === 'object' && m.status !== 'discontinued';
   });
-  // Sort by drugClass then name for grouped display
   meds.sort(function(a,b){
     var ca = a.drugClass||'ZZZ', cb = b.drugClass||'ZZZ';
     if(ca!==cb) return ca.localeCompare(cb);
@@ -40307,212 +40281,55 @@ function openMedIntel() {
   });
 
   var html = '<div class="modal-title">💊 Medication Intelligence</div>';
-  html += '<div style="font-size:14px;color:#6b7280;margin-bottom:16px;line-height:1.5">Thresholds derived from your own data — not population averages. Review each suggestion and approve to activate. Your approved thresholds are used by the medication safety system at log time.</div>';
+  html += '<div style="font-size:14px;color:#6b7280;margin-bottom:14px;line-height:1.6">Observational medication context only. CardiacLens organizes doctor instructions, today\'s relevant awareness, and one personal pattern sentence. It does not diagnose, recommend medication changes, create calculated thresholds, or override physician instructions.</div>';
+  html += '<input type="text" id="mip-search" value="' + (_mipSearchQuery||'').replace(/"/g,'&quot;') + '" placeholder="🔍 Search medicines or drug class..." oninput="_mipFilterMeds(this.value)" style="width:100%;padding:12px 14px;border:2px solid #cbd5e1;border-radius:10px;font-size:16px;box-sizing:border-box;margin-bottom:14px">';
 
-  // Three-window summary table
-  var metrics = ['systolic','diastolic','hr','pp'];
-  var labels  = {systolic:'Systolic',diastolic:'Diastolic',hr:'Heart Rate',pp:'Pulse Pressure'};
-  var units   = {systolic:'mmHg',diastolic:'mmHg',hr:'bpm',pp:'mmHg'};
-
-  html += '<div style="background:#f0f9ff;border:2px solid #0ea5e9;border-radius:12px;padding:14px;margin-bottom:16px">';
-  html += '<div style="font-size:14px;font-weight:700;color:#0369a1;margin-bottom:10px">📊 Your Data — 3 Time Windows</div>';
-  html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">';
-  html += '<tr style="background:#0369a1;color:white"><th style="padding:7px 10px;text-align:left;border-radius:6px 0 0 0">Metric</th><th style="padding:7px 10px;text-align:center">7-day avg</th><th style="padding:7px 10px;text-align:center">30-day avg</th><th style="padding:7px 10px;text-align:center;border-radius:0 6px 0 0">90-day avg</th></tr>';
-  metrics.forEach(function(m) {
-    var w7  = computed.w7[m];
-    var w30 = computed.w30[m];
-    var w90 = computed.w90[m];
-    html += '<tr style="border-bottom:1px solid #e5e7eb">';
-    html += '<td style="padding:7px 10px;font-weight:600;color:#374151">' + labels[m] + '</td>';
-    html += '<td style="padding:7px 10px;text-align:center;color:#0369a1;font-weight:700">' + (w7  ? w7.mean.toFixed(1)  + ' <span style="font-size:11px;color:#6b7280">±' + w7.sd.toFixed(1)  + '</span>' : '—') + '</td>';
-    html += '<td style="padding:7px 10px;text-align:center;color:#374151">'                + (w30 ? w30.mean.toFixed(1) + ' <span style="font-size:11px;color:#6b7280">±' + w30.sd.toFixed(1) + '</span>' : '—') + '</td>';
-    html += '<td style="padding:7px 10px;text-align:center;color:#374151">'                + (w90 ? w90.mean.toFixed(1) + ' <span style="font-size:11px;color:#6b7280">±' + w90.sd.toFixed(1) + '</span>' : '—') + '</td>';
-    html += '</tr>';
-  });
-  html += '</table></div>';
-  html += '<div style="font-size:12px;color:#6b7280;margin-top:8px">±SD = standard deviation — your personal variability range. 7-day window drives threshold suggestions.</div>';
-  html += '</div>';
-
-  if (meds.length === 0) {
-    html += '<div style="text-align:center;padding:24px;color:#6b7280;font-size:14px">No active medicines found.<br>Add medicines in Manage Medicines to use the Intelligence Panel.</div>';
+  if(!meds.length){
+    html += '<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:16px;color:#6b7280;text-align:center">No active medicines found.</div>';
   } else {
-    html += '<div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:10px">💊 Threshold Suggestions by Medicine</div>';
-
-    // Sticky search bar — filters medicine cards by name or drug class
-    html += '<div style="position:sticky;top:0;z-index:50;background:#fff;padding:8px 0;margin-bottom:6px">';
-    html += '<input type="text" id="mip-search-input" placeholder="🔍 Search medicines or drug class..." value="' + _mipSearchQuery.replace(/"/g,'&quot;') + '" oninput="_mipFilterMeds(this.value)" style="width:100%;padding:10px 14px;border:2px solid #d1d5db;border-radius:10px;font-size:15px;font-family:inherit;box-sizing:border-box">';
-    html += '</div>';
-    html += '<div id="mip-no-results" style="display:none;text-align:center;padding:20px;color:#9ca3af;font-size:14px">No medicines match your search.</div>';
-
-    // Build groups of consecutive medicines sharing the same drug class (meds is pre-sorted by drugClass)
-    var groups = [];
-    meds.forEach(function(med){
-      var cls = med.drugClass || '';
-      if(groups.length === 0 || groups[groups.length-1].cls !== cls){
-        groups.push({cls:cls, meds:[]});
+    var currentClass = null;
+    meds.forEach(function(m){
+      var cls = m.drugClass || 'Other';
+      if(cls !== currentClass){
+        if(currentClass !== null) html += '</div>';
+        currentClass = cls;
+        html += '<div class="mip-group" data-search="' + ((cls||'')+' '+meds.map(function(x){return x.name||'';}).join(' ')).toLowerCase().replace(/"/g,'') + '" style="margin-bottom:14px">';
+        html += '<div style="background:#eaf2ff;border-left:4px solid #2563eb;border-radius:6px;padding:7px 10px;margin-bottom:8px;font-size:14px;font-weight:800;color:#1e40af;text-transform:uppercase;letter-spacing:.03em">' + cls + '</div>';
       }
-      groups[groups.length-1].meds.push(med);
+      html += '<div class="mip-med-card" data-search="' + (((m.name||'')+' '+(m.drugClass||'')).toLowerCase().replace(/"/g,'')) + '" style="border:1px solid #e5e7eb;border-radius:12px;padding:12px;margin-bottom:10px;background:#fff">';
+      html += '<div style="font-size:16px;font-weight:800;color:#111827;margin-bottom:2px">' + (m.name||'Unnamed medicine') + '</div>';
+      if(m.drugClass) html += '<div style="display:inline-block;background:#eef2ff;border-radius:5px;padding:2px 6px;font-size:12px;color:#64748b;margin-bottom:6px">' + m.drugClass + '</div>';
+      html += _renderMedicationIntelligenceHTML(m.name||'');
+      html += '</div>';
     });
-
-    groups.forEach(function(group){
-      var cls = group.cls;
-      var clsDisplay = cls || 'Other / Unclassified';
-      var groupSearch = (cls + ' ' + group.meds.map(function(m){return m.name;}).join(' ')).toLowerCase().replace(/"/g,'');
-      html += '<div class="mip-group" data-search="' + groupSearch + '">';
-      html += '<div class="mip-class-header" style="font-size:13px;font-weight:800;color:#1e40af;text-transform:uppercase;letter-spacing:0.07em;margin:16px 0 8px 0;padding:6px 10px;background:#eff6ff;border-left:4px solid #3b82f6;border-radius:0 6px 6px 0">' + clsDisplay + '</div>';
-
-    group.meds.forEach(function(med) {
-      // Per-medicine card — show suggestions for all four metrics
-      var metricList = ['systolic','diastolic','hr','pp'];
-
-      var cardSearch = (med.name + ' ' + (med.drugClass||'')).toLowerCase().replace(/"/g,'');
-      html += '<div id="mip-medcard-' + med.name.replace(/\s/g,'_') + '" class="mip-med-card" data-search="' + cardSearch + '" style="border:2px solid #e5e7eb;border-radius:12px;padding:14px;margin-bottom:12px;background:#fff">';
-      html += '<div style="font-size:16px;font-weight:800;color:#1f2937;margin-bottom:4px">' + med.name + (med.drugClass ? ' <span style="font-size:12px;font-weight:500;color:#6b7280;background:#f3f4f6;border-radius:4px;padding:2px 6px">'+med.drugClass+'</span>' : '') + '</div>';
-
-
-      // Active rules summary
-      if(med.conditionRules && med.conditionRules.length > 0){
-        html += '<div style="font-size:13px;background:#fef3c7;border-radius:6px;padding:8px 10px;margin-bottom:10px;color:#92400e"><strong>Active rules:</strong> '+med.conditionNote+'</div>';
-      } else {
-        html += '<div style="font-size:13px;color:#9ca3af;margin-bottom:10px">No condition rules set — add rules in Manage Medicines to enable blocking/warning.</div>';
-      }
-
-      // Copy-rules offer: show when another medicine of the same class has rules
-      if(med.drugClass){
-        var sameClassWithRules = meds.filter(function(m){ return m.name !== med.name && m.drugClass === med.drugClass && m.conditionRules && m.conditionRules.length > 0; });
-        if(sameClassWithRules.length > 0 && (!med.conditionRules || !med.conditionRules.length)){
-          html += '<div style="background:#f0f9ff;border:1px solid #38bdf8;border-radius:8px;padding:10px;margin-bottom:10px;font-size:13px;color:#0369a1">';
-          html += '💡 <strong>' + sameClassWithRules[0].name + '</strong> is also a ' + med.drugClass + ' with condition rules. ';
-          var _fromSafe = sameClassWithRules[0].name.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-          var _toSafe   = med.name.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-          html += '<button onclick="mipCopyRulesById(this)" data-from="' + _fromSafe + '" data-to="' + _toSafe + '" style="background:#0369a1;color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;margin-left:6px">Copy rules \u2192</button>';
-          html += '</div>';
-        }
-      }
-
-      var _nc=['Anticoagulant','Statin'],_wc=['Sleep Aid'],_mc=med.drugClass||'',_nr=_nc.indexOf(_mc)!==-1,_wo=_wc.indexOf(_mc)!==-1;
-      if(_nr){
-        html+='<div style="background:#fef2f2;border:1.5px solid #fca5a5;border-radius:10px;padding:12px 14px;margin-top:8px"><div style="font-size:14px;font-weight:700;color:#991b1b;margin-bottom:6px">⚠️ No threshold rules recommended</div><div style="font-size:13px;color:#7f1d1d;line-height:1.6">'+_mc+' medicines do not affect BP or HR in a way that justifies threshold rules. Setting rules could prevent you from taking a needed dose.</div><div style="font-size:12px;color:#9ca3af;margin-top:8px">Data shown below for reference only.</div></div>';
-        metricList.forEach(function(mt){var s7=computed.w7[mt];if(!s7)return;html+='<div style="border-top:1px solid #f3f4f6;padding-top:6px;margin-top:6px"><div style="font-size:12px;color:#9ca3af">'+(labels[mt]||mt)+': 7-day mean '+s7.mean.toFixed(1)+' '+(units[mt]||'')+' ±'+s7.sd.toFixed(1)+'</div><div style="font-size:12px;color:#9ca3af">'+_mipRangeText(s7,(units[mt]||''))+'</div></div>';});
-      } else {
-      // Threshold sections for each metric
-      metricList.forEach(function(metric){
-        var stats7 = computed.w7[metric];
-        var sugg   = stats7 ? _mipSuggest(stats7) : null;
-        var approved = mipGetApproved(med.name, metric);
-        var metricLabel = labels[metric] || metric;
-        var unit = units[metric] || '';
-        if(!sugg && !approved) return; // no data and nothing approved — skip metric
-
-        // Per-metric suggestion block within medicine card
-        html += '<div id="mip-metric-' + med.name.replace(/\s/g,'_') + '_' + metric + '" style="border-top:1px solid #e5e7eb;padding-top:10px;margin-top:10px">';
-        html += '<div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:8px">' + metricLabel + ' thresholds</div>';
-        if (sugg) {
-          html += '<div style="background:#fefce8;border:1px solid #f59e0b;border-radius:8px;padding:10px;margin-bottom:10px">';
-          html += '<div style="font-size:12px;font-weight:700;color:#92400e;margin-bottom:6px">💡 7-day: mean ' + stats7.mean.toFixed(1) + ' ' + unit + ', SD ±' + stats7.sd.toFixed(1) + ', n=' + stats7.n + '</div>';
-          html += '<div style="font-size:12px;color:#92400e;margin-bottom:6px">' + _mipRangeText(stats7, unit) + '</div>';
-          html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">';
-          html += '<div style="background:white;border-radius:6px;padding:7px;text-align:center"><div style="font-size:10px;color:#6b7280;font-weight:600;text-transform:uppercase">Block below</div><div style="font-size:20px;font-weight:800;color:#dc2626">' + sugg.block + '</div><div style="font-size:10px;color:#6b7280">' + unit + '</div></div>';
-          html += '<div style="background:white;border-radius:6px;padding:7px;text-align:center"><div style="font-size:10px;color:#6b7280;font-weight:600;text-transform:uppercase">Warn below</div><div style="font-size:20px;font-weight:800;color:#d97706">' + sugg.warn + '</div><div style="font-size:10px;color:#6b7280">' + unit + '</div></div>';
-          html += '</div></div>';
-        }
-        if (approved) {
-          html += '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:8px;margin-bottom:8px">';
-          html += '<div style="font-size:12px;font-weight:700;color:#065f46;margin-bottom:3px">✅ Approved</div>';
-          html += '<div style="font-size:12px;color:#374151">Block: <strong>' + approved.block + ' ' + unit + '</strong> · Warn: <strong>' + approved.warn + ' ' + unit + '</strong>';
-          if (approved.approvedAt) html += ' · <span style="color:#9ca3af">Set ' + new Date(approved.approvedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'}) + '</span>';
-          html += '</div></div>';
-        }
-        var blockVal = approved ? approved.block : (sugg ? sugg.block : '');
-        var warnVal  = approved ? approved.warn  : (sugg ? sugg.warn  : '');
-        var _mipKey = med.name.replace(/\s/g,'_') + '_' + metric;
-        html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">';
-        html += '<div><div style="font-size:11px;font-weight:700;color:#374151;margin-bottom:3px">Block (' + unit + ')</div>';
-        html += '<input type="number" inputmode="numeric" id="mip-block-' + _mipKey + '" value="' + blockVal + '" style="width:100%;padding:8px;border:1.5px solid #d1d5db;border-radius:8px;font-size:16px;font-family:inherit;box-sizing:border-box" onblur="_sanitizeNumericInput(this)"></div>';
-        html += '<div><div style="font-size:11px;font-weight:700;color:#374151;margin-bottom:3px">Warn (' + unit + ')</div>';
-        html += '<input type="number" inputmode="numeric" id="mip-warn-' + _mipKey + '" value="' + warnVal + '" style="width:100%;padding:8px;border:1.5px solid #d1d5db;border-radius:8px;font-size:16px;font-family:inherit;box-sizing:border-box" onblur="_sanitizeNumericInput(this)"></div>';
-        html += '</div>';
-        html += '<div style="font-size:12px;color:#6b7280;margin-bottom:6px;line-height:1.5">📋 Review before activating — your doctor guidance takes priority over calculated suggestions.</div>';
-        var _btnStyle = approved
-          ? 'width:100%;background:white;color:#6b7280;border:2px solid #d1d5db;padding:9px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;touch-action:manipulation'
-          : 'width:100%;background:#059669;color:white;border:none;padding:10px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;touch-action:manipulation';
-        var _btnLabel = approved ? '✏️ Update' : '✅ Approve & Activate';
-        html += '<button onclick="mipApprove(\'' + med.name.replace(/'/g,"\'") + '\',\'' + metric + '\')" style="' + _btnStyle + '">' + _btnLabel + '</button>';
-        html += '</div>'; // end metric section
-      }); // end metricList.forEach
-      } // end drug class else
-
-      html += '</div>'; // end medicine card
-    }); // end group.meds.forEach
-
-    html += '</div>'; // end .mip-group
-    }); // end groups.forEach
-
-    // PP section — personal baseline tracker
-    // PP section — separate since it's not a conditionMetric yet but we track it
-    var ppStats7 = computed.w7.pp;
-    var ppSugg   = ppStats7 ? _mipSuggest(ppStats7) : null;
-    var ppApproved = mipGetApproved('__pp__','pp');
-    html += '<div id="mip-ppcard" style="border:2px solid #7c3aed;border-radius:12px;padding:14px;margin-bottom:12px;background:#fff">';
-    html += '<div style="font-size:16px;font-weight:800;color:#1f2937;margin-bottom:4px">📊 Pulse Pressure — Personal Baseline</div>';
-    html += '<div style="font-size:13px;color:#6b7280;margin-bottom:10px">PP is tracked separately — used for medication warn logic and appointment preparation.</div>';
-    if (ppSugg) {
-      html += '<div style="background:#f5f3ff;border:1px solid #7c3aed;border-radius:8px;padding:10px;margin-bottom:10px">';
-      html += '<div style="font-size:13px;font-weight:700;color:#5b21b6;margin-bottom:6px">7-Day PP: mean ' + ppStats7.mean.toFixed(1) + ' mmHg, SD ' + ppStats7.sd.toFixed(1) + ', n=' + ppStats7.n + '</div>';
-      html += '<div style="font-size:13px;color:#5b21b6;margin-bottom:6px">' + _mipRangeText(ppStats7, 'mmHg') + '</div>';
-      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
-      html += '<div style="background:white;border-radius:6px;padding:8px;text-align:center"><div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase">Warn below</div><div style="font-size:22px;font-weight:800;color:#7c3aed">' + ppSugg.warn + '</div><div style="font-size:11px;color:#6b7280">mmHg</div></div>';
-      html += '<div style="background:white;border-radius:6px;padding:8px;text-align:center"><div style="font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase">Recovery target</div><div style="font-size:22px;font-weight:800;color:#059669">' + (ppApproved && ppApproved.target ? ppApproved.target : '—') + '</div><div style="font-size:11px;color:#6b7280">mmHg (user-set)</div></div>';
-      html += '</div></div>';
-    }
-    if (ppApproved) {
-      html += '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px;margin-bottom:10px">';
-      html += '<div style="font-size:13px;font-weight:700;color:#065f46;margin-bottom:4px">✅ Currently Approved</div>';
-      html += '<div style="font-size:13px;color:#374151">Warn below: <strong>' + ppApproved.warn + ' mmHg</strong> &nbsp;·&nbsp; Recovery target: <strong>' + (ppApproved.target||'—') + ' mmHg</strong></div></div>';
-    }
-    var ppWarnVal   = ppApproved ? ppApproved.warn   : (ppSugg ? ppSugg.warn : '');
-    var ppTargetVal = ppApproved ? ppApproved.target  : 34;
-    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">';
-    html += '<div><div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Warn below (mmHg)</div>';
-    html += '<input type="number" inputmode="numeric" id="mip-pp-warn" value="' + ppWarnVal + '" style="width:100%;padding:9px;border:1.5px solid #d1d5db;border-radius:8px;font-size:16px;font-family:inherit;box-sizing:border-box" onblur="_sanitizeNumericInput(this)"></div>';
-    html += '<div><div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Recovery target (mmHg)</div>';
-    html += '<input type="number" inputmode="numeric" id="mip-pp-target" value="' + ppTargetVal + '" style="width:100%;padding:9px;border:1.5px solid #d1d5db;border-radius:8px;font-size:16px;font-family:inherit;box-sizing:border-box" onblur="_sanitizeNumericInput(this)"></div>';
-    html += '</div>';
-    var _ppBtnStyle = ppApproved
-      ? 'width:100%;background:white;color:#6b7280;border:2px solid #d1d5db;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;touch-action:manipulation'
-      : 'width:100%;background:#7c3aed;color:white;border:none;padding:11px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation';
-    var _ppBtnLabel = ppApproved ? '✏️ Update PP Thresholds' : '✅ Approve PP Thresholds';
-    html += '<button onclick="mipApprovePP()" style="' + _ppBtnStyle + '">' + _ppBtnLabel + '</button>';
-    html += '</div>';
+    if(currentClass !== null) html += '</div>';
+    html += '<div id="mip-no-results" style="display:none;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:14px;color:#6b7280;text-align:center">No medicines match that search.</div>';
   }
 
-  html += '<div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:12px;margin-top:4px;font-size:13px;color:#92400e;line-height:1.6">';
-  html += '⚠️ <strong>Clinical guidance:</strong> These thresholds are derived from your personal data using a clinically validated method (mean ± 1 SD). They are directional — not a medical prescription. Discuss any threshold changes with your cardiologist before activating them. All findings are patterns worth discussing, not clinical conclusions.';
-  html += '</div>';
-
   html += '<div class="modal-actions"><button class="modal-cancel" onclick="_mipSearchQuery=\'\';hideModal()">Close</button></div>';
-
-  // Floating "back to top" button — appears after scrolling down within the modal
-  html += '<button id="mip-back-to-top" onclick="_mipScrollTop()" style="display:none;position:fixed;bottom:24px;right:24px;width:48px;height:48px;border-radius:50%;background:#1d4ed8;color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.3);z-index:100000;touch-action:manipulation">⬆️</button>';
-
   showModal(html);
-  _mipSetupScroll();
   if(_mipSearchQuery) _mipFilterMeds(_mipSearchQuery);
 }
 
-// Filter MIP medicine groups by search text (matches medicine name or drug class)
 function _mipFilterMeds(query){
   _mipSearchQuery = query || '';
   var q = _mipSearchQuery.toLowerCase().trim();
-  var groups = document.querySelectorAll('#modalContent .mip-group');
+  var cards = document.querySelectorAll('#modalContent .mip-med-card');
   var anyVisible = false;
-  groups.forEach(function(g){
-    var match = !q || (g.getAttribute('data-search')||'').indexOf(q) !== -1;
-    g.style.display = match ? '' : 'none';
+  cards.forEach(function(c){
+    var match = !q || (c.getAttribute('data-search')||'').indexOf(q) !== -1;
+    c.style.display = match ? '' : 'none';
     if(match) anyVisible = true;
   });
+  var groups = document.querySelectorAll('#modalContent .mip-group');
+  groups.forEach(function(g){
+    var visible = false;
+    var groupCards = g.querySelectorAll('.mip-med-card');
+    groupCards.forEach(function(c){ if(c.style.display !== 'none') visible = true; });
+    g.style.display = visible ? '' : 'none';
+  });
   var noResults = document.getElementById('mip-no-results');
-  if(noResults) noResults.style.display = (groups.length && !anyVisible) ? 'block' : 'none';
+  if(noResults) noResults.style.display = (cards.length && !anyVisible) ? 'block' : 'none';
 }
 
 // Show/hide the floating back-to-top button based on scroll position within the modal
@@ -40598,93 +40415,13 @@ var _MIP_QUEUE_LABELS = {systolic:'Systolic',diastolic:'Diastolic',hr:'Heart Rat
 var _MIP_QUEUE_UNITS  = {systolic:'mmHg',diastolic:'mmHg',hr:'bpm',pp:'mmHg'};
 
 function openMipReviewQueue() {
-  _mipQueue = _mipDueItems();
-  _mipQueueIdx = 0;
-  _mipQueueChanges = [];
-  if (_mipQueue.length === 0) { showToast('\u2705 All medication thresholds are up to date'); return; }
-  _mipRenderQueueStep();
+  // v9.10.347.163: old calculated threshold review queue retired.
+  // Medication Intelligence now opens the observational three-section panel.
+  openMedIntel();
 }
 
 function _mipRenderQueueStep() {
-  var item = _mipQueue[_mipQueueIdx];
-  if (!item) { _mipRenderQueueSummary(); return; }
-  var n = _mipQueueIdx + 1, total = _mipQueue.length;
-  var label = item.isPP ? 'Pulse Pressure' : (_MIP_QUEUE_LABELS[item.metric] || item.metric);
-  var unit  = item.isPP ? 'mmHg' : (_MIP_QUEUE_UNITS[item.metric] || '');
-
-  var html = '<div class="modal-title">\uD83D\uDCCB Weekly Threshold Review</div>';
-  html += '<div style="font-size:13px;color:#6b7280;margin-bottom:14px">Item ' + n + ' of ' + total + '</div>';
-
-  if (item.isPP) {
-    html += '<div style="border:2px solid #7c3aed;border-radius:12px;padding:14px;margin-bottom:14px;background:#fff">';
-    html += '<div style="font-size:16px;font-weight:800;color:#1f2937;margin-bottom:8px">\uD83D\uDCCA Pulse Pressure \u2014 Personal Baseline</div>';
-    if (item.stats7) {
-      html += '<div style="font-size:13px;color:#6b7280;margin-bottom:10px">7-day: mean ' + item.stats7.mean.toFixed(1) + ' mmHg, SD \u00b1' + item.stats7.sd.toFixed(1) + ', n=' + item.stats7.n + '</div>';
-    }
-    if (item.sugg) {
-      html += '<div style="background:#f5f3ff;border:1px solid #7c3aed;border-radius:8px;padding:10px;margin-bottom:10px">';
-      html += '<div style="font-size:12px;font-weight:700;color:#5b21b6">\uD83D\uDCA1 Suggested \u2014 Warn below: <strong>' + item.sugg.warn + ' mmHg</strong></div>';
-      html += '</div>';
-    }
-    if (item.approved) {
-      html += '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px;margin-bottom:10px">';
-      html += '<div style="font-size:12px;font-weight:700;color:#065f46">\u2705 Currently approved \u2014 Warn below: <strong>' + item.approved.warn + ' mmHg</strong> \u00b7 Target: <strong>' + (item.approved.target || '\u2014') + ' mmHg</strong></div>';
-      html += '</div>';
-    }
-    html += '</div>';
-  } else {
-    html += '<div style="border:2px solid #e5e7eb;border-radius:12px;padding:14px;margin-bottom:14px;background:#fff">';
-    html += '<div style="font-size:16px;font-weight:800;color:#1f2937;margin-bottom:4px">' + item.medName + (item.drugClass ? ' <span style="font-size:12px;font-weight:500;color:#6b7280;background:#f3f4f6;border-radius:4px;padding:2px 6px">' + item.drugClass + '</span>' : '') + '</div>';
-    html += '<div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:8px">' + label + ' thresholds</div>';
-    if (item.stats7) {
-      html += '<div style="font-size:13px;color:#6b7280;margin-bottom:10px">7-day: mean ' + item.stats7.mean.toFixed(1) + ' ' + unit + ', SD \u00b1' + item.stats7.sd.toFixed(1) + ', n=' + item.stats7.n + '</div>';
-    }
-    if (item.sugg) {
-      html += '<div style="background:#fefce8;border:1px solid #f59e0b;border-radius:8px;padding:10px;margin-bottom:10px">';
-      html += '<div style="font-size:12px;font-weight:700;color:#92400e">\uD83D\uDCA1 Suggested \u2014 Block: <strong>' + item.sugg.block + ' ' + unit + '</strong> \u00b7 Warn: <strong>' + item.sugg.warn + ' ' + unit + '</strong></div>';
-      html += '</div>';
-    }
-    if (item.approved) {
-      html += '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px;margin-bottom:10px">';
-      html += '<div style="font-size:12px;font-weight:700;color:#065f46">\u2705 Currently approved \u2014 Block: <strong>' + item.approved.block + ' ' + unit + '</strong> \u00b7 Warn: <strong>' + item.approved.warn + ' ' + unit + '</strong></div>';
-      html += '</div>';
-    }
-    html += '</div>';
-  }
-
-  // Edit fields — hidden until "Edit manually" is tapped
-  html += '<div id="mip-queue-edit" style="display:none;border:2px solid #3b82f6;border-radius:12px;padding:14px;margin-bottom:14px;background:#eff6ff">';
-  if (item.isPP) {
-    var ev = item.approved ? item.approved.warn : (item.sugg ? item.sugg.warn : '');
-    var et = (item.approved && item.approved.target) ? item.approved.target : 34;
-    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">';
-    html += '<div><div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Warn below (mmHg)</div><input type="number" inputmode="numeric" id="mip-queue-val1" value="' + ev + '" style="width:100%;padding:9px;border:1.5px solid #d1d5db;border-radius:8px;font-size:16px;font-family:inherit;box-sizing:border-box" onblur="_sanitizeNumericInput(this)"></div>';
-    html += '<div><div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Recovery target (mmHg)</div><input type="number" inputmode="numeric" id="mip-queue-val2" value="' + et + '" style="width:100%;padding:9px;border:1.5px solid #d1d5db;border-radius:8px;font-size:16px;font-family:inherit;box-sizing:border-box" onblur="_sanitizeNumericInput(this)"></div>';
-    html += '</div>';
-  } else {
-    var bv = item.approved ? item.approved.block : (item.sugg ? item.sugg.block : '');
-    var wv = item.approved ? item.approved.warn  : (item.sugg ? item.sugg.warn  : '');
-    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">';
-    html += '<div><div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Block (' + unit + ')</div><input type="number" inputmode="numeric" id="mip-queue-val1" value="' + bv + '" style="width:100%;padding:9px;border:1.5px solid #d1d5db;border-radius:8px;font-size:16px;font-family:inherit;box-sizing:border-box" onblur="_sanitizeNumericInput(this)"></div>';
-    html += '<div><div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:4px">Warn (' + unit + ')</div><input type="number" inputmode="numeric" id="mip-queue-val2" value="' + wv + '" style="width:100%;padding:9px;border:1.5px solid #d1d5db;border-radius:8px;font-size:16px;font-family:inherit;box-sizing:border-box" onblur="_sanitizeNumericInput(this)"></div>';
-    html += '</div>';
-  }
-  html += '<button onclick="_mipQueueAction(\'edit\')" style="width:100%;background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation">Save &amp; Continue</button>';
-  html += '</div>';
-
-  // Action buttons
-  var suggUsable = item.sugg && (item.isPP || item.sugg.warn > item.sugg.block);
-  if (suggUsable) {
-    html += '<button onclick="_mipQueueAction(\'approve\')" style="width:100%;background:#059669;color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;touch-action:manipulation">\u2705 Use suggested values</button>';
-  }
-  if (item.approved) {
-    html += '<button onclick="_mipQueueAction(\'keep\')" style="width:100%;background:white;color:#374151;border:2px solid #d1d5db;border-radius:8px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:8px;touch-action:manipulation">\u2194\uFE0F Keep current values</button>';
-  }
-  html += '<button onclick="_mipQueueToggleEdit()" style="width:100%;background:white;color:#1d4ed8;border:2px solid #93c5fd;border-radius:8px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:8px;touch-action:manipulation">\u270F\uFE0F Edit manually</button>';
-
-  html += '<div style="font-size:12px;color:#6b7280;margin-top:4px;line-height:1.5">\uD83D\uDCCB Review before activating \u2014 your doctor guidance takes priority over calculated suggestions.</div>';
-  html += '<div class="modal-actions"><button class="modal-cancel" onclick="hideModal()">Close \u2014 review later</button></div>';
-  showModal(html);
+  openMedIntel();
 }
 
 function _mipQueueToggleEdit() {
@@ -46833,7 +46570,7 @@ function _showAskClarifyChips(options) {
 /* CardiacLens Secure Access Takeover v9.10.287
    Reliability pass: pointer-event tap handling, preserved app tab for email, exact cooldown thresholds. */
 (function(){
-  var VERSION='v9.10.347.159';
+  var VERSION='v9.10.347.163';
   var KEY='CL_SEC_KEY', COLOR='CL_SEC_COLOR', Q='CL_SEC_Q', A='CL_SEC_A', DONE='CL_SEC_DONE';
   var FAILS='CL_SEC_FAILS', COOL='CL_SEC_COOL_UNTIL';
   var COLORS={red:'#e53935',blue:'#1565c0',green:'#2e7d32',orange:'#e65100',purple:'#6a1b9a',teal:'#00695c',pink:'#c2185b',gold:'#f57f17'};
@@ -46991,7 +46728,7 @@ function _showAskClarifyChips(options) {
   // attachment state. This review screen never auto-attaches images; it gives the
   // user a visible message to copy, then opens email from a direct button tap.
   function installFeedbackReviewOverrides(){
-    function currentVersion(){return (typeof CURRENT_VERSION!=='undefined')?CURRENT_VERSION:'v9.10.347.159';}
+    function currentVersion(){return (typeof CURRENT_VERSION!=='undefined')?CURRENT_VERSION:'v9.10.347.163';}
     function deviceLine(){try{return (navigator.userAgent||'').slice(0,180);}catch(e){return '';}}
     function feedbackStamp(){try{var d=new Date();function z(n){return String(n).padStart(2,'0');}return 'ID '+d.getFullYear()+z(d.getMonth()+1)+z(d.getDate())+'-'+z(d.getHours())+z(d.getMinutes())+z(d.getSeconds());}catch(e){return 'ID '+Date.now();}}
     function supportPayload(){
@@ -47077,7 +46814,7 @@ function _showAskClarifyChips(options) {
 
 
 
-  // v9.10.347.159: Final tappable email contact workflow
+  // v9.10.347.163: Final tappable email contact workflow
   // Purpose: keep feedback simple while still opening the user's default mail app.
   // Primary action is a real mailto: link to robert@cardiaclens.com. Copy remains as fallback.
   (function installPlainSupportContactOverride(){
@@ -47206,7 +46943,7 @@ function _showAskClarifyChips(options) {
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,100);});else setTimeout(boot,100);setTimeout(boot,1000);setTimeout(boot,4000);
 })();
 
-// ── v9.10.347.159: Weather hardening override ─────────────────────────────
+// ── v9.10.347.163: Weather hardening override ─────────────────────────────
 // Purpose: keep Today's Weather simple and predictable: Saved ZIP -> coordinates -> Open-Meteo -> render.
 // No GPS unless Use My Location is explicitly tapped. Older weather code remains below this override but these
 // same global function names take precedence for buttons, modal open, planner, and activity weather.

@@ -1,31 +1,9 @@
 {
-  "version": "9.10.347.159",
-  "date": "2026-07-03",
-  "releaseDate": "July 3, 2026",
-  "updated": "2026-07-03",
-  "label": "WindySingleTabRadarFix",
-  "name": "CardiacLens v9.10.347.159",
-  "notes": "Fix Live Rain Radar so Windy opens in a single tab/window using the tested direct radar URL.",
-  "summary": "Today\u2019s Weather opens one Windy radar tab using https://www.windy.com/-Weather-radar-radar?radar,{latitude},{longitude},9. Current GPS is used when allowed; saved Weather ZIP coordinates are used as fallback.",
-  "whatsNew": [
-    "Live Rain Radar now uses the tested Windy URL format: https://www.windy.com/-Weather-radar-radar?radar,{latitude},{longitude},9.",
-    "CardiacLens requests current GPS only when the radar button is tapped; if unavailable, it falls back to the saved Weather ZIP coordinates.",
-    "Help text explains why Windy was chosen while Open-Meteo remains the in-app forecast source."
-  ],
-  "fixes": [
-    "Repairs duplicate-tab behavior caused by opening an about:blank tab that could not be reused after the GPS callback.",
-    "Keeps Open-Meteo as the in-app forecast source and Windy as the optional animated precipitation map."
-  ],
-  "changes": [
-    "Live Rain Radar now opens Windy in a single named tab/window instead of leaving an about:blank tab and opening a second tab.",
-    "Preserves the tested Windy URL format: https://www.windy.com/-Weather-radar-radar?radar,{latitude},{longitude},9.",
-    "CardiacLens requests current GPS only when the radar button is tapped; if unavailable, it falls back to the saved Weather ZIP coordinates."
-  ],
-  "audit": [
-    "Change isolated to Today\u2019s Weather live radar link behavior, version metadata, service worker cache name, and related help/release text."
-  ],
-  "testing": [
-    "Verified source contains one Windy URL builder and one Live Rain Radar handler.",
-    "Verified initial window open no longer uses noopener/noreferrer, allowing the GPS callback to update the same pending tab."
-  ]
+  "version": "9.10.347.163",
+  "date": "2026-07-04",
+  "releaseDate": "July 4, 2026",
+  "updated": "2026-07-04",
+  "build": "MedicationIntelligenceDeployCleanup",
+  "name": "CardiacLens v9.10.347.163",
+  "notes": "Medication Intelligence v163: deploy cleanup after Doctor Rule entry. Log Medicine now routes only physician-defined Doctor Rules and the three-section Medication Intelligence display; obsolete formula-generated MIP/PP/HR warning branches were removed from the save path. Help documentation updated."
 }
