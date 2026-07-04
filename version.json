@@ -1,9 +1,29 @@
 {
-  "version": "9.10.347.163",
+  "version": "9.10.347.165",
   "date": "2026-07-04",
   "releaseDate": "July 4, 2026",
   "updated": "2026-07-04",
-  "build": "MedicationIntelligenceDeployCleanup",
-  "name": "CardiacLens v9.10.347.163",
-  "notes": "Medication Intelligence v163: deploy cleanup after Doctor Rule entry. Log Medicine now routes only physician-defined Doctor Rules and the three-section Medication Intelligence display; obsolete formula-generated MIP/PP/HR warning branches were removed from the save path. Help documentation updated."
+  "build": "MedicationConditionRulesRetired",
+  "name": "CardiacLens v9.10.347.165",
+  "notes": "Medication Intelligence v165: retires the old medicine condition-rule engine from Log Medicine and Manage Medicines. Doctor Rule / Instructions remains as the user-entered clinician instruction field. Old conditionRules, legacy conditionMetric values, and MIP-approved formula thresholds are not evaluated, displayed as Doctor Rules, copied between medicines, or synced into medicine records.",
+  "label": "MedicationConditionRulesRetired",
+  "summary": "Removes the remaining old medication condition-rule path so Medication Intelligence is observational only: Doctor Rule, Today's Awareness, and Personal Pattern.",
+  "whatsNew": [
+    "Log Medicine no longer runs old medicine condition rules, MIP threshold rules, pulse-pressure warnings, or HR formula warnings.",
+    "Manage Medicines no longer shows the old Condition Rules builder; users enter only Doctor Rule / Instructions.",
+    "Existing saved condition-rule data is cleaned from medicine records on load."
+  ],
+  "fixes": [
+    "Removed the remaining condition-rule block/warn path from medicine logging.",
+    "Disabled old MIP-to-conditionRules migrations and sync helpers.",
+    "Updated Ask context/help wording so condition rules are not presented as active medication safety rules."
+  ],
+  "changes": [
+    "Version advanced to v9.10.347.165."
+  ],
+  "testing": [
+    "Verified JavaScript syntax with node --check all.js.",
+    "Verified JSON metadata.",
+    "Verified ZIP integrity."
+  ]
 }
