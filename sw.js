@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.165-medication-condition-rules-retired';
+const CACHE_NAME = 'cardiaclens-v9.10.347.167-medication-deploy-verification';
 
 self.addEventListener('install', event => {
   self.skipWaiting();

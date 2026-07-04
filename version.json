@@ -1,29 +1,31 @@
 {
-  "version": "9.10.347.165",
+  "version": "9.10.347.167",
   "date": "2026-07-04",
   "releaseDate": "July 4, 2026",
   "updated": "2026-07-04",
-  "build": "MedicationConditionRulesRetired",
-  "name": "CardiacLens v9.10.347.165",
-  "notes": "Medication Intelligence v165: retires the old medicine condition-rule engine from Log Medicine and Manage Medicines. Doctor Rule / Instructions remains as the user-entered clinician instruction field. Old conditionRules, legacy conditionMetric values, and MIP-approved formula thresholds are not evaluated, displayed as Doctor Rules, copied between medicines, or synced into medicine records.",
-  "label": "MedicationConditionRulesRetired",
-  "summary": "Removes the remaining old medication condition-rule path so Medication Intelligence is observational only: Doctor Rule, Today's Awareness, and Personal Pattern.",
+  "build": "MedicationDeployVerification",
+  "name": "CardiacLens v9.10.347.167",
+  "notes": "v167 verifies the v166 deploy package and tightens the remaining user-facing Medication Intelligence wording so retired medication condition rules are not presented as active features. Guard Dog timer null-reference repair and v165 condition-rule retirement are preserved.",
+  "label": "MedicationDeployVerification",
+  "summary": "Deployment verification cleanup for GitHub/iPhone: retired medication condition-rule wording removed from current user-facing guidance; app files and cache version advanced.",
   "whatsNew": [
-    "Log Medicine no longer runs old medicine condition rules, MIP threshold rules, pulse-pressure warnings, or HR formula warnings.",
-    "Manage Medicines no longer shows the old Condition Rules builder; users enter only Doctor Rule / Instructions.",
-    "Existing saved condition-rule data is cleaned from medicine records on load."
+    "Medication condition rules remain retired: Log Medicine does not use old conditionRules, MIP-approved thresholds, PP warnings, or HR formula warnings to block or warn medication logging.",
+    "Medication guidance wording now points users to Doctor Rule text and observational Medication Intelligence instead of old condition-check wording.",
+    "Service worker cache name advanced for a clean GitHub/iPhone deploy."
   ],
   "fixes": [
-    "Removed the remaining condition-rule block/warn path from medicine logging.",
-    "Disabled old MIP-to-conditionRules migrations and sync helpers.",
-    "Updated Ask context/help wording so condition rules are not presented as active medication safety rules."
+    "Updated current safety/disclaimer wording so it no longer describes old medication condition checks as active medication safety features.",
+    "Doctor-report medication context now uses Doctor Rule text rather than retired conditionNote text.",
+    "Verified Guard Dog timerTime null-reference guard remains present."
   ],
   "changes": [
-    "Version advanced to v9.10.347.165."
+    "Version advanced to v9.10.347.167."
   ],
   "testing": [
     "Verified JavaScript syntax with node --check all.js.",
+    "Verified inline script syntax extracted from index.html.",
     "Verified JSON metadata.",
+    "Verified service worker syntax.",
     "Verified ZIP integrity."
   ]
 }
