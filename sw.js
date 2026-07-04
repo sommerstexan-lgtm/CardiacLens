@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.169-compact-due-missed-next-event';
+const CACHE_NAME = 'cardiaclens-v9.10.347.170-events-tile-queue-sound';
 
 self.addEventListener('install', event => {
   self.skipWaiting();

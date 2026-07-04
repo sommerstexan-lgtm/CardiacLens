@@ -1,26 +1,27 @@
 {
-  "version": "9.10.347.169",
+  "version": "9.10.347.170",
   "date": "2026-07-04",
   "releaseDate": "July 4, 2026",
   "updated": "2026-07-04",
-  "build": "CompactDueMissedNextEvent",
-  "name": "CardiacLens v9.10.347.169",
-  "notes": "v169 shrinks the event notification footprint. Today's Status now shows overall status first, a compact Due & Missed Events card only for due/overdue items, and a separate compact Next Event card for the next scheduled item. Pop-up event modals remain retired.",
-  "label": "CompactDueMissedNextEvent",
-  "summary": "Compact, non-interrupting scheduled-event experience: due/missed now, next event separately.",
+  "build": "EventsTileQueueSoundTiming",
+  "name": "CardiacLens v9.10.347.170",
+  "notes": "v170 moves event awareness into a single color-changing Events tile inside Today's Status. The tile shows whether anything is due, missed, clear, or next; tapping it opens the full event queue. Home-page event cards are removed. Audible sound plays only once when a new event becomes due while the app is open, not when the app is opened.",
+  "label": "EventsTileQueueSoundTiming",
+  "summary": "Single Events tile in Today's Status with non-interrupting queue and one-time due-event sound timing.",
   "whatsNew": [
-    "Due & Missed Events now shows only due or overdue items, not far-future upcoming events.",
-    "Next Event is shown separately in a compact card so the user can see what is coming without making the queue dominate the screen.",
-    "The home screen now answers: overall status, due/overdue now, and next scheduled event.",
-    "Event reminders remain non-interrupting and do not open pop-up modals over active logging."
+    "Today's Status now includes a single Events tile as the gateway to due, missed, and next scheduled events.",
+    "The Events tile changes color: green for clear/next, blue for due now, and red for missed.",
+    "Large home-page Due & Missed / Next Event cards are removed so the dashboard stays compact.",
+    "Tapping Events opens the full queue with Log, Snooze 10, and Dismiss for due or missed items.",
+    "Audible sound is state-change based: one soft tone when a new event becomes due while CardiacLens is open; no sound fires just because the app opens."
   ],
   "fixes": [
-    "Reduced the v168 Due & Missed card footprint so it no longer dominates Today's Status.",
-    "Separated upcoming events from due/missed items for clearer event awareness.",
-    "Service worker cache name advanced for clean GitHub Pages and iPhone refresh."
+    "Removed event cards that were crowding the mobile home page.",
+    "Disabled missed-event catch-up modals from opening automatically on app start.",
+    "Advanced service worker cache name for clean GitHub Pages and iPhone refresh."
   ],
   "changes": [
-    "Version advanced to v9.10.347.169."
+    "Version advanced to v9.10.347.170."
   ],
   "testing": [
     "Verified JavaScript syntax with node --check all.js.",
