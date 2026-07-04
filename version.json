@@ -1,25 +1,26 @@
 {
-  "version": "9.10.347.167",
+  "version": "9.10.347.169",
   "date": "2026-07-04",
   "releaseDate": "July 4, 2026",
   "updated": "2026-07-04",
-  "build": "MedicationDeployVerification",
-  "name": "CardiacLens v9.10.347.167",
-  "notes": "v167 verifies the v166 deploy package and tightens the remaining user-facing Medication Intelligence wording so retired medication condition rules are not presented as active features. Guard Dog timer null-reference repair and v165 condition-rule retirement are preserved.",
-  "label": "MedicationDeployVerification",
-  "summary": "Deployment verification cleanup for GitHub/iPhone: retired medication condition-rule wording removed from current user-facing guidance; app files and cache version advanced.",
+  "build": "CompactDueMissedNextEvent",
+  "name": "CardiacLens v9.10.347.169",
+  "notes": "v169 shrinks the event notification footprint. Today's Status now shows overall status first, a compact Due & Missed Events card only for due/overdue items, and a separate compact Next Event card for the next scheduled item. Pop-up event modals remain retired.",
+  "label": "CompactDueMissedNextEvent",
+  "summary": "Compact, non-interrupting scheduled-event experience: due/missed now, next event separately.",
   "whatsNew": [
-    "Medication condition rules remain retired: Log Medicine does not use old conditionRules, MIP-approved thresholds, PP warnings, or HR formula warnings to block or warn medication logging.",
-    "Medication guidance wording now points users to Doctor Rule text and observational Medication Intelligence instead of old condition-check wording.",
-    "Service worker cache name advanced for a clean GitHub/iPhone deploy."
+    "Due & Missed Events now shows only due or overdue items, not far-future upcoming events.",
+    "Next Event is shown separately in a compact card so the user can see what is coming without making the queue dominate the screen.",
+    "The home screen now answers: overall status, due/overdue now, and next scheduled event.",
+    "Event reminders remain non-interrupting and do not open pop-up modals over active logging."
   ],
   "fixes": [
-    "Updated current safety/disclaimer wording so it no longer describes old medication condition checks as active medication safety features.",
-    "Doctor-report medication context now uses Doctor Rule text rather than retired conditionNote text.",
-    "Verified Guard Dog timerTime null-reference guard remains present."
+    "Reduced the v168 Due & Missed card footprint so it no longer dominates Today's Status.",
+    "Separated upcoming events from due/missed items for clearer event awareness.",
+    "Service worker cache name advanced for clean GitHub Pages and iPhone refresh."
   ],
   "changes": [
-    "Version advanced to v9.10.347.167."
+    "Version advanced to v9.10.347.169."
   ],
   "testing": [
     "Verified JavaScript syntax with node --check all.js.",

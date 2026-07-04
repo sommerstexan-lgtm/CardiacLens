@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.167-medication-deploy-verification';
+const CACHE_NAME = 'cardiaclens-v9.10.347.169-compact-due-missed-next-event';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
