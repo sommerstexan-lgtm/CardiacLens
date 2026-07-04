@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.170-events-tile-queue-sound';
+const CACHE_NAME = 'cardiaclens-v9.10.347.172-events-title-consistency-repair';
 
 self.addEventListener('install', event => {
   self.skipWaiting();

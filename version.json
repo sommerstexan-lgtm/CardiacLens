@@ -1,27 +1,27 @@
 {
-  "version": "9.10.347.170",
+  "version": "9.10.347.172",
   "date": "2026-07-04",
   "releaseDate": "July 4, 2026",
   "updated": "2026-07-04",
-  "build": "EventsTileQueueSoundTiming",
-  "name": "CardiacLens v9.10.347.170",
-  "notes": "v170 moves event awareness into a single color-changing Events tile inside Today's Status. The tile shows whether anything is due, missed, clear, or next; tapping it opens the full event queue. Home-page event cards are removed. Audible sound plays only once when a new event becomes due while the app is open, not when the app is opened.",
-  "label": "EventsTileQueueSoundTiming",
-  "summary": "Single Events tile in Today's Status with non-interrupting queue and one-time due-event sound timing.",
+  "build": "EventsTitleConsistencyRepair",
+  "name": "CardiacLens v9.10.347.172",
+  "notes": "v172 repairs event-title consistency across the Events tile, Events queue, action card, and reminder text. A single due or missed event now carries its name through every level of the interface; multiple due or missed events show the count on the tile and the names in the queue. Version/help/service worker updated for deploy.",
+  "label": "EventsTitleConsistencyRepair",
+  "summary": "Repairs Events tile and queue title consistency so the active event name is visible everywhere it appears.",
   "whatsNew": [
-    "Today's Status now includes a single Events tile as the gateway to due, missed, and next scheduled events.",
-    "The Events tile changes color: green for clear/next, blue for due now, and red for missed.",
-    "Large home-page Due & Missed / Next Event cards are removed so the dashboard stays compact.",
-    "Tapping Events opens the full queue with Log, Snooze 10, and Dismiss for due or missed items.",
-    "Audible sound is state-change based: one soft tone when a new event becomes due while CardiacLens is open; no sound fires just because the app opens."
+    "Events tile now shows the event name clearly for a single due or missed item.",
+    "Events queue rows now use the same event title source and keep the name readable on mobile.",
+    "Event action cards and reminder notices now show the same event name consistently.",
+    "Multiple due or missed items still show a count on the tile and list names inside the queue."
   ],
   "fixes": [
-    "Removed event cards that were crowding the mobile home page.",
-    "Disabled missed-event catch-up modals from opening automatically on app start.",
-    "Advanced service worker cache name for clean GitHub Pages and iPhone refresh."
+    "Fixed Log button from Events queue being blocked by the already-open queue modal.",
+    "Fixed stale queue/tile state after Dismiss or Snooze.",
+    "Fixed cramped mobile layout in missed/due queue rows.",
+    "Preserved deploy cache advancement for clean GitHub Pages/iPhone refresh."
   ],
   "changes": [
-    "Version advanced to v9.10.347.170."
+    "Version advanced to v9.10.347.172."
   ],
   "testing": [
     "Verified JavaScript syntax with node --check all.js.",
