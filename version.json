@@ -1,30 +1,28 @@
 {
-  "version": "9.10.347.176",
-  "date": "2026-07-04",
-  "releaseDate": "July 4, 2026",
-  "updated": "2026-07-04",
-  "build": "EventsTileRefreshSynchronizationRepair",
-  "name": "CardiacLens v9.10.347.176",
-  "notes": "v176 repairs the Today's Status Events tile refresh path. After event Log, Snooze, Dismiss, or final multi-action completion, the Events tile rebuilds immediately from scheduler state instead of retaining stale detail text.",
-  "label": "EventsTileRefreshSynchronizationRepair",
-  "summary": "Rebuilds the Today's Status Events tile immediately after scheduled event state changes.",
+  "version": "9.10.347.177",
+  "date": "2026-07-05",
+  "releaseDate": "July 5, 2026",
+  "updated": "2026-07-05",
+  "build": "LogActivitySimplification",
+  "name": "CardiacLens v9.10.347.177",
+  "notes": "v177 simplifies Log Activity by removing Google Maps route fields and reorganizing the activity workflow into Activity, Before Activity BP, Activity Details, Start Activity, and After Activity.",
+  "label": "LogActivitySimplification",
+  "summary": "Simplifies Log Activity and removes Google Maps-dependent navigation and route-statistics entry.",
   "whatsNew": [
-    "Today's Status Events tile now refreshes immediately after event Log, Snooze, Dismiss, and multi-action completion.",
-    "Replaced the stale updateTodayZone() call with the actual showTodayZone() rebuild path.",
-    "Prevents mixed tile state where the count changes but the old event detail remains visible.",
-    "Service worker, manifest, version metadata, and visible version labels advanced to v176."
+    "Log Activity now flows top-to-bottom: Activity, Before Activity BP, Activity Details, Start Activity, After Activity.",
+    "Google Maps, route destination, distance, speed, elevation, and route-summary entry were removed from Log Activity.",
+    "Before-activity BP status and fresh BP entry now stay together in the same section.",
+    "After-activity entry is limited to automatic duration, optional fluid, snack/meal, symptoms, notes, and Save."
   ],
   "fixes": [
-    "Fixed Events tile stale text after completing multi-action scheduled events.",
-    "Fixed event dashboard refresh calls pointing to a missing updateTodayZone() function.",
-    "Fixed Today's Status not rebuilding immediately after event queue state changes."
+    "Reduced Log Activity scrolling and removed fields with unclear long-term health-response value.",
+    "Removed Google Maps-specific saved-field handling from the Log Activity workflow."
   ],
   "changes": [
-    "Version advanced to v9.10.347.176."
+    "Version advanced to v9.10.347.177."
   ],
   "testing": [
     "Verified JavaScript syntax with node --check all.js.",
-    "Verified inline script syntax extracted from index.html.",
     "Verified JSON metadata.",
     "Verified service worker syntax.",
     "Verified ZIP integrity."

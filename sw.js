@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.176-events-tile-refresh-sync-repair';
+const CACHE_NAME = 'cardiaclens-v9.10.347.177-log-activity-simplification';
 
 self.addEventListener('install', event => {
   self.skipWaiting();

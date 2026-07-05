@@ -11,7 +11,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.176' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.177' }, params || {}));
       }
     } catch(e) {}
   };
@@ -893,7 +893,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.347.176';
+    var GD_VERSION   = 'v9.10.347.177';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1438,7 +1438,7 @@
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.347.176';
+  var CURRENT='v9.10.347.177';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -1457,8 +1457,8 @@ var M=[],B=[],W=[],S=[],A=[],notes=[],medLog=[],fluidLog=[],procedures=[],dailyF
 var savedMeals=[];
 var medIntelData = {}; // CARDIACLENS_MED_INTEL — approved thresholds per medicine
 var _eventsWidgetCollapsed=false; // user can collapse the upcoming-events widget
-var _eventsCardLastAttentionKey=''; // v9.10.347.176: sound/banner fires only when a new event becomes due
-var _eventNoticeToast=null; // v9.10.347.176: quiet visual notice, never a modal
+var _eventsCardLastAttentionKey=''; // v9.10.347.177: sound/banner fires only when a new event becomes due
+var _eventNoticeToast=null; // v9.10.347.177: quiet visual notice, never a modal
 
 // Fluid goal injected from a notification — consumed (and cleared) by the FIRST
 // fluid-capable modal that opens. Zero after first use so it can never double-log.
@@ -1668,7 +1668,7 @@ function registerServiceWorker(){
     .then(function(reg){
       window._swRegistration = reg;
       console.log('[CardiacLens] SW registered, scope:', reg.scope);
-      // v9.10.347.176: iPhone/GitHub Pages deploy repair.
+      // v9.10.347.177: iPhone/GitHub Pages deploy repair.
       // If a refreshed service worker is waiting, activate it now instead of
       // leaving the Home Screen app controlled by the old deploy until later.
       if(reg.waiting){
@@ -1993,7 +1993,7 @@ notes:true
 dailyEvents:[],
 customActivities:[], // User-defined custom physical activities
 securityProfile:null, // Secure Access mirror for update persistence
-// Activity / Today's Weather settings (v9.10.347.176)
+// Activity / Today's Weather settings (v9.10.347.177)
 activityWeatherMode:'manual', // off | manual | internet
 activityWeatherStoreSnapshot:true,
 activityWeatherRainThresholdPct:40,
@@ -2041,7 +2041,7 @@ document.body.style.overflow = '';
 _syncFab();
 // Clear budget dashboard cache so next open gets fresh data
 window._fbdEvts=null;
-// v9.10.347.176: after a saved action from a multi-action event, rebuild
+// v9.10.347.177: after a saved action from a multi-action event, rebuild
 // the same event card until all configured actions are complete. This prevents
 // the Today's Status Events tile/queue from losing the remaining actions after
 // the first saved log.
@@ -2056,7 +2056,7 @@ if(activeReminderEvt){
   }
   return;
 }
-// v9.10.347.176: reminders no longer open a modal after the user finishes logging.
+// v9.10.347.177: reminders no longer open a modal after the user finishes logging.
 // They stay in the Due & Missed card until logged, snoozed, or dismissed.
 if(_pendingReminderEvt){
   _recordEventQueueItem(_pendingReminderEvt,'due');
@@ -3450,7 +3450,7 @@ function renderFAQ() {
     },
     {
       q: 'Can I still save an outdoor activity if GPS fails?',
-      a: 'No. GPS has been removed from Log Activity in v9.10.347.176. Activity logging remains useful with duration, exertion, notes, fluids, snacks, symptoms, stop entries, and optional manual distance. GPS fields are no longer shown in Log Activity.'
+      a: 'Google Maps has been removed from Log Activity in v9.10.347.177. Activity logging now focuses on duration, intensity, BP workflow, weather context when relevant, fluids, snack/meal, symptoms, and notes.'
     },
     {
       q: 'Can I use voice dictation to enter data?',
@@ -7045,7 +7045,7 @@ S.push({
 symptom:symptom,
 severity:severity,
 t:getTime(),
-notes:notes,
+notes:(notes+(activityAfterNotes?' | After: '+activityAfterNotes:'')+(activitySymptomsNotes?' | Symptoms: '+activitySymptomsNotes:'')),
 expected:isExpected,
 event:eventId,
 condition:conditionLinked,
@@ -7880,7 +7880,7 @@ types=types.concat(settings.customActivities);
 return types;
 }
 
-// v9.10.347.176 KISS: users choose activity/purpose first; CardiacLens highlights the recommended context, then allows plausible override.
+// v9.10.347.177 KISS: users choose activity/purpose first; CardiacLens highlights the recommended context, then allows plausible override.
 function getActivityTypesForContext(ctx){
 return getActivityTypes();
 }
@@ -7914,42 +7914,42 @@ var activityTypes=defaultActivityTypes;
 
 var selectedExertion='';
 var selectedTempBand=null;
-// Activity environment/window state (v9.10.347.176)
+// Activity environment/window state (v9.10.347.177)
 var selectedActivityWindow='';
 var selectedActivityWindowMinutes=null;
 var selectedDestination='';
 var selectedEnvironmentalMode='manual';
 var activityEnvironmentSnapshot=null;
-// Today's Weather request guard (v9.10.347.176) — one location/weather request per activity modal/window.
+// Today's Weather request guard (v9.10.347.177) — one location/weather request per activity modal/window.
 // Prevents repeated browser location prompts when Automatic is selected and the user changes fields.
 var activityEnvironmentFetchInFlight=false;
 var activityEnvironmentFetchKey='';
 var activityEnvironmentFetchFailedKey='';
-// Activity context / journey state (v9.10.347.176)
+// Activity context / journey state (v9.10.347.177)
 var selectedActivityContext='';
 var selectedJourneyRole='single';
 var selectedJourneyName='';
 var selectedJourneyId=null;
 var selectedActivityPurpose=''; // exercise | transportation | other
-// v9.10.347.176 KISS transportation workflow: Start once, Finish once; GPS derives movement/stops automatically.
+// v9.10.347.177 KISS transportation workflow: Start once, Finish once; GPS derives movement/stops automatically.
 var activityTravelState='traveling'; // legacy display only
 var activityTravelEvents=[]; // legacy compatibility; no longer user-managed
 var activityGpsMotion={state:'unknown',lastMoveTs:null,lastStopTs:null,currentStopStart:null,movingSeconds:0,stoppedSeconds:0,stopCount:0,lastTs:null};
-// GPS distance tracking state (v9.10.347.176)
+// GPS distance tracking state (v9.10.347.177)
 var activityGpsSelected=false;
 var activityGpsWatchId=null;
 var activityGpsStartTime=null;
 var activityGpsLastPoint=null;
-var activityGpsLastFix=null; // v9.10.347.176: readiness/current-location seed for immediate map marker on Start
+var activityGpsLastFix=null; // v9.10.347.177: readiness/current-location seed for immediate map marker on Start
 var activityGpsMetrics={distanceMiles:0,elevationGainFt:0,elevationLossFt:0,pointCount:0,maxSpeedMph:null,lastAccuracy:null,status:'off',error:'',permissionState:'unknown',readinessChecked:false};
-// GPS live route map state (v9.10.347.176)
+// GPS live route map state (v9.10.347.177)
 var activityGpsRoutePoints=[];
 var activityGpsMap=null;
 var activityGpsMapMarker=null;
 var activityGpsMapRoute=null;
 var activityGpsMapLoadState='idle';
 var activityGpsDiagnostics=[];
-// v9.10.347.176: increments whenever the GPS proof/activity lifecycle is restarted or cancelled.
+// v9.10.347.177: increments whenever the GPS proof/activity lifecycle is restarted or cancelled.
 // Async geolocation callbacks from a prior activity are ignored if their lifecycle id is stale.
 var activityGpsLifecycleId=0;
 function _activityGpsTrace(msg){try{activityGpsDiagnostics.push((new Date()).toLocaleTimeString()+': '+msg);if(activityGpsDiagnostics.length>6)activityGpsDiagnostics=activityGpsDiagnostics.slice(-6);}catch(e){}}
@@ -7957,8 +7957,8 @@ var activityTimerInterval=null;
 var activityStartTime=null;
 var activityElapsedSeconds=0;
 var activityTimerPaused=false;
-var activityTimerStoppedForSave=false; // v9.10.347.176: Save unlocks only after activity is finished
-var activityStopLog=[]; // v9.10.347.176: optional in-activity stop/waypoint notes saved with final activity
+var activityTimerStoppedForSave=false; // v9.10.347.177: Save unlocks only after activity is finished
+var activityStopLog=[]; // v9.10.347.177: optional in-activity stop/waypoint notes saved with final activity
 
 // Background activity state (v9.10.36) — set when user minimizes the activity modal
 var _activityMinimized=false;
@@ -7998,159 +7998,83 @@ if(_activityMinimized && _minimizedActivityState){
   return;
 }
 if(!preserveActivityContext){selectedActivityContext='';selectedActivityPurpose='';}
-var html='<div class="modal-title">Log Activity Setup</div>';
+var html='<div class="modal-title">Log Activity</div>';
 html+='<div id="activityDetailsAfterContext" style="display:block">';
-html+='<div id="recentBPCard" style="margin-bottom:12px"></div>';
 
 html+='<div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:12px;margin-bottom:14px">';
-html+='<div style="font-size:13px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">1. What are you doing?</div>';
-html+='<label style="display:block;font-size:18px;font-weight:600;margin-bottom:8px">Activity Type <span style="color:#dc2626">*</span>:</label>';
-html+='<select id="activitySelect" class="modal-input" style="font-size:20px" onchange="handleActivitySelection();updateActivityStartState()">';
+html+='<div style="font-size:13px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">1. Activity</div>';
+html+='<label style="display:block;font-size:18px;font-weight:600;margin-bottom:8px">Activity Type <span style="color:#dc2626">*</span></label>';
+html+='<select id="activitySelect" class="modal-input" style="font-size:20px;margin-bottom:0" onchange="handleActivitySelection();updateActivityStartState()">';
 html+=buildActivityOptionsHTML('');
 var customActivities=settings.customActivities||[];
 html+='</select>';
-if(customActivities.length>0){
-html+='<button type="button" onclick="openActivityManager()" style="margin-top:8px;padding:8px 12px;background:#6b7280;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;width:100%">⚙️ Manage Custom Activities</button>';
-}
-html+='<div id="manualWorkDesc" style="display:none;margin-top:12px">';
-html+='<input type="text" id="workDescription" class="modal-input" placeholder="Describe manual work (e.g., gardening, moving boxes)" />';
-html+='</div>';
+if(customActivities.length>0){html+='<button type="button" onclick="openActivityManager()" style="margin-top:8px;padding:8px 12px;background:#6b7280;color:white;border:none;border-radius:6px;font-size:14px;cursor:pointer;width:100%">⚙️ Manage Custom Activities</button>';}
+html+='<div id="manualWorkDesc" style="display:none;margin-top:12px"><input type="text" id="workDescription" class="modal-input" placeholder="Describe manual work (e.g., gardening, moving boxes)" /></div>';
 html+='<div id="activityPurposeSection" style="display:none">'+buildActivityPurposeHTML()+'</div>';
 html+=buildActivityContextHTML();
-html+='<div id="activityJourneySection" style="display:none">'+buildJourneyHTML()+'</div>';
-html+='<div id="activityWindowSection" style="display:none">'+buildActivityWindowHTML()+'</div>';
-html+='<div id="activityDestinationSection" style="display:none">'+buildDestinationHTML()+'</div>';
-html+='</div>';
-
-// v9.10.347.176 KISS: optional Google Maps escape hatch only. No GPS permission, no data capture, no save dependency.
-html+='<div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:12px;padding:12px;margin-bottom:14px">';
-html+='<div style="font-size:13px;font-weight:800;color:#3730a3;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Navigation help (optional)</div>';
-html+='<div style="font-size:14px;color:#475569;line-height:1.45;margin-bottom:10px">Need navigation or location help? Open Google Maps. CardiacLens keeps logging even if Maps is unavailable.</div>';
-html+='<button type="button" class="modal-btn" onclick="openGoogleMapsFromActivity()" style="background:#2563eb;color:#fff;width:100%;margin-bottom:0">🗺️ Open Google Maps</button>';
 html+='</div>';
 
 html+='<div id="activityBPSection" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:12px;margin-bottom:14px">';
-html+='<div style="font-size:13px;font-weight:800;color:#1e40af;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">2. BP before you start</div>';
+html+='<div style="font-size:13px;font-weight:800;color:#1e40af;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">2. Before activity</div>';
+html+='<div id="recentBPCard" style="margin-bottom:10px"></div>';
 html+='<div id="bpBeforeStatus" style="margin-bottom:8px;padding:8px;background:#dbeafe;border-radius:6px;font-size:14px;font-weight:600;color:#1e40af;display:none"></div>';
-html+='<button type="button" id="takeBPBeforeBtn" class="modal-btn" onclick="takeBPBeforeActivity()" style="background:#3b82f6;color:#fff;margin-bottom:0;display:block;width:100%">📊 Take BP Before Activity</button>';
-html+='<div id="manualBPInfoCard" style="display:none;background:#fffbeb;border-left:4px solid #f59e0b;border-radius:8px;padding:12px 14px;margin-top:12px;font-size:15px;color:#92400e;line-height:1.55">';
-html+='<strong style="display:block;margin-bottom:6px">📋 Before-activity BP in manual mode</strong>';
-html+='<div style="margin-bottom:4px">• If you already took a BP before starting, tap <strong>Take BP Before Activity</strong> above — it will pair correctly with your after reading.</div>';
-html+='<div>• If you skip it, your after-BP will still save, but this session won\'t appear in BP change analysis (which requires both readings).</div>';
-html+='</div>';
+html+='<button type="button" id="takeBPBeforeBtn" class="modal-btn" onclick="takeBPBeforeActivity()" style="background:#3b82f6;color:#fff;margin-bottom:0;display:block;width:100%">📊 Enter Fresh BP</button>';
 html+='</div>';
 
 html+='<div id="activityWeatherSection" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px;margin-bottom:14px">';
-html+='<div style="font-size:13px;font-weight:800;color:#166534;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">3. Today\'s Weather</div>';
+html+='<div style="font-size:13px;font-weight:800;color:#166534;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Today\'s Weather</div>';
 html+=buildEnvironmentalModeHTML();
 html+='<div id="internetEnvironmentStatus" style="display:none;margin-bottom:12px"></div>';
 html+='<div id="activityWeatherAwareness" style="display:none;margin-bottom:12px"></div>';
 html+=buildTempBandHTML();
 html+='</div>';
 
-
-
-html+='<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:12px;margin-bottom:14px">';
-html+='<div style="font-size:13px;font-weight:800;color:#9a3412;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">4. Effort and notes</div>';
-html+='<label style="display:block;font-size:18px;font-weight:600;margin:0 0 8px 0">Exertion Level <span style="font-size:13px;font-weight:400;color:#6b7280">(optional)</span>:</label>';
-html+='<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:16px;width:100%;box-sizing:border-box">';
+html+='<div id="activityEffortSection" style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:12px;margin-bottom:14px">';
+html+='<div style="font-size:13px;font-weight:800;color:#9a3412;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">3. Activity details</div>';
+html+='<label style="display:block;font-size:18px;font-weight:600;margin:0 0 8px 0">Intensity <span style="color:#dc2626">*</span></label>';
+html+='<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px;width:100%;box-sizing:border-box">';
 html+='<button type="button" class="modal-btn" id="exertionLight" onclick="selectExertion(\'Light\')" style="width:auto;margin:0;min-width:0;padding:14px 4px;font-size:clamp(16px,4.2vw,22px);white-space:nowrap">Light</button>';
 html+='<button type="button" class="modal-btn" id="exertionModerate" onclick="selectExertion(\'Moderate\')" style="width:auto;margin:0;min-width:0;padding:14px 4px;font-size:clamp(16px,4.2vw,22px);white-space:nowrap">Moderate</button>';
 html+='<button type="button" class="modal-btn" id="exertionVigorous" onclick="selectExertion(\'Vigorous\')" style="width:auto;margin:0;min-width:0;padding:14px 4px;font-size:clamp(16px,4.2vw,22px);white-space:nowrap">Vigorous</button>';
 html+='</div>';
-html+='<input type="text" id="activityNotes" class="modal-input" placeholder="Additional notes (optional)" />';
-html+='</div>';
-
-html+='<div id="activityCompletionDetails" style="display:none;background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:12px;margin-bottom:14px">';
-html+='<div style="font-size:13px;font-weight:800;color:#0369a1;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">After activity details (optional)</div>';
-html+='<div style="font-size:13px;color:#475569;line-height:1.45;margin-bottom:10px">After you finish, you can record fluid consumed and snacks eaten during or immediately after this activity. Leave blank if none.</div>';
-html+='<label style="display:block;font-size:15px;font-weight:700;color:#0f172a;margin-bottom:6px">Fluid consumed</label>';
-html+='<input type="number" inputmode="numeric" id="activityFluidOz" class="modal-input" placeholder="Fluid ounces, e.g. 8" min="0" onblur="_sanitizeNumericInput(this)" />';
-html+='<label style="display:block;font-size:15px;font-weight:700;color:#0f172a;margin:10px 0 6px 0">Snacks / food eaten</label>';
-html+='<input type="text" id="activitySnackNotes" class="modal-input" placeholder="Snack or food eaten, e.g. banana, crackers (optional)" />';
-html+='<div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;padding:10px;margin-top:12px">';
-html+='<div style="font-size:14px;font-weight:800;color:#3730a3;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Google Maps Summary (optional)</div>';
-html+='<div style="font-size:13px;color:#475569;line-height:1.45;margin-bottom:8px">Copy these from Google Maps when useful. CardiacLens does not require Maps and does not import automatically.</div>';
-html+='<label style="display:block;font-size:15px;font-weight:700;color:#0f172a;margin:10px 0 6px 0">Route name</label>';
-html+='<input type="text" id="activityMapsRouteName" class="modal-input" placeholder="Example: Home to HEB, Duck Pond Loop" />';
-html+='<label style="display:block;font-size:15px;font-weight:700;color:#0f172a;margin:10px 0 6px 0">Distance</label>';
-html+='<input type="number" inputmode="decimal" id="activityManualDistanceMiles" class="modal-input" placeholder="Miles, e.g. 1.2 (optional)" min="0" step="0.01" />';
-html+='<label style="display:block;font-size:15px;font-weight:700;color:#0f172a;margin:10px 0 6px 0">Average speed</label>';
-html+='<input type="number" inputmode="decimal" id="activityMapsAverageSpeedMph" class="modal-input" placeholder="mph, e.g. 8.4 (optional)" min="0" step="0.1" />';
-html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
-html+='<div><label style="display:block;font-size:15px;font-weight:700;color:#0f172a;margin:10px 0 6px 0">Elevation gain</label><input type="number" inputmode="numeric" id="activityMapsElevationGainFt" class="modal-input" placeholder="ft gain" min="0" step="1" /></div>';
-html+='<div><label style="display:block;font-size:15px;font-weight:700;color:#0f172a;margin:10px 0 6px 0">Elevation loss</label><input type="number" inputmode="numeric" id="activityMapsElevationLossFt" class="modal-input" placeholder="ft loss" min="0" step="1" /></div>';
-html+='</div>';
-html+='</div>';
-html+='<label style="display:block;font-size:15px;font-weight:700;color:#0f172a;margin:10px 0 6px 0">Location / landmark (optional)</label>';
-html+='<input type="text" id="activityLocationNote" class="modal-input" placeholder="Nearest cross street, landmark, destination, or area (optional)" />';
-html+='<label style="display:block;font-size:15px;font-weight:700;color:#0f172a;margin:10px 0 6px 0">Route / activity detail note (optional)</label>';
-html+='<input type="text" id="activityRouteNotes" class="modal-input" placeholder="Example: mailbox walk, HEB ride, hills, rested twice" />';
+html+='<input type="text" id="activityNotes" class="modal-input" placeholder="Notes before/during activity (optional)" style="margin-bottom:0" />';
 html+='</div>';
 
 html+='<div style="background:#f8fafc;border:2px solid #cbd5e1;border-radius:12px;padding:12px;margin-bottom:14px">';
-html+='<div style="font-size:13px;font-weight:800;color:#334155;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">5. Start or enter completed time</div>';
-html+='<label style="display:block;font-size:18px;font-weight:600;margin:0 0 8px 0">Tracking <span style="color:#dc2626">*</span>:</label>';
-html+='<div style="display:flex;gap:12px;margin-bottom:16px">';
-html+='<button type="button" class="modal-btn" id="manualTimeBtn" onclick="selectTimeMode(\'manual\')">Manual Entry</button>';
-html+='<button type="button" class="modal-btn" id="timerBtn" onclick="selectTimeMode(\'timer\')">Use Timer</button>';
-html+='</div>';
-html+='<div id="manualTimeInput" style="display:none">';
-html+='<input type="number" inputmode="numeric" id="durationMinutes" class="modal-input" placeholder="Completed duration minutes (required)" min="1" oninput="updateActivitySaveState()" onblur="_sanitizeNumericInput(this);updateActivitySaveState()"/>';
-html+='</div>';
-html+='<div id="timerDisplay" style="display:none;text-align:center;padding:20px;background:#f0fdf4;border-radius:12px;margin-bottom:0">';
+html+='<div style="font-size:13px;font-weight:800;color:#334155;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">4. Start activity</div>';
+html+='<div id="timerDisplay" style="display:block;text-align:center;padding:16px;background:#f0fdf4;border-radius:12px;margin-bottom:0">';
 html+='<div id="timerTime" style="font-size:48px;font-weight:bold;color:#10b981;font-family:monospace">00:00</div>';
 html+='<div id="timerPausedLabel" style="display:none;font-size:13px;font-weight:700;color:#f59e0b;letter-spacing:1px;margin-top:4px">⏸ PAUSED</div>';
-html+='<div style="display:flex;gap:10px;justify-content:center;margin-top:12px">';
-html+='<button type="button" id="timerStartBtn" class="modal-btn" onclick="startActivityTimer()" disabled title="Select Activity Type, Purpose if shown, and confirm Environment Context" style="background:#10b981;color:#fff;opacity:0.45;cursor:not-allowed">▶ Start Activity</button>';
+html+='<div style="display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap">';
+html+='<button type="button" id="timerStartBtn" class="modal-btn" onclick="startActivityTimer()" disabled title="Select Activity Type and confirm Environment Context" style="background:#10b981;color:#fff;opacity:0.45;cursor:not-allowed">START ACTIVITY</button>';
 html+='<button type="button" id="timerPauseBtn" class="modal-btn" onclick="pauseActivityTimer()" style="background:#f59e0b;color:#fff;display:none">⏸ Pause</button>';
 html+='<button type="button" id="timerResumeBtn" class="modal-btn" onclick="startActivityTimer()" style="background:#10b981;color:#fff;display:none">▶ Resume</button>';
-html+='<button type="button" id="activityTravelBtn" class="modal-btn" onclick="toggleActivityTravelState()" style="background:#0ea5e9;color:#fff;display:none">Travel State</button>';
-html+='<button type="button" id="timerStopLogBtn" class="modal-btn" onclick="openActivityStopEditorFromTimer()" style="background:#0ea5e9;color:#fff;display:none">➕ Stop Note / Symptom</button>';
-html+='<button type="button" id="timerStopBtn" class="modal-btn" onclick="stopActivityTimer()" style="background:#ef4444;color:#fff;display:none">⏹ Finish Activity</button>';
-html+='</div>';
-html+='</div>';
-html+='</div>';
+html+='<button type="button" id="timerStopBtn" class="modal-btn" onclick="stopActivityTimer()" style="background:#ef4444;color:#fff;display:none">⏹ Stop Activity</button>';
+html+='</div></div></div>';
 
-html+='<div id="activityStopLogSection" style="display:none;background:#f8fafc;border:1px solid #cbd5e1;border-radius:12px;padding:12px;margin-bottom:14px">';
-html+='<div style="font-size:13px;font-weight:800;color:#334155;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">In-activity stop log (optional)</div>';
-html+='<div style="font-size:13px;color:#475569;line-height:1.45;margin-bottom:10px">Use this during one continuous ride/walk to mark a stop, add a note, record symptoms, record fluid, or record a snack. The timer continues until you tap Finish Activity.</div>';
-html+='<button type="button" id="activityAddStopBtn" class="modal-btn" onclick="showActivityStopEditor()" style="background:#0ea5e9;color:#fff;width:100%;margin-bottom:10px">➕ Add Stop Note / Symptom</button>';
-html+='<div id="activityStopEditor" style="display:none;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px;margin-bottom:10px">';
-html+='<div id="activityStopTimeLabel" style="font-size:13px;font-weight:800;color:#0369a1;margin-bottom:8px">Stop time</div>';
-html+='<input type="text" id="activityStopLocationInput" class="modal-input" placeholder="Stop location / landmark (optional)" />';
-html+='<textarea id="activityStopNoteInput" class="modal-input" rows="2" placeholder="Stop note (optional)" style="min-height:64px;resize:none"></textarea>';
-html+='<textarea id="activityStopSymptomInput" class="modal-input" rows="2" placeholder="Symptoms at this stop (optional)" style="min-height:64px;resize:none"></textarea>';
-html+='<input type="number" inputmode="numeric" id="activityStopFluidInput" class="modal-input" placeholder="Fluid ounces at this stop (optional)" min="0" onblur="_sanitizeNumericInput(this)" />';
-html+='<input type="text" id="activityStopSnackInput" class="modal-input" placeholder="Snack / food at this stop (optional)" />';
-html+='<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="modal-btn" onclick="saveActivityStopEntry()" style="background:#10b981;color:#fff;flex:1">Save Stop & Resume</button><button type="button" class="modal-btn" onclick="hideActivityStopEditor()" style="background:#e5e7eb;color:#374151;flex:1">Resume Without Saving</button></div>';
-html+='</div>';
-html+='<div id="activityStopLogList"></div>';
+html+='<div id="activityCompletionDetails" style="display:none;background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:12px;margin-bottom:14px">';
+html+='<div style="font-size:13px;font-weight:800;color:#0369a1;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">5. After activity</div>';
+html+='<div style="font-size:15px;color:#0f172a;line-height:1.45;margin-bottom:10px"><strong>Duration:</strong> <span id="activityFinalDurationLabel">automatic after Stop Activity</span></div>';
+html+='<label style="display:block;font-size:15px;font-weight:700;color:#0f172a;margin-bottom:6px">Fluid consumed (optional)</label>';
+html+='<input type="number" inputmode="numeric" id="activityFluidOz" class="modal-input" placeholder="Fluid ounces, e.g. 8" min="0" step="1" onblur="_sanitizeNumericInput(this)" />';
+html+='<label style="display:block;font-size:15px;font-weight:700;color:#0f172a;margin:10px 0 6px 0">Snack / meal (optional)</label>';
+html+='<input type="text" id="activitySnackNotes" class="modal-input" placeholder="Snack or meal, e.g. banana, crackers" />';
+html+='<label style="display:block;font-size:15px;font-weight:700;color:#0f172a;margin:10px 0 6px 0">Symptoms (optional)</label>';
+html+='<textarea id="activitySymptomsNotes" class="modal-input" rows="2" placeholder="Symptoms during or after activity (optional)" style="min-height:64px;resize:none"></textarea>';
+html+='<label style="display:block;font-size:15px;font-weight:700;color:#0f172a;margin:10px 0 6px 0">Notes (optional)</label>';
+html+='<textarea id="activityAfterNotes" class="modal-input" rows="2" placeholder="After-activity notes (optional)" style="min-height:64px;resize:none"></textarea>';
 html+='</div>';
 
 html+='<button type="button" onclick="minimizeActivityLog()" style="width:100%;margin-bottom:10px;background:none;border:2px solid #0369a1;color:#0369a1;border-radius:10px;padding:12px;font-size:16px;font-weight:600;cursor:pointer">↙ Minimize — do something else and come back</button>';
-html+='<div class="modal-actions"><button class="modal-cancel" onclick="cancelActivityLog()">Cancel</button><button class="modal-ok" id="activitySaveBtn" onclick="saveActivity()" disabled style="opacity:0.45;cursor:not-allowed">Save Completed Activity</button></div>';
+html+='<div class="modal-actions"><button class="modal-cancel" onclick="cancelActivityLog()">Cancel</button><button class="modal-ok" id="activitySaveBtn" onclick="saveActivity()" disabled style="opacity:0.45;cursor:not-allowed">SAVE</button></div>';
 html+='</div>';
 showModal(html);
 setTimeout(function(){var a=document.getElementById('activitySelect');if(a&&a.offsetParent!==null)a.focus();},100);
-setTimeout(function(){if(selectedActivityContext)_showRecentBPCard();},150);
+setTimeout(function(){_showRecentBPCard();},150);
 setTimeout(function(){selectEnvironmentalMode(selectedEnvironmentalMode||settings.activityEnvironmentalMode||'manual');},175);
-setTimeout(function(){renderActivityContextButtons();updateActivitySectionsForContext();handleJourneyRoleSelection();updateActivitySaveState();updateActivityStartState();},200);
+setTimeout(function(){renderActivityContextButtons();updateActivitySectionsForContext();updateActivitySaveState();updateActivityStartState();},200);
 }
 
-
-function openGoogleMapsFromActivity(){
-// v9.10.347.176 KISS: open Maps only. Do not request GPS, do not save data, do not affect the activity timer.
-try{
-  var mapsUrl='https://www.google.com/maps';
-  var opened=window.open(mapsUrl,'_blank','noopener');
-  if(!opened){ window.location.href=mapsUrl; }
-}catch(e){
-  try{ window.location.href='https://www.google.com/maps'; }catch(_e){}
-}
-}
-
-// NEW: Handle activity selection including "Add New"
 function handleActivitySelection(){
 var select=document.getElementById('activitySelect');
 var desc=document.getElementById('manualWorkDesc');
@@ -8163,20 +8087,6 @@ select.value=''; // Reset selection
 return;
 }
 activityName=activityName.trim();
-var destAdvice=_customActivityDestinationAdvice(activityName);
-if(destAdvice){
-  var move=confirm(destAdvice+'\n\nPress OK to move this to Destination and choose an activity instead.\nPress Cancel to keep it as a custom Activity.');
-  if(move){
-    if(!settings.activityDestinations)settings.activityDestinations=[];
-    settings.activityDestinations=_clMergeDestinations(settings.activityDestinations,[{label:activityName,minutes:settings.activityWeatherDefaultWindowMin||30}]);
-    selectedDestination=activityName;
-    _clSaveAllSettings();
-    select.value='';
-    alert('Saved as destination: '+activityName+'\n\nNow choose what you are doing, such as E-bike, Walking, Car Travel, Shopping, or Doctor Visit.');
-    updateActivityStartState();
-    return;
-  }
-}
 // Check if already exists
 if(!settings.customActivities)settings.customActivities=[];
 if(defaultActivityTypes.includes(activityName)){
@@ -8204,7 +8114,7 @@ if(desc)desc.style.display='block';
 }else{
 if(desc)desc.style.display='none';
 }
-// v9.10.347.176: Activity Type comes first; purpose next when needed; then CardiacLens suggests context.
+// v9.10.347.177: Activity Type comes first; purpose next when needed; then CardiacLens suggests context.
 if(!_activityNeedsPurpose(select.value)){selectedActivityPurpose='';}
 selectedActivityContext='';
 updateActivityPurposeSection();
@@ -8215,14 +8125,6 @@ updateActivitySectionsForContext();
 updateActivityStartState();
 }
 
-function _customActivityDestinationAdvice(name){
-  var n=(name||'').trim().toLowerCase();
-  if(!n)return '';
-  var known=['heb','walmart','kroger','aldi','cvs','walgreens','pharmacy','clinic','hospital','doctor','church','home','work','office','restaurant','mcdonald','sonic','dollar general','dollar tree','target','lowes','home depot','post office','bank'];
-  for(var i=0;i<known.length;i++){if(n===known[i]||n.indexOf(known[i])>=0)return '“'+name+'” looks like a destination, not an activity. Activity means what you are doing. Destination means where you are going.';}
-  if(/^(dr\.?|doctor|heb|cvs|walgreens|walmart)/i.test(name))return '“'+name+'” looks like a destination, not an activity. Activity means what you are doing. Destination means where you are going.';
-  return '';
-}
 function _activityPrereqsMet(){
   var sel=document.getElementById('activitySelect');
   if(!sel||!sel.value||sel.value==='__ADD_NEW__')return false;
@@ -8294,14 +8196,14 @@ function _activityContextReason(activity,suggested){
   activity=(activity||'').toLowerCase();
   if(!suggested)return '';
   if((activity==='e-bike'||activity==='cycling')&&selectedActivityPurpose==='transportation'){
-    return '<div style="margin-top:4px;color:#334155">Reason: transportation/errands may include outdoor travel, indoor destination time, stops, weather exposure, and plan changes. This recommends the environment context, not the whole activity structure.</div>';
+    return '<div style="margin-top:4px;color:#334155">Reason: transportation/errands may include outdoor travel, indoor time, stops, weather exposure, and plan changes. This recommends the environment context, not route details.</div>';
   }
   if((activity==='e-bike'||activity==='cycling')&&selectedActivityPurpose==='exercise'){
     return '<div style="margin-top:4px;color:#334155">Reason: exercise/recreation cycling is usually a continuous outdoor activity.</div>';
   }
-  if(suggested==='indoor')return '<div style="margin-top:4px;color:#334155">Reason: this activity is usually done indoors, so GPS/weather/trip fields usually are not needed.</div>';
+  if(suggested==='indoor')return '<div style="margin-top:4px;color:#334155">Reason: this activity is usually done indoors, so weather context is usually not needed.</div>';
   if(suggested==='outdoor')return '<div style="margin-top:4px;color:#334155">Reason: this activity is usually done outside, where weather and outdoor window context may matter.</div>';
-  if(suggested==='mixed')return '<div style="margin-top:4px;color:#334155">Reason: this activity commonly includes both indoor and outdoor exposure. Trip structure is handled separately below.</div>';
+  if(suggested==='mixed')return '<div style="margin-top:4px;color:#334155">Reason: this activity commonly includes both indoor and outdoor exposure.</div>';
   return '';
 }
 function _activityContextLabel(c){
@@ -8326,7 +8228,7 @@ function buildActivityContextHTML(){
     h+='<button type="button" id="actCtx_'+x[0]+'" onclick="selectActivityContext(&quot;'+x[0]+'&quot;)" disabled style="border:2px solid #cbd5e1;background:#f1f5f9;color:#94a3b8;border-radius:8px;padding:10px 6px;font-size:14px;font-weight:700;cursor:not-allowed">'+x[1]+'</button>';
   });
   h+='</div>';
-  h+='<div style="font-size:12px;color:#64748b;margin-top:6px">Highlighted = recommended. This is environment context only: Indoor, Outdoor, or Mixed Environment (indoor + outdoor exposure). Trip flow is handled separately below.</div>';
+  h+='<div style="font-size:12px;color:#64748b;margin-top:6px">Highlighted = recommended. This is environment context only: Indoor, Outdoor, or Mixed Environment (indoor + outdoor exposure).</div>';
   h+='</div>';
   return h;
 }
@@ -8334,9 +8236,9 @@ function _activityContextMismatchMessage(chosen,suggested){
   var sel=document.getElementById('activitySelect');
   var act=sel?sel.value:'this activity';
   if(!chosen||!suggested||chosen===suggested)return '';
-  if(chosen==='indoor'&&(suggested==='outdoor'||suggested==='mixed'))return act+' is usually not Indoor. Outdoor or Mixed Environment keeps weather, GPS, destination, and travel context available when appropriate.';
+  if(chosen==='indoor'&&(suggested==='outdoor'||suggested==='mixed'))return act+' is usually not Indoor. Outdoor or Mixed Environment keeps weather context available when appropriate.';
   if(chosen==='outdoor'&&suggested==='mixed')return act+' with transportation/errands is usually Mixed Environment because plans can change, stops happen, and you may go inside before traveling again.';
-  if(chosen==='mixed'&&suggested==='indoor')return act+' is usually Indoor. Mixed Environment may add trip, destination, weather, and GPS fields that may not apply.';
+  if(chosen==='mixed'&&suggested==='indoor')return act+' is usually Indoor. Mixed Environment may add weather context that may not apply.';
   return act+' usually fits '+_activityContextLabel(suggested)+'.';
 }
 function selectActivityContext(ctx){
@@ -8422,7 +8324,7 @@ function clearActiveJourney(){
   if(wrap)wrap.style.display='none';
 }
 function buildJourneyHTML(){
-  // v9.10.347.176: no user-managed trip-flow dropdown.
+  // v9.10.347.177: no user-managed trip-flow dropdown.
   // CardiacLens records transportation flow from the Start / Start / Finish / Finish Activity buttons.
   var h='<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin-bottom:12px">';
   h+='<div style="font-size:14px;font-weight:800;color:#374151;margin-bottom:6px">🧭 Transportation Flow</div>';
@@ -8436,13 +8338,13 @@ function buildJourneyHTML(){
   return h;
 }
 function handleJourneyRoleSelection(){
-  // v9.10.347.176: retained for compatibility with older restore code; no visible dropdown remains.
+  // v9.10.347.177: retained for compatibility with older restore code; no visible dropdown remains.
   selectedJourneyRole='single';
   var name=document.getElementById('journeyNameInput');
   selectedJourneyName=(name&&name.value?name.value.trim():selectedJourneyName||'');
 }
 function getJourneyFormData(activityName){
-  // v9.10.347.176: transportation trips save as one activity unless the user later chooses to describe details in notes.
+  // v9.10.347.177: transportation trips save as one activity unless the user later chooses to describe details in notes.
   var nameEl=document.getElementById('journeyNameInput');
   var name=(nameEl&&nameEl.value.trim())||selectedJourneyName||'';
   return {role:'single',journeyId:null,journeyName:name,active:false};
@@ -8479,7 +8381,7 @@ function updateActivityTimerWorkflowButtons(){
 }
 
 function toggleActivityTravelState(){
-  // v9.10.347.176: transportation is Start -> Finish only. GPS derives stops automatically.
+  // v9.10.347.177: transportation is Start -> Finish only. GPS derives stops automatically.
   return;
 }
 function getActivityTravelEvents(){
@@ -8490,7 +8392,7 @@ function getActivityTravelEvents(){
 // Weather settings persistence guard
 
 
-// Weather settings persistence guard (v9.10.347.176)
+// Weather settings persistence guard (v9.10.347.177)
 var CARDIACLENS_WEATHER_SETTINGS_KEY='CARDIACLENS_WEATHER_SETTINGS';
 function _clMergeDestinations(a,b){
   var out=[],seen={};
@@ -8538,7 +8440,7 @@ function _clWeatherSettingsSnapshot(){
   };}catch(e){return null;}
 }
 function _clSaveWeatherSettingsBackup(){
-  // v9.10.347.176: current saved settings win; backup only fills missing weather fields.
+  // v9.10.347.177: current saved settings win; backup only fills missing weather fields.
   try{
     var snap=_clWeatherSettingsSnapshot(); if(!snap)return;
     var prior=null;
@@ -8560,14 +8462,14 @@ function _clSaveWeatherSettingsBackup(){
   }catch(e){}
 }
 function _clRestoreWeatherSettingsBackup(){
-  // v9.10.347.176: restore defensively. Blank/default backup fields must not erase current settings.
+  // v9.10.347.177: restore defensively. Blank/default backup fields must not erase current settings.
   try{
     var raw=localStorage.getItem(CARDIACLENS_WEATHER_SETTINGS_KEY); if(!raw)return;
     var w=JSON.parse(raw); if(!w||typeof w!=='object')return;
     var fields=['activityWeatherMode','activityEnvironmentalMode','activityWeatherStoreSnapshot','activityWeatherRainThresholdPct','activityWeatherDefaultWindowMin','activityWeatherAskOnOutdoor','activityWeatherStoreCoordinates','todayWeatherPillEnabled','todayWeatherCacheMinutes','todayWeatherSavedZip','todayWeatherSource','pickupPlannerDefaultDate','activityWindows','activityDestinations','activityGpsMode','activityGpsRememberChoice','activityGpsStoreCoordinates','activityGpsPreferences'];
     fields.forEach(function(k){
       if(w[k]===undefined||w[k]===null)return;
-      // v9.10.347.176: current Saved ZIP settings must not be overwritten by older backup values.
+      // v9.10.347.177: current Saved ZIP settings must not be overwritten by older backup values.
       // Backup is only a fill-in source, not the authority when current settings are explicit.
       if(k==='todayWeatherSource'){
         var curSource=settings&&settings.todayWeatherSource;
@@ -8602,15 +8504,15 @@ function _ensureActivityEnvSettings(){
     {label:'Medium — 1 hr',minutes:60},{label:'Long — 2 hr',minutes:120}
   ];}
   if(!settings.activityDestinations){settings.activityDestinations=[];}
-  // v9.10.347.176: remove legacy/test destination presets that were seeded during weather testing.
+  // v9.10.347.177: remove legacy/test destination presets that were seeded during weather testing.
   if(!settings.activityDestinationLegacyCleanupV309){
     var legacyNames={'Doctor':true,'Store':true,'Church':true,'Aggarwala':true,'HEB':true};
     settings.activityDestinations=(settings.activityDestinations||[]).filter(function(d){return d&&d.label&&!legacyNames[d.label];});
     settings.activityDestinationLegacyCleanupV309=true;
-    // v9.10.347.176: do not write defaults from _ensureActivityEnvSettings().
+    // v9.10.347.177: do not write defaults from _ensureActivityEnvSettings().
     // This function may run during startup before saved settings are loaded.
   }
-  // v9.10.347.176: no baked-in destinations. Users add their own.
+  // v9.10.347.177: no baked-in destinations. Users add their own.
   if(settings.activityEnvironmentalMode&&!settings.activityWeatherMode)settings.activityWeatherMode=settings.activityEnvironmentalMode;
   if(!settings.activityWeatherMode)settings.activityWeatherMode='manual';
   settings.activityEnvironmentalMode=settings.activityWeatherMode; // backwards-compatible alias
@@ -8925,7 +8827,7 @@ function getActivityEventContextSnapshot(activityName){
 }
 
 
-// v9.10.347.176 KISS: activity-centered hydration helpers for Ask/activity summaries.
+// v9.10.347.177 KISS: activity-centered hydration helpers for Ask/activity summaries.
 // Daily total remains supporting context; the activity window is before/during/after the activity.
 function clActivityTimeToMinutes(t){
   if(!t)return null;
@@ -9016,7 +8918,7 @@ function getActivityEnvironmentFormData(){
 
 
 
-// v9.10.347.176 KISS: Environment Context display helpers (display only; no save/storage changes)
+// v9.10.347.177 KISS: Environment Context display helpers (display only; no save/storage changes)
 function clActivityEsc(v){
   return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
 }
@@ -9049,10 +8951,8 @@ function clActivityContextLines(a){
   if(manual.length) lines.push('Environment: '+manual.join(', '));
   var w=clActivityWeatherText(a);
   if(w) lines.push('Weather: '+w);
-  if(a.activityMapsRouteName){ lines.push('Google Maps route: '+a.activityMapsRouteName); }
-  if(a.activityLocationNote){ lines.push('Location / landmark: '+a.activityLocationNote); }
-  if(a.activityRouteNotes){ lines.push('Route / detail note: '+a.activityRouteNotes); }
-  if(a.distanceMiles){ lines.push((a.distanceSource==='Manual entry'?'Manual distance: ':'Distance: ')+a.distanceMiles+' mi'+(a.averageSpeedMph?' · avg '+a.averageSpeedMph+' mph':'')+(a.elevationGainFt!==null&&a.elevationGainFt!==undefined?' · gain '+a.elevationGainFt+' ft':'')+(a.movingSeconds?' · moving '+_formatDurationShort(a.movingSeconds):'')+(a.stoppedSeconds?' · stopped '+_formatDurationShort(a.stoppedSeconds):'')+(a.stopCount!==null&&a.stopCount!==undefined?' · stops '+a.stopCount:'')); }
+  if(a.activitySymptomsNotes){ lines.push('Activity symptoms: '+a.activitySymptomsNotes); }
+  if(a.activityAfterNotes){ lines.push('After-activity notes: '+a.activityAfterNotes); }
   if(a.activityFluidOz){ lines.push('Activity fluid: '+a.activityFluidOz+' oz'); }
   if(a.activityStopLog&&a.activityStopLog.length){
     var stopBits=a.activityStopLog.map(function(st){var b='Stop '+(st.stopNumber||'')+' '+(st.time||''); if(st.location)b+=' location: '+st.location; if(st.note)b+=' note: '+st.note; if(st.symptom)b+=' symptoms: '+st.symptom; if(st.fluidOz)b+=' fluid '+st.fluidOz+' oz'; if(st.snack)b+=' snack: '+st.snack; return b;});
@@ -9101,9 +9001,8 @@ function clActivityAnalysisCompleteness(a){
   var hasStopSymptoms=!!(a.activityStopLog&&a.activityStopLog.some&&a.activityStopLog.some(function(st){return !!(st&&st.symptom);}));
   if(cs.recentSymptoms && cs.recentSymptoms.length) captured.push('Recent symptoms'); else if(hasStopSymptoms) captured.push('Stop symptoms'); else missing.push('Symptoms');
   if(a.notes) captured.push('Notes'); else missing.push('Notes');
-  if(a.activityMapsRouteName) captured.push('Google Maps route');
-  if(a.activityLocationNote) captured.push('Location/landmark');
-  if(a.activityRouteNotes) captured.push('Route note');
+  if(a.activitySymptomsNotes) captured.push('Activity symptoms');
+  if(a.activityAfterNotes) captured.push('After-activity notes');
   if(a.activityStopLog&&a.activityStopLog.length) captured.push('Stop log');
 
   var total=captured.length+missing.length;
@@ -9170,7 +9069,7 @@ function openActivityContextDetailsHistorical(dateKey,timeKey){
 }
 function askActivityContextFor(a){
   if(!a){alert('Activity not found');return;}
-  var q='Give me a concise one-screen executive summary of this saved activity using only my CardiacLens data. Put the most useful facts first and keep it short. Include distance, moving time, stopped time, stops, elevation gain/change, activity-specific weather, activity-centered hydration, BP/HR, symptoms, and same-destination route comparison only when captured or useful. Do not write a long narrative. Use at most 5 bullets plus one short Observation line. Treat the saved activity as an Activity Context Snapshot. Activity: '+(a.activity||'Activity')+'. Logged: '+(a._date||a.date||'')+' '+(a.t||'unknown time')+'. STRICT WEATHER RULE: use only the saved weather snapshot values for this activity. Do not mention heat advisory, heat wave, or 112° unless this saved activity weather snapshot explicitly contains that value. If the snapshot says Feels Like 100°, say Feels Like 100°, not any other historical value. HYDRATION RULE: prioritize the activity fluid window (60 min before, during, 30 min after) over the daily total. The daily total is supporting context only. WORDING RULES: avoid medical reassurance or conclusions such as controlled, normal recovery, no red flags, critically low, warrants discussion, or appropriate response. Say no symptoms logged if none were recorded; do not speculate about symptoms that were not logged. Use recorded observations only. Use these snapshot lines: '+clActivityContextLines(a).join(' | ')+'. '+clActivityCompletenessText(a)+' Do not diagnose; summarize what is known and what is missing.';
+  var q='Give me a concise one-screen executive summary of this saved activity using only my CardiacLens data. Put the most useful facts first and keep it short. Include duration, intensity, activity-specific weather when captured, activity-centered hydration, BP/HR, symptoms, snack/meal, and notes only when captured or useful. Do not write a long narrative. Use at most 5 bullets plus one short Observation line. Treat the saved activity as an Activity Context Snapshot. Activity: '+(a.activity||'Activity')+'. Logged: '+(a._date||a.date||'')+' '+(a.t||'unknown time')+'. STRICT WEATHER RULE: use only the saved weather snapshot values for this activity. Do not mention heat advisory, heat wave, or 112° unless this saved activity weather snapshot explicitly contains that value. If the snapshot says Feels Like 100°, say Feels Like 100°, not any other historical value. HYDRATION RULE: prioritize the activity fluid window (60 min before, during, 30 min after) over the daily total. The daily total is supporting context only. WORDING RULES: avoid medical reassurance or conclusions such as controlled, normal recovery, no red flags, critically low, warrants discussion, or appropriate response. Say no symptoms logged if none were recorded; do not speculate about symptoms that were not logged. Use recorded observations only. Use these snapshot lines: '+clActivityContextLines(a).join(' | ')+'. '+clActivityCompletenessText(a)+' Do not diagnose; summarize what is known and what is missing.';
   try{hideModal();}catch(e){}
   openAskPanel();
   setTimeout(function(){var inp=document.getElementById('askInput');if(inp){inp.value=q;inp.style.height='120px';}if(typeof submitAskQuestion==='function')submitAskQuestion();},350);
@@ -9256,7 +9155,7 @@ function _activityGpsPointFromPosition(pos){
 }
 function _activityGpsAcquireCurrentPosition(success,failure,label){
   if(!navigator.geolocation){failure({code:0,message:'GPS is not available in this browser/app.'});return;}
-  // v9.10.347.176: iOS/PWA-safe acquisition.
+  // v9.10.347.177: iOS/PWA-safe acquisition.
   // Use one direct browser location request per user action. Multiple chained requests
   // can produce inconsistent iOS PWA permission behavior and confusing duplicate errors.
   var attempts=[
@@ -9296,7 +9195,7 @@ function _activityGpsDescribeErrors(err){
   return out;
 }
 function testActivityGpsCoordinateProof(){
-  // v9.10.347.176: first-touch permission request.
+  // v9.10.347.177: first-touch permission request.
   // Keep the geolocation call as the first browser action after the user taps Check My Location.
   var geo=navigator.geolocation;
   if(!geo){
@@ -9345,7 +9244,7 @@ function testActivityGpsCoordinateProof(){
   },{enableHighAccuracy:false,maximumAge:600000,timeout:20000});
 }
 function checkActivityGpsReadiness(){
-  // v9.10.347.176: non-invasive readiness only.
+  // v9.10.347.177: non-invasive readiness only.
   // Do not call getCurrentPosition() from readiness/render paths. On iOS/PWA, GPS prompts
   // must be tied to an obvious user action such as Check My Location or Start Activity.
   if(!activityGpsSelected){updateActivityGpsStatus();return;}
@@ -9389,7 +9288,7 @@ function _activityGpsDestroyMap(){
   activityGpsMap=null;activityGpsMapMarker=null;activityGpsMapRoute=null;activityGpsRoutePoints=[];
 }
 function _activityGpsReset(){
-  // v9.10.347.176: full lifecycle reset. This is used after Cancel/Save/Finish-new-session so
+  // v9.10.347.177: full lifecycle reset. This is used after Cancel/Save/Finish-new-session so
   // a second Log Activity starts like a fresh app launch without requiring the user to close/reopen.
   activityGpsLifecycleId++;
   try{if(activityGpsWatchId!==null&&navigator.geolocation)navigator.geolocation.clearWatch(activityGpsWatchId);}catch(e){}
@@ -9723,7 +9622,7 @@ function saveActivityStopEntry(){
   hideActivityStopEditor();
   renderActivityStopLogList();
   if(activityTimerInterval && !activityTimerStoppedForSave){
-    // v9.10.347.176: Save Stop & Resume should return the user to the blue activity pill
+    // v9.10.347.177: Save Stop & Resume should return the user to the blue activity pill
     // and persist the new stop entry immediately for the iPhone/minimize workflow.
     minimizeActivityLog();
     showToast('Stop saved — activity still running');
@@ -9763,7 +9662,7 @@ function _sumActivityStopFluid(){
 }
 
 function getActivityGpsSaveData(){
-  // v9.10.347.176 KISS: GPS is additive. Activity logging must remain accurate even when GPS fails.
+  // v9.10.347.177 KISS: GPS is additive. Activity logging must remain accurate even when GPS fails.
   // If no live coordinate was captured, save GPS status/diagnostics but do not save fake 0.00-mile GPS distance.
   var pts=(activityGpsMetrics&&activityGpsMetrics.pointCount)?activityGpsMetrics.pointCount:0;
   if(!activityGpsSelected && !pts)return null;
@@ -9799,6 +9698,8 @@ function updateActivityCompletionDetails(){
   var box=document.getElementById('activityCompletionDetails');
   if(!box)return;
   box.style.display=_isActivityFinishedForSave()?'block':'none';
+  var lab=document.getElementById('activityFinalDurationLabel');
+  if(lab&&_isActivityFinishedForSave()){lab.textContent=(activityTimerStoppedForSave&&activityElapsedSeconds>0)?(Math.max(1,Math.ceil(activityElapsedSeconds/60))+' min'):(document.getElementById('durationMinutes')?document.getElementById('durationMinutes').value+' min':'automatic');}
 }
 
 function _isActivityFinishedForSave(){
@@ -9807,7 +9708,7 @@ function _isActivityFinishedForSave(){
   var isTimerMode=timerDisplay&&timerDisplay.style.display==='block';
   var isManualMode=manualInput&&manualInput.parentElement&&manualInput.parentElement.style.display==='block';
   if(isTimerMode){
-    // v9.10.347.176 KISS: Once the user taps Finish Activity, any positive elapsed time can be saved.
+    // v9.10.347.177 KISS: Once the user taps Finish Activity, any positive elapsed time can be saved.
     // Do not require the full 60 seconds to pass; short real-world activities still matter.
     return !!activityTimerStoppedForSave && activityElapsedSeconds>0 && !activityTimerInterval;
   }
@@ -9917,7 +9818,7 @@ var __tt=document.getElementById('timerTime');
 if(__tt){__tt.textContent=(mins<10?'0':'')+mins+':'+(secs<10?'0':'')+secs;}
 else if(!document.getElementById('activityLogModal')){clearInterval(activityTimerInterval);activityTimerInterval=null;}
 },100);
-// v9.10.347.176 KISS: Start Activity now uses the proven Minimize workflow.
+// v9.10.347.177 KISS: Start Activity now uses the proven Minimize workflow.
 // This creates/persists the activity pill, closes the modal, and starts the pill timer immediately.
 minimizeActivityLog();
 }
@@ -9951,7 +9852,7 @@ var stopBtn=document.getElementById('timerStopBtn');
 var stopLogBtn=document.getElementById('timerStopLogBtn');
 var travelBtn=document.getElementById('activityTravelBtn');
 var pausedLabel=document.getElementById('timerPausedLabel');
-if(startBtn)startBtn.style.display='inline-block';
+if(startBtn)startBtn.style.display=(activityElapsedSeconds>0?'none':'inline-block');
 if(pauseBtn)pauseBtn.style.display='none';
 if(resumeBtn)resumeBtn.style.display='none';
 if(stopBtn)stopBtn.style.display='none';
@@ -9959,7 +9860,7 @@ if(stopLogBtn)stopLogBtn.style.display='none';
 if(travelBtn)travelBtn.style.display='none';
 _setActivityStopLogVisible(activityStopLog&&activityStopLog.length>0);
 if(pausedLabel)pausedLabel.style.display='none';
-activityTimerStoppedForSave=(activityElapsedSeconds>0); // v9.10.347.176: Save unlocks after Stop for any positive elapsed time
+activityTimerStoppedForSave=(activityElapsedSeconds>0); // v9.10.347.177: Save unlocks after Stop for any positive elapsed time
 updateActivitySaveState();
 }
 
@@ -9976,26 +9877,12 @@ var activityReturnStateForBP=null;
 function captureActivityReturnStateForBP(){
   var sel=document.getElementById('activitySelect');
   var notes=document.getElementById('activityNotes');
-  var loc=document.getElementById('activityLocationNote');
-  var route=document.getElementById('activityRouteNotes');
-  var dist=document.getElementById('activityManualDistanceMiles');
-  var mapsRoute=document.getElementById('activityMapsRouteName');
-  var mapsSpeed=document.getElementById('activityMapsAverageSpeedMph');
-  var mapsGain=document.getElementById('activityMapsElevationGainFt');
-  var mapsLoss=document.getElementById('activityMapsElevationLossFt');
   var fluid=document.getElementById('activityFluidOz');
   var snack=document.getElementById('activitySnackNotes');
   var dur=document.getElementById('durationMinutes');
   return {
     activityType: sel ? sel.value : '',
     notes: notes ? notes.value : '',
-    activityLocationNote: loc ? loc.value : '',
-    activityRouteNotes: route ? route.value : '',
-    activityManualDistanceMiles: dist ? dist.value : '',
-    activityMapsRouteName: mapsRoute ? mapsRoute.value : '',
-    activityMapsAverageSpeedMph: mapsSpeed ? mapsSpeed.value : '',
-    activityMapsElevationGainFt: mapsGain ? mapsGain.value : '',
-    activityMapsElevationLossFt: mapsLoss ? mapsLoss.value : '',
     activityFluidOz: fluid ? fluid.value : '',
     activitySnackNotes: snack ? snack.value : '',
     exertion: selectedExertion,
@@ -10033,14 +9920,7 @@ function restoreActivityAfterBP(state, bpLabel){
     renderActivityPurposeButtons();
     var notes=document.getElementById('activityNotes');
     if(notes)notes.value=state.notes||'';
-    var loc=document.getElementById('activityLocationNote');if(loc)loc.value=state.activityLocationNote||'';
-    var route=document.getElementById('activityRouteNotes');if(route)route.value=state.activityRouteNotes||'';
-    var dist=document.getElementById('activityManualDistanceMiles');if(dist)dist.value=state.activityManualDistanceMiles||'';
-    var mapsRoute=document.getElementById('activityMapsRouteName');if(mapsRoute)mapsRoute.value=state.activityMapsRouteName||'';
-    var mapsSpeed=document.getElementById('activityMapsAverageSpeedMph');if(mapsSpeed)mapsSpeed.value=state.activityMapsAverageSpeedMph||'';
-    var mapsGain=document.getElementById('activityMapsElevationGainFt');if(mapsGain)mapsGain.value=state.activityMapsElevationGainFt||'';
-    var mapsLoss=document.getElementById('activityMapsElevationLossFt');if(mapsLoss)mapsLoss.value=state.activityMapsElevationLossFt||'';
-    var fluid=document.getElementById('activityFluidOz');if(fluid)fluid.value=state.activityFluidOz||'';
+        var fluid=document.getElementById('activityFluidOz');if(fluid)fluid.value=state.activityFluidOz||'';
     var snack=document.getElementById('activitySnackNotes');if(snack)snack.value=state.activitySnackNotes||'';
     if(state.exertion)selectExertion(state.exertion);
     if(state.tempBand!==undefined&&state.tempBand!==null)selectTempBand(state.tempBand);
@@ -10204,7 +10084,7 @@ completeAndCloseModal();
 // ── Background Activity System (v9.10.36) ────────────────────────────────────
 
 
-// v9.10.347.176 KISS: activity pill state is created immediately when timer starts.
+// v9.10.347.177 KISS: activity pill state is created immediately when timer starts.
 // This is intentionally limited to the floating pill lifecycle; activity save/history/context logic is untouched.
 function _captureActivityPillStateFromForm(isTimerMode){
   var sel=document.getElementById('activitySelect');
@@ -10214,13 +10094,6 @@ function _captureActivityPillStateFromForm(isTimerMode){
   _minimizedActivityState={
     activityType:  activityType,
     notes:         notes ? notes.value : '',
-    activityLocationNote:(function(){var el=document.getElementById('activityLocationNote');return el?el.value:'';})(),
-    activityRouteNotes:(function(){var el=document.getElementById('activityRouteNotes');return el?el.value:'';})(),
-    activityManualDistanceMiles:(function(){var el=document.getElementById('activityManualDistanceMiles');return el?el.value:'';})(),
-    activityMapsRouteName:(function(){var el=document.getElementById('activityMapsRouteName');return el?el.value:'';})(),
-    activityMapsAverageSpeedMph:(function(){var el=document.getElementById('activityMapsAverageSpeedMph');return el?el.value:'';})(),
-    activityMapsElevationGainFt:(function(){var el=document.getElementById('activityMapsElevationGainFt');return el?el.value:'';})(),
-    activityMapsElevationLossFt:(function(){var el=document.getElementById('activityMapsElevationLossFt');return el?el.value:'';})(),
     activityFluidOz:(function(){var el=document.getElementById('activityFluidOz');return el?el.value:'';})(),
     activitySnackNotes:(function(){var el=document.getElementById('activitySnackNotes');return el?el.value:'';})(),
     exertion:      selectedExertion,
@@ -10254,7 +10127,7 @@ function _captureActivityPillStateFromForm(isTimerMode){
   } catch(e) {}
 }
 
-// v9.10.347.176 KISS: prevent bottom floating controls from covering each other on iPhone.
+// v9.10.347.177 KISS: prevent bottom floating controls from covering each other on iPhone.
 function _layoutBottomPills(){
   var activity=document.getElementById('activityPillBtn');
   var status=document.getElementById('statusFab');
@@ -10308,13 +10181,6 @@ function minimizeActivityLog(){
   _minimizedActivityState={
     activityType:  sel.value,
     notes:         notes ? notes.value : '',
-    activityLocationNote:(function(){var el=document.getElementById('activityLocationNote');return el?el.value:'';})(),
-    activityRouteNotes:(function(){var el=document.getElementById('activityRouteNotes');return el?el.value:'';})(),
-    activityManualDistanceMiles:(function(){var el=document.getElementById('activityManualDistanceMiles');return el?el.value:'';})(),
-    activityMapsRouteName:(function(){var el=document.getElementById('activityMapsRouteName');return el?el.value:'';})(),
-    activityMapsAverageSpeedMph:(function(){var el=document.getElementById('activityMapsAverageSpeedMph');return el?el.value:'';})(),
-    activityMapsElevationGainFt:(function(){var el=document.getElementById('activityMapsElevationGainFt');return el?el.value:'';})(),
-    activityMapsElevationLossFt:(function(){var el=document.getElementById('activityMapsElevationLossFt');return el?el.value:'';})(),
     activityFluidOz:(function(){var el=document.getElementById('activityFluidOz');return el?el.value:'';})(),
     activitySnackNotes:(function(){var el=document.getElementById('activitySnackNotes');return el?el.value:'';})(),
     exertion:      selectedExertion,
@@ -10416,14 +10282,7 @@ function restoreActivityLog(){
     renderActivityPurposeButtons();
     var notes=document.getElementById('activityNotes');
     if(notes && state.notes) notes.value=state.notes;
-    var loc=document.getElementById('activityLocationNote');if(loc)loc.value=state.activityLocationNote||'';
-    var route=document.getElementById('activityRouteNotes');if(route)route.value=state.activityRouteNotes||'';
-    var dist=document.getElementById('activityManualDistanceMiles');if(dist)dist.value=state.activityManualDistanceMiles||'';
-    var mapsRoute=document.getElementById('activityMapsRouteName');if(mapsRoute)mapsRoute.value=state.activityMapsRouteName||'';
-    var mapsSpeed=document.getElementById('activityMapsAverageSpeedMph');if(mapsSpeed)mapsSpeed.value=state.activityMapsAverageSpeedMph||'';
-    var mapsGain=document.getElementById('activityMapsElevationGainFt');if(mapsGain)mapsGain.value=state.activityMapsElevationGainFt||'';
-    var mapsLoss=document.getElementById('activityMapsElevationLossFt');if(mapsLoss)mapsLoss.value=state.activityMapsElevationLossFt||'';
-    var fluid=document.getElementById('activityFluidOz');if(fluid)fluid.value=state.activityFluidOz||'';
+        var fluid=document.getElementById('activityFluidOz');if(fluid)fluid.value=state.activityFluidOz||'';
     var snack=document.getElementById('activitySnackNotes');if(snack)snack.value=state.activitySnackNotes||'';
     selectedActivityWindow=state.activityWindow||'';
     selectedActivityWindowMinutes=state.activityWindowMinutes||null;
@@ -10497,7 +10356,7 @@ function restoreActivityLog(){
       updateActivitySaveState();
       _setActivityStopLogVisible(activityStopLog&&activityStopLog.length>0);
     }
-    // v9.10.347.176 KISS: returning from the Activity pill should land at the active timer/save area,
+    // v9.10.347.177 KISS: returning from the Activity pill should land at the active timer/save area,
     // not the top of the Log Activity setup modal.
     setTimeout(function(){
       var target=document.getElementById('activityTimingSection')||document.getElementById('timerDisplay')||document.getElementById('timerStartBtn');
@@ -10607,14 +10466,14 @@ bg='#fffbeb';border='#f59e0b';
 badge='⚠️ Acceptable if you were resting';showBtn=true;
 }else{
 bg='#f3f4f6';border='#9ca3af';
-badge='🕐 Too far back — resting BP can shift meaningfully beyond 60 minutes. Take a fresh reading or skip.';showBtn=false;
+badge='🕐 Too far back — use the fresh BP entry below if you want before-activity BP paired.';showBtn=false;
 }
 var btnHtml='';
 if(showBtn){
 var ts=latest.t;
 btnHtml='<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">'
-+'<button type="button" data-ts="'+ts+'" onclick="_useExistingBPFromBtn(this)" style="background:#3b82f6;color:#fff;border:none;padding:10px 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">Use This Reading</button>'
-+'<button type="button" onclick="takeBPBeforeActivity()" style="background:#f3f4f6;color:#374151;border:2px solid #d1d5db;padding:10px 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">Take New</button>'
++'<button type="button" data-ts="'+ts+'" onclick="_useExistingBPFromBtn(this)" style="background:#3b82f6;color:#fff;border:none;padding:10px 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">Use Previous BP</button>'
++'<button type="button" onclick="takeBPBeforeActivity()" style="background:#f3f4f6;color:#374151;border:2px solid #d1d5db;padding:10px 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">Enter Fresh BP</button>'
 +'</div>';
 }
 card.innerHTML='<div class="rcbp-inner" style="background:'+bg+';border-left:4px solid '+border+';border-radius:8px;padding:12px 14px;font-size:14px;color:#1f2937;margin-bottom:4px">'
@@ -10758,24 +10617,10 @@ var activityFluidOz=_actFluidEl?parseInt(_actFluidEl.value,10):0;
 if(isNaN(activityFluidOz)||activityFluidOz<0)activityFluidOz=0;
 var _actSnackEl=document.getElementById('activitySnackNotes');
 var activitySnackNotes=_actSnackEl?_actSnackEl.value.trim():'';
-var _actManualDistEl=document.getElementById('activityManualDistanceMiles');
-var activityManualDistanceMiles=_actManualDistEl?parseFloat(_actManualDistEl.value):null;
-if(!isFinite(activityManualDistanceMiles)||activityManualDistanceMiles<=0)activityManualDistanceMiles=null;
-var _actMapsRouteNameEl=document.getElementById('activityMapsRouteName');
-var activityMapsRouteName=_actMapsRouteNameEl?_actMapsRouteNameEl.value.trim():'';
-var _actMapsAvgEl=document.getElementById('activityMapsAverageSpeedMph');
-var activityMapsAverageSpeedMph=_actMapsAvgEl?parseFloat(_actMapsAvgEl.value):null;
-if(!isFinite(activityMapsAverageSpeedMph)||activityMapsAverageSpeedMph<=0)activityMapsAverageSpeedMph=null;
-var _actMapsGainEl=document.getElementById('activityMapsElevationGainFt');
-var activityMapsElevationGainFt=_actMapsGainEl?parseInt(_actMapsGainEl.value,10):null;
-if(!isFinite(activityMapsElevationGainFt)||activityMapsElevationGainFt<0)activityMapsElevationGainFt=null;
-var _actMapsLossEl=document.getElementById('activityMapsElevationLossFt');
-var activityMapsElevationLossFt=_actMapsLossEl?parseInt(_actMapsLossEl.value,10):null;
-if(!isFinite(activityMapsElevationLossFt)||activityMapsElevationLossFt<0)activityMapsElevationLossFt=null;
-var _actLocationNoteEl=document.getElementById('activityLocationNote');
-var activityLocationNote=_actLocationNoteEl?_actLocationNoteEl.value.trim():'';
-var _actRouteNotesEl=document.getElementById('activityRouteNotes');
-var activityRouteNotes=_actRouteNotesEl?_actRouteNotesEl.value.trim():'';
+var _actSymptomsEl=document.getElementById('activitySymptomsNotes');
+var activitySymptomsNotes=_actSymptomsEl?_actSymptomsEl.value.trim():'';
+var _actAfterNotesEl=document.getElementById('activityAfterNotes');
+var activityAfterNotes=_actAfterNotesEl?_actAfterNotesEl.value.trim():'';
 var activityStopEntries=_getActivityStopLogSaveData();
 var activityStopFluidOz=_sumActivityStopFluid();
 if(!activity){
@@ -10862,7 +10707,7 @@ try{
 }catch(e){}
 var gpsData=null;
 var routeComparison=null;
-var manualAverageSpeed=activityMapsAverageSpeedMph||((activityManualDistanceMiles&&duration>0)?Math.round((activityManualDistanceMiles/(duration/60))*10)/10:null);
+var manualAverageSpeed=null;
 var journeyData=getJourneyFormData(activityName);
 var activityContext=selectedActivityContext||getDefaultActivityContext(activityName);
 var savedExertion=selectedExertion;
@@ -10876,16 +10721,11 @@ duration:duration,
 exertion:selectedExertion,
 t:getTime(),
 startTime:activityStartTimeText,
-notes:notes,
+notes:(notes+(activityAfterNotes?' | After: '+activityAfterNotes:'')+(activitySymptomsNotes?' | Symptoms: '+activitySymptomsNotes:'')),
 activityFluidOz:activityFluidOz||0,
 activitySnackNotes:activitySnackNotes,
-activityLocationNote:activityLocationNote,
-activityRouteNotes:activityRouteNotes,
-activityManualDistanceMiles:activityManualDistanceMiles,
-activityMapsRouteName:activityMapsRouteName,
-activityMapsAverageSpeedMph:activityMapsAverageSpeedMph,
-activityMapsElevationGainFt:activityMapsElevationGainFt,
-activityMapsElevationLossFt:activityMapsElevationLossFt,
+activitySymptomsNotes:activitySymptomsNotes,
+activityAfterNotes:activityAfterNotes,
 activityStopLog:activityStopEntries,
 activityStopFluidOz:activityStopFluidOz||0,
 outdoorTempBand:selectedTempBand,
@@ -10903,15 +10743,15 @@ environmentalMode:(envData.mode||'manual'),
 environmentalSnapshot:envData,
 eventContextSnapshot:(envData.contextSnapshot||null),
 gpsTracking:null,
-distanceMiles:activityManualDistanceMiles||null,
-distanceSource:activityManualDistanceMiles?'Google Maps / manual entry':'',
+distanceMiles:null,
+distanceSource:'',
 gpsCaptured:false,
-gpsCaptureNote:'GPS removed from Log Activity in v9.10.347.176. Activity saved with duration, effort, notes, stops, fluids, snacks, symptoms, and optional manual distance.',
-averageSpeedMph:manualAverageSpeed,
+gpsCaptureNote:'Route statistics removed from Log Activity in v9.10.347.177. Activity saved with duration, intensity, BP links, weather context, fluids, snack/meal, symptoms, and notes.',
+averageSpeedMph:null,
 maxSpeedMph:null,
-elevationGainFt:activityMapsElevationGainFt,
-elevationLossFt:activityMapsElevationLossFt,
-elevationChangeFt:(activityMapsElevationGainFt!==null||activityMapsElevationLossFt!==null)?((activityMapsElevationGainFt||0)-(activityMapsElevationLossFt||0)):null,
+elevationGainFt:null,
+elevationLossFt:null,
+elevationChangeFt:null,
 movingSeconds:null,
 stoppedSeconds:null,
 stopCount:(activityStopEntries&&activityStopEntries.length)||null,
@@ -11409,8 +11249,6 @@ for(var i=activityData.length-1;i>=0;i--){
   h+='<div style="font-size:16px;font-weight:600;color:'+exertionColor+'">'+r.exertion+' Exertion</div></div>';
   if(r.notes){ h+='<div style="margin-top:12px;padding:12px;background:#f3f4f6;border-radius:6px;font-size:16px;color:#374151"><strong>Notes:</strong> '+r.notes+'</div>'; }
   if(r.activityFluidOz||r.activitySnackNotes){ h+='<div style="margin-top:12px;padding:12px;background:#f0f9ff;border-left:4px solid #0ea5e9;border-radius:6px;font-size:15px;color:#0c4a6e"><strong>After activity:</strong> '+(r.activityFluidOz?('💧 '+r.activityFluidOz+' oz'):'')+(r.activityFluidOz&&r.activitySnackNotes?' · ':'')+(r.activitySnackNotes?('🍎 '+clActivityEsc(r.activitySnackNotes)):'')+'</div>'; }
-  if(r.activityMapsRouteName||r.activityLocationNote||r.activityRouteNotes){ h+='<div style="margin-top:12px;padding:12px;background:#fefce8;border-left:4px solid #ca8a04;border-radius:6px;font-size:15px;color:#713f12">'+(r.activityMapsRouteName?('<strong>Google Maps route:</strong> '+clActivityEsc(r.activityMapsRouteName)):'')+((r.activityMapsRouteName&&(r.activityLocationNote||r.activityRouteNotes))?'<br>':'')+(r.activityLocationNote?('<strong>Location:</strong> '+clActivityEsc(r.activityLocationNote)):'')+(r.activityLocationNote&&r.activityRouteNotes?'<br>':'')+(r.activityRouteNotes?('<strong>Route/detail:</strong> '+clActivityEsc(r.activityRouteNotes)):'')+'</div>'; }
-  if(r.distanceMiles){ h+='<div style="margin-top:12px;padding:12px;background:#eef2ff;border-left:4px solid #6366f1;border-radius:6px;font-size:15px;color:#312e81"><strong>'+(r.distanceSource==='Manual entry'?'Manual distance':(r.distanceSource==='Google Maps / manual entry'?'Google Maps summary':'Distance'))+':</strong> '+r.distanceMiles+' mi'+(r.averageSpeedMph?' · avg '+r.averageSpeedMph+' mph':'')+(r.elevationGainFt!==null&&r.elevationGainFt!==undefined?' · elevation gain '+r.elevationGainFt+' ft':'')+(r.movingSeconds?' · moving '+_formatDurationShort(r.movingSeconds):'')+(r.stoppedSeconds?' · stopped '+_formatDurationShort(r.stoppedSeconds):'')+(r.stopCount!==null&&r.stopCount!==undefined?' · stops '+r.stopCount:'')+'</div>'; }
     h+=clRouteComparisonHtml(r);
   var parts=clActivityContextLines(r);
   if(parts.length){
@@ -11827,7 +11665,7 @@ planMyDay();
 
 
 function updateNextEvent(){
-// v9.10.347.176: Next Event is summarized inside the Today's Status Events tile.
+// v9.10.347.177: Next Event is summarized inside the Today's Status Events tile.
 // No large standalone event cards on the home screen.
 var _ne=document.getElementById('next-event');
 if(_ne){_ne.innerHTML='';_ne.style.display='none';}
@@ -11942,7 +11780,7 @@ function runNextEventNow(){ if(_nextEvtRef) _openEventActionModal(_nextEvtRef); 
 function runEventNow(mapKey){
   var evt=_wEvtMap[mapKey];
   if(!evt)return;
-  // v9.10.347.176: queue Log is user-initiated. Close the queue modal first
+  // v9.10.347.177: queue Log is user-initiated. Close the queue modal first
   // so the event action card opens instead of creating the old waiting badge.
   try{_pendingReminderEvt=null;_hideReminderQueueBadge();}catch(e){}
   var modal=document.getElementById('modal');
@@ -11967,7 +11805,7 @@ function snoozeEventFromQueue(mapKey,minutes){
   _recordEventQueueItem(evt,'snoozed');
   updateUpcomingEventsWidget();
   _showEventNotice('Snoozed: '+_eventDisplayName(evt)+' for '+minutes+' minutes');
-  // v9.10.347.176: keep the open queue and Today Status tile in sync immediately.
+  // v9.10.347.177: keep the open queue and Today Status tile in sync immediately.
   setTimeout(function(){try{openEventsQueue();}catch(e){}},60);
 }
 
@@ -11977,7 +11815,7 @@ function dismissEventFromQueue(mapKey){
   dismissOverdueEvent(evt.time,evt.name);
   updateUpcomingEventsWidget();
   _showEventNotice('Dismissed: '+_eventDisplayName(evt));
-  // v9.10.347.176: refresh the open queue so dismissed items disappear right away.
+  // v9.10.347.177: refresh the open queue so dismissed items disappear right away.
   setTimeout(function(){try{openEventsQueue();}catch(e){}},60);
 }
 
@@ -11990,9 +11828,9 @@ _eventsWidgetCollapsed=false;
 updateUpcomingEventsWidget();
 }
 function updateUpcomingEventsWidget(){
-// v9.10.347.176: Home screen event awareness lives in one Today's Status Events tile.
+// v9.10.347.177: Home screen event awareness lives in one Today's Status Events tile.
 // The larger queue is opened only when the user taps that tile.
-// v9.10.347.176 repair: there is no updateTodayZone() function in this codebase.
+// v9.10.347.177 repair: there is no updateTodayZone() function in this codebase.
 // Event Log/Snooze/Dismiss changes must rebuild Today's Status immediately so the
 // Events tile cannot keep stale detail text after the count/state changes.
 var widget=document.getElementById('upcoming-events-widget');
@@ -12009,7 +11847,7 @@ function _formatEventCountdown(diff){
 }
 
 function _playEventAttentionSound(evt){
-  // v9.10.347.176: sound is state-change based, not app-open based.
+  // v9.10.347.177: sound is state-change based, not app-open based.
   // It plays once when a new event becomes due while CardiacLens is already open.
   if(!evt||evt.sound===false)return;
   if(document.hidden)return;
@@ -12426,7 +12264,7 @@ for(var i=0;i<allEvents.length;i++){
     }
   }
 
-  // v9.10.347.176: advance reminders are quiet visual queue updates only.
+  // v9.10.347.177: advance reminders are quiet visual queue updates only.
   // They never open audioAlertBox, play a sound, or cover the current logging screen.
   if(advanceTime && currentTime===advanceTime && !firedEvents[advanceKey]){
     console.log('Advance reminder queued:',event.name,'at',currentTime,'(advance',advance,'min)');
@@ -13006,7 +12844,7 @@ function deleteMedHistorical(dateKey, timeKey){
 }
 
 
-// ── Medication Intelligence Milestone B helpers (v9.10.347.176) ─────────────
+// ── Medication Intelligence Milestone B helpers (v9.10.347.177) ─────────────
 function _miFindMedicine(medName){
   for(var i=0;i<(medicineList||[]).length;i++){
     var m=medicineList[i];
@@ -13029,7 +12867,7 @@ function _miIsFormulaConditionNote(note){
   return n.indexOf('mip-approved')!==-1||n.indexOf('medication intelligence panel')!==-1||n.indexOf('pulse pressure')!==-1&&n.indexOf('warn')!==-1;
 }
 function _miDoctorRules(med){
-  // v9.10.347.176: Doctor Rule means only the clinician instruction typed by the user.
+  // v9.10.347.177: Doctor Rule means only the clinician instruction typed by the user.
   // Old structured conditionRules/conditionMetric values are intentionally not displayed
   // or treated as active medication rules.
   var out=[];
@@ -14112,9 +13950,9 @@ function _evalRule(rule, reading) {
 }
 
 // ── Retired medication condition-rule engine ───────────────────────
-// v9.10.347.176: kept as a compatibility stub only; always returns null.
+// v9.10.347.177: kept as a compatibility stub only; always returns null.
 function _checkMedCondition(medName){
-  // v9.10.347.176: Medication Intelligence is observational only.
+  // v9.10.347.177: Medication Intelligence is observational only.
   // Log Medicine no longer evaluates old conditionRules, legacy conditionMetric fields,
   // MIP-approved thresholds, PP thresholds, or HR formula warnings.
   // Doctor Rule text is displayed for awareness only and never blocks logging.
@@ -14634,7 +14472,7 @@ function _checkDisclaimerAccepted(){
 
 function _acceptDisclaimer(){
   try{
-    var rec = {accepted: true, ts: new Date().toISOString(), version: 'v9.10.347.176'};
+    var rec = {accepted: true, ts: new Date().toISOString(), version: 'v9.10.347.177'};
     // Checksum the acknowledgment record
     rec._cs = _cbHash(rec.ts + '|' + rec.version + '|' + CB_TAMPER_SALT);
     localStorage.setItem(CB_DISCLAIMER_KEY, JSON.stringify(rec));
@@ -14709,7 +14547,7 @@ var currentDate=getTodayKey();
 // Store attempted meds so Back button can restore selection
 _medSafetyBlockedMeds = selectedMeds.slice();
 if(arguments[0]!=='warned'&&arguments[0]!=='override')window._medSafetyWarnState={meds:selectedMeds.slice(),timing:timing,fluid:fluid,eventId:eventId};
-// v9.10.347.176: old medication condition-rule checks removed from Log Medicine.
+// v9.10.347.177: old medication condition-rule checks removed from Log Medicine.
 // Only interval/double-dose protection remains here; Doctor Rule text is observational.
 for(var ii=0; ii<selectedMeds.length; ii++){
   var _iblock = _checkMedInterval(selectedMeds[ii]);
@@ -14937,7 +14775,7 @@ function _medContextFieldsHTML(prefix, med){
   }
   h+='</div>';
 
-  // v9.10.347.176: old Condition Rules builder removed.
+  // v9.10.347.177: old Condition Rules builder removed.
   // Users enter clinician instructions in Doctor Rule / Instructions only.
   // No hidden block/warn medication thresholds are created from this form.
   h+='</div>';
@@ -15496,7 +15334,7 @@ if(ctx.linkedTo)           medObject.linkedTo=ctx.linkedTo;
 if(ctx.discDate)           medObject.discDate=ctx.discDate;
 if(ctx.doctorRule)         medObject.doctorRule=ctx.doctorRule;
 if(ctx.drugClass)          medObject.drugClass=ctx.drugClass;
-// v9.10.347.176: old condition rules removed; Doctor Rule text is observational only.
+// v9.10.347.177: old condition rules removed; Doctor Rule text is observational only.
 medObject.conditionRules = [];
 medObject.conditionLogic = 'OR';
 medObject.conditionNote = '';
@@ -15588,7 +15426,7 @@ if(ctx.linkedTo)           medObject.linkedTo=ctx.linkedTo;
 if(ctx.discDate)           medObject.discDate=ctx.discDate;
 if(ctx.doctorRule)         medObject.doctorRule=ctx.doctorRule;
 if(ctx.drugClass)          medObject.drugClass=ctx.drugClass;
-// v9.10.347.176: old condition rules removed; Doctor Rule text is observational only.
+// v9.10.347.177: old condition rules removed; Doctor Rule text is observational only.
 medObject.conditionRules=[];
 medObject.conditionLogic='OR';
 medObject.conditionNote='';
@@ -15799,7 +15637,7 @@ function _buildConditionNote(rules, logic) {
 
 function saveMedicineList(){
 try{
-// v9.10.347.176: no medication condition-rule checksums are stamped because condition rules are inactive.
+// v9.10.347.177: no medication condition-rule checksums are stamped because condition rules are inactive.
 // Save to multiple keys for redundancy
 localStorage.setItem('BP_TRACKER_MEDICINES',JSON.stringify(medicineList));
 localStorage.setItem('medicineList',JSON.stringify(medicineList));
@@ -15825,7 +15663,7 @@ localStorage.setItem('BP_TRACKER_MEDICINES',saved);
 if(saved){
 medicineList=JSON.parse(saved);
 console.log('Loaded',medicineList.length,'medicines from storage');
-// v9.10.347.176: remove old medicine condition-rule data from saved medicine records.
+// v9.10.347.177: remove old medicine condition-rule data from saved medicine records.
 // Medication Intelligence now uses Doctor Rule text, Today's Awareness, and Personal Pattern only.
 var _needsSave=false;
 medicineList.forEach(function(m){
@@ -15849,7 +15687,7 @@ console.error('Failed to load medicines:',e);
 }
 }
 
-// v9.10.347.176: v9.10.189 MIP-to-conditionRules migration disabled.
+// v9.10.347.177: v9.10.189 MIP-to-conditionRules migration disabled.
 // Formula thresholds must never be copied into medication condition rules.
 try { localStorage.setItem('cardiaclens_mip_sync_v189_done','1'); } catch(e) {}
 
@@ -16648,7 +16486,7 @@ name:name,
 category:category,
 facility:facility,
 physician:physician,
-notes:notes,
+notes:(notes+(activityAfterNotes?' | After: '+activityAfterNotes:'')+(activitySymptomsNotes?' | Symptoms: '+activitySymptomsNotes:'')),
 timestamp:new Date(date+' '+time).toISOString()
 };
 
@@ -16803,7 +16641,7 @@ symptoms:S,
 activities:A,
 fluid:fluidLog,
 medLog:medLog,
-notes:notes,
+notes:(notes+(activityAfterNotes?' | After: '+activityAfterNotes:'')+(activitySymptomsNotes?' | Symptoms: '+activitySymptomsNotes:'')),
 dailyFluid:dailyFluid,
 exportedToday:exportedToday,
 timestamp:new Date().toISOString()
@@ -17523,7 +17361,7 @@ function buildSmartStatusMessage(zoneData) {
 }
 
 
-// ── Home Today's Weather pill + pickup/trip planner (v9.10.347.176) ─────────────
+// ── Home Today's Weather pill + pickup/trip planner (v9.10.347.177) ─────────────
 var TODAY_WEATHER_CACHE_KEY='CARDIACLENS_TODAY_WEATHER_CACHE';
 var todayWeatherFetchInFlight=false;
 var todayWeatherModalRequestSeq=0;
@@ -17537,7 +17375,7 @@ function _clWindCompass(deg){
 function _clGetWeatherCache(){try{var raw=localStorage.getItem(TODAY_WEATHER_CACHE_KEY);return raw?JSON.parse(raw):null;}catch(e){return null;}}
 function _clSetWeatherCache(obj){try{localStorage.setItem(TODAY_WEATHER_CACHE_KEY,JSON.stringify(obj));}catch(e){}}
 function _clResolveSavedWeatherZip(){
-  // v9.10.347.176: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
+  // v9.10.347.177: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
   // Today Weather must not fall back to GPS unless the user explicitly taps Use My Location.
   try{
     var z=String((settings&&settings.todayWeatherSavedZip)||'').trim();
@@ -17567,7 +17405,7 @@ function _clWeatherUpdatedLabel(c){
   return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+' ('+ageText+')';
 }
 function _clBuildWeatherUrl(lat,lon){
-  // v9.10.347.176: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
+  // v9.10.347.177: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
   // The app only needs current conditions + hourly forecast for rain/heat/wind guidance.
   return 'https://api.open-meteo.com/v1/forecast?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+
     '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=2'+
@@ -17575,7 +17413,7 @@ function _clBuildWeatherUrl(lat,lon){
     '&hourly=precipitation_probability,precipitation,rain,temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m';
 }
 
-// v9.10.347.176: Saved ZIP uses a direct local coordinate table first.
+// v9.10.347.177: Saved ZIP uses a direct local coordinate table first.
 // For Robert's normal area, 77340 always resolves directly to Huntsville coordinates.
 var CL_ZIP_COORDS={
   '77340':{lat:30.7235,lon:-95.5508,label:'Huntsville'},
@@ -17700,15 +17538,15 @@ function openTodayWeatherModal(){
   var html='<div class="modal-title" style="font-size:26px;margin-bottom:10px">☀️ Today\'s Weather</div><button type="button" onclick="hideModal();openHelpModal(\'weather\')" style="width:100%;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;border-radius:10px;padding:10px;font-size:14px;font-weight:800;margin-bottom:12px">How to use Today\'s Weather</button><div id="todayWeatherModalBody">'+_renderTodayWeatherBody(c,null,initialState)+'</div>';
   html+='<div class="modal-actions"><button class="modal-cancel" onclick="hideModal()">Close</button><button class="modal-ok" id="todayWeatherRefreshBtn" onclick="refreshTodayWeatherFromModal()">Refresh Weather</button></div>';
   showModal(html);
-  // v9.10.347.176: if cached weather is older than the user's refresh threshold, refresh automatically on open.
+  // v9.10.347.177: if cached weather is older than the user's refresh threshold, refresh automatically on open.
   // This keeps the weather pill, planner, and activity weather on the same fresh source without requiring a manual tap.
   if(stale){setTimeout(function(){
-    // v9.10.347.176: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
+    // v9.10.347.177: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
     refreshTodayWeatherFromModal(true,'zip');
   },100);}
 }
 
-// v9.10.347.176: Today's Weather banner must use the real weather state, not a stale/default activity flag.
+// v9.10.347.177: Today's Weather banner must use the real weather state, not a stale/default activity flag.
 function _clIsTodayWeatherAutomaticEnabled(c){
   try{
     if(typeof _clRestoreWeatherSettingsBackup==='function')_clRestoreWeatherSettingsBackup();
@@ -17761,7 +17599,7 @@ function _clWindyRadarFallback(pendingWindow){
 }
 
 function openWindyLiveRainRadar(){
-  /* v9.10.347.176 KISS: open exactly one Windy radar tab/window.
+  /* v9.10.347.177 KISS: open exactly one Windy radar tab/window.
      Use a named pending window (without noopener) so the later GPS callback
      updates that same tab instead of leaving about:blank and opening a second tab. */
   var pending=null;
@@ -17860,7 +17698,7 @@ function useSavedZipWeather(){
   refreshTodayWeatherFromModal(false,'zip');
 }
 function refreshTodayWeatherFromModal(silent,source){
-  // v9.10.347.176: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
+  // v9.10.347.177: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
   source=(source==='location')?'location':'zip';
   if(source==='zip'){
     try{settings.todayWeatherSource='zip';settings.todayWeatherSavedZip=_clResolveSavedWeatherZip();localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
@@ -18251,7 +18089,7 @@ html+='<div class="stat-tile" style="background:#1e3a8a18;border:2.5px solid #1e
        +'<div class="stat-tile-action" style="color:'+borderColor+'">'+sublabel+'</div>'
        +'</div>';
 })();
-// Events tile — v9.10.347.176: one dashboard gateway for due, missed, and next event.
+// Events tile — v9.10.347.177: one dashboard gateway for due, missed, and next event.
 (function(){
   var evState=(typeof _getEventsTileState==='function')?_getEventsTileState():{color:'#10b981',bg:'#10b98118',border:'#10b981',shadow:'#10b98144',count:'✓',label:'Events',action:'tap to view',detail:'No due or missed events'};
   var evDetail=_eventSafeText(evState.detail||'');
@@ -18275,7 +18113,7 @@ if(zoneData&&zoneData.reasons.length>0){
 
 html+='</div>';
 
-// v9.10.347.176: Medication Intelligence is observational only.
+// v9.10.347.177: Medication Intelligence is observational only.
 // Do not surface calculated medication-threshold review banners.
 
 html+='</div>';
@@ -18938,7 +18776,7 @@ return{bp:allBP,weight:allWeight,symptoms:allSymptoms,activities:allActivities,m
 
 function getFilteredData(){
 if(dateFilterMode==='today'){
-return{bp:B,weight:W,symptoms:S,activities:A,meals:M,medicines:medLog,notes:notes,procedures:procedures||[]};
+return{bp:B,weight:W,symptoms:S,activities:A,meals:M,medicines:medLog,notes:(notes+(activityAfterNotes?' | After: '+activityAfterNotes:'')+(activitySymptomsNotes?' | Symptoms: '+activitySymptomsNotes:'')),procedures:procedures||[]};
 }else{
 return getAllHistoricalData();
 }
@@ -19732,7 +19570,7 @@ html+=lbBadge;
 html+='<div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">';
 html+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
 html+='<div>';
-html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.347.176</span></div>';
+html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.347.177</span></div>';
 html+='<div id="settingsVersionStatus" style="font-size:13px;color:#6b7280;margin-top:3px">Tap "Check for Updates" to see if a newer version is available</div>';
 html+='</div>';
 html+='<button onclick="checkForUpdates(true)" id="checkUpdateBtn" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">🔍 Check for Updates</button>';
@@ -19891,7 +19729,7 @@ html+='</div>';// close settings-section
   html+='</div></div>';
 })();
 
-// ── v9.10.347.176: Activity & Today's Weather Settings ─────────────────────────
+// ── v9.10.347.177: Activity & Today's Weather Settings ─────────────────────────
 (function(){
   _ensureActivityEnvSettings();
   var wm=settings.activityWeatherMode||'manual';
@@ -20788,19 +20626,6 @@ if(!activityName||!activityName.trim()){
 return;
 }
 activityName=activityName.trim();
-var destAdvice=_customActivityDestinationAdvice(activityName);
-if(destAdvice){
-  var move=confirm(destAdvice+'\n\nPress OK to move this to Destination and choose an activity instead.\nPress Cancel to keep it as a custom Activity.');
-  if(move){
-    if(!settings.activityDestinations)settings.activityDestinations=[];
-    settings.activityDestinations=_clMergeDestinations(settings.activityDestinations,[{label:activityName,minutes:settings.activityWeatherDefaultWindowMin||30}]);
-    selectedDestination=activityName;
-    _clSaveAllSettings();
-    alert('Saved as destination: '+activityName+'\n\nNow choose what you are doing, such as E-bike, Walking, Car Travel, Shopping, or Doctor Visit.');
-    updateActivityStartState();
-    return;
-  }
-}
 // Check if already exists
 if(!settings.customActivities)settings.customActivities=[];
 if(defaultActivityTypes.includes(activityName)){
@@ -21068,7 +20893,7 @@ function buildMissedEventList() {
 }
 
 function runCatchUpScan() {
-  // v9.10.347.176: catch-up scan updates the Events tile/queue only.
+  // v9.10.347.177: catch-up scan updates the Events tile/queue only.
   // It must never open an interrupting modal when the user opens the app.
   var missed = buildMissedEventList();
   if (missed.length === 0) return;
@@ -21381,7 +21206,7 @@ function _isEventLoggedToday(evt,loggedIds){
 }
 
 function showEventReminder(evt){
-  // v9.10.347.176: scheduled events never open a modal or cover the user's current work.
+  // v9.10.347.177: scheduled events never open a modal or cover the user's current work.
   // They enter the Due & Missed queue, appear in Today's Events, and remain there
   // until logged, snoozed, dismissed, or the day rolls over.
   if(!evt||!evt.time||!evt.name)return;
@@ -21409,7 +21234,7 @@ function _openEventActionModal(evt){
 var _mainModal=document.getElementById('modal');
 var _modalOpen=_mainModal&&_mainModal.style.display==='block';
 if(_modalOpen&&!activeReminderEvt){
-  // v9.10.347.176: never show the old floating reminder badge.
+  // v9.10.347.177: never show the old floating reminder badge.
   // Leave the event in the Events tile/queue and let the user finish the current task.
   _recordEventQueueItem(evt,'due');
   _pendingReminderEvt=null;
@@ -21458,7 +21283,7 @@ if(evt.actions&&evt.actions.length>0){
   actions=['logBP','logFluid'];
 }
 
-// v9.10.347.176: include actions already saved earlier for this same scheduled event.
+// v9.10.347.177: include actions already saved earlier for this same scheduled event.
 _eventCompletedActionIdsToday(evt).forEach(function(id){
   if(completedReminderActions.indexOf(id)===-1)completedReminderActions.push(id);
 });
@@ -21502,7 +21327,7 @@ if(allActionsCompleted){
 html+='</div>';
 
 // Arm the active reminder BEFORE showModal so hideModal can reshow if needed
-// v9.10.347.176: rebuild action progress from saved logs each time this card opens.
+// v9.10.347.177: rebuild action progress from saved logs each time this card opens.
 // This keeps multi-action scheduled events available after the first action is saved.
 var _savedReminderActions=_eventCompletedActionIdsToday(evt);
 if(activeReminderEvt!==evt){ eventFluidLogged=false; eventSoundFired=false; }
@@ -21519,7 +21344,7 @@ pendingEventFluid=(function(){
   var remaining=settings.fluidMax-dailyFluid;
   return Math.max(0,Math.min(rawGoal,remaining));
 })();
-// v9.10.347.176: opening the action card is user-initiated, so do not chime or send a second notification.
+// v9.10.347.177: opening the action card is user-initiated, so do not chime or send a second notification.
 showModal(html);
 }
 
@@ -31497,7 +31322,7 @@ html+=`</table></div>`;
 }
 
 
-// Activity & Environment Context Summary (v9.10.347.176)
+// Activity & Environment Context Summary (v9.10.347.177)
 if(settings.features&&settings.features.exercise&&data.activities&&data.activities.length>0){
 function _clDrEsc(v){return String(v===undefined||v===null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function _clDrDate(d){if(!d)return'';var parts=String(d).split('-');if(parts.length===3){var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return mo[parseInt(parts[1],10)-1]+' '+parseInt(parts[2],10);}return d;}
@@ -31778,7 +31603,7 @@ html+=`</div>`;
 
 html+=`
 <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:2px solid #e5e7eb;color:#6b7280;font-size:14px">
-<p style="margin:0">CardiacLens v9.10.347.176 — Free & Source-Available</p>
+<p style="margin:0">CardiacLens v9.10.347.177 — Free & Source-Available</p>
 <p style="margin:4px 0 0 0">Report Generated: ${reportDate}</p>
 </div>`;
 
@@ -31989,7 +31814,7 @@ text+=`- ${type}: ${d.count} session(s), BP change ${sysChange>0?'+':''}${sysCha
 }
 
 
-// Activity & Environment Context Summary (v9.10.347.176)
+// Activity & Environment Context Summary (v9.10.347.177)
 if(settings.features&&settings.features.exercise&&data.activities&&data.activities.length>0){
 function _clTxtContext(a){var c=(a.activityContext||a.contextType||'').toString().toLowerCase();var es=a.environmentalSnapshot||{};if(!c&&es.context)c=String(es.context).toLowerCase();if(!c&&es.mode)c=String(es.mode).toLowerCase();if(c.indexOf('mixed')>=0)return'Mixed';if(c.indexOf('out')>=0)return'Outdoor';if(c.indexOf('in')>=0)return'Indoor';return'Not specified';}
 function _clTxtWeather(a){try{if(typeof clActivityWeatherText==='function')return clActivityWeatherText(a)||'';}catch(e){}var es=a.environmentalSnapshot||{};var ws=es.weatherSnapshot||es.weather||{};var out=[];if(ws.feelsLikeF||ws.feelsLike)out.push('Feels like '+(ws.feelsLikeF||ws.feelsLike)+'°');if(ws.precipChance!==undefined&&ws.precipChance!==null)out.push('Rain '+ws.precipChance+'%');if(ws.windMph)out.push('Wind '+ws.windMph+' mph');return out.join(' · ');}
@@ -32109,7 +31934,7 @@ Note: This report is based on patient self-tracked data. Clinical correlation
 and examination are essential for diagnosis and treatment decisions.
 
 ---
-CardiacLens v9.10.347.176 Medical Grade - Free
+CardiacLens v9.10.347.177 Medical Grade - Free
 Report Generated: ${reportDate}`;
 
 return text;
@@ -36246,7 +36071,7 @@ report.push(notes);
 report.push('');
 }
 report.push('═══════════════════════════════════════════════════════════');
-report.push('This report was generated by CardiacLens v9.10.347.176 Medical Grade - Free');
+report.push('This report was generated by CardiacLens v9.10.347.177 Medical Grade - Free');
 report.push('Advanced Analytics Dashboard - Phase 3 Implementation');
 report.push('═══════════════════════════════════════════════════════════');
 const blob=new Blob([report.join('\n')],{type:'text/plain'});
@@ -36336,7 +36161,7 @@ ${periodHTML}
 <h2>Key Insights</h2>
 ${insightsHTML}
 <div style="margin-top:40px;padding:20px;background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:8px">
-<strong>CardiacLens v9.10.347.176 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
+<strong>CardiacLens v9.10.347.177 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
 This report is not a substitute for professional medical advice.
 </div>
 </body>
@@ -37309,7 +37134,7 @@ alert(`🏃 Activity Summary\n\n` +
 var VERSION_JSON_URL = 'https://cardiaclens.com/version.json';
 var VERSION_CHECK_KEY = 'CARDIACLENS_LAST_VERSION_CHECK';
 var VERSION_DISMISSED_KEY = 'CARDIACLENS_UPDATE_DISMISSED';
-var CURRENT_VERSION = 'v9.10.347.176';
+var CURRENT_VERSION = 'v9.10.347.177';
 var _latestVersionData = null; // cached from last fetch
 
 // Detect whether running as an installed Home Screen PWA on iOS
@@ -39808,7 +39633,7 @@ function _mipMarkWeeklyReviewComplete(){
     var stamp=new Date().toISOString();
     localStorage.setItem('CARDIACLENS_MIP_WEEKLY_REVIEWED_AT',stamp);
     if(!medIntelData||typeof medIntelData!=='object')medIntelData={};
-    medIntelData._weeklyReview={completedAt:stamp,version:'v9.10.347.176'};
+    medIntelData._weeklyReview={completedAt:stamp,version:'v9.10.347.177'};
     _mipSave();
   }catch(e){}
 }
@@ -39944,7 +39769,7 @@ function _mipRecordHistory(medName, metric, entry) {
 // or its approvedAt is 7+ days old. Returns one entry per medicine+metric,
 // plus a PP entry, in the same drug-class/name order as the MIP panel.
 function _mipDueItems() {
-  // v9.10.347.176: global weekly-review completion guard.
+  // v9.10.347.177: global weekly-review completion guard.
   // The per-threshold approvedAt values are still the source of truth, but this
   // prevents the red weekly-review card from reappearing immediately after a
   // version update/import when the user has already completed the full queue
@@ -39998,7 +39823,7 @@ function _mipDueItems() {
 // Saves to MIP store, records a history breadcrumb, and syncs the block/warn
 // approval history only. actionType is 'approve'|'edit'|'keep'.
 function _mipApplyMedThresholds(medName, metric, blockVal, warnVal, actionType) {
-  // v9.10.347.176: keep any historical MIP approval data only inside the
+  // v9.10.347.177: keep any historical MIP approval data only inside the
   // Medication Intelligence store. Do not create, update, or sync medicine
   // conditionRules. Medication logging must not block/warn from formulas.
   var approvedBefore = mipGetApproved(medName, metric);
@@ -40021,7 +39846,7 @@ function _mipApplyMedThresholds(medName, metric, blockVal, warnVal, actionType) 
 // ── v9.10.208: Shared "apply PP thresholds" logic ───────────────────────
 // Returns 0 because PP thresholds no longer sync to medicine rules.
 function _mipApplyPPThresholds(warnVal, targetVal, actionType) {
-  // v9.10.347.176: retain PP approval history only; do not sync PP warnings
+  // v9.10.347.177: retain PP approval history only; do not sync PP warnings
   // into individual medicine conditionRules.
   var ppApprovedBefore = mipGetApproved('__pp__', 'pp');
   var ppStats7 = _mipCollect(7).pp;
@@ -40045,7 +39870,7 @@ function _mipApplyPPThresholds(warnVal, targetVal, actionType) {
 var _mipSearchQuery = '';
 
 function openMedIntel() {
-  // v9.10.347.176: KISS cleanup. This panel is observational only.
+  // v9.10.347.177: KISS cleanup. This panel is observational only.
   // It must not show formula-generated thresholds, SD, approval controls,
   // PP warning setup, or MIP block/warn activation values.
   var meds = (medicineList || []).filter(function(m) {
@@ -40192,7 +40017,7 @@ var _MIP_QUEUE_LABELS = {systolic:'Systolic',diastolic:'Diastolic',hr:'Heart Rat
 var _MIP_QUEUE_UNITS  = {systolic:'mmHg',diastolic:'mmHg',hr:'bpm',pp:'mmHg'};
 
 function openMipReviewQueue() {
-  // v9.10.347.176: old calculated threshold review queue retired.
+  // v9.10.347.177: old calculated threshold review queue retired.
   // Medication Intelligence now opens the observational three-section panel.
   openMedIntel();
 }
@@ -40281,7 +40106,7 @@ function mipCopyRulesById(btn) {
 
 // Copy condition rules from one medicine to another (same drug class)
 function mipCopyRules(fromName, toName) {
-  // v9.10.347.176: condition rules are retired. Nothing can be copied.
+  // v9.10.347.177: condition rules are retired. Nothing can be copied.
   alert('Condition Rules have been retired. Use Doctor Rule / Instructions on each medicine instead.');
 }
 
@@ -46321,7 +46146,7 @@ function _showAskClarifyChips(options) {
 /* CardiacLens Secure Access Takeover v9.10.287
    Reliability pass: pointer-event tap handling, preserved app tab for email, exact cooldown thresholds. */
 (function(){
-  var VERSION='v9.10.347.176';
+  var VERSION='v9.10.347.177';
   var KEY='CL_SEC_KEY', COLOR='CL_SEC_COLOR', Q='CL_SEC_Q', A='CL_SEC_A', DONE='CL_SEC_DONE';
   var FAILS='CL_SEC_FAILS', COOL='CL_SEC_COOL_UNTIL';
   var COLORS={red:'#e53935',blue:'#1565c0',green:'#2e7d32',orange:'#e65100',purple:'#6a1b9a',teal:'#00695c',pink:'#c2185b',gold:'#f57f17'};
@@ -46479,7 +46304,7 @@ function _showAskClarifyChips(options) {
   // attachment state. This review screen never auto-attaches images; it gives the
   // user a visible message to copy, then opens email from a direct button tap.
   function installFeedbackReviewOverrides(){
-    function currentVersion(){return (typeof CURRENT_VERSION!=='undefined')?CURRENT_VERSION:'v9.10.347.176';}
+    function currentVersion(){return (typeof CURRENT_VERSION!=='undefined')?CURRENT_VERSION:'v9.10.347.177';}
     function deviceLine(){try{return (navigator.userAgent||'').slice(0,180);}catch(e){return '';}}
     function feedbackStamp(){try{var d=new Date();function z(n){return String(n).padStart(2,'0');}return 'ID '+d.getFullYear()+z(d.getMonth()+1)+z(d.getDate())+'-'+z(d.getHours())+z(d.getMinutes())+z(d.getSeconds());}catch(e){return 'ID '+Date.now();}}
     function supportPayload(){
@@ -46565,7 +46390,7 @@ function _showAskClarifyChips(options) {
 
 
 
-  // v9.10.347.176: Final tappable email contact workflow
+  // v9.10.347.177: Final tappable email contact workflow
   // Purpose: keep feedback simple while still opening the user's default mail app.
   // Primary action is a real mailto: link to robert@cardiaclens.com. Copy remains as fallback.
   (function installPlainSupportContactOverride(){
@@ -46694,7 +46519,7 @@ function _showAskClarifyChips(options) {
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,100);});else setTimeout(boot,100);setTimeout(boot,1000);setTimeout(boot,4000);
 })();
 
-// ── v9.10.347.176: Weather hardening override ─────────────────────────────
+// ── v9.10.347.177: Weather hardening override ─────────────────────────────
 // Purpose: keep Today's Weather simple and predictable: Saved ZIP -> coordinates -> Open-Meteo -> render.
 // No GPS unless Use My Location is explicitly tapped. Older weather code remains below this override but these
 // same global function names take precedence for buttons, modal open, planner, and activity weather.
