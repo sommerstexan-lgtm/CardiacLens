@@ -1,27 +1,26 @@
 {
-  "version": "9.10.347.172",
+  "version": "9.10.347.176",
   "date": "2026-07-04",
   "releaseDate": "July 4, 2026",
   "updated": "2026-07-04",
-  "build": "EventsTitleConsistencyRepair",
-  "name": "CardiacLens v9.10.347.172",
-  "notes": "v172 repairs event-title consistency across the Events tile, Events queue, action card, and reminder text. A single due or missed event now carries its name through every level of the interface; multiple due or missed events show the count on the tile and the names in the queue. Version/help/service worker updated for deploy.",
-  "label": "EventsTitleConsistencyRepair",
-  "summary": "Repairs Events tile and queue title consistency so the active event name is visible everywhere it appears.",
+  "build": "EventsTileRefreshSynchronizationRepair",
+  "name": "CardiacLens v9.10.347.176",
+  "notes": "v176 repairs the Today's Status Events tile refresh path. After event Log, Snooze, Dismiss, or final multi-action completion, the Events tile rebuilds immediately from scheduler state instead of retaining stale detail text.",
+  "label": "EventsTileRefreshSynchronizationRepair",
+  "summary": "Rebuilds the Today's Status Events tile immediately after scheduled event state changes.",
   "whatsNew": [
-    "Events tile now shows the event name clearly for a single due or missed item.",
-    "Events queue rows now use the same event title source and keep the name readable on mobile.",
-    "Event action cards and reminder notices now show the same event name consistently.",
-    "Multiple due or missed items still show a count on the tile and list names inside the queue."
+    "Today's Status Events tile now refreshes immediately after event Log, Snooze, Dismiss, and multi-action completion.",
+    "Replaced the stale updateTodayZone() call with the actual showTodayZone() rebuild path.",
+    "Prevents mixed tile state where the count changes but the old event detail remains visible.",
+    "Service worker, manifest, version metadata, and visible version labels advanced to v176."
   ],
   "fixes": [
-    "Fixed Log button from Events queue being blocked by the already-open queue modal.",
-    "Fixed stale queue/tile state after Dismiss or Snooze.",
-    "Fixed cramped mobile layout in missed/due queue rows.",
-    "Preserved deploy cache advancement for clean GitHub Pages/iPhone refresh."
+    "Fixed Events tile stale text after completing multi-action scheduled events.",
+    "Fixed event dashboard refresh calls pointing to a missing updateTodayZone() function.",
+    "Fixed Today's Status not rebuilding immediately after event queue state changes."
   ],
   "changes": [
-    "Version advanced to v9.10.347.172."
+    "Version advanced to v9.10.347.176."
   ],
   "testing": [
     "Verified JavaScript syntax with node --check all.js.",
