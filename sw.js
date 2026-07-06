@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.177-log-activity-simplification';
+const CACHE_NAME = 'cardiaclens-v9.10.347.185-activity-recovery-regression-repair';
 
 self.addEventListener('install', event => {
   self.skipWaiting();

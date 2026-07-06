@@ -1,30 +1,30 @@
 {
-  "version": "9.10.347.177",
+  "version": "9.10.347.185",
   "date": "2026-07-05",
   "releaseDate": "July 5, 2026",
   "updated": "2026-07-05",
-  "build": "LogActivitySimplification",
-  "name": "CardiacLens v9.10.347.177",
-  "notes": "v177 simplifies Log Activity by removing Google Maps route fields and reorganizing the activity workflow into Activity, Before Activity BP, Activity Details, Start Activity, and After Activity.",
-  "label": "LogActivitySimplification",
-  "summary": "Simplifies Log Activity and removes Google Maps-dependent navigation and route-statistics entry.",
+  "build": "ActivityRecoveryRegressionRepair",
+  "name": "CardiacLens v9.10.347.185",
+  "notes": [
+    "Fixed regression from Activity Recovery Window edits where activity-only note variables leaked into symptom, procedure, daily data, and filtered data paths."
+  ],
+  "label": "ActivityRecoveryRegressionRepair",
+  "summary": "Repairs Guard Dog ReferenceError activityAfterNotes/activitySymptomsNotes paths and restores normal notes handling outside Log Activity.",
   "whatsNew": [
-    "Log Activity now flows top-to-bottom: Activity, Before Activity BP, Activity Details, Start Activity, After Activity.",
-    "Google Maps, route destination, distance, speed, elevation, and route-summary entry were removed from Log Activity.",
-    "Before-activity BP status and fresh BP entry now stay together in the same section.",
-    "After-activity entry is limited to automatic duration, optional fluid, snack/meal, symptoms, notes, and Save."
+    "Notes data is again handled as the normal notes list outside Log Activity.",
+    "Activity after-notes remain attached only to the saved activity record."
   ],
   "fixes": [
-    "Reduced Log Activity scrolling and removed fields with unclear long-term health-response value.",
-    "Removed Google Maps-specific saved-field handling from the Log Activity workflow."
+    "Fixes Guard Dog error: activityAfterNotes is not defined in getFilteredData/showNotes.",
+    "Fixes unintended activity note variable references in symptom logging, procedure logging, daily save, and filtered data."
   ],
   "changes": [
-    "Version advanced to v9.10.347.177."
+    "Version advanced to v9.10.347.185.",
+    "No workflow changes were added."
   ],
   "testing": [
     "Verified JavaScript syntax with node --check all.js.",
-    "Verified JSON metadata.",
-    "Verified service worker syntax.",
+    "Verified no activityAfterNotes/activitySymptomsNotes references remain outside Activity functions and activity context display.",
     "Verified ZIP integrity."
   ]
 }
