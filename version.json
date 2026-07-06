@@ -1,30 +1,35 @@
 {
-  "version": "9.10.347.185",
-  "date": "2026-07-05",
-  "releaseDate": "July 5, 2026",
-  "updated": "2026-07-05",
-  "build": "ActivityRecoveryRegressionRepair",
-  "name": "CardiacLens v9.10.347.185",
+  "version": "9.10.347.194",
+  "date": "2026-07-06",
+  "releaseDate": "July 6, 2026",
+  "updated": "2026-07-06",
+  "build": "ActivityContextButtonRemoval",
+  "name": "CardiacLens v9.10.347.194",
   "notes": [
-    "Fixed regression from Activity Recovery Window edits where activity-only note variables leaked into symptom, procedure, daily data, and filtered data paths."
+    "Removed the duplicate Environment Context button from activity records.",
+    "Removed Ask About Activity and View Context Details from activity records.",
+    "Kept only the inline expandable Environment Context panel on activity records."
   ],
-  "label": "ActivityRecoveryRegressionRepair",
-  "summary": "Repairs Guard Dog ReferenceError activityAfterNotes/activitySymptomsNotes paths and restores normal notes handling outside Log Activity.",
+  "label": "ActivityContextButtonRemoval",
+  "summary": "Removes the extra activity Environment Context button; preserves only the inline expandable Environment Context panel.",
   "whatsNew": [
-    "Notes data is again handled as the normal notes list outside Log Activity.",
-    "Activity after-notes remain attached only to the saved activity record."
+    "Activity records now contain no Ask About Activity button.",
+    "Activity records now contain no View Context Details button.",
+    "Activity records now contain no duplicate Environment Context button below the card.",
+    "Only the inline expandable Environment Context section remains."
   ],
   "fixes": [
-    "Fixes Guard Dog error: activityAfterNotes is not defined in getFilteredData/showNotes.",
-    "Fixes unintended activity note variable references in symptom logging, procedure logging, daily save, and filtered data."
+    "Removes duplicate Environment Context button missed in v9.10.347.193.",
+    "Keeps activity record controls limited to the inline Environment Context disclosure."
   ],
   "changes": [
-    "Version advanced to v9.10.347.185.",
-    "No workflow changes were added."
+    "Version advanced to v9.10.347.194.",
+    "No unrelated features were changed."
   ],
   "testing": [
     "Verified JavaScript syntax with node --check all.js.",
-    "Verified no activityAfterNotes/activitySymptomsNotes references remain outside Activity functions and activity context display.",
+    "Searched all.js and index.html to confirm no activity-card Environment Context button remains.",
+    "Verified Ask About Activity and View Context Details strings are absent from activity record rendering.",
     "Verified ZIP integrity."
   ]
 }

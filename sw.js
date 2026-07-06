@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.185-activity-recovery-regression-repair';
+const CACHE_NAME = 'cardiaclens-v9.10.347.194-activity-context-button-removal';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
