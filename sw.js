@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.196-evidence-library-refinement';
+const CACHE_NAME = 'cardiaclens-v9.10.347.197-evidence-library-storage-repair';
 
 self.addEventListener('install', event => {
   self.skipWaiting();

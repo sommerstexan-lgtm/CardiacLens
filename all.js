@@ -11,7 +11,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.196' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.197' }, params || {}));
       }
     } catch(e) {}
   };
@@ -893,7 +893,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.347.196';
+    var GD_VERSION   = 'v9.10.347.197';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1438,7 +1438,7 @@
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.347.196';
+  var CURRENT='v9.10.347.197';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -1457,8 +1457,8 @@ var M=[],B=[],W=[],S=[],A=[],notes=[],medLog=[],fluidLog=[],procedures=[],dailyF
 var savedMeals=[];
 var medIntelData = {}; // CARDIACLENS_MED_INTEL — approved thresholds per medicine
 var _eventsWidgetCollapsed=false; // user can collapse the upcoming-events widget
-var _eventsCardLastAttentionKey=''; // v9.10.347.196: sound/banner fires only when a new event becomes due
-var _eventNoticeToast=null; // v9.10.347.196: quiet visual notice, never a modal
+var _eventsCardLastAttentionKey=''; // v9.10.347.197: sound/banner fires only when a new event becomes due
+var _eventNoticeToast=null; // v9.10.347.197: quiet visual notice, never a modal
 
 // Fluid goal injected from a notification — consumed (and cleared) by the FIRST
 // fluid-capable modal that opens. Zero after first use so it can never double-log.
@@ -1668,7 +1668,7 @@ function registerServiceWorker(){
     .then(function(reg){
       window._swRegistration = reg;
       console.log('[CardiacLens] SW registered, scope:', reg.scope);
-      // v9.10.347.196: iPhone/GitHub Pages deploy repair.
+      // v9.10.347.197: iPhone/GitHub Pages deploy repair.
       // If a refreshed service worker is waiting, activate it now instead of
       // leaving the Home Screen app controlled by the old deploy until later.
       if(reg.waiting){
@@ -1993,7 +1993,7 @@ notes:true
 dailyEvents:[],
 customActivities:[], // User-defined custom physical activities
 securityProfile:null, // Secure Access mirror for update persistence
-// Activity / Today's Weather settings (v9.10.347.196)
+// Activity / Today's Weather settings (v9.10.347.197)
 activityWeatherMode:'manual', // off | manual | internet
 activityWeatherStoreSnapshot:true,
 activityWeatherRainThresholdPct:40,
@@ -2035,7 +2035,7 @@ _syncFab();
 }
 
 function hideModal(){
-// v9.10.347.196 KISS: the floating Close button calls hideModal().
+// v9.10.347.197 KISS: the floating Close button calls hideModal().
 // If Log Activity is active and the timer is running, Close must behave like Minimize, not discard/hide the activity.
 if(typeof _closeActiveLogActivityGracefully==='function' && _closeActiveLogActivityGracefully())return;
 document.getElementById('modal').style.display='none';
@@ -2044,7 +2044,7 @@ document.body.style.overflow = '';
 _syncFab();
 // Clear budget dashboard cache so next open gets fresh data
 window._fbdEvts=null;
-// v9.10.347.196: after a saved action from a multi-action event, rebuild
+// v9.10.347.197: after a saved action from a multi-action event, rebuild
 // the same event card until all configured actions are complete. This prevents
 // the Today's Status Events tile/queue from losing the remaining actions after
 // the first saved log.
@@ -2059,7 +2059,7 @@ if(activeReminderEvt){
   }
   return;
 }
-// v9.10.347.196: reminders no longer open a modal after the user finishes logging.
+// v9.10.347.197: reminders no longer open a modal after the user finishes logging.
 // They stay in the Due & Missed card until logged, snoozed, or dismissed.
 if(_pendingReminderEvt){
   _recordEventQueueItem(_pendingReminderEvt,'due');
@@ -2080,7 +2080,7 @@ function _isActiveLogActivityModalOpen(){
 }
 
 function _closeActiveLogActivityGracefully(){
-  // v9.10.347.196 KISS: the floating Close button must not orphan a running activity.
+  // v9.10.347.197 KISS: the floating Close button must not orphan a running activity.
   // Treat Close exactly like Minimize while the Log Activity timer is still running.
   if(_isActiveLogActivityModalOpen() && activityTimerInterval && !activityTimerStoppedForSave){
     minimizeActivityLog();
@@ -3469,7 +3469,7 @@ function renderFAQ() {
 
     {
       q: 'What does Environment Context show on activity records?',
-      a: 'Environment Context is a factual snapshot saved with the activity. It shows only directly stored context such as environment mode, saved weather snapshot, activity fluid, recovery snack or food typed with the activity, after-activity notes, stop notes, recent BP/HR snapshot, and recent symptoms snapshot when those fields exist. Activity analysis and the separate context-details button were removed from activity records in v9.10.347.196 to keep the activity record simple and avoid unverified activity analysis.'
+      a: 'Environment Context is a factual snapshot saved with the activity. It shows only directly stored context such as environment mode, saved weather snapshot, activity fluid, recovery snack or food typed with the activity, after-activity notes, stop notes, recent BP/HR snapshot, and recent symptoms snapshot when those fields exist. Activity analysis and the separate context-details button were removed from activity records in v9.10.347.197 to keep the activity record simple and avoid unverified activity analysis.'
     },
     {
       q: 'Can I record stop notes, symptoms, fluid, or snacks during an activity?',
@@ -7915,7 +7915,7 @@ types=types.concat(settings.customActivities);
 return types;
 }
 
-// v9.10.347.196 KISS: users choose activity/purpose first; CardiacLens highlights the recommended context, then allows plausible override.
+// v9.10.347.197 KISS: users choose activity/purpose first; CardiacLens highlights the recommended context, then allows plausible override.
 function getActivityTypesForContext(ctx){
 return getActivityTypes();
 }
@@ -7949,42 +7949,42 @@ var activityTypes=defaultActivityTypes;
 
 var selectedExertion='';
 var selectedTempBand=null;
-// Activity environment/window state (v9.10.347.196)
+// Activity environment/window state (v9.10.347.197)
 var selectedActivityWindow='';
 var selectedActivityWindowMinutes=null;
 var selectedDestination='';
 var selectedEnvironmentalMode='manual';
 var activityEnvironmentSnapshot=null;
-// Today's Weather request guard (v9.10.347.196) — one location/weather request per activity modal/window.
+// Today's Weather request guard (v9.10.347.197) — one location/weather request per activity modal/window.
 // Prevents repeated browser location prompts when Automatic is selected and the user changes fields.
 var activityEnvironmentFetchInFlight=false;
 var activityEnvironmentFetchKey='';
 var activityEnvironmentFetchFailedKey='';
-// Activity context / journey state (v9.10.347.196)
+// Activity context / journey state (v9.10.347.197)
 var selectedActivityContext='';
 var selectedJourneyRole='single';
 var selectedJourneyName='';
 var selectedJourneyId=null;
 var selectedActivityPurpose=''; // exercise | transportation | other
-// v9.10.347.196 KISS transportation workflow: Start once, Finish once; GPS derives movement/stops automatically.
+// v9.10.347.197 KISS transportation workflow: Start once, Finish once; GPS derives movement/stops automatically.
 var activityTravelState='traveling'; // legacy display only
 var activityTravelEvents=[]; // legacy compatibility; no longer user-managed
 var activityGpsMotion={state:'unknown',lastMoveTs:null,lastStopTs:null,currentStopStart:null,movingSeconds:0,stoppedSeconds:0,stopCount:0,lastTs:null};
-// GPS distance tracking state (v9.10.347.196)
+// GPS distance tracking state (v9.10.347.197)
 var activityGpsSelected=false;
 var activityGpsWatchId=null;
 var activityGpsStartTime=null;
 var activityGpsLastPoint=null;
-var activityGpsLastFix=null; // v9.10.347.196: readiness/current-location seed for immediate map marker on Start
+var activityGpsLastFix=null; // v9.10.347.197: readiness/current-location seed for immediate map marker on Start
 var activityGpsMetrics={distanceMiles:0,elevationGainFt:0,elevationLossFt:0,pointCount:0,maxSpeedMph:null,lastAccuracy:null,status:'off',error:'',permissionState:'unknown',readinessChecked:false};
-// GPS live route map state (v9.10.347.196)
+// GPS live route map state (v9.10.347.197)
 var activityGpsRoutePoints=[];
 var activityGpsMap=null;
 var activityGpsMapMarker=null;
 var activityGpsMapRoute=null;
 var activityGpsMapLoadState='idle';
 var activityGpsDiagnostics=[];
-// v9.10.347.196: increments whenever the GPS proof/activity lifecycle is restarted or cancelled.
+// v9.10.347.197: increments whenever the GPS proof/activity lifecycle is restarted or cancelled.
 // Async geolocation callbacks from a prior activity are ignored if their lifecycle id is stale.
 var activityGpsLifecycleId=0;
 function _activityGpsTrace(msg){try{activityGpsDiagnostics.push((new Date()).toLocaleTimeString()+': '+msg);if(activityGpsDiagnostics.length>6)activityGpsDiagnostics=activityGpsDiagnostics.slice(-6);}catch(e){}}
@@ -7992,9 +7992,9 @@ var activityTimerInterval=null;
 var activityStartTime=null;
 var activityElapsedSeconds=0;
 var activityTimerPaused=false;
-var activityTimerStoppedForSave=false; // v9.10.347.196: Save unlocks only after activity is finished
-var activityStopLog=[]; // v9.10.347.196: optional in-activity stop/waypoint notes saved with final activity
-var activityStopTime=null; // v9.10.347.196: preserves the actual timer stop timestamp for recovery-window context
+var activityTimerStoppedForSave=false; // v9.10.347.197: Save unlocks only after activity is finished
+var activityStopLog=[]; // v9.10.347.197: optional in-activity stop/waypoint notes saved with final activity
+var activityStopTime=null; // v9.10.347.197: preserves the actual timer stop timestamp for recovery-window context
 
 // Background activity state (v9.10.36) — set when user minimizes the activity modal
 var _activityMinimized=false;
@@ -8150,7 +8150,7 @@ if(desc)desc.style.display='block';
 }else{
 if(desc)desc.style.display='none';
 }
-// v9.10.347.196: Activity Type comes first; purpose next when needed; then CardiacLens suggests context.
+// v9.10.347.197: Activity Type comes first; purpose next when needed; then CardiacLens suggests context.
 if(!_activityNeedsPurpose(select.value)){selectedActivityPurpose='';}
 selectedActivityContext='';
 updateActivityPurposeSection();
@@ -8360,7 +8360,7 @@ function clearActiveJourney(){
   if(wrap)wrap.style.display='none';
 }
 function buildJourneyHTML(){
-  // v9.10.347.196: no user-managed trip-flow dropdown.
+  // v9.10.347.197: no user-managed trip-flow dropdown.
   // CardiacLens records transportation flow from the Start / Start / Finish / Finish Activity buttons.
   var h='<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin-bottom:12px">';
   h+='<div style="font-size:14px;font-weight:800;color:#374151;margin-bottom:6px">🧭 Transportation Flow</div>';
@@ -8374,13 +8374,13 @@ function buildJourneyHTML(){
   return h;
 }
 function handleJourneyRoleSelection(){
-  // v9.10.347.196: retained for compatibility with older restore code; no visible dropdown remains.
+  // v9.10.347.197: retained for compatibility with older restore code; no visible dropdown remains.
   selectedJourneyRole='single';
   var name=document.getElementById('journeyNameInput');
   selectedJourneyName=(name&&name.value?name.value.trim():selectedJourneyName||'');
 }
 function getJourneyFormData(activityName){
-  // v9.10.347.196: transportation trips save as one activity unless the user later chooses to describe details in notes.
+  // v9.10.347.197: transportation trips save as one activity unless the user later chooses to describe details in notes.
   var nameEl=document.getElementById('journeyNameInput');
   var name=(nameEl&&nameEl.value.trim())||selectedJourneyName||'';
   return {role:'single',journeyId:null,journeyName:name,active:false};
@@ -8417,7 +8417,7 @@ function updateActivityTimerWorkflowButtons(){
 }
 
 function toggleActivityTravelState(){
-  // v9.10.347.196: transportation is Start -> Finish only. GPS derives stops automatically.
+  // v9.10.347.197: transportation is Start -> Finish only. GPS derives stops automatically.
   return;
 }
 function getActivityTravelEvents(){
@@ -8428,7 +8428,7 @@ function getActivityTravelEvents(){
 // Weather settings persistence guard
 
 
-// Weather settings persistence guard (v9.10.347.196)
+// Weather settings persistence guard (v9.10.347.197)
 var CARDIACLENS_WEATHER_SETTINGS_KEY='CARDIACLENS_WEATHER_SETTINGS';
 function _clMergeDestinations(a,b){
   var out=[],seen={};
@@ -8476,7 +8476,7 @@ function _clWeatherSettingsSnapshot(){
   };}catch(e){return null;}
 }
 function _clSaveWeatherSettingsBackup(){
-  // v9.10.347.196: current saved settings win; backup only fills missing weather fields.
+  // v9.10.347.197: current saved settings win; backup only fills missing weather fields.
   try{
     var snap=_clWeatherSettingsSnapshot(); if(!snap)return;
     var prior=null;
@@ -8498,14 +8498,14 @@ function _clSaveWeatherSettingsBackup(){
   }catch(e){}
 }
 function _clRestoreWeatherSettingsBackup(){
-  // v9.10.347.196: restore defensively. Blank/default backup fields must not erase current settings.
+  // v9.10.347.197: restore defensively. Blank/default backup fields must not erase current settings.
   try{
     var raw=localStorage.getItem(CARDIACLENS_WEATHER_SETTINGS_KEY); if(!raw)return;
     var w=JSON.parse(raw); if(!w||typeof w!=='object')return;
     var fields=['activityWeatherMode','activityEnvironmentalMode','activityWeatherStoreSnapshot','activityWeatherRainThresholdPct','activityWeatherDefaultWindowMin','activityWeatherAskOnOutdoor','activityWeatherStoreCoordinates','todayWeatherPillEnabled','todayWeatherCacheMinutes','todayWeatherSavedZip','todayWeatherSource','pickupPlannerDefaultDate','activityWindows','activityDestinations','activityGpsMode','activityGpsRememberChoice','activityGpsStoreCoordinates','activityGpsPreferences'];
     fields.forEach(function(k){
       if(w[k]===undefined||w[k]===null)return;
-      // v9.10.347.196: current Saved ZIP settings must not be overwritten by older backup values.
+      // v9.10.347.197: current Saved ZIP settings must not be overwritten by older backup values.
       // Backup is only a fill-in source, not the authority when current settings are explicit.
       if(k==='todayWeatherSource'){
         var curSource=settings&&settings.todayWeatherSource;
@@ -8540,15 +8540,15 @@ function _ensureActivityEnvSettings(){
     {label:'Medium — 1 hr',minutes:60},{label:'Long — 2 hr',minutes:120}
   ];}
   if(!settings.activityDestinations){settings.activityDestinations=[];}
-  // v9.10.347.196: remove legacy/test destination presets that were seeded during weather testing.
+  // v9.10.347.197: remove legacy/test destination presets that were seeded during weather testing.
   if(!settings.activityDestinationLegacyCleanupV309){
     var legacyNames={'Doctor':true,'Store':true,'Church':true,'Aggarwala':true,'HEB':true};
     settings.activityDestinations=(settings.activityDestinations||[]).filter(function(d){return d&&d.label&&!legacyNames[d.label];});
     settings.activityDestinationLegacyCleanupV309=true;
-    // v9.10.347.196: do not write defaults from _ensureActivityEnvSettings().
+    // v9.10.347.197: do not write defaults from _ensureActivityEnvSettings().
     // This function may run during startup before saved settings are loaded.
   }
-  // v9.10.347.196: no baked-in destinations. Users add their own.
+  // v9.10.347.197: no baked-in destinations. Users add their own.
   if(settings.activityEnvironmentalMode&&!settings.activityWeatherMode)settings.activityWeatherMode=settings.activityEnvironmentalMode;
   if(!settings.activityWeatherMode)settings.activityWeatherMode='manual';
   settings.activityEnvironmentalMode=settings.activityWeatherMode; // backwards-compatible alias
@@ -8863,7 +8863,7 @@ function getActivityEventContextSnapshot(activityName){
 }
 
 
-// v9.10.347.196 KISS: activity-centered hydration helpers for Ask/activity summaries.
+// v9.10.347.197 KISS: activity-centered hydration helpers for Ask/activity summaries.
 // Daily total remains supporting context; the activity window is before/during/after the activity.
 function clActivityTimeToMinutes(t){
   if(!t)return null;
@@ -8941,7 +8941,7 @@ function clActivityHydrationTextFromSnapshot(h){
   return parts.join(' · ');
 }
 
-// v9.10.347.196 KISS: Display/Ask must not trust a stale saved hydration snapshot for recovery fluid.
+// v9.10.347.197 KISS: Display/Ask must not trust a stale saved hydration snapshot for recovery fluid.
 // The activity record + Fluid Log are the source of truth; snapshot values are only fallback context.
 function clActivityEffectiveHydrationSnapshot(a){
   var src=((((a||{}).eventContextSnapshot||{}).hydration||{}).activity)||((((a||{}).environmentalSnapshot||{}).contextSnapshot||{}).hydration||{}).activity||null;
@@ -8995,7 +8995,7 @@ function clActivityAskContextLines(a){
   return lines;
 }
 
-// v9.10.347.196 KISS: activity recovery-window helpers. Uses existing timestamped BP, fluid, symptom, and note entries only.
+// v9.10.347.197 KISS: activity recovery-window helpers. Uses existing timestamped BP, fluid, symptom, and note entries only.
 function clActivityDateTimeFromParts(dateKey,timeText){
   try{
     var d=(dateKey||getTodayKey()).split('-');
@@ -9050,7 +9050,7 @@ function clActivityTimingSummary(a){
   var b=clActivityGetRecoveryBounds(a);
   if(!b)return 'Activity timing unavailable';
   var bits=[];
-  // v9.10.347.196 precision repair: the user-facing activity card displays the logged time.
+  // v9.10.347.197 precision repair: the user-facing activity card displays the logged time.
   // Ask must not invent or headline a start-stop clock range from internal timestamps.
   if(b.displayTime)bits.push('logged/display time '+b.displayTime);
   bits.push('duration '+(parseInt((a||{}).duration,10)||0)+' min');
@@ -9160,7 +9160,7 @@ function getActivityEnvironmentFormData(){
 
 
 
-// v9.10.347.196 KISS: Environment Context display helpers (display only; no save/storage changes)
+// v9.10.347.197 KISS: Environment Context display helpers (display only; no save/storage changes)
 function clActivityEsc(v){
   return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
 }
@@ -9201,7 +9201,7 @@ function clActivityContextLines(a){
     lines.push('Activity stop log: '+stopBits.join(' | '));
   }
   if(a.activitySnackNotes){ lines.push('Recovery snack/food: '+a.activitySnackNotes); }
-  // v9.10.347.196 rollback: Environment Context is direct saved context only.
+  // v9.10.347.197 rollback: Environment Context is direct saved context only.
   // Do not calculate or summarize activity hydration/recovery windows here.
   if(cs.hydration&&cs.hydration.todayOz!==null&&cs.hydration.todayOz!==undefined) lines.push('Fluid today at save: '+cs.hydration.todayOz+' oz');
   if(cs.recentBP) lines.push('Recent BP: '+cs.recentBP.systolic+'/'+cs.recentBP.diastolic+' HR '+cs.recentBP.pulse+(cs.recentBP.time?' at '+cs.recentBP.time:''));
@@ -9263,11 +9263,11 @@ function clActivityAnalysisCompleteness(a){
   return {captured:captured,missing:missing,percent:pct,beforeBP:before,afterBP:after};
 }
 function clActivityCompletenessHtml(a){
-  // v9.10.347.196: activity detail should stay clean; no analysis-completeness percentage panel.
+  // v9.10.347.197: activity detail should stay clean; no analysis-completeness percentage panel.
   return '';
 }
 function clActivityCompletenessText(a){
-  // v9.10.347.196: Ask/activity wording no longer uses analysis-completeness percentages.
+  // v9.10.347.197: Ask/activity wording no longer uses analysis-completeness percentages.
   return '';
 }
 
@@ -9510,7 +9510,7 @@ function _activityGpsPointFromPosition(pos){
 }
 function _activityGpsAcquireCurrentPosition(success,failure,label){
   if(!navigator.geolocation){failure({code:0,message:'GPS is not available in this browser/app.'});return;}
-  // v9.10.347.196: iOS/PWA-safe acquisition.
+  // v9.10.347.197: iOS/PWA-safe acquisition.
   // Use one direct browser location request per user action. Multiple chained requests
   // can produce inconsistent iOS PWA permission behavior and confusing duplicate errors.
   var attempts=[
@@ -9550,7 +9550,7 @@ function _activityGpsDescribeErrors(err){
   return out;
 }
 function testActivityGpsCoordinateProof(){
-  // v9.10.347.196: first-touch permission request.
+  // v9.10.347.197: first-touch permission request.
   // Keep the geolocation call as the first browser action after the user taps Check My Location.
   var geo=navigator.geolocation;
   if(!geo){
@@ -9599,7 +9599,7 @@ function testActivityGpsCoordinateProof(){
   },{enableHighAccuracy:false,maximumAge:600000,timeout:20000});
 }
 function checkActivityGpsReadiness(){
-  // v9.10.347.196: non-invasive readiness only.
+  // v9.10.347.197: non-invasive readiness only.
   // Do not call getCurrentPosition() from readiness/render paths. On iOS/PWA, GPS prompts
   // must be tied to an obvious user action such as Check My Location or Start Activity.
   if(!activityGpsSelected){updateActivityGpsStatus();return;}
@@ -9643,7 +9643,7 @@ function _activityGpsDestroyMap(){
   activityGpsMap=null;activityGpsMapMarker=null;activityGpsMapRoute=null;activityGpsRoutePoints=[];
 }
 function _activityGpsReset(){
-  // v9.10.347.196: full lifecycle reset. This is used after Cancel/Save/Finish-new-session so
+  // v9.10.347.197: full lifecycle reset. This is used after Cancel/Save/Finish-new-session so
   // a second Log Activity starts like a fresh app launch without requiring the user to close/reopen.
   activityGpsLifecycleId++;
   try{if(activityGpsWatchId!==null&&navigator.geolocation)navigator.geolocation.clearWatch(activityGpsWatchId);}catch(e){}
@@ -9977,7 +9977,7 @@ function saveActivityStopEntry(){
   hideActivityStopEditor();
   renderActivityStopLogList();
   if(activityTimerInterval && !activityTimerStoppedForSave){
-    // v9.10.347.196: Save Stop & Resume should return the user to the blue activity pill
+    // v9.10.347.197: Save Stop & Resume should return the user to the blue activity pill
     // and persist the new stop entry immediately for the iPhone/minimize workflow.
     minimizeActivityLog();
     showToast('Stop saved — activity still running');
@@ -10017,7 +10017,7 @@ function _sumActivityStopFluid(){
 }
 
 function getActivityGpsSaveData(){
-  // v9.10.347.196 KISS: GPS is additive. Activity logging must remain accurate even when GPS fails.
+  // v9.10.347.197 KISS: GPS is additive. Activity logging must remain accurate even when GPS fails.
   // If no live coordinate was captured, save GPS status/diagnostics but do not save fake 0.00-mile GPS distance.
   var pts=(activityGpsMetrics&&activityGpsMetrics.pointCount)?activityGpsMetrics.pointCount:0;
   if(!activityGpsSelected && !pts)return null;
@@ -10063,7 +10063,7 @@ function _isActivityFinishedForSave(){
   var isTimerMode=timerDisplay&&timerDisplay.style.display==='block';
   var isManualMode=manualInput&&manualInput.parentElement&&manualInput.parentElement.style.display==='block';
   if(isTimerMode){
-    // v9.10.347.196 KISS: Once the user taps Finish Activity, any positive elapsed time can be saved.
+    // v9.10.347.197 KISS: Once the user taps Finish Activity, any positive elapsed time can be saved.
     // Do not require the full 60 seconds to pass; short real-world activities still matter.
     return !!activityTimerStoppedForSave && activityElapsedSeconds>0 && !activityTimerInterval;
   }
@@ -10173,7 +10173,7 @@ var __tt=document.getElementById('timerTime');
 if(__tt){__tt.textContent=(mins<10?'0':'')+mins+':'+(secs<10?'0':'')+secs;}
 else if(!document.getElementById('activityLogModal')){clearInterval(activityTimerInterval);activityTimerInterval=null;}
 },100);
-// v9.10.347.196 KISS: Start Activity now uses the proven Minimize workflow.
+// v9.10.347.197 KISS: Start Activity now uses the proven Minimize workflow.
 // This creates/persists the activity pill, closes the modal, and starts the pill timer immediately.
 minimizeActivityLog();
 }
@@ -10215,8 +10215,8 @@ if(stopLogBtn)stopLogBtn.style.display='none';
 if(travelBtn)travelBtn.style.display='none';
 _setActivityStopLogVisible(activityStopLog&&activityStopLog.length>0);
 if(pausedLabel)pausedLabel.style.display='none';
-activityTimerStoppedForSave=(activityElapsedSeconds>0); // v9.10.347.196: Save unlocks after Stop for any positive elapsed time
-activityStopTime=new Date(); // v9.10.347.196: recovery window starts when the user finishes the activity
+activityTimerStoppedForSave=(activityElapsedSeconds>0); // v9.10.347.197: Save unlocks after Stop for any positive elapsed time
+activityStopTime=new Date(); // v9.10.347.197: recovery window starts when the user finishes the activity
 updateActivitySaveState();
 }
 
@@ -10441,7 +10441,7 @@ completeAndCloseModal();
 // ── Background Activity System (v9.10.36) ────────────────────────────────────
 
 
-// v9.10.347.196 KISS: activity pill state is created immediately when timer starts.
+// v9.10.347.197 KISS: activity pill state is created immediately when timer starts.
 // This is intentionally limited to the floating pill lifecycle; activity save/history/context logic is untouched.
 function _captureActivityPillStateFromForm(isTimerMode){
   var sel=document.getElementById('activitySelect');
@@ -10484,7 +10484,7 @@ function _captureActivityPillStateFromForm(isTimerMode){
   } catch(e) {}
 }
 
-// v9.10.347.196 KISS: prevent bottom floating controls from covering each other on iPhone.
+// v9.10.347.197 KISS: prevent bottom floating controls from covering each other on iPhone.
 function _layoutBottomPills(){
   var activity=document.getElementById('activityPillBtn');
   var status=document.getElementById('statusFab');
@@ -10713,7 +10713,7 @@ function restoreActivityLog(){
       updateActivitySaveState();
       _setActivityStopLogVisible(activityStopLog&&activityStopLog.length>0);
     }
-    // v9.10.347.196 KISS: returning from the Activity pill should land at the active timer/save area,
+    // v9.10.347.197 KISS: returning from the Activity pill should land at the active timer/save area,
     // not the top of the Log Activity setup modal.
     setTimeout(function(){
       var target=document.getElementById('activityTimingSection')||document.getElementById('timerDisplay')||document.getElementById('timerStartBtn');
@@ -10964,7 +10964,7 @@ function clRouteComparisonHtml(r){
 
 
 
-// v9.10.347.196 KISS: save recovery food once from Activity into Meal History.
+// v9.10.347.197 KISS: save recovery food once from Activity into Meal History.
 function clFindSavedMealByActivityFood(txt){
   try{
     txt=String(txt||'').trim();
@@ -11144,7 +11144,7 @@ gpsTracking:null,
 distanceMiles:null,
 distanceSource:'',
 gpsCaptured:false,
-gpsCaptureNote:'Route statistics removed from Log Activity in v9.10.347.196. Activity saved with duration, intensity, BP links, weather context, fluids, snack/meal, symptoms, notes, and recovery-window timestamps.',
+gpsCaptureNote:'Route statistics removed from Log Activity in v9.10.347.197. Activity saved with duration, intensity, BP links, weather context, fluids, snack/meal, symptoms, notes, and recovery-window timestamps.',
 averageSpeedMph:null,
 maxSpeedMph:null,
 elevationGainFt:null,
@@ -12075,7 +12075,7 @@ planMyDay();
 
 
 function updateNextEvent(){
-// v9.10.347.196: Next Event is summarized inside the Today's Status Events tile.
+// v9.10.347.197: Next Event is summarized inside the Today's Status Events tile.
 // No large standalone event cards on the home screen.
 var _ne=document.getElementById('next-event');
 if(_ne){_ne.innerHTML='';_ne.style.display='none';}
@@ -12190,7 +12190,7 @@ function runNextEventNow(){ if(_nextEvtRef) _openEventActionModal(_nextEvtRef); 
 function runEventNow(mapKey){
   var evt=_wEvtMap[mapKey];
   if(!evt)return;
-  // v9.10.347.196: queue Log is user-initiated. Close the queue modal first
+  // v9.10.347.197: queue Log is user-initiated. Close the queue modal first
   // so the event action card opens instead of creating the old waiting badge.
   try{_pendingReminderEvt=null;_hideReminderQueueBadge();}catch(e){}
   var modal=document.getElementById('modal');
@@ -12215,7 +12215,7 @@ function snoozeEventFromQueue(mapKey,minutes){
   _recordEventQueueItem(evt,'snoozed');
   updateUpcomingEventsWidget();
   _showEventNotice('Snoozed: '+_eventDisplayName(evt)+' for '+minutes+' minutes');
-  // v9.10.347.196: keep the open queue and Today Status tile in sync immediately.
+  // v9.10.347.197: keep the open queue and Today Status tile in sync immediately.
   setTimeout(function(){try{openEventsQueue();}catch(e){}},60);
 }
 
@@ -12225,7 +12225,7 @@ function dismissEventFromQueue(mapKey){
   dismissOverdueEvent(evt.time,evt.name);
   updateUpcomingEventsWidget();
   _showEventNotice('Dismissed: '+_eventDisplayName(evt));
-  // v9.10.347.196: refresh the open queue so dismissed items disappear right away.
+  // v9.10.347.197: refresh the open queue so dismissed items disappear right away.
   setTimeout(function(){try{openEventsQueue();}catch(e){}},60);
 }
 
@@ -12238,9 +12238,9 @@ _eventsWidgetCollapsed=false;
 updateUpcomingEventsWidget();
 }
 function updateUpcomingEventsWidget(){
-// v9.10.347.196: Home screen event awareness lives in one Today's Status Events tile.
+// v9.10.347.197: Home screen event awareness lives in one Today's Status Events tile.
 // The larger queue is opened only when the user taps that tile.
-// v9.10.347.196 repair: there is no updateTodayZone() function in this codebase.
+// v9.10.347.197 repair: there is no updateTodayZone() function in this codebase.
 // Event Log/Snooze/Dismiss changes must rebuild Today's Status immediately so the
 // Events tile cannot keep stale detail text after the count/state changes.
 var widget=document.getElementById('upcoming-events-widget');
@@ -12257,7 +12257,7 @@ function _formatEventCountdown(diff){
 }
 
 function _playEventAttentionSound(evt){
-  // v9.10.347.196: sound is state-change based, not app-open based.
+  // v9.10.347.197: sound is state-change based, not app-open based.
   // It plays once when a new event becomes due while CardiacLens is already open.
   if(!evt||evt.sound===false)return;
   if(document.hidden)return;
@@ -12674,7 +12674,7 @@ for(var i=0;i<allEvents.length;i++){
     }
   }
 
-  // v9.10.347.196: advance reminders are quiet visual queue updates only.
+  // v9.10.347.197: advance reminders are quiet visual queue updates only.
   // They never open audioAlertBox, play a sound, or cover the current logging screen.
   if(advanceTime && currentTime===advanceTime && !firedEvents[advanceKey]){
     console.log('Advance reminder queued:',event.name,'at',currentTime,'(advance',advance,'min)');
@@ -13254,7 +13254,7 @@ function deleteMedHistorical(dateKey, timeKey){
 }
 
 
-// ── Medication Intelligence Milestone B helpers (v9.10.347.196) ─────────────
+// ── Medication Intelligence Milestone B helpers (v9.10.347.197) ─────────────
 function _miFindMedicine(medName){
   for(var i=0;i<(medicineList||[]).length;i++){
     var m=medicineList[i];
@@ -13277,7 +13277,7 @@ function _miIsFormulaConditionNote(note){
   return n.indexOf('mip-approved')!==-1||n.indexOf('medication intelligence panel')!==-1||n.indexOf('pulse pressure')!==-1&&n.indexOf('warn')!==-1;
 }
 function _miDoctorRules(med){
-  // v9.10.347.196: Doctor Rule means only the clinician instruction typed by the user.
+  // v9.10.347.197: Doctor Rule means only the clinician instruction typed by the user.
   // Old structured conditionRules/conditionMetric values are intentionally not displayed
   // or treated as active medication rules.
   var out=[];
@@ -14360,9 +14360,9 @@ function _evalRule(rule, reading) {
 }
 
 // ── Retired medication condition-rule engine ───────────────────────
-// v9.10.347.196: kept as a compatibility stub only; always returns null.
+// v9.10.347.197: kept as a compatibility stub only; always returns null.
 function _checkMedCondition(medName){
-  // v9.10.347.196: Medication Intelligence is observational only.
+  // v9.10.347.197: Medication Intelligence is observational only.
   // Log Medicine no longer evaluates old conditionRules, legacy conditionMetric fields,
   // MIP-approved thresholds, PP thresholds, or HR formula warnings.
   // Doctor Rule text is displayed for awareness only and never blocks logging.
@@ -14882,7 +14882,7 @@ function _checkDisclaimerAccepted(){
 
 function _acceptDisclaimer(){
   try{
-    var rec = {accepted: true, ts: new Date().toISOString(), version: 'v9.10.347.196'};
+    var rec = {accepted: true, ts: new Date().toISOString(), version: 'v9.10.347.197'};
     // Checksum the acknowledgment record
     rec._cs = _cbHash(rec.ts + '|' + rec.version + '|' + CB_TAMPER_SALT);
     localStorage.setItem(CB_DISCLAIMER_KEY, JSON.stringify(rec));
@@ -14957,7 +14957,7 @@ var currentDate=getTodayKey();
 // Store attempted meds so Back button can restore selection
 _medSafetyBlockedMeds = selectedMeds.slice();
 if(arguments[0]!=='warned'&&arguments[0]!=='override')window._medSafetyWarnState={meds:selectedMeds.slice(),timing:timing,fluid:fluid,eventId:eventId};
-// v9.10.347.196: old medication condition-rule checks removed from Log Medicine.
+// v9.10.347.197: old medication condition-rule checks removed from Log Medicine.
 // Only interval/double-dose protection remains here; Doctor Rule text is observational.
 for(var ii=0; ii<selectedMeds.length; ii++){
   var _iblock = _checkMedInterval(selectedMeds[ii]);
@@ -15185,7 +15185,7 @@ function _medContextFieldsHTML(prefix, med){
   }
   h+='</div>';
 
-  // v9.10.347.196: old Condition Rules builder removed.
+  // v9.10.347.197: old Condition Rules builder removed.
   // Users enter clinician instructions in Doctor Rule / Instructions only.
   // No hidden block/warn medication thresholds are created from this form.
   h+='</div>';
@@ -15744,7 +15744,7 @@ if(ctx.linkedTo)           medObject.linkedTo=ctx.linkedTo;
 if(ctx.discDate)           medObject.discDate=ctx.discDate;
 if(ctx.doctorRule)         medObject.doctorRule=ctx.doctorRule;
 if(ctx.drugClass)          medObject.drugClass=ctx.drugClass;
-// v9.10.347.196: old condition rules removed; Doctor Rule text is observational only.
+// v9.10.347.197: old condition rules removed; Doctor Rule text is observational only.
 medObject.conditionRules = [];
 medObject.conditionLogic = 'OR';
 medObject.conditionNote = '';
@@ -15836,7 +15836,7 @@ if(ctx.linkedTo)           medObject.linkedTo=ctx.linkedTo;
 if(ctx.discDate)           medObject.discDate=ctx.discDate;
 if(ctx.doctorRule)         medObject.doctorRule=ctx.doctorRule;
 if(ctx.drugClass)          medObject.drugClass=ctx.drugClass;
-// v9.10.347.196: old condition rules removed; Doctor Rule text is observational only.
+// v9.10.347.197: old condition rules removed; Doctor Rule text is observational only.
 medObject.conditionRules=[];
 medObject.conditionLogic='OR';
 medObject.conditionNote='';
@@ -16047,7 +16047,7 @@ function _buildConditionNote(rules, logic) {
 
 function saveMedicineList(){
 try{
-// v9.10.347.196: no medication condition-rule checksums are stamped because condition rules are inactive.
+// v9.10.347.197: no medication condition-rule checksums are stamped because condition rules are inactive.
 // Save to multiple keys for redundancy
 localStorage.setItem('BP_TRACKER_MEDICINES',JSON.stringify(medicineList));
 localStorage.setItem('medicineList',JSON.stringify(medicineList));
@@ -16073,7 +16073,7 @@ localStorage.setItem('BP_TRACKER_MEDICINES',saved);
 if(saved){
 medicineList=JSON.parse(saved);
 console.log('Loaded',medicineList.length,'medicines from storage');
-// v9.10.347.196: remove old medicine condition-rule data from saved medicine records.
+// v9.10.347.197: remove old medicine condition-rule data from saved medicine records.
 // Medication Intelligence now uses Doctor Rule text, Today's Awareness, and Personal Pattern only.
 var _needsSave=false;
 medicineList.forEach(function(m){
@@ -16097,7 +16097,7 @@ console.error('Failed to load medicines:',e);
 }
 }
 
-// v9.10.347.196: v9.10.189 MIP-to-conditionRules migration disabled.
+// v9.10.347.197: v9.10.189 MIP-to-conditionRules migration disabled.
 // Formula thresholds must never be copied into medication condition rules.
 try { localStorage.setItem('cardiaclens_mip_sync_v189_done','1'); } catch(e) {}
 
@@ -17771,7 +17771,7 @@ function buildSmartStatusMessage(zoneData) {
 }
 
 
-// ── Home Today's Weather pill + pickup/trip planner (v9.10.347.196) ─────────────
+// ── Home Today's Weather pill + pickup/trip planner (v9.10.347.197) ─────────────
 var TODAY_WEATHER_CACHE_KEY='CARDIACLENS_TODAY_WEATHER_CACHE';
 var todayWeatherFetchInFlight=false;
 var todayWeatherModalRequestSeq=0;
@@ -17785,7 +17785,7 @@ function _clWindCompass(deg){
 function _clGetWeatherCache(){try{var raw=localStorage.getItem(TODAY_WEATHER_CACHE_KEY);return raw?JSON.parse(raw):null;}catch(e){return null;}}
 function _clSetWeatherCache(obj){try{localStorage.setItem(TODAY_WEATHER_CACHE_KEY,JSON.stringify(obj));}catch(e){}}
 function _clResolveSavedWeatherZip(){
-  // v9.10.347.196: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
+  // v9.10.347.197: one reliable ZIP source. Settings wins, backup fills blanks, cache fills blanks, then Robert's normal ZIP.
   // Today Weather must not fall back to GPS unless the user explicitly taps Use My Location.
   try{
     var z=String((settings&&settings.todayWeatherSavedZip)||'').trim();
@@ -17815,7 +17815,7 @@ function _clWeatherUpdatedLabel(c){
   return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+' ('+ageText+')';
 }
 function _clBuildWeatherUrl(lat,lon){
-  // v9.10.347.196: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
+  // v9.10.347.197: Simple, direct Open-Meteo request. No ZIP lookup, no GPS, no extra layers.
   // The app only needs current conditions + hourly forecast for rain/heat/wind guidance.
   return 'https://api.open-meteo.com/v1/forecast?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+
     '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=2'+
@@ -17823,7 +17823,7 @@ function _clBuildWeatherUrl(lat,lon){
     '&hourly=precipitation_probability,precipitation,rain,temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m,wind_direction_10m';
 }
 
-// v9.10.347.196: Saved ZIP uses a direct local coordinate table first.
+// v9.10.347.197: Saved ZIP uses a direct local coordinate table first.
 // For Robert's normal area, 77340 always resolves directly to Huntsville coordinates.
 var CL_ZIP_COORDS={
   '77340':{lat:30.7235,lon:-95.5508,label:'Huntsville'},
@@ -17948,15 +17948,15 @@ function openTodayWeatherModal(){
   var html='<div class="modal-title" style="font-size:26px;margin-bottom:10px">☀️ Today\'s Weather</div><button type="button" onclick="hideModal();openHelpModal(\'weather\')" style="width:100%;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;border-radius:10px;padding:10px;font-size:14px;font-weight:800;margin-bottom:12px">How to use Today\'s Weather</button><div id="todayWeatherModalBody">'+_renderTodayWeatherBody(c,null,initialState)+'</div>';
   html+='<div class="modal-actions"><button class="modal-cancel" onclick="hideModal()">Close</button><button class="modal-ok" id="todayWeatherRefreshBtn" onclick="refreshTodayWeatherFromModal()">Refresh Weather</button></div>';
   showModal(html);
-  // v9.10.347.196: if cached weather is older than the user's refresh threshold, refresh automatically on open.
+  // v9.10.347.197: if cached weather is older than the user's refresh threshold, refresh automatically on open.
   // This keeps the weather pill, planner, and activity weather on the same fresh source without requiring a manual tap.
   if(stale){setTimeout(function(){
-    // v9.10.347.196: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
+    // v9.10.347.197: stale weather auto-refresh always uses Saved ZIP. No GPS prompt, no source guessing.
     refreshTodayWeatherFromModal(true,'zip');
   },100);}
 }
 
-// v9.10.347.196: Today's Weather banner must use the real weather state, not a stale/default activity flag.
+// v9.10.347.197: Today's Weather banner must use the real weather state, not a stale/default activity flag.
 function _clIsTodayWeatherAutomaticEnabled(c){
   try{
     if(typeof _clRestoreWeatherSettingsBackup==='function')_clRestoreWeatherSettingsBackup();
@@ -18009,7 +18009,7 @@ function _clWindyRadarFallback(pendingWindow){
 }
 
 function openWindyLiveRainRadar(){
-  /* v9.10.347.196 KISS: open exactly one Windy radar tab/window.
+  /* v9.10.347.197 KISS: open exactly one Windy radar tab/window.
      Use a named pending window (without noopener) so the later GPS callback
      updates that same tab instead of leaving about:blank and opening a second tab. */
   var pending=null;
@@ -18108,7 +18108,7 @@ function useSavedZipWeather(){
   refreshTodayWeatherFromModal(false,'zip');
 }
 function refreshTodayWeatherFromModal(silent,source){
-  // v9.10.347.196: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
+  // v9.10.347.197: Refresh Weather uses Saved ZIP by default. GPS only when explicitly requested by Use My Location.
   source=(source==='location')?'location':'zip';
   if(source==='zip'){
     try{settings.todayWeatherSource='zip';settings.todayWeatherSavedZip=_clResolveSavedWeatherZip();localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
@@ -18499,7 +18499,7 @@ html+='<div class="stat-tile" style="background:#1e3a8a18;border:2.5px solid #1e
        +'<div class="stat-tile-action" style="color:'+borderColor+'">'+sublabel+'</div>'
        +'</div>';
 })();
-// Events tile — v9.10.347.196: one dashboard gateway for due, missed, and next event.
+// Events tile — v9.10.347.197: one dashboard gateway for due, missed, and next event.
 (function(){
   var evState=(typeof _getEventsTileState==='function')?_getEventsTileState():{color:'#10b981',bg:'#10b98118',border:'#10b981',shadow:'#10b98144',count:'✓',label:'Events',action:'tap to view',detail:'No due or missed events'};
   var evDetail=_eventSafeText(evState.detail||'');
@@ -18523,7 +18523,7 @@ if(zoneData&&zoneData.reasons.length>0){
 
 html+='</div>';
 
-// v9.10.347.196: Medication Intelligence is observational only.
+// v9.10.347.197: Medication Intelligence is observational only.
 // Do not surface calculated medication-threshold review banners.
 
 html+='</div>';
@@ -20011,7 +20011,7 @@ html+=lbBadge;
 html+='<div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">';
 html+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
 html+='<div>';
-html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.347.196</span></div>';
+html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.347.197</span></div>';
 html+='<div id="settingsVersionStatus" style="font-size:13px;color:#6b7280;margin-top:3px">Tap "Check for Updates" to see if a newer version is available</div>';
 html+='</div>';
 html+='<button onclick="checkForUpdates(true)" id="checkUpdateBtn" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">🔍 Check for Updates</button>';
@@ -20170,7 +20170,7 @@ html+='</div>';// close settings-section
   html+='</div></div>';
 })();
 
-// ── v9.10.347.196: Activity & Today's Weather Settings ─────────────────────────
+// ── v9.10.347.197: Activity & Today's Weather Settings ─────────────────────────
 (function(){
   _ensureActivityEnvSettings();
   var wm=settings.activityWeatherMode||'manual';
@@ -21334,7 +21334,7 @@ function buildMissedEventList() {
 }
 
 function runCatchUpScan() {
-  // v9.10.347.196: catch-up scan updates the Events tile/queue only.
+  // v9.10.347.197: catch-up scan updates the Events tile/queue only.
   // It must never open an interrupting modal when the user opens the app.
   var missed = buildMissedEventList();
   if (missed.length === 0) return;
@@ -21647,7 +21647,7 @@ function _isEventLoggedToday(evt,loggedIds){
 }
 
 function showEventReminder(evt){
-  // v9.10.347.196: scheduled events never open a modal or cover the user's current work.
+  // v9.10.347.197: scheduled events never open a modal or cover the user's current work.
   // They enter the Due & Missed queue, appear in Today's Events, and remain there
   // until logged, snoozed, dismissed, or the day rolls over.
   if(!evt||!evt.time||!evt.name)return;
@@ -21675,7 +21675,7 @@ function _openEventActionModal(evt){
 var _mainModal=document.getElementById('modal');
 var _modalOpen=_mainModal&&_mainModal.style.display==='block';
 if(_modalOpen&&!activeReminderEvt){
-  // v9.10.347.196: never show the old floating reminder badge.
+  // v9.10.347.197: never show the old floating reminder badge.
   // Leave the event in the Events tile/queue and let the user finish the current task.
   _recordEventQueueItem(evt,'due');
   _pendingReminderEvt=null;
@@ -21724,7 +21724,7 @@ if(evt.actions&&evt.actions.length>0){
   actions=['logBP','logFluid'];
 }
 
-// v9.10.347.196: include actions already saved earlier for this same scheduled event.
+// v9.10.347.197: include actions already saved earlier for this same scheduled event.
 _eventCompletedActionIdsToday(evt).forEach(function(id){
   if(completedReminderActions.indexOf(id)===-1)completedReminderActions.push(id);
 });
@@ -21768,7 +21768,7 @@ if(allActionsCompleted){
 html+='</div>';
 
 // Arm the active reminder BEFORE showModal so hideModal can reshow if needed
-// v9.10.347.196: rebuild action progress from saved logs each time this card opens.
+// v9.10.347.197: rebuild action progress from saved logs each time this card opens.
 // This keeps multi-action scheduled events available after the first action is saved.
 var _savedReminderActions=_eventCompletedActionIdsToday(evt);
 if(activeReminderEvt!==evt){ eventFluidLogged=false; eventSoundFired=false; }
@@ -21785,7 +21785,7 @@ pendingEventFluid=(function(){
   var remaining=settings.fluidMax-dailyFluid;
   return Math.max(0,Math.min(rawGoal,remaining));
 })();
-// v9.10.347.196: opening the action card is user-initiated, so do not chime or send a second notification.
+// v9.10.347.197: opening the action card is user-initiated, so do not chime or send a second notification.
 showModal(html);
 }
 
@@ -21983,13 +21983,15 @@ html+='<div class="modal-actions"><button class="modal-cancel" onclick="hideModa
 showModal(html);
 }
 
-function exportAllData(){
+async function exportAllData(){
 try{_ensureActivityEnvSettings();localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
 var allData={};
 for(var i=0;i<localStorage.length;i++){
 var key=localStorage.key(i);
 allData[key]=localStorage.getItem(key);
 }
+// Include Evidence Library image data stored in IndexedDB
+try{ if(window._clEvidenceExportAll){ allData['CARDIACLENS_EVIDENCE_IMAGE_DATA']=JSON.stringify(await window._clEvidenceExportAll()); } }catch(e){}
 // Record backup timestamp
 var nowISO=new Date().toISOString();
 allData['CARDIACLENS_LAST_BACKUP']=nowISO;
@@ -22016,13 +22018,14 @@ setTimeout(function(){openSyncBackup();},600);
 
 // Called from an event notification action — triggers instant file download
 // without dismissing the reminder (completeAndCloseModal keeps event alive)
-function backupNowFromEvent(){
+async function backupNowFromEvent(){
 try{_ensureActivityEnvSettings();localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
 var allData={};
 for(var i=0;i<localStorage.length;i++){
 var key=localStorage.key(i);
 allData[key]=localStorage.getItem(key);
 }
+try{ if(window._clEvidenceExportAll){ allData['CARDIACLENS_EVIDENCE_IMAGE_DATA']=JSON.stringify(await window._clEvidenceExportAll()); } }catch(e){}
 var nowISO=new Date().toISOString();
 allData['CARDIACLENS_LAST_BACKUP']=nowISO;
 localStorage.setItem('CARDIACLENS_LAST_BACKUP',nowISO);
@@ -22152,19 +22155,23 @@ window._pendingImportData = allData;
 showModal(html);
 }
 
-function _confirmImport(){
+async function _confirmImport(){
 try{
   var allData=window._pendingImportData;
   if(!allData){return _showInlineError('❌ Import data lost — please try again.');}
   window._pendingImportData=null;
+  var evidenceImageData = allData['CARDIACLENS_EVIDENCE_IMAGE_DATA'] || '[]';
   var count=0;
   // Never overwrite Secure Access keys — user's current combination is device-specific
   var _clSecProtected = ['CL_SEC_KEY','CL_SEC_COLOR','CL_SEC_Q','CL_SEC_A','CL_SEC_DONE','CL_SEC_FIRST'];
   Object.keys(allData).forEach(function(k){
     if(_clSecProtected.indexOf(k) !== -1) return;
+    if(k==='CARDIACLENS_EVIDENCE_IMAGE_DATA') return;
     localStorage.setItem(k,allData[k]);
     count++;
   });
+  // Restore Evidence Library image data into IndexedDB before showing restored records
+  try{ if(window._clEvidenceImportAll){ await window._clEvidenceImportAll(evidenceImageData); } }catch(e){}
   // Show "importing" overlay
   hideModal();
   var msg=document.createElement('div');
@@ -31763,7 +31770,7 @@ html+=`</table></div>`;
 }
 
 
-// Activity & Environment Context Summary (v9.10.347.196)
+// Activity & Environment Context Summary (v9.10.347.197)
 if(settings.features&&settings.features.exercise&&data.activities&&data.activities.length>0){
 function _clDrEsc(v){return String(v===undefined||v===null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function _clDrDate(d){if(!d)return'';var parts=String(d).split('-');if(parts.length===3){var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return mo[parseInt(parts[1],10)-1]+' '+parseInt(parts[2],10);}return d;}
@@ -32044,7 +32051,7 @@ html+=`</div>`;
 
 html+=`
 <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:2px solid #e5e7eb;color:#6b7280;font-size:14px">
-<p style="margin:0">CardiacLens v9.10.347.196 — Free & Source-Available</p>
+<p style="margin:0">CardiacLens v9.10.347.197 — Free & Source-Available</p>
 <p style="margin:4px 0 0 0">Report Generated: ${reportDate}</p>
 </div>`;
 
@@ -32255,7 +32262,7 @@ text+=`- ${type}: ${d.count} session(s), BP change ${sysChange>0?'+':''}${sysCha
 }
 
 
-// Activity & Environment Context Summary (v9.10.347.196)
+// Activity & Environment Context Summary (v9.10.347.197)
 if(settings.features&&settings.features.exercise&&data.activities&&data.activities.length>0){
 function _clTxtContext(a){var c=(a.activityContext||a.contextType||'').toString().toLowerCase();var es=a.environmentalSnapshot||{};if(!c&&es.context)c=String(es.context).toLowerCase();if(!c&&es.mode)c=String(es.mode).toLowerCase();if(c.indexOf('mixed')>=0)return'Mixed';if(c.indexOf('out')>=0)return'Outdoor';if(c.indexOf('in')>=0)return'Indoor';return'Not specified';}
 function _clTxtWeather(a){try{if(typeof clActivityWeatherText==='function')return clActivityWeatherText(a)||'';}catch(e){}var es=a.environmentalSnapshot||{};var ws=es.weatherSnapshot||es.weather||{};var out=[];if(ws.feelsLikeF||ws.feelsLike)out.push('Feels like '+(ws.feelsLikeF||ws.feelsLike)+'°');if(ws.precipChance!==undefined&&ws.precipChance!==null)out.push('Rain '+ws.precipChance+'%');if(ws.windMph)out.push('Wind '+ws.windMph+' mph');return out.join(' · ');}
@@ -32375,7 +32382,7 @@ Note: This report is based on patient self-tracked data. Clinical correlation
 and examination are essential for diagnosis and treatment decisions.
 
 ---
-CardiacLens v9.10.347.196 Medical Grade - Free
+CardiacLens v9.10.347.197 Medical Grade - Free
 Report Generated: ${reportDate}`;
 
 return text;
@@ -36512,7 +36519,7 @@ report.push(notes);
 report.push('');
 }
 report.push('═══════════════════════════════════════════════════════════');
-report.push('This report was generated by CardiacLens v9.10.347.196 Medical Grade - Free');
+report.push('This report was generated by CardiacLens v9.10.347.197 Medical Grade - Free');
 report.push('Advanced Analytics Dashboard - Phase 3 Implementation');
 report.push('═══════════════════════════════════════════════════════════');
 const blob=new Blob([report.join('\n')],{type:'text/plain'});
@@ -36602,7 +36609,7 @@ ${periodHTML}
 <h2>Key Insights</h2>
 ${insightsHTML}
 <div style="margin-top:40px;padding:20px;background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:8px">
-<strong>CardiacLens v9.10.347.196 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
+<strong>CardiacLens v9.10.347.197 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
 This report is not a substitute for professional medical advice.
 </div>
 </body>
@@ -37575,7 +37582,7 @@ alert(`🏃 Activity Summary\n\n` +
 var VERSION_JSON_URL = 'https://cardiaclens.com/version.json';
 var VERSION_CHECK_KEY = 'CARDIACLENS_LAST_VERSION_CHECK';
 var VERSION_DISMISSED_KEY = 'CARDIACLENS_UPDATE_DISMISSED';
-var CURRENT_VERSION = 'v9.10.347.196';
+var CURRENT_VERSION = 'v9.10.347.197';
 var _latestVersionData = null; // cached from last fetch
 
 // Detect whether running as an installed Home Screen PWA on iOS
@@ -40074,7 +40081,7 @@ function _mipMarkWeeklyReviewComplete(){
     var stamp=new Date().toISOString();
     localStorage.setItem('CARDIACLENS_MIP_WEEKLY_REVIEWED_AT',stamp);
     if(!medIntelData||typeof medIntelData!=='object')medIntelData={};
-    medIntelData._weeklyReview={completedAt:stamp,version:'v9.10.347.196'};
+    medIntelData._weeklyReview={completedAt:stamp,version:'v9.10.347.197'};
     _mipSave();
   }catch(e){}
 }
@@ -40210,7 +40217,7 @@ function _mipRecordHistory(medName, metric, entry) {
 // or its approvedAt is 7+ days old. Returns one entry per medicine+metric,
 // plus a PP entry, in the same drug-class/name order as the MIP panel.
 function _mipDueItems() {
-  // v9.10.347.196: global weekly-review completion guard.
+  // v9.10.347.197: global weekly-review completion guard.
   // The per-threshold approvedAt values are still the source of truth, but this
   // prevents the red weekly-review card from reappearing immediately after a
   // version update/import when the user has already completed the full queue
@@ -40264,7 +40271,7 @@ function _mipDueItems() {
 // Saves to MIP store, records a history breadcrumb, and syncs the block/warn
 // approval history only. actionType is 'approve'|'edit'|'keep'.
 function _mipApplyMedThresholds(medName, metric, blockVal, warnVal, actionType) {
-  // v9.10.347.196: keep any historical MIP approval data only inside the
+  // v9.10.347.197: keep any historical MIP approval data only inside the
   // Medication Intelligence store. Do not create, update, or sync medicine
   // conditionRules. Medication logging must not block/warn from formulas.
   var approvedBefore = mipGetApproved(medName, metric);
@@ -40287,7 +40294,7 @@ function _mipApplyMedThresholds(medName, metric, blockVal, warnVal, actionType) 
 // ── v9.10.208: Shared "apply PP thresholds" logic ───────────────────────
 // Returns 0 because PP thresholds no longer sync to medicine rules.
 function _mipApplyPPThresholds(warnVal, targetVal, actionType) {
-  // v9.10.347.196: retain PP approval history only; do not sync PP warnings
+  // v9.10.347.197: retain PP approval history only; do not sync PP warnings
   // into individual medicine conditionRules.
   var ppApprovedBefore = mipGetApproved('__pp__', 'pp');
   var ppStats7 = _mipCollect(7).pp;
@@ -40311,7 +40318,7 @@ function _mipApplyPPThresholds(warnVal, targetVal, actionType) {
 var _mipSearchQuery = '';
 
 function openMedIntel() {
-  // v9.10.347.196: KISS cleanup. This panel is observational only.
+  // v9.10.347.197: KISS cleanup. This panel is observational only.
   // It must not show formula-generated thresholds, SD, approval controls,
   // PP warning setup, or MIP block/warn activation values.
   var meds = (medicineList || []).filter(function(m) {
@@ -40458,7 +40465,7 @@ var _MIP_QUEUE_LABELS = {systolic:'Systolic',diastolic:'Diastolic',hr:'Heart Rat
 var _MIP_QUEUE_UNITS  = {systolic:'mmHg',diastolic:'mmHg',hr:'bpm',pp:'mmHg'};
 
 function openMipReviewQueue() {
-  // v9.10.347.196: old calculated threshold review queue retired.
+  // v9.10.347.197: old calculated threshold review queue retired.
   // Medication Intelligence now opens the observational three-section panel.
   openMedIntel();
 }
@@ -40547,7 +40554,7 @@ function mipCopyRulesById(btn) {
 
 // Copy condition rules from one medicine to another (same drug class)
 function mipCopyRules(fromName, toName) {
-  // v9.10.347.196: condition rules are retired. Nothing can be copied.
+  // v9.10.347.197: condition rules are retired. Nothing can be copied.
   alert('Condition Rules have been retired. Use Doctor Rule / Instructions on each medicine instead.');
 }
 
@@ -46587,7 +46594,7 @@ function _showAskClarifyChips(options) {
 /* CardiacLens Secure Access Takeover v9.10.287
    Reliability pass: pointer-event tap handling, preserved app tab for email, exact cooldown thresholds. */
 (function(){
-  var VERSION='v9.10.347.196';
+  var VERSION='v9.10.347.197';
   var KEY='CL_SEC_KEY', COLOR='CL_SEC_COLOR', Q='CL_SEC_Q', A='CL_SEC_A', DONE='CL_SEC_DONE';
   var FAILS='CL_SEC_FAILS', COOL='CL_SEC_COOL_UNTIL';
   var COLORS={red:'#e53935',blue:'#1565c0',green:'#2e7d32',orange:'#e65100',purple:'#6a1b9a',teal:'#00695c',pink:'#c2185b',gold:'#f57f17'};
@@ -46745,7 +46752,7 @@ function _showAskClarifyChips(options) {
   // attachment state. This review screen never auto-attaches images; it gives the
   // user a visible message to copy, then opens email from a direct button tap.
   function installFeedbackReviewOverrides(){
-    function currentVersion(){return (typeof CURRENT_VERSION!=='undefined')?CURRENT_VERSION:'v9.10.347.196';}
+    function currentVersion(){return (typeof CURRENT_VERSION!=='undefined')?CURRENT_VERSION:'v9.10.347.197';}
     function deviceLine(){try{return (navigator.userAgent||'').slice(0,180);}catch(e){return '';}}
     function feedbackStamp(){try{var d=new Date();function z(n){return String(n).padStart(2,'0');}return 'ID '+d.getFullYear()+z(d.getMonth()+1)+z(d.getDate())+'-'+z(d.getHours())+z(d.getMinutes())+z(d.getSeconds());}catch(e){return 'ID '+Date.now();}}
     function supportPayload(){
@@ -46831,7 +46838,7 @@ function _showAskClarifyChips(options) {
 
 
 
-  // v9.10.347.196: Final tappable email contact workflow
+  // v9.10.347.197: Final tappable email contact workflow
   // Purpose: keep feedback simple while still opening the user's default mail app.
   // Primary action is a real mailto: link to robert@cardiaclens.com. Copy remains as fallback.
   (function installPlainSupportContactOverride(){
@@ -46960,7 +46967,7 @@ function _showAskClarifyChips(options) {
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,100);});else setTimeout(boot,100);setTimeout(boot,1000);setTimeout(boot,4000);
 })();
 
-// ── v9.10.347.196: Weather hardening override ─────────────────────────────
+// ── v9.10.347.197: Weather hardening override ─────────────────────────────
 // Purpose: keep Today's Weather simple and predictable: Saved ZIP -> coordinates -> Open-Meteo -> render.
 // No GPS unless Use My Location is explicitly tapped. Older weather code remains below this override but these
 // same global function names take precedence for buttons, modal open, planner, and activity weather.
@@ -47196,255 +47203,115 @@ function _showAskClarifyChips(options) {
   };
 })();
 
-// ── Evidence Library (v9.10.347.196) ─────────────────────────────
+// ── Evidence Library (v9.10.347.197) ─────────────────────────────
 (function(){
   var EVIDENCE_KEY = 'CARDIACLENS_EVIDENCE_LIBRARY';
+  var EVIDENCE_DB_NAME = 'CardiacLensEvidenceDB';
+  var EVIDENCE_DB_VERSION = 1;
+  var EVIDENCE_IMG_STORE = 'images';
+  var EVIDENCE_SAVE_ERROR = 'This evidence event could not be saved because the images are too large for available browser storage. Try removing one image or cropping screenshots/photos first.';
   var pendingImages = [];
 
-  function esc(v){
-    return String(v == null ? '' : v).replace(/[&<>'"]/g, function(c){
-      return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c];
-    });
-  }
+  function esc(v){ return String(v == null ? '' : v).replace(/[&<>'"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]; }); }
   function uid(prefix){ return prefix + Date.now() + '_' + Math.random().toString(36).slice(2,8); }
   function today(){ return new Date().toISOString().slice(0,10); }
-  function loadEvents(){
-    try { var arr = JSON.parse(localStorage.getItem(EVIDENCE_KEY) || '[]'); return Array.isArray(arr) ? arr : []; }
-    catch(e){ return []; }
-  }
-  function saveEvents(arr){ localStorage.setItem(EVIDENCE_KEY, JSON.stringify(arr || [])); }
-  function findEvent(id){ return loadEvents().filter(function(ev){ return ev && ev.id === id; })[0] || null; }
-  function notePreview(n){
-    n = String(n || '').replace(/\s+/g,' ').trim();
-    return n.length > 120 ? n.slice(0,117) + '...' : n;
-  }
+  function loadEventsMeta(){ try { var arr = JSON.parse(localStorage.getItem(EVIDENCE_KEY) || '[]'); return Array.isArray(arr) ? arr : []; } catch(e){ return []; } }
+  function stripImageData(img){ var out={}; Object.keys(img||{}).forEach(function(k){ if(k !== 'dataUrl') out[k]=img[k]; }); return out; }
+  function stripEventData(ev){ var copy={ id: ev.id, title: ev.title||'', date: ev.date||'', notes: ev.notes||'', images: [], createdAt: ev.createdAt||'', updatedAt: ev.updatedAt||'' }; copy.images=(Array.isArray(ev.images)?ev.images:[]).map(stripImageData); return copy; }
+  function saveEventsMeta(arr){ localStorage.setItem(EVIDENCE_KEY, JSON.stringify((arr || []).map(stripEventData))); }
+  function notePreview(n){ n = String(n || '').replace(/\s+/g,' ').trim(); return n.length > 120 ? n.slice(0,117) + '...' : n; }
   function setError(msg){ var el = document.getElementById('evidenceError'); if (el) el.textContent = msg || ''; }
   function pad(n){ return String(n).padStart(2,'0'); }
-  function dateTimeLocalFromIso(iso){
-    if (!iso) return '';
-    var d = new Date(iso);
-    if (isNaN(d.getTime())) return '';
-    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
-  }
-  function isoFromDateTimeLocal(v){
-    if (!v) return '';
-    var d = new Date(v);
-    return isNaN(d.getTime()) ? '' : d.toISOString();
-  }
-  function formatEvidenceDate(isoOrDate){
-    if (!isoOrDate) return '';
-    var d = new Date(isoOrDate);
-    if (isNaN(d.getTime())) return String(isoOrDate || '');
-    return d.toLocaleDateString([], { year:'numeric', month:'long', day:'numeric' });
-  }
-  function formatEvidenceTime(iso){
-    if (!iso) return '';
-    var d = new Date(iso);
-    if (isNaN(d.getTime())) return '';
-    return d.toLocaleTimeString([], { hour:'numeric', minute:'2-digit' });
-  }
-  function syncEvidenceImageFields(){
-    pendingImages.forEach(function(img, idx){
-      var cap = document.getElementById('evidenceImgCaption_' + idx);
-      var ts = document.getElementById('evidenceImgTime_' + idx);
-      if (cap) img.caption = cap.value || '';
-      if (ts) img.takenAt = isoFromDateTimeLocal(ts.value) || img.takenAt || img.addedAt || '';
-    });
-  }
+  function dateTimeLocalFromIso(iso){ if (!iso) return ''; var d = new Date(iso); if (isNaN(d.getTime())) return ''; return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+  function isoFromDateTimeLocal(v){ if (!v) return ''; var d = new Date(v); return isNaN(d.getTime()) ? '' : d.toISOString(); }
+  function formatEvidenceDate(isoOrDate){ if (!isoOrDate) return ''; var d = new Date(isoOrDate); if (isNaN(d.getTime())) return String(isoOrDate || ''); return d.toLocaleDateString([], { year:'numeric', month:'long', day:'numeric' }); }
+  function formatEvidenceTime(iso){ if (!iso) return ''; var d = new Date(iso); if (isNaN(d.getTime())) return ''; return d.toLocaleTimeString([], { hour:'numeric', minute:'2-digit' }); }
   function imageWhen(img){ return img && (img.takenAt || img.addedAt || ''); }
+
+  function openDb(){
+    return new Promise(function(resolve,reject){
+      if (!window.indexedDB) { reject(new Error('IndexedDB is not available.')); return; }
+      var req = indexedDB.open(EVIDENCE_DB_NAME, EVIDENCE_DB_VERSION);
+      req.onupgradeneeded = function(){ var db=req.result; if(!db.objectStoreNames.contains(EVIDENCE_IMG_STORE)) db.createObjectStore(EVIDENCE_IMG_STORE,{keyPath:'id'}); };
+      req.onsuccess = function(){ resolve(req.result); };
+      req.onerror = function(){ reject(req.error || new Error('Could not open browser database storage.')); };
+    });
+  }
+  function dbPutImage(img){
+    return openDb().then(function(db){ return new Promise(function(resolve,reject){
+      var tx=db.transaction(EVIDENCE_IMG_STORE,'readwrite'); tx.objectStore(EVIDENCE_IMG_STORE).put({id:img.id,eventId:img.eventId||'',dataUrl:img.dataUrl||'',type:img.type||'image/jpeg',name:img.name||'Evidence image',updatedAt:new Date().toISOString()});
+      tx.oncomplete=function(){db.close();resolve();}; tx.onerror=function(){db.close();reject(tx.error||new Error('Could not save image.'));};
+    });});
+  }
+  function dbGetImage(id){
+    return openDb().then(function(db){ return new Promise(function(resolve){
+      var tx=db.transaction(EVIDENCE_IMG_STORE,'readonly'); var req=tx.objectStore(EVIDENCE_IMG_STORE).get(id);
+      req.onsuccess=function(){ var rec=req.result||null; db.close(); resolve(rec ? rec.dataUrl : ''); };
+      req.onerror=function(){ db.close(); resolve(''); };
+    });});
+  }
+  function dbDeleteImage(id){
+    return openDb().then(function(db){ return new Promise(function(resolve){
+      var tx=db.transaction(EVIDENCE_IMG_STORE,'readwrite'); tx.objectStore(EVIDENCE_IMG_STORE).delete(id);
+      tx.oncomplete=function(){db.close();resolve();}; tx.onerror=function(){db.close();resolve();};
+    });});
+  }
+  function dbAllImages(){
+    return openDb().then(function(db){ return new Promise(function(resolve){
+      var out=[]; var tx=db.transaction(EVIDENCE_IMG_STORE,'readonly'); var store=tx.objectStore(EVIDENCE_IMG_STORE);
+      if (store.getAll) { var req=store.getAll(); req.onsuccess=function(){out=req.result||[];}; }
+      else { store.openCursor().onsuccess=function(e){var c=e.target.result;if(c){out.push(c.value);c.continue();}}; }
+      tx.oncomplete=function(){db.close();resolve(out);}; tx.onerror=function(){db.close();resolve(out);};
+    });});
+  }
+  function hydrateImage(img){
+    img = Object.assign({}, img || {});
+    if (img.dataUrl || !img.id) return Promise.resolve(img);
+    return dbGetImage(img.id).then(function(dataUrl){ img.dataUrl = dataUrl || ''; return img; });
+  }
+  function hydrateEvent(ev){
+    if (!ev) return Promise.resolve(null);
+    var copy = Object.assign({}, ev); var imgs = Array.isArray(copy.images) ? copy.images : [];
+    return Promise.all(imgs.map(hydrateImage)).then(function(h){ copy.images = h; return copy; });
+  }
+  function findEventMeta(id){ return loadEventsMeta().filter(function(ev){ return ev && ev.id === id; })[0] || null; }
+  function findEvent(id){ return hydrateEvent(findEventMeta(id)); }
+  function migrateEvidenceImages(){
+    var events = loadEventsMeta(), changed = false, jobs = [];
+    events.forEach(function(ev){ (Array.isArray(ev.images)?ev.images:[]).forEach(function(img){ if(img && img.dataUrl && img.id){ jobs.push(dbPutImage(Object.assign({}, img, {eventId: ev.id}))); delete img.dataUrl; changed = true; } }); });
+    return Promise.all(jobs).then(function(){ if(changed) saveEventsMeta(events); return events; }).catch(function(){ return events; });
+  }
+  window._clEvidenceExportAll = function(){ return dbAllImages().then(function(imgs){ return imgs.map(function(r){ return {id:r.id,eventId:r.eventId||'',dataUrl:r.dataUrl||'',type:r.type||'image/jpeg',name:r.name||'',updatedAt:r.updatedAt||''}; }); }).catch(function(){ return []; }); };
+  window._clEvidenceImportAll = function(raw){
+    var imgs=[]; try { imgs = typeof raw === 'string' ? JSON.parse(raw||'[]') : (Array.isArray(raw)?raw:[]); } catch(e){ imgs=[]; }
+    return Promise.all(imgs.filter(function(r){return r&&r.id&&r.dataUrl;}).map(dbPutImage)).catch(function(){});
+  };
+
+  function syncEvidenceImageFields(){ pendingImages.forEach(function(img, idx){ var cap=document.getElementById('evidenceImgCaption_'+idx); var ts=document.getElementById('evidenceImgTime_'+idx); if(cap) img.caption=cap.value||''; if(ts) img.takenAt=isoFromDateTimeLocal(ts.value)||img.takenAt||img.addedAt||''; }); }
   function renderImageThumbs(){
-    var box = document.getElementById('evidenceImagePreview');
-    if (!box) return;
-    if (!pendingImages.length) {
-      box.innerHTML = '<div style="font-size:14px;color:#6b7280;background:#f9fafb;border:1px dashed #d1d5db;border-radius:10px;padding:12px">No images added yet.</div>';
-      return;
-    }
-    var html = '';
-    pendingImages.forEach(function(img, idx){
-      html += '<div style="border:1px solid #e5e7eb;border-radius:10px;padding:8px;margin-bottom:10px;background:#fff">';
-      html += '<div style="display:flex;gap:10px;align-items:center">';
-      html += '<img src="'+esc(img.dataUrl)+'" alt="Evidence image" style="width:74px;height:74px;object-fit:cover;border-radius:8px;border:1px solid #d1d5db">';
-      html += '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:800;color:#111827">Evidence Photo '+(idx+1)+'</div><div style="font-size:12px;color:#6b7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(img.name || 'Evidence image')+'</div></div>';
-      html += '<button type="button" onclick="removeEvidenceImage('+idx+')" style="background:#fee2e2;color:#991b1b;border:none;border-radius:8px;padding:9px 10px;font-size:13px;font-weight:800;cursor:pointer">Remove</button>';
-      html += '</div>';
-      html += '<label style="display:block;font-size:12px;font-weight:800;color:#374151;margin:8px 0 3px">Image date/time</label>';
-      html += '<input id="evidenceImgTime_'+idx+'" type="datetime-local" value="'+esc(dateTimeLocalFromIso(imageWhen(img)))+'" style="width:100%;padding:9px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;box-sizing:border-box">';
-      html += '<label style="display:block;font-size:12px;font-weight:800;color:#374151;margin:8px 0 3px">Optional image caption</label>';
-      html += '<textarea id="evidenceImgCaption_'+idx+'" rows="2" placeholder="Example: Selfie taken after pushing bicycle approximately 3 miles." style="width:100%;padding:9px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;box-sizing:border-box;resize:vertical">'+esc(img.caption || '')+'</textarea>';
-      html += '</div>';
-    });
-    box.innerHTML = html;
+    var box=document.getElementById('evidenceImagePreview'); if(!box)return;
+    if(!pendingImages.length){ box.innerHTML='<div style="font-size:14px;color:#6b7280;background:#f9fafb;border:1px dashed #d1d5db;border-radius:10px;padding:12px">No images added yet.</div>'; return; }
+    var html=''; pendingImages.forEach(function(img,idx){
+      html+='<div style="border:1px solid #e5e7eb;border-radius:10px;padding:8px;margin-bottom:10px;background:#fff">';
+      html+='<div style="display:flex;gap:10px;align-items:center">';
+      html+='<img src="'+esc(img.dataUrl||'')+'" alt="Evidence image" style="width:74px;height:74px;object-fit:cover;border-radius:8px;border:1px solid #d1d5db">';
+      html+='<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:800;color:#111827">Evidence Photo '+(idx+1)+'</div><div style="font-size:12px;color:#6b7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(img.name||'Evidence image')+'</div></div>';
+      html+='<button type="button" onclick="removeEvidenceImage('+idx+')" style="background:#fee2e2;color:#991b1b;border:none;border-radius:8px;padding:9px 10px;font-size:13px;font-weight:800;cursor:pointer">Remove</button></div>';
+      html+='<label style="display:block;font-size:12px;font-weight:800;color:#374151;margin:8px 0 3px">Image date/time</label><input id="evidenceImgTime_'+idx+'" type="datetime-local" value="'+esc(dateTimeLocalFromIso(imageWhen(img)))+'" style="width:100%;padding:9px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;box-sizing:border-box">';
+      html+='<label style="display:block;font-size:12px;font-weight:800;color:#374151;margin:8px 0 3px">Optional image caption</label><textarea id="evidenceImgCaption_'+idx+'" rows="2" placeholder="Example: Selfie taken after pushing bicycle approximately 3 miles." style="width:100%;padding:9px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;box-sizing:border-box;resize:vertical">'+esc(img.caption||'')+'</textarea></div>';
+    }); box.innerHTML=html;
   }
-  function resizeImageFile(file){
-    return new Promise(function(resolve, reject){
-      if (!file || !file.type || !/^image\//.test(file.type)) { reject(new Error('Only image files can be added.')); return; }
-      var reader = new FileReader();
-      reader.onerror = function(){ reject(new Error('Could not read this image.')); };
-      reader.onload = function(){
-        var original = reader.result;
-        var img = new Image();
-        img.onerror = function(){ reject(new Error('Could not process this image.')); };
-        img.onload = function(){
-          try {
-            var maxW = 1200;
-            var w = img.naturalWidth || img.width;
-            var h = img.naturalHeight || img.height;
-            if (!w || !h) { reject(new Error('Could not process this image.')); return; }
-            if (w > maxW) { h = Math.round(h * (maxW / w)); w = maxW; }
-            var canvas = document.createElement('canvas');
-            canvas.width = w; canvas.height = h;
-            var ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, w, h);
-            var dataUrl = canvas.toDataURL('image/jpeg', 0.75);
-            var stamp = file.lastModified ? new Date(file.lastModified).toISOString() : new Date().toISOString();
-            resolve({ id: uid('img_'), name: file.name || 'Evidence image', type: 'image/jpeg', dataUrl: dataUrl, takenAt: stamp, caption: '', addedAt: new Date().toISOString() });
-          } catch(e) { reject(new Error('Could not compress this image.')); }
-        };
-        img.src = original;
-      };
-      reader.readAsDataURL(file);
-    });
-  }
+  function resizeImageFile(file){ return new Promise(function(resolve,reject){ if(!file||!file.type||!/^image\//.test(file.type)){reject(new Error('Only image files can be added.'));return;} var reader=new FileReader(); reader.onerror=function(){reject(new Error('Could not read this image.'));}; reader.onload=function(){ var img=new Image(); img.onerror=function(){reject(new Error('Could not process this image.'));}; img.onload=function(){ try{ var maxW=1200,w=img.naturalWidth||img.width,h=img.naturalHeight||img.height; if(!w||!h){reject(new Error('Could not process this image.'));return;} if(w>maxW){h=Math.round(h*(maxW/w));w=maxW;} var canvas=document.createElement('canvas'); canvas.width=w; canvas.height=h; var ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,w,h); var dataUrl=canvas.toDataURL('image/jpeg',0.75); var stamp=file.lastModified?new Date(file.lastModified).toISOString():new Date().toISOString(); resolve({id:uid('img_'),name:file.name||'Evidence image',type:'image/jpeg',dataUrl:dataUrl,takenAt:stamp,caption:'',addedAt:new Date().toISOString()}); }catch(e){reject(new Error('Could not compress this image.'));} }; img.src=reader.result; }; reader.readAsDataURL(file); }); }
 
-  window.openEvidenceLibrary = function(){
-    var events = loadEvents().sort(function(a,b){ return String(b.date || '').localeCompare(String(a.date || '')) || String(b.createdAt || '').localeCompare(String(a.createdAt || '')); });
-    var html = '<div class="modal-title" style="font-size:26px;margin-bottom:10px">📁 Evidence Library</div>';
-    html += '<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:12px;margin-bottom:12px;color:#1e3a8a;font-size:14px;line-height:1.45"><strong>Use this for one documented health event or investigation.</strong><br>Save the title, date, notes, and supporting photos or screenshots so you can review the story later or show it to your doctor.</div>';
-    html += '<button type="button" onclick="openEvidenceForm()" style="width:100%;background:#9d174d;color:#fff;border:none;border-radius:10px;padding:14px;font-size:17px;font-weight:800;margin-bottom:14px;cursor:pointer">+ New Evidence Event</button>';
-    if (!events.length) {
-      html += '<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:14px;color:#374151;font-size:15px;line-height:1.5">No evidence events saved yet. Create one event to preserve photos, screenshots, image times, captions, and notes for later review.</div>';
-    } else {
-      events.forEach(function(ev){
-        html += '<div style="border:1px solid #e5e7eb;border-radius:12px;padding:13px;margin-bottom:10px;background:#fff">';
-        html += '<div style="font-size:17px;font-weight:800;color:#111827;margin-bottom:4px">'+esc(ev.title || 'Untitled evidence event')+'</div>';
-        html += '<div style="font-size:13px;color:#6b7280;margin-bottom:6px">'+esc(ev.date || '')+' · '+((ev.images || []).length)+' image'+(((ev.images || []).length)===1?'':'s')+'</div>';
-        if (ev.notes) html += '<div style="font-size:14px;color:#374151;margin-bottom:10px;line-height:1.45">'+esc(notePreview(ev.notes))+'</div>';
-        html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">';
-        html += '<button type="button" onclick="viewEvidenceEvent(\''+esc(ev.id)+'\')" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:800;cursor:pointer">View</button>';
-        html += '<button type="button" onclick="openEvidenceForm(\''+esc(ev.id)+'\')" style="background:#0f766e;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:800;cursor:pointer">Edit</button>';
-        html += '<button type="button" onclick="deleteEvidenceEvent(\''+esc(ev.id)+'\')" style="background:#dc2626;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:800;cursor:pointer">Delete</button>';
-        html += '</div></div>';
-      });
-    }
-    html += '<div class="modal-actions"><button class="modal-cancel" onclick="hideModal()">Close</button></div>';
-    showModal(html);
-  };
-
-  window.openEvidenceForm = function(id){
-    var ev = id ? findEvent(id) : null;
-    pendingImages = ev && Array.isArray(ev.images) ? ev.images.slice() : [];
-    var html = '<div class="modal-title" style="font-size:24px;margin-bottom:10px">'+(ev ? 'Edit Evidence Event' : 'New Evidence Event')+'</div>';
-    html += '<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:10px;margin-bottom:10px;color:#374151;font-size:14px;line-height:1.45">Add only images that support this event: photos, screenshots, BP readings, symptoms, or other evidence you may want to explain later.</div>';
-    html += '<div id="evidenceError" style="color:#b91c1c;font-size:14px;font-weight:700;margin-bottom:8px"></div>';
-    html += '<label style="display:block;font-size:14px;font-weight:800;color:#374151;margin:8px 0 4px">Title *</label>';
-    html += '<input id="evidenceTitle" type="text" value="'+esc(ev ? ev.title : '')+'" style="width:100%;padding:11px;border:1px solid #d1d5db;border-radius:8px;font-size:16px;box-sizing:border-box">';
-    html += '<label style="display:block;font-size:14px;font-weight:800;color:#374151;margin:10px 0 4px">Event Date</label>';
-    html += '<input id="evidenceDate" type="date" value="'+esc(ev ? (ev.date || today()) : today())+'" style="width:100%;padding:11px;border:1px solid #d1d5db;border-radius:8px;font-size:16px;box-sizing:border-box">';
-    html += '<label style="display:block;font-size:14px;font-weight:800;color:#374151;margin:10px 0 4px">Notes</label>';
-    html += '<textarea id="evidenceNotes" rows="5" placeholder="What happened? Why does this evidence matter? What should you or your doctor understand later?" style="width:100%;padding:11px;border:1px solid #d1d5db;border-radius:8px;font-size:16px;box-sizing:border-box;resize:vertical">'+esc(ev ? ev.notes : '')+'</textarea>';
-    html += '<label style="display:block;font-size:14px;font-weight:800;color:#374151;margin:12px 0 6px">Images</label>';
-    html += '<input id="evidenceFileInput" type="file" accept="image/*" multiple style="display:none" onchange="handleEvidenceFiles(this.files)">';
-    html += '<button type="button" onclick="document.getElementById(\'evidenceFileInput\').click()" style="width:100%;background:#374151;color:#fff;border:none;border-radius:10px;padding:12px;font-size:16px;font-weight:800;margin-bottom:10px;cursor:pointer">Add Image</button>';
-    html += '<div id="evidenceImagePreview"></div>';
-    html += '<div class="modal-actions"><button class="modal-cancel" onclick="openEvidenceLibrary()">Cancel</button><button class="modal-ok" onclick="saveEvidenceEvent(\''+(ev ? esc(ev.id) : '')+'\')">Save</button></div>';
-    showModal(html);
-    setTimeout(renderImageThumbs, 20);
-  };
-
-  window.handleEvidenceFiles = function(files){
-    syncEvidenceImageFields();
-    setError('');
-    files = Array.prototype.slice.call(files || []);
-    if (!files.length) return;
-    var chain = Promise.resolve();
-    files.forEach(function(file){
-      chain = chain.then(function(){ return resizeImageFile(file).then(function(img){ pendingImages.push(img); renderImageThumbs(); }); });
-    });
-    chain.catch(function(err){ setError((err && err.message) ? err.message : 'Could not add this image.'); renderImageThumbs(); });
-  };
-
-  window.removeEvidenceImage = function(idx){
-    syncEvidenceImageFields();
-    if (idx < 0 || idx >= pendingImages.length) return;
-    if (!confirm('Remove this image from the event?')) return;
-    pendingImages.splice(idx, 1);
-    renderImageThumbs();
-  };
-
-  window.saveEvidenceEvent = function(id){
-    syncEvidenceImageFields();
-    setError('');
-    var title = (document.getElementById('evidenceTitle') || {}).value || '';
-    var date = (document.getElementById('evidenceDate') || {}).value || today();
-    var notes = (document.getElementById('evidenceNotes') || {}).value || '';
-    title = title.trim();
-    if (!title) { setError('Title is required.'); return; }
-    var events = loadEvents();
-    var now = new Date().toISOString();
-    var found = false;
-    events = events.map(function(ev){
-      if (ev && ev.id === id) {
-        found = true;
-        return { id: ev.id, title: title, date: date, notes: notes, images: pendingImages.slice(), createdAt: ev.createdAt || now, updatedAt: now };
-      }
-      return ev;
-    });
-    if (!id || !found) events.push({ id: uid('ev_'), title: title, date: date, notes: notes, images: pendingImages.slice(), createdAt: now, updatedAt: now });
-    try {
-      saveEvents(events);
-      pendingImages = [];
-      openEvidenceLibrary();
-      if (typeof showToast === 'function') showToast('Evidence event saved');
-    } catch(e) {
-      setError('This image is too large to save. Try cropping the screenshot/photo first or remove another image.');
-    }
-  };
-
-  window.viewEvidenceEvent = function(id){
-    var ev = findEvent(id);
-    if (!ev) { openEvidenceLibrary(); return; }
-    var html = '<div class="modal-title" style="font-size:24px;margin-bottom:8px">'+esc(ev.title || 'Evidence Event')+'</div>';
-    html += '<div style="font-size:14px;color:#6b7280;margin-bottom:12px">'+esc(ev.date || '')+'</div>';
-    if (ev.notes) html += '<div style="white-space:pre-wrap;font-size:15px;color:#374151;line-height:1.55;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:12px;margin-bottom:12px">'+esc(ev.notes)+'</div>';
-    var imgs = Array.isArray(ev.images) ? ev.images : [];
-    if (!imgs.length) html += '<div style="font-size:14px;color:#6b7280;margin-bottom:12px">No images saved with this event.</div>';
-    imgs.forEach(function(img, idx){
-      var when = imageWhen(img);
-      html += '<div style="font-size:13px;font-weight:800;color:#374151;margin:12px 0 4px">Evidence Photo '+(idx+1)+' of '+imgs.length+'</div>';
-      if (when) html += '<div style="font-size:13px;color:#6b7280;margin-bottom:6px">'+esc(formatEvidenceDate(when))+(formatEvidenceTime(when) ? ' · '+esc(formatEvidenceTime(when)) : '')+'</div>';
-      if (img.caption) html += '<div style="font-size:14px;color:#374151;line-height:1.45;margin-bottom:6px">'+esc(img.caption)+'</div>';
-      html += '<button type="button" onclick="openEvidenceImage(\''+esc(ev.id)+'\','+idx+')" style="display:block;width:100%;padding:0;margin:0 0 12px 0;background:transparent;border:none;cursor:pointer;text-align:left"><img src="'+esc(img.dataUrl)+'" alt="Evidence image" style="width:100%;height:auto;border-radius:10px;border:1px solid #d1d5db"></button>';
-    });
-    html += '<div style="font-size:13px;color:#6b7280;margin:4px 0 12px">Tap an image to open it larger.</div>';
-    html += '<div class="modal-actions"><button class="modal-cancel" onclick="openEvidenceLibrary()">Back to Evidence Library</button><button class="modal-ok" onclick="openEvidenceForm(\''+esc(ev.id)+'\')">Edit</button></div>';
-    html += '<button type="button" onclick="deleteEvidenceEvent(\''+esc(ev.id)+'\')" style="width:100%;background:#dc2626;color:#fff;border:none;border-radius:10px;padding:12px;font-size:16px;font-weight:800;margin-top:8px;cursor:pointer">Delete</button>';
-    showModal(html);
-  };
-
-  window.openEvidenceImage = function(id, idx){
-    var ev = findEvent(id);
-    if (!ev) { openEvidenceLibrary(); return; }
-    var imgs = Array.isArray(ev.images) ? ev.images : [];
-    var img = imgs[idx];
-    if (!img) { viewEvidenceEvent(id); return; }
-    var when = imageWhen(img);
-    var html = '<div class="modal-title" style="font-size:22px;margin-bottom:6px">Evidence Photo '+(idx+1)+' of '+imgs.length+'</div>';
-    html += '<div style="font-size:14px;font-weight:800;color:#111827;margin-bottom:4px">'+esc(ev.title || 'Evidence Event')+'</div>';
-    if (when) html += '<div style="font-size:13px;color:#6b7280;margin-bottom:8px">'+esc(formatEvidenceDate(when))+(formatEvidenceTime(when) ? ' · '+esc(formatEvidenceTime(when)) : '')+'</div>';
-    if (img.caption) html += '<div style="font-size:14px;color:#374151;line-height:1.45;margin-bottom:8px">'+esc(img.caption)+'</div>';
-    html += '<img src="'+esc(img.dataUrl)+'" alt="Evidence image" style="width:100%;height:auto;border-radius:10px;border:1px solid #d1d5db;margin-bottom:12px">';
-    html += '<div class="modal-actions"><button class="modal-cancel" onclick="viewEvidenceEvent(\''+esc(ev.id)+'\')">Back to Event</button><button class="modal-ok" onclick="hideModal()">Close</button></div>';
-    showModal(html);
-  };
-
-  window.deleteEvidenceEvent = function(id){
-    var ev = findEvent(id);
-    if (!ev) { openEvidenceLibrary(); return; }
-    if (!confirm('Delete this evidence event? This cannot be undone.')) return;
-    var events = loadEvents().filter(function(item){ return item && item.id !== id; });
-    saveEvents(events);
-    openEvidenceLibrary();
-    if (typeof showToast === 'function') showToast('Evidence event deleted');
-  };
+  window.openEvidenceLibrary = function(){ migrateEvidenceImages().then(function(){ var events=loadEventsMeta().sort(function(a,b){return String(b.date||'').localeCompare(String(a.date||''))||String(b.createdAt||'').localeCompare(String(a.createdAt||''));}); var html='<div class="modal-title" style="font-size:26px;margin-bottom:10px">📁 Evidence Library</div>'; html+='<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:12px;margin-bottom:12px;color:#1e3a8a;font-size:14px;line-height:1.45"><strong>Use this for one documented health event or investigation.</strong><br>Save the title, date, notes, and supporting photos or screenshots so you can review the story later or show it to your doctor.</div>'; html+='<button type="button" onclick="openEvidenceForm()" style="width:100%;background:#9d174d;color:#fff;border:none;border-radius:10px;padding:14px;font-size:17px;font-weight:800;margin-bottom:14px;cursor:pointer">+ New Evidence Event</button>'; if(!events.length){html+='<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:14px;color:#374151;font-size:15px;line-height:1.5">No evidence events saved yet. Create one event to preserve photos, screenshots, image times, captions, and notes for later review.</div>';} else {events.forEach(function(ev){ html+='<div style="border:1px solid #e5e7eb;border-radius:12px;padding:13px;margin-bottom:10px;background:#fff"><div style="font-size:17px;font-weight:800;color:#111827;margin-bottom:4px">'+esc(ev.title||'Untitled evidence event')+'</div><div style="font-size:13px;color:#6b7280;margin-bottom:6px">'+esc(ev.date||'')+' · '+((ev.images||[]).length)+' image'+(((ev.images||[]).length)===1?'':'s')+'</div>'; if(ev.notes) html+='<div style="font-size:14px;color:#374151;margin-bottom:10px;line-height:1.45">'+esc(notePreview(ev.notes))+'</div>'; html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"><button type="button" onclick="viewEvidenceEvent(\''+esc(ev.id)+'\')" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:800;cursor:pointer">View</button><button type="button" onclick="openEvidenceForm(\''+esc(ev.id)+'\')" style="background:#0f766e;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:800;cursor:pointer">Edit</button><button type="button" onclick="deleteEvidenceEvent(\''+esc(ev.id)+'\')" style="background:#dc2626;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:800;cursor:pointer">Delete</button></div></div>'; }); } html+='<div class="modal-actions"><button class="modal-cancel" onclick="hideModal()">Close</button></div>'; showModal(html); }); };
+  window.openEvidenceForm = function(id){ var evMeta=id?findEventMeta(id):null; (id?findEvent(id):Promise.resolve(null)).then(function(ev){ pendingImages=ev&&Array.isArray(ev.images)?ev.images.slice():[]; var html='<div class="modal-title" style="font-size:24px;margin-bottom:10px">'+(ev?'Edit Evidence Event':'New Evidence Event')+'</div>'; html+='<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:10px;margin-bottom:10px;color:#374151;font-size:14px;line-height:1.45">Add only images that support this event: photos, screenshots, BP readings, symptoms, or other evidence you may want to explain later.</div><div id="evidenceError" style="color:#b91c1c;font-size:14px;font-weight:700;margin-bottom:8px"></div>'; html+='<label style="display:block;font-size:14px;font-weight:800;color:#374151;margin:8px 0 4px">Title *</label><input id="evidenceTitle" type="text" value="'+esc(ev?ev.title:'')+'" style="width:100%;padding:11px;border:1px solid #d1d5db;border-radius:8px;font-size:16px;box-sizing:border-box">'; html+='<label style="display:block;font-size:14px;font-weight:800;color:#374151;margin:10px 0 4px">Event Date</label><input id="evidenceDate" type="date" value="'+esc(ev?(ev.date||today()):today())+'" style="width:100%;padding:11px;border:1px solid #d1d5db;border-radius:8px;font-size:16px;box-sizing:border-box">'; html+='<label style="display:block;font-size:14px;font-weight:800;color:#374151;margin:10px 0 4px">Notes</label><textarea id="evidenceNotes" rows="5" placeholder="What happened? Why does this evidence matter? What should you or your doctor understand later?" style="width:100%;padding:11px;border:1px solid #d1d5db;border-radius:8px;font-size:16px;box-sizing:border-box;resize:vertical">'+esc(ev?ev.notes:'')+'</textarea>'; html+='<label style="display:block;font-size:14px;font-weight:800;color:#374151;margin:12px 0 6px">Images</label><input id="evidenceFileInput" type="file" accept="image/*" multiple style="display:none" onchange="handleEvidenceFiles(this.files)"><button type="button" onclick="document.getElementById(\'evidenceFileInput\').click()" style="width:100%;background:#374151;color:#fff;border:none;border-radius:10px;padding:12px;font-size:16px;font-weight:800;margin-bottom:10px;cursor:pointer">Add Image</button><div id="evidenceImagePreview"></div>'; html+='<div class="modal-actions"><button class="modal-cancel" onclick="openEvidenceLibrary()">Cancel</button><button class="modal-ok" onclick="saveEvidenceEvent(\''+(evMeta?esc(evMeta.id):'')+'\')">Save</button></div>'; showModal(html); setTimeout(renderImageThumbs,20); }); };
+  window.handleEvidenceFiles=function(files){ syncEvidenceImageFields(); setError(''); files=Array.prototype.slice.call(files||[]); if(!files.length)return; var chain=Promise.resolve(); files.forEach(function(file){chain=chain.then(function(){return resizeImageFile(file).then(function(img){pendingImages.push(img);renderImageThumbs();});});}); chain.catch(function(err){setError((err&&err.message)?err.message:'Could not add this image.');renderImageThumbs();}); };
+  window.removeEvidenceImage=function(idx){ syncEvidenceImageFields(); if(idx<0||idx>=pendingImages.length)return; if(!confirm('Remove this image from the event?'))return; pendingImages.splice(idx,1); renderImageThumbs(); };
+  window.saveEvidenceEvent=function(id){ syncEvidenceImageFields(); setError(''); var title=(document.getElementById('evidenceTitle')||{}).value||''; var date=(document.getElementById('evidenceDate')||{}).value||today(); var notes=(document.getElementById('evidenceNotes')||{}).value||''; title=title.trim(); if(!title){setError('Title is required.');return;} var events=loadEventsMeta(); var now=new Date().toISOString(); var eventId=id||uid('ev_'); var old=(id?findEventMeta(id):null); var oldIds=(old&&Array.isArray(old.images)?old.images:[]).map(function(i){return i.id;}); pendingImages.forEach(function(img){ if(!img.id) img.id=uid('img_'); img.eventId=eventId; }); var newIds=pendingImages.map(function(i){return i.id;}); var record={id:eventId,title:title,date:date,notes:notes,images:pendingImages.map(stripImageData),createdAt:(old&&old.createdAt)||now,updatedAt:now}; var jobs=pendingImages.map(dbPutImage); Promise.all(jobs).then(function(){ var found=false; events=events.map(function(ev){ if(ev&&ev.id===eventId){found=true;return record;} return ev;}); if(!found) events.push(record); saveEventsMeta(events); return Promise.all(oldIds.filter(function(x){return newIds.indexOf(x)<0;}).map(dbDeleteImage)); }).then(function(){ pendingImages=[]; openEvidenceLibrary(); if(typeof showToast==='function')showToast('Evidence event saved'); }).catch(function(){ setError(EVIDENCE_SAVE_ERROR); }); };
+  window.viewEvidenceEvent=function(id){ findEvent(id).then(function(ev){ if(!ev){openEvidenceLibrary();return;} var html='<div class="modal-title" style="font-size:24px;margin-bottom:8px">'+esc(ev.title||'Evidence Event')+'</div><div style="font-size:14px;color:#6b7280;margin-bottom:12px">'+esc(ev.date||'')+'</div>'; if(ev.notes) html+='<div style="white-space:pre-wrap;font-size:15px;color:#374151;line-height:1.55;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:12px;margin-bottom:12px">'+esc(ev.notes)+'</div>'; var imgs=Array.isArray(ev.images)?ev.images:[]; if(!imgs.length) html+='<div style="font-size:14px;color:#6b7280;margin-bottom:12px">No images saved with this event.</div>'; imgs.forEach(function(img,idx){ var when=imageWhen(img); html+='<div style="font-size:13px;font-weight:800;color:#374151;margin:12px 0 4px">Evidence Photo '+(idx+1)+' of '+imgs.length+'</div>'; if(when) html+='<div style="font-size:13px;color:#6b7280;margin-bottom:6px">'+esc(formatEvidenceDate(when))+(formatEvidenceTime(when)?' · '+esc(formatEvidenceTime(when)):'')+'</div>'; if(img.caption) html+='<div style="font-size:14px;color:#374151;line-height:1.45;margin-bottom:6px">'+esc(img.caption)+'</div>'; html+='<button type="button" onclick="openEvidenceImage(\''+esc(ev.id)+'\','+idx+')" style="display:block;width:100%;padding:0;margin:0 0 12px 0;background:transparent;border:none;cursor:pointer;text-align:left"><img src="'+esc(img.dataUrl||'')+'" alt="Evidence image" style="width:100%;height:auto;border-radius:10px;border:1px solid #d1d5db"></button>'; }); html+='<div style="font-size:13px;color:#6b7280;margin:4px 0 12px">Tap an image to open it larger.</div><div class="modal-actions"><button class="modal-cancel" onclick="openEvidenceLibrary()">Back to Evidence Library</button><button class="modal-ok" onclick="openEvidenceForm(\''+esc(ev.id)+'\')">Edit</button></div><button type="button" onclick="deleteEvidenceEvent(\''+esc(ev.id)+'\')" style="width:100%;background:#dc2626;color:#fff;border:none;border-radius:10px;padding:12px;font-size:16px;font-weight:800;margin-top:8px;cursor:pointer">Delete</button>'; showModal(html); }); };
+  window.openEvidenceImage=function(id,idx){ findEvent(id).then(function(ev){ if(!ev){openEvidenceLibrary();return;} var imgs=Array.isArray(ev.images)?ev.images:[],img=imgs[idx]; if(!img){viewEvidenceEvent(id);return;} var when=imageWhen(img); var html='<div class="modal-title" style="font-size:22px;margin-bottom:6px">Evidence Photo '+(idx+1)+' of '+imgs.length+'</div><div style="font-size:14px;font-weight:800;color:#111827;margin-bottom:4px">'+esc(ev.title||'Evidence Event')+'</div>'; if(when) html+='<div style="font-size:13px;color:#6b7280;margin-bottom:8px">'+esc(formatEvidenceDate(when))+(formatEvidenceTime(when)?' · '+esc(formatEvidenceTime(when)):'')+'</div>'; if(img.caption) html+='<div style="font-size:14px;color:#374151;line-height:1.45;margin-bottom:8px">'+esc(img.caption)+'</div>'; html+='<img src="'+esc(img.dataUrl||'')+'" alt="Evidence image" style="width:100%;height:auto;border-radius:10px;border:1px solid #d1d5db;margin-bottom:12px"><div class="modal-actions"><button class="modal-cancel" onclick="viewEvidenceEvent(\''+esc(ev.id)+'\')">Back to Event</button><button class="modal-ok" onclick="hideModal()">Close</button></div>'; showModal(html); }); };
+  window.deleteEvidenceEvent=function(id){ var ev=findEventMeta(id); if(!ev){openEvidenceLibrary();return;} if(!confirm('Delete this evidence event? This cannot be undone.'))return; var ids=(Array.isArray(ev.images)?ev.images:[]).map(function(i){return i.id;}); Promise.all(ids.map(dbDeleteImage)).then(function(){ saveEventsMeta(loadEventsMeta().filter(function(item){return item&&item.id!==id;})); openEvidenceLibrary(); if(typeof showToast==='function')showToast('Evidence event deleted'); }); };
+  migrateEvidenceImages();
 })();
+
 
