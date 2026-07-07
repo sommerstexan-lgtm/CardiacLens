@@ -1,35 +1,36 @@
 {
-  "version": "9.10.347.194",
-  "date": "2026-07-06",
-  "releaseDate": "July 6, 2026",
-  "updated": "2026-07-06",
-  "build": "ActivityContextButtonRemoval",
-  "name": "CardiacLens v9.10.347.194",
+  "version": "9.10.347.195",
+  "date": "2026-07-07",
+  "releaseDate": "July 7, 2026",
+  "updated": "2026-07-07",
+  "build": "EvidenceLibrary",
+  "name": "CardiacLens v9.10.347.195",
   "notes": [
-    "Removed the duplicate Environment Context button from activity records.",
-    "Removed Ask About Activity and View Context Details from activity records.",
-    "Kept only the inline expandable Environment Context panel on activity records."
+    "Added Evidence Library under Manage & Data.",
+    "Users can save one documented evidence event containing a title, date, notes, and one or more photos/screenshots.",
+    "Designed for preserving important health-event evidence for later review or doctor visits.",
+    "No AI analysis, OCR, tagging, or automatic linking added."
   ],
-  "label": "ActivityContextButtonRemoval",
-  "summary": "Removes the extra activity Environment Context button; preserves only the inline expandable Environment Context panel.",
+  "label": "EvidenceLibrary",
+  "summary": "Adds a simple local Evidence Library for documenting important health-event evidence with compressed user-selected images and notes.",
   "whatsNew": [
-    "Activity records now contain no Ask About Activity button.",
-    "Activity records now contain no View Context Details button.",
-    "Activity records now contain no duplicate Environment Context button below the card.",
-    "Only the inline expandable Environment Context section remains."
+    "Evidence Library button added under Manage & Data.",
+    "New evidence events support title, event date, notes, and one or more photos/screenshots.",
+    "Saved event cards show title, date, image count, and note preview.",
+    "Events can be viewed, edited, and deleted with confirmation.",
+    "Selected images are compressed before localStorage save."
   ],
-  "fixes": [
-    "Removes duplicate Environment Context button missed in v9.10.347.193.",
-    "Keeps activity record controls limited to the inline Environment Context disclosure."
-  ],
+  "fixes": [],
   "changes": [
-    "Version advanced to v9.10.347.194.",
-    "No unrelated features were changed."
+    "Version advanced to v9.10.347.195.",
+    "No unrelated activity, BP, medication, meal, symptom, Ask, weather, or backup behavior was changed."
   ],
   "testing": [
+    "Confirmed Evidence Library button appears under Manage & Data.",
+    "Confirmed Evidence Library opens from the new button.",
+    "Verified create/view/edit/delete code paths for evidence events.",
+    "Verified CARDIACLENS_EVIDENCE_LIBRARY uses localStorage and is included by Export ALL Data automatically with existing localStorage export behavior.",
     "Verified JavaScript syntax with node --check all.js.",
-    "Searched all.js and index.html to confirm no activity-card Environment Context button remains.",
-    "Verified Ask About Activity and View Context Details strings are absent from activity record rendering.",
     "Verified ZIP integrity."
   ]
 }

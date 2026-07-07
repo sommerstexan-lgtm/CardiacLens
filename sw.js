@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.194-activity-context-button-removal';
+const CACHE_NAME = 'cardiaclens-v9.10.347.195-evidence-library';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
