@@ -1,35 +1,37 @@
 {
-  "version": "9.10.347.195",
+  "version": "9.10.347.196",
   "date": "2026-07-07",
   "releaseDate": "July 7, 2026",
   "updated": "2026-07-07",
-  "build": "EvidenceLibrary",
-  "name": "CardiacLens v9.10.347.195",
+  "build": "EvidenceLibraryRefinement",
+  "name": "CardiacLens v9.10.347.196",
   "notes": [
-    "Added Evidence Library under Manage & Data.",
-    "Users can save one documented evidence event containing a title, date, notes, and one or more photos/screenshots.",
-    "Designed for preserving important health-event evidence for later review or doctor visits.",
-    "No AI analysis, OCR, tagging, or automatic linking added."
+    "Refined Evidence Library viewing so each saved image shows image numbering and date/time.",
+    "Added optional per-image captions for explaining why a photo or screenshot matters.",
+    "Added tap-to-enlarge image viewing inside the existing modal workflow.",
+    "Improved Evidence Library guidance so users understand how documented evidence can help personal review and doctor visits."
   ],
-  "label": "EvidenceLibrary",
-  "summary": "Adds a simple local Evidence Library for documenting important health-event evidence with compressed user-selected images and notes.",
+  "label": "EvidenceLibraryRefinement",
+  "summary": "Refines the Evidence Library with image date/time, image numbering, optional captions, tap-to-enlarge viewing, and clearer user guidance for doctor-ready health-event evidence.",
   "whatsNew": [
-    "Evidence Library button added under Manage & Data.",
-    "New evidence events support title, event date, notes, and one or more photos/screenshots.",
-    "Saved event cards show title, date, image count, and note preview.",
-    "Events can be viewed, edited, and deleted with confirmation.",
-    "Selected images are compressed before localStorage save."
+    "Evidence event images now show Evidence Photo 1 of N style numbering.",
+    "Each image can display an editable date/time using the selected file timestamp by default.",
+    "Each image supports an optional caption to explain what the photo or screenshot proves.",
+    "Tapping an image opens a larger view without adding albums, tags, OCR, AI, or automatic linking.",
+    "Evidence Library instructions now explain how to preserve one event narrative for later review or doctor visits."
   ],
   "fixes": [],
   "changes": [
-    "Version advanced to v9.10.347.195.",
+    "Version advanced to v9.10.347.196.",
     "No unrelated activity, BP, medication, meal, symptom, Ask, weather, or backup behavior was changed."
   ],
   "testing": [
-    "Confirmed Evidence Library button appears under Manage & Data.",
-    "Confirmed Evidence Library opens from the new button.",
-    "Verified create/view/edit/delete code paths for evidence events.",
-    "Verified CARDIACLENS_EVIDENCE_LIBRARY uses localStorage and is included by Export ALL Data automatically with existing localStorage export behavior.",
+    "Confirmed Evidence Library button remains under Manage & Data.",
+    "Confirmed image date/time fields render in new and edit evidence event forms.",
+    "Confirmed optional image captions render in edit, event view, and enlarged image view.",
+    "Confirmed event view shows Evidence Photo 1 of N numbering.",
+    "Confirmed tapping an event image opens a larger modal view and returns to the event.",
+    "Verified CARDIACLENS_EVIDENCE_LIBRARY remains localStorage-based and is included by Export ALL Data automatically with existing localStorage export behavior.",
     "Verified JavaScript syntax with node --check all.js.",
     "Verified ZIP integrity."
   ]
