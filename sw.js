@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.202-pace-ui-consistency';
+const CACHE_NAME = 'cardiaclens-v9.10.347.203-help-docs';
 
 self.addEventListener('install', event => {
   self.skipWaiting();

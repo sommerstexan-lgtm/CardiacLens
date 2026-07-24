@@ -1,27 +1,26 @@
 {
-  "version": "9.10.347.202",
+  "version": "9.10.347.203",
   "date": "2026-07-24",
   "releaseDate": "July 24, 2026",
   "updated": "2026-07-24",
-  "build": "PaceUiConsistency",
-  "name": "CardiacLens v9.10.347.202",
+  "build": "FluidPushHelpDocs",
+  "name": "CardiacLens v9.10.347.203",
   "notes": [
-    "Fixed the Total Today card showing contradictory messages when pace tracking is active, for example an orange Below Minimum warning stacked directly above a green Ahead of Pace card.",
-    "The static Below Minimum banner (a full-day-total check written before pace tracking existed) is now suppressed once the pacing engine has a first fluid entry to work from, since the pace card already gives the correct time-aware answer.",
-    "Above Maximum and Within Target Range messaging is unchanged."
+    "Added a full FAQ entry explaining how fluid push reminders work under all three supported setups: pacing only, named events (Scheduled Events or Plan My Day) with fluid amounts, or a combination of both.",
+    "Added a changelog entry summarizing the complete fluid push reminder feature shipped across v9.10.347.198 through .202.",
+    "No functional code changes in this build. Documentation only."
   ],
-  "label": "PaceUiConsistency",
-  "summary": "Removes a contradictory pair of messages on the fluid dashboard: a full-day Below Minimum warning could appear next to an Ahead of Pace card saying the opposite.",
-  "fixes": [
-    "isBelowMin banner (range mode) now only shows when the pacing engine is not active (no first fluid entry logged yet, or pacing not configured), avoiding a direct visual contradiction with the pace card."
-  ],
+  "label": "FluidPushHelpDocs",
+  "summary": "Documentation-only release: explains the new fluid push reminder system (pacing, events, or both) in the FAQ and changelog.",
+  "fixes": [],
   "changes": [
-    "Version advanced to v9.10.347.202.",
-    "range-mode Total Today block: isBelowMin branch split into pacing-active (suppressed) and pacing-inactive (shown as before) cases.",
-    "No unrelated CardiacLens behavior was intentionally changed."
+    "Version advanced to v9.10.347.203.",
+    "New FAQ entry added to renderFAQ().",
+    "New changelog entry added at the top of Known Issues covering v9.10.347.198 through .202."
   ],
   "testing": [
-    "Verified bracket balance delta matches the new code added only.",
-    "Not yet verified visually on device. Confirm the Below Minimum banner no longer appears once pace tracking is active with a first fluid entry logged."
+    "Verified no literal em dashes introduced in new content (one caught and fixed before packaging).",
+    "Verified bracket balance delta matches new content only.",
+    "Verified no old version-number strings remain in any of the previously-updated locations."
   ]
 }
