@@ -1,38 +1,34 @@
 {
-  "version": "9.10.347.197",
-  "date": "2026-07-07",
-  "releaseDate": "July 7, 2026",
-  "updated": "2026-07-07",
-  "build": "EvidenceLibraryStorageRepair",
-  "name": "CardiacLens v9.10.347.197",
+  "version": "9.10.347.198",
+  "date": "2026-07-24",
+  "releaseDate": "July 24, 2026",
+  "updated": "2026-07-24",
+  "build": "FluidPushIntegration",
+  "name": "CardiacLens v9.10.347.198",
   "notes": [
-    "Evidence Library now stores image data more reliably using browser database storage.",
-    "One evidence event can hold a larger medical investigation with multiple screenshots/photos.",
-    "Save failures now show a clear warning instead of silently failing.",
-    "Existing Evidence Library entries are preserved and migrated when possible.",
-    "Backup/export and restore/import continue to include Evidence Library content."
+    "Fluid event reminders now fire as real push notifications, even when CardiacLens is closed or the phone is locked.",
+    "Notification permission grant now subscribes the device to the CardiacLens fluid push service automatically.",
+    "The next upcoming fluid event's due time is kept in sync with the push service as events change.",
+    "Service worker now handles incoming push messages and notification taps."
   ],
-  "label": "EvidenceLibraryStorageRepair",
-  "summary": "Evidence Library now stores image data in browser database storage so one evidence event can hold a larger medical investigation with multiple screenshots/photos, while export/import continues to include Evidence Library content.",
+  "label": "FluidPushIntegration",
+  "summary": "Adds background push notifications for fluid event reminders via a dedicated Cloudflare Worker, so alerts fire even when the app is closed or the screen is locked.",
   "whatsNew": [
-    "Evidence Library now stores image data more reliably using browser database storage.",
-    "One evidence event can hold a larger medical investigation with multiple screenshots/photos.",
-    "Save failures now show a clear warning instead of silently failing.",
-    "Existing Evidence Library entries are preserved and migrated when possible.",
-    "Backup/export and restore/import continue to include Evidence Library content."
+    "Fluid event reminders now fire as real push notifications, even when CardiacLens is closed or the phone is locked.",
+    "Notification permission grant now subscribes the device to the CardiacLens fluid push service automatically.",
+    "The next upcoming fluid event's due time is kept in sync with the push service as events change.",
+    "Service worker now handles incoming push messages and notification taps."
   ],
-  "fixes": [
-    "Moved Evidence Library image data out of localStorage metadata and into IndexedDB."
-  ],
+  "fixes": [],
   "changes": [
-    "Version advanced to v9.10.347.197.",
-    "Evidence Library metadata stays in CARDIACLENS_EVIDENCE_LIBRARY without full image data after migration.",
+    "Version advanced to v9.10.347.198.",
+    "New window.cbInitFluidPush and window.cbSyncFluidReminder functions added, wired to existing notification permission flow and existing nextFluidEvt calculation.",
+    "sw.js gained push and notificationclick event listeners.",
     "No unrelated CardiacLens behavior was intentionally changed."
   ],
   "testing": [
-    "Verified JavaScript syntax with node --check all.js.",
-    "Verified Evidence Library functions are present and backed by IndexedDB helpers.",
-    "Verified export/import code includes CARDIACLENS_EVIDENCE_IMAGE_DATA for Evidence Library image records.",
-    "Verified ZIP integrity."
+    "Verified new push module syntax in isolation with node --check.",
+    "Verified overall bracket balance unchanged relative to the prior release baseline.",
+    "Not yet verified: live push delivery on iPhone Home Screen install. Test before relying on this for real reminders."
   ]
 }

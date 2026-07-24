@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.197-evidence-library-storage-repair';
+const CACHE_NAME = 'cardiaclens-v9.10.347.198-fluid-push';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
@@ -28,4 +28,29 @@ self.addEventListener('fetch', event => {
     return;
   }
   event.respondWith(fetch(req).catch(() => caches.match(req)));
+});
+
+self.addEventListener('push', function(event) {
+  var data = {};
+  try { data = event.data.json(); } catch (e) {}
+  var title = data.title || 'CardiacLens';
+  var options = {
+    body: data.body || '',
+    tag: data.tag || 'cardiaclens-fluid-reminder',
+    icon: './icon-192.png',
+    badge: './icon-192.png'
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close();
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window' }).then(function(clientList) {
+      for (var i = 0; i < clientList.length; i++) {
+        if ('focus' in clientList[i]) return clientList[i].focus();
+      }
+      if (self.clients.openWindow) return self.clients.openWindow('./');
+    })
+  );
 });

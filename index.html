@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- CardiacLens versioned archive: v9.10.347.197 - deploy reference copy -->
+<!-- CardiacLens versioned archive: v9.10.347.198 - deploy reference copy -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -28,7 +28,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.197' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.198' }, params || {}));
       }
     } catch(e) {}
   };
@@ -910,7 +910,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.347.197';
+    var GD_VERSION   = 'v9.10.347.198';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1447,7 +1447,7 @@
   // -- End CL_SEC_COLOR migration ---------------------------------------------
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
-<title>CardiacLens v9.10.347.197</title>
+<title>CardiacLens v9.10.347.198</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
@@ -2334,7 +2334,7 @@ input[type="time"].modal-input,input[type="time"]{-webkit-appearance:auto;appear
     <!-- Version + clock row -->
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid rgba(255,255,255,0.15);padding-top:12px">
       <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px">
-        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.347.197 · Medical Grade - Free</span>
+        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.347.198 · Medical Grade - Free</span>
         <span id="cl-gd-heartbeat" style="font-size:11px;color:rgba(125,211,252,0.55);font-weight:500;letter-spacing:0.01em">ð Eyes open...</span>
         <!-- ═══════════════════════════════════════════════════════════════════
              VERSION UPDATE CHECKLIST — update ALL 8 locations every release:
@@ -2535,7 +2535,7 @@ input[type="time"].modal-input,input[type="time"]{-webkit-appearance:auto;appear
                   check and a final READY TO ZIP or DO NOT ZIP summary. That
                   output must be shown to the user before the ZIP is built.
              ═══════════════════════════════════════════════════════════════════ -->
-        <span style="font-size:12px;color:#94a3b8;font-weight:400">Updated July 6, 2026</span>
+        <span style="font-size:12px;color:#94a3b8;font-weight:400">Updated July 24, 2026</span>
       </div>
       <div id="t" style="font-size:14px;color:#94a3b8;text-align:right;font-weight:600"></div>
     </div>
@@ -6142,7 +6142,7 @@ Custom Range
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.347.197';
+  var CURRENT='v9.10.347.198';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -6218,6 +6218,64 @@ function disableOSNotifications(){
   openSettings();
 }
 
+// ---------- Fluid reminder push (background alerts, screen locked / tab closed) ----------
+window.CB_FLUID_PUSH_URL='https://cardiaclens-fluid-push.sommers-texan.workers.dev';
+window._cbFluidPushLastSynced=null;
+
+window.cbInitFluidPush=function(){
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)){
+    console.warn('Push not supported on this browser.');
+    return;
+  }
+  navigator.serviceWorker.ready.then(function(reg){
+    return reg.pushManager.getSubscription().then(function(existing){
+      if(existing) return existing;
+      return fetch(window.CB_FLUID_PUSH_URL+'/vapid-public-key')
+        .then(function(r){return r.json();})
+        .then(function(data){
+          var appKey=_cbUrlB64ToUint8Array(data.publicKey);
+          return reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:appKey});
+        });
+    });
+  }).then(function(subscription){
+    if(!subscription) return;
+    return fetch(window.CB_FLUID_PUSH_URL+'/sync',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({subscription:subscription.toJSON()})
+    });
+  }).catch(function(e){
+    console.warn('cbInitFluidPush failed:',e);
+  });
+};
+
+function _cbUrlB64ToUint8Array(base64String){
+  var padding='='.repeat((4-base64String.length%4)%4);
+  var base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/');
+  var rawData=atob(base64);
+  var outputArray=new Uint8Array(rawData.length);
+  for(var i=0;i<rawData.length;i++) outputArray[i]=rawData.charCodeAt(i);
+  return outputArray;
+}
+
+// Call whenever the next upcoming fluid event changes. Pass a JS Date for
+// the next due time, or null/omit to cancel the scheduled reminder.
+// Throttled to avoid POSTing on every render -- only sends when the target
+// time actually changes.
+window.cbSyncFluidReminder=function(nextDueDate){
+  var key=nextDueDate?nextDueDate.toISOString():'none';
+  if(window._cbFluidPushLastSynced===key) return;
+  window._cbFluidPushLastSynced=key;
+  var body=nextDueDate?{nextDueAt:nextDueDate.toISOString()}:{cancel:true};
+  fetch(window.CB_FLUID_PUSH_URL+'/sync',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  }).catch(function(e){
+    console.warn('cbSyncFluidReminder failed:',e);
+  });
+};
+
 function requestOSNotificationPermission(fromUser){
   if(!('Notification' in window)){
     if(fromUser)alert('Your browser does not support desktop notifications.\nTry Chrome or Edge for the best experience.');
@@ -6257,6 +6315,7 @@ function requestOSNotificationPermission(fromUser){
         'Reminders are active — alerts will appear when CardiacLens is open or on screen.',
         'cardiaclens-test'
       );
+      if(location.protocol!=='file:') window.cbInitFluidPush();
       setTimeout(function(){ openSettings(); },300);
     } else if(result==='denied'){
       if(location.protocol==='file:') localStorage.removeItem('CARDIACLENS_NOTIF_GRANTED');
@@ -6372,6 +6431,9 @@ function registerServiceWorker(){
     .then(function(reg){
       window._swRegistration = reg;
       console.log('[CardiacLens] SW registered, scope:', reg.scope);
+      if(location.protocol!=='file:' && ('Notification' in window) && Notification.permission==='granted'){
+        window.cbInitFluidPush();
+      }
       // v9.10.347.197: iPhone/GitHub Pages deploy repair.
       // If a refreshed service worker is waiting, activate it now instead of
       // leaving the Home Screen app controlled by the old deploy until later.
@@ -10125,6 +10187,15 @@ if(nextFluidEvt){
   var _diffMins=Math.round(_evtMins-nowMins);
   var _diffStr=_diffMins>=60?(Math.floor(_diffMins/60)+'h '+(_diffMins%60>0?_diffMins%60+'m':'')):'in '+_diffMins+' min';
   var _oz=(nextFluidEvt.fluidGoal||nextFluidEvt.amount||0);
+  if(window.cbSyncFluidReminder){
+    var _dueDate=new Date();
+    _dueDate.setHours(parseInt(_parts[0]),parseInt(_parts[1]),0,0);
+    window.cbSyncFluidReminder(_dueDate);
+  }
+}else{
+  if(window.cbSyncFluidReminder) window.cbSyncFluidReminder(null);
+}
+if(nextFluidEvt){
   html+='<div style="margin-top:12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 14px;">';
   html+='<div style="font-size:12px;font-weight:700;color:#3b82f6;letter-spacing:0.05em;margin-bottom:4px">💧 NEXT FLUID EVENT</div>';
   html+='<div style="display:flex;justify-content:space-between;align-items:center">';
