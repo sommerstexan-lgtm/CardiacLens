@@ -1,31 +1,27 @@
 {
-  "version": "9.10.347.199",
+  "version": "9.10.347.200",
   "date": "2026-07-24",
   "releaseDate": "July 24, 2026",
   "updated": "2026-07-24",
-  "build": "FluidPushRaceFix",
-  "name": "CardiacLens v9.10.347.199",
+  "build": "PacingBasedFluidPush",
+  "name": "CardiacLens v9.10.347.200",
   "notes": [
-    "Fixed a race condition where opening or refreshing the app right at a fluid event's due time could silently cancel that event's push reminder before it fired.",
-    "The app now keeps treating the current fluid event as due for a short grace window after its nominal time before advancing to the next one, so it no longer resyncs the push server with a later time mid-fire.",
-    "Confirmed working via live server-side log monitoring and a real push notification received on iPhone."
+    "Fluid push reminders now work directly from the pacing engine's calculated next-drink suggestion, not only from named Plan My Day or Scheduled Events.",
+    "Users who only use the fluid pacing setup in Settings (fluid min/max and end time) now get real push reminders with no need to also set up Plan My Day or Scheduled Events for fluid.",
+    "If both a named fluid event and a pacing suggestion exist at the same time, whichever is sooner determines the reminder."
   ],
-  "label": "FluidPushRaceFix",
-  "summary": "Fixes a timing race that could silently cancel a fluid reminder push notification if the app was open right when the reminder was due.",
-  "whatsNew": [
-    "Fluid reminder push notifications are now reliable even when the app is open and refreshing near a scheduled event's due time."
-  ],
-  "fixes": [
-    "Race condition: dashboard render at an event's due moment advanced to the next event and overwrote (canceled) the pending push alarm before it fired. Fixed with a 2-minute grace window before advancing."
-  ],
+  "label": "PacingBasedFluidPush",
+  "summary": "Push reminders now follow the fluid pacing engine directly, so pacing-only users get real background notifications without setting up any events.",
+  "fixes": [],
   "changes": [
-    "Version advanced to v9.10.347.199.",
-    "nextFluidEvt selection logic in the main dashboard render now uses a grace window (eMins > nowMins - 2) instead of a hard cutover at the exact due minute.",
+    "Version advanced to v9.10.347.200.",
+    "_buildFluidPaceHtml now exposes its computed next-drink time via window._cbPaceNextDrinkMins.",
+    "The dashboard render's push sync now compares the named-event due time and the pacing due time, and syncs whichever is sooner, instead of only using named events.",
     "No unrelated CardiacLens behavior was intentionally changed."
   ],
   "testing": [
-    "Verified live via wrangler tail: alarm fired correctly and push notification was received on iPhone with app closed.",
-    "Race condition reproduced and root-caused via live log inspection before this fix.",
-    "Recommended follow-up test: keep using the app normally (opening/checking it) near a scheduled event's due time and confirm the notification still arrives."
+    "Verified new logic in isolation for syntax.",
+    "Verified overall bracket balance change matches expected delta from the new code only.",
+    "Not yet verified: live push delivery from a pacing-only setup with no Plan My Day or Scheduled Events configured. Test this before relying on it."
   ]
 }

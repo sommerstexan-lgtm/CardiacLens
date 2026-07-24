@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- CardiacLens versioned archive: v9.10.347.199 - deploy reference copy -->
+<!-- CardiacLens versioned archive: v9.10.347.200 - deploy reference copy -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -28,7 +28,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.199' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.200' }, params || {}));
       }
     } catch(e) {}
   };
@@ -910,7 +910,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.347.199';
+    var GD_VERSION   = 'v9.10.347.200';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1447,7 +1447,7 @@
   // -- End CL_SEC_COLOR migration ---------------------------------------------
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
-<title>CardiacLens v9.10.347.199</title>
+<title>CardiacLens v9.10.347.200</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
@@ -2334,7 +2334,7 @@ input[type="time"].modal-input,input[type="time"]{-webkit-appearance:auto;appear
     <!-- Version + clock row -->
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid rgba(255,255,255,0.15);padding-top:12px">
       <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px">
-        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.347.199 · Medical Grade - Free</span>
+        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.347.200 · Medical Grade - Free</span>
         <span id="cl-gd-heartbeat" style="font-size:11px;color:rgba(125,211,252,0.55);font-weight:500;letter-spacing:0.01em">ð Eyes open...</span>
         <!-- ═══════════════════════════════════════════════════════════════════
              VERSION UPDATE CHECKLIST — update ALL 8 locations every release:
@@ -6142,7 +6142,7 @@ Custom Range
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.347.199';
+  var CURRENT='v9.10.347.200';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -10187,18 +10187,32 @@ for(var _ni=0;_ni<allFluEvts.length;_ni++){
   // canceling) the alarm that was about to fire for this one.
   if(_eMins>nowMins-2){nextFluidEvt=_ep;break;}
 }
+if(window.cbSyncFluidReminder){
+  // Two independent sources can suggest a next fluid time: named events
+  // (Plan My Day / Scheduled Events) and the pacing engine's calculated
+  // suggestion (_buildFluidPaceHtml, run earlier in this render and exposed
+  // via window._cbPaceNextDrinkMins). Neither is required -- a user relying
+  // purely on pacing, with no events set up, still gets a push reminder.
+  // When both exist, the sooner one wins.
+  var _cbCandidateDate=null;
+  if(nextFluidEvt){
+    var _evtParts=nextFluidEvt.time.split(':');
+    var _cbEvtDate=new Date();
+    _cbEvtDate.setHours(parseInt(_evtParts[0]),parseInt(_evtParts[1]),0,0);
+    _cbCandidateDate=_cbEvtDate;
+  }
+  if(typeof window._cbPaceNextDrinkMins==='number'){
+    var _cbPaceDate=new Date();
+    _cbPaceDate.setHours(Math.floor(window._cbPaceNextDrinkMins/60),window._cbPaceNextDrinkMins%60,0,0);
+    if(!_cbCandidateDate||_cbPaceDate<_cbCandidateDate) _cbCandidateDate=_cbPaceDate;
+  }
+  window.cbSyncFluidReminder(_cbCandidateDate);
+}
 if(nextFluidEvt){
   var _evtMins=nextFluidEvt.time.split(':').reduce(function(acc,v,i){return i===0?parseInt(v)*60:acc+parseInt(v);},0);
   var _diffMins=Math.round(_evtMins-nowMins);
   var _diffStr=_diffMins>=60?(Math.floor(_diffMins/60)+'h '+(_diffMins%60>0?_diffMins%60+'m':'')):'in '+_diffMins+' min';
   var _oz=(nextFluidEvt.fluidGoal||nextFluidEvt.amount||0);
-  if(window.cbSyncFluidReminder){
-    var _dueDate=new Date();
-    _dueDate.setHours(parseInt(_parts[0]),parseInt(_parts[1]),0,0);
-    window.cbSyncFluidReminder(_dueDate);
-  }
-}else{
-  if(window.cbSyncFluidReminder) window.cbSyncFluidReminder(null);
 }
 if(nextFluidEvt){
   html+='<div style="margin-top:12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 14px;">';
@@ -27645,6 +27659,7 @@ function _getFluidEndTime(){
 }
 
 function _buildFluidPaceHtml(){
+  window._cbPaceNextDrinkMins=null;
   var target=(settings.fluidMode&&settings.fluidMode!=='none')?(settings.fluidMax||64):80;
   var firstFluid=_getFirstFluidTimeToday();
   var endTime=_getFluidEndTime();
@@ -27690,7 +27705,10 @@ function _buildFluidPaceHtml(){
   if(diff>0&&ozRemaining>0){
     var minsAhead=Math.round((diff/target)*windowMins);
     var ndMins=nowMins+minsAhead;
-    if(ndMins<endMins) nextDrinkStr='Next drink around '+fmtTime(ndMins);
+    if(ndMins<endMins){
+      nextDrinkStr='Next drink around '+fmtTime(ndMins);
+      window._cbPaceNextDrinkMins=ndMins;
+    }
   }
   var footer='<div style="font-size:12px;color:#6b7280;margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:8px"><span>Fluid day ends '+endTimeStr+' &middot; '+timeRemStr+' remaining &middot; '+ozRemaining+' oz to go</span><button onclick="openFluidEndTimeQuickChange()" style="background:none;border:1px solid #d1d5db;border-radius:6px;padding:2px 8px;font-size:11px;color:#6b7280;cursor:pointer;white-space:nowrap;touch-action:manipulation;flex-shrink:0">\u270F\uFE0F Change</button></div>';
   var disclaimer='<div style="font-size:11px;color:#6b7280;margin-top:4px">Pace is a daily guide — your doctor sets your actual target</div>';
