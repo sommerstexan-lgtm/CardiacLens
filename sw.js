@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.198-fluid-push';
+const CACHE_NAME = 'cardiaclens-v9.10.347.199-fluid-push-race-fix';
 
 self.addEventListener('install', event => {
   self.skipWaiting();

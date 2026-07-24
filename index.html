@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- CardiacLens versioned archive: v9.10.347.198 - deploy reference copy -->
+<!-- CardiacLens versioned archive: v9.10.347.199 - deploy reference copy -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -28,7 +28,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.198' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.199' }, params || {}));
       }
     } catch(e) {}
   };
@@ -910,7 +910,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.347.198';
+    var GD_VERSION   = 'v9.10.347.199';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1447,7 +1447,7 @@
   // -- End CL_SEC_COLOR migration ---------------------------------------------
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
-<title>CardiacLens v9.10.347.198</title>
+<title>CardiacLens v9.10.347.199</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
@@ -2334,7 +2334,7 @@ input[type="time"].modal-input,input[type="time"]{-webkit-appearance:auto;appear
     <!-- Version + clock row -->
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid rgba(255,255,255,0.15);padding-top:12px">
       <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px">
-        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.347.198 · Medical Grade - Free</span>
+        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.347.199 · Medical Grade - Free</span>
         <span id="cl-gd-heartbeat" style="font-size:11px;color:rgba(125,211,252,0.55);font-weight:500;letter-spacing:0.01em">ð Eyes open...</span>
         <!-- ═══════════════════════════════════════════════════════════════════
              VERSION UPDATE CHECKLIST — update ALL 8 locations every release:
@@ -6142,7 +6142,7 @@ Custom Range
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.347.198';
+  var CURRENT='v9.10.347.199';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -10180,7 +10180,12 @@ for(var _ni=0;_ni<allFluEvts.length;_ni++){
   var _ep=allFluEvts[_ni];
   var _parts=_ep.time.split(':');
   var _eMins=parseInt(_parts[0])*60+parseInt(_parts[1]);
-  if(_eMins>nowMins){nextFluidEvt=_ep;break;}
+  // Grace window: keep treating this as the "next" event for a couple minutes
+  // past its nominal time before advancing. Without this, a dashboard render
+  // that lands right at the due moment jumps straight to the FOLLOWING event
+  // and resyncs the Worker with that later time, overwriting (and silently
+  // canceling) the alarm that was about to fire for this one.
+  if(_eMins>nowMins-2){nextFluidEvt=_ep;break;}
 }
 if(nextFluidEvt){
   var _evtMins=nextFluidEvt.time.split(':').reduce(function(acc,v,i){return i===0?parseInt(v)*60:acc+parseInt(v);},0);

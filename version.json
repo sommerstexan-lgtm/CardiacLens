@@ -1,34 +1,31 @@
 {
-  "version": "9.10.347.198",
+  "version": "9.10.347.199",
   "date": "2026-07-24",
   "releaseDate": "July 24, 2026",
   "updated": "2026-07-24",
-  "build": "FluidPushIntegration",
-  "name": "CardiacLens v9.10.347.198",
+  "build": "FluidPushRaceFix",
+  "name": "CardiacLens v9.10.347.199",
   "notes": [
-    "Fluid event reminders now fire as real push notifications, even when CardiacLens is closed or the phone is locked.",
-    "Notification permission grant now subscribes the device to the CardiacLens fluid push service automatically.",
-    "The next upcoming fluid event's due time is kept in sync with the push service as events change.",
-    "Service worker now handles incoming push messages and notification taps."
+    "Fixed a race condition where opening or refreshing the app right at a fluid event's due time could silently cancel that event's push reminder before it fired.",
+    "The app now keeps treating the current fluid event as due for a short grace window after its nominal time before advancing to the next one, so it no longer resyncs the push server with a later time mid-fire.",
+    "Confirmed working via live server-side log monitoring and a real push notification received on iPhone."
   ],
-  "label": "FluidPushIntegration",
-  "summary": "Adds background push notifications for fluid event reminders via a dedicated Cloudflare Worker, so alerts fire even when the app is closed or the screen is locked.",
+  "label": "FluidPushRaceFix",
+  "summary": "Fixes a timing race that could silently cancel a fluid reminder push notification if the app was open right when the reminder was due.",
   "whatsNew": [
-    "Fluid event reminders now fire as real push notifications, even when CardiacLens is closed or the phone is locked.",
-    "Notification permission grant now subscribes the device to the CardiacLens fluid push service automatically.",
-    "The next upcoming fluid event's due time is kept in sync with the push service as events change.",
-    "Service worker now handles incoming push messages and notification taps."
+    "Fluid reminder push notifications are now reliable even when the app is open and refreshing near a scheduled event's due time."
   ],
-  "fixes": [],
+  "fixes": [
+    "Race condition: dashboard render at an event's due moment advanced to the next event and overwrote (canceled) the pending push alarm before it fired. Fixed with a 2-minute grace window before advancing."
+  ],
   "changes": [
-    "Version advanced to v9.10.347.198.",
-    "New window.cbInitFluidPush and window.cbSyncFluidReminder functions added, wired to existing notification permission flow and existing nextFluidEvt calculation.",
-    "sw.js gained push and notificationclick event listeners.",
+    "Version advanced to v9.10.347.199.",
+    "nextFluidEvt selection logic in the main dashboard render now uses a grace window (eMins > nowMins - 2) instead of a hard cutover at the exact due minute.",
     "No unrelated CardiacLens behavior was intentionally changed."
   ],
   "testing": [
-    "Verified new push module syntax in isolation with node --check.",
-    "Verified overall bracket balance unchanged relative to the prior release baseline.",
-    "Not yet verified: live push delivery on iPhone Home Screen install. Test before relying on this for real reminders."
+    "Verified live via wrangler tail: alarm fired correctly and push notification was received on iPhone with app closed.",
+    "Race condition reproduced and root-caused via live log inspection before this fix.",
+    "Recommended follow-up test: keep using the app normally (opening/checking it) near a scheduled event's due time and confirm the notification still arrives."
   ]
 }
