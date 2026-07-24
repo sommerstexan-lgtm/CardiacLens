@@ -1,27 +1,27 @@
 {
-  "version": "9.10.347.200",
+  "version": "9.10.347.201",
   "date": "2026-07-24",
   "releaseDate": "July 24, 2026",
   "updated": "2026-07-24",
-  "build": "PacingBasedFluidPush",
-  "name": "CardiacLens v9.10.347.200",
+  "build": "NoSpuriousCancel",
+  "name": "CardiacLens v9.10.347.201",
   "notes": [
-    "Fluid push reminders now work directly from the pacing engine's calculated next-drink suggestion, not only from named Plan My Day or Scheduled Events.",
-    "Users who only use the fluid pacing setup in Settings (fluid min/max and end time) now get real push reminders with no need to also set up Plan My Day or Scheduled Events for fluid.",
-    "If both a named fluid event and a pacing suggestion exist at the same time, whichever is sooner determines the reminder."
+    "Fixed a bug where the pacing-based push reminder could get silently canceled if the app was reopened while at or behind pace, with no named fluid event to fall back on.",
+    "The app now only actively cancels a scheduled push reminder when the fluid day is genuinely complete. Otherwise, if there is no fresh suggestion available right now, any previously scheduled reminder is left untouched instead of being wiped."
   ],
-  "label": "PacingBasedFluidPush",
-  "summary": "Push reminders now follow the fluid pacing engine directly, so pacing-only users get real background notifications without setting up any events.",
-  "fixes": [],
+  "label": "NoSpuriousCancel",
+  "summary": "Fixes a bug where reopening the app while at or behind fluid pace could silently cancel an already-scheduled push reminder before it fired.",
+  "fixes": [
+    "cbSyncFluidReminder(null) was being called whenever the pacing engine had no fresh ahead-of-pace suggestion, even mid-day, canceling any previously scheduled reminder. Fixed: only cancels on genuine fluid-day completion."
+  ],
   "changes": [
-    "Version advanced to v9.10.347.200.",
-    "_buildFluidPaceHtml now exposes its computed next-drink time via window._cbPaceNextDrinkMins.",
-    "The dashboard render's push sync now compares the named-event due time and the pacing due time, and syncs whichever is sooner, instead of only using named events.",
+    "Version advanced to v9.10.347.201.",
+    "_buildFluidPaceHtml now exposes window._cbFluidDayComplete alongside window._cbPaceNextDrinkMins.",
+    "The push sync block now distinguishes no-fresh-candidate from genuinely-done-for-the-day, and only cancels in the latter case.",
     "No unrelated CardiacLens behavior was intentionally changed."
   ],
   "testing": [
-    "Verified new logic in isolation for syntax.",
-    "Verified overall bracket balance change matches expected delta from the new code only.",
-    "Not yet verified: live push delivery from a pacing-only setup with no Plan My Day or Scheduled Events configured. Test this before relying on it."
+    "Verified new logic in isolation for syntax and bracket balance.",
+    "Not yet verified: live push delivery through a full day of normal app use, including periods at/behind pace. Test this before relying on it."
   ]
 }

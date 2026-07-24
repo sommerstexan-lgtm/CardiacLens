@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- CardiacLens versioned archive: v9.10.347.200 - deploy reference copy -->
+<!-- CardiacLens versioned archive: v9.10.347.201 - deploy reference copy -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -28,7 +28,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.200' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.201' }, params || {}));
       }
     } catch(e) {}
   };
@@ -910,7 +910,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.347.200';
+    var GD_VERSION   = 'v9.10.347.201';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1447,7 +1447,7 @@
   // -- End CL_SEC_COLOR migration ---------------------------------------------
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
-<title>CardiacLens v9.10.347.200</title>
+<title>CardiacLens v9.10.347.201</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
@@ -2334,7 +2334,7 @@ input[type="time"].modal-input,input[type="time"]{-webkit-appearance:auto;appear
     <!-- Version + clock row -->
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid rgba(255,255,255,0.15);padding-top:12px">
       <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px">
-        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.347.200 · Medical Grade - Free</span>
+        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.347.201 · Medical Grade - Free</span>
         <span id="cl-gd-heartbeat" style="font-size:11px;color:rgba(125,211,252,0.55);font-weight:500;letter-spacing:0.01em">ð Eyes open...</span>
         <!-- ═══════════════════════════════════════════════════════════════════
              VERSION UPDATE CHECKLIST — update ALL 8 locations every release:
@@ -6142,7 +6142,7 @@ Custom Range
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.347.200';
+  var CURRENT='v9.10.347.201';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -10206,7 +10206,15 @@ if(window.cbSyncFluidReminder){
     _cbPaceDate.setHours(Math.floor(window._cbPaceNextDrinkMins/60),window._cbPaceNextDrinkMins%60,0,0);
     if(!_cbCandidateDate||_cbPaceDate<_cbCandidateDate) _cbCandidateDate=_cbPaceDate;
   }
-  window.cbSyncFluidReminder(_cbCandidateDate);
+  if(_cbCandidateDate){
+    window.cbSyncFluidReminder(_cbCandidateDate);
+  }else if(window._cbFluidDayComplete){
+    window.cbSyncFluidReminder(null);
+  }
+  // else: no fresh candidate right now (e.g. currently on/behind pace, no
+  // named event), but the day isn't over -- do nothing, so any reminder
+  // already scheduled on the server from an earlier "ahead of pace" render
+  // is left alone instead of being silently canceled.
 }
 if(nextFluidEvt){
   var _evtMins=nextFluidEvt.time.split(':').reduce(function(acc,v,i){return i===0?parseInt(v)*60:acc+parseInt(v);},0);
@@ -27660,6 +27668,7 @@ function _getFluidEndTime(){
 
 function _buildFluidPaceHtml(){
   window._cbPaceNextDrinkMins=null;
+  window._cbFluidDayComplete=false;
   var target=(settings.fluidMode&&settings.fluidMode!=='none')?(settings.fluidMax||64):80;
   var firstFluid=_getFirstFluidTimeToday();
   var endTime=_getFluidEndTime();
@@ -27687,6 +27696,7 @@ function _buildFluidPaceHtml(){
   var endMins=toMins(endTime);
   var endTimeStr=fmtTime(endMins);
   if(nowMins>=endMins){
+    window._cbFluidDayComplete=true;
     return '<div style="margin-top:12px;background:#f0fdf4;border-left:4px solid #10b981;border-radius:8px;padding:10px 12px;font-size:14px;color:#065f46">'
       +'✓ Fluid day complete · End time '+endTimeStr+' reached'
       +'</div>';
