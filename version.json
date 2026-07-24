@@ -1,27 +1,27 @@
 {
-  "version": "9.10.347.201",
+  "version": "9.10.347.202",
   "date": "2026-07-24",
   "releaseDate": "July 24, 2026",
   "updated": "2026-07-24",
-  "build": "NoSpuriousCancel",
-  "name": "CardiacLens v9.10.347.201",
+  "build": "PaceUiConsistency",
+  "name": "CardiacLens v9.10.347.202",
   "notes": [
-    "Fixed a bug where the pacing-based push reminder could get silently canceled if the app was reopened while at or behind pace, with no named fluid event to fall back on.",
-    "The app now only actively cancels a scheduled push reminder when the fluid day is genuinely complete. Otherwise, if there is no fresh suggestion available right now, any previously scheduled reminder is left untouched instead of being wiped."
+    "Fixed the Total Today card showing contradictory messages when pace tracking is active, for example an orange Below Minimum warning stacked directly above a green Ahead of Pace card.",
+    "The static Below Minimum banner (a full-day-total check written before pace tracking existed) is now suppressed once the pacing engine has a first fluid entry to work from, since the pace card already gives the correct time-aware answer.",
+    "Above Maximum and Within Target Range messaging is unchanged."
   ],
-  "label": "NoSpuriousCancel",
-  "summary": "Fixes a bug where reopening the app while at or behind fluid pace could silently cancel an already-scheduled push reminder before it fired.",
+  "label": "PaceUiConsistency",
+  "summary": "Removes a contradictory pair of messages on the fluid dashboard: a full-day Below Minimum warning could appear next to an Ahead of Pace card saying the opposite.",
   "fixes": [
-    "cbSyncFluidReminder(null) was being called whenever the pacing engine had no fresh ahead-of-pace suggestion, even mid-day, canceling any previously scheduled reminder. Fixed: only cancels on genuine fluid-day completion."
+    "isBelowMin banner (range mode) now only shows when the pacing engine is not active (no first fluid entry logged yet, or pacing not configured), avoiding a direct visual contradiction with the pace card."
   ],
   "changes": [
-    "Version advanced to v9.10.347.201.",
-    "_buildFluidPaceHtml now exposes window._cbFluidDayComplete alongside window._cbPaceNextDrinkMins.",
-    "The push sync block now distinguishes no-fresh-candidate from genuinely-done-for-the-day, and only cancels in the latter case.",
+    "Version advanced to v9.10.347.202.",
+    "range-mode Total Today block: isBelowMin branch split into pacing-active (suppressed) and pacing-inactive (shown as before) cases.",
     "No unrelated CardiacLens behavior was intentionally changed."
   ],
   "testing": [
-    "Verified new logic in isolation for syntax and bracket balance.",
-    "Not yet verified: live push delivery through a full day of normal app use, including periods at/behind pace. Test this before relying on it."
+    "Verified bracket balance delta matches the new code added only.",
+    "Not yet verified visually on device. Confirm the Below Minimum banner no longer appears once pace tracking is active with a first fluid entry logged."
   ]
 }

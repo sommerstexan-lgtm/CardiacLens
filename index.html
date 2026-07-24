@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- CardiacLens versioned archive: v9.10.347.201 - deploy reference copy -->
+<!-- CardiacLens versioned archive: v9.10.347.202 - deploy reference copy -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -28,7 +28,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.201' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.202' }, params || {}));
       }
     } catch(e) {}
   };
@@ -910,7 +910,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.347.201';
+    var GD_VERSION   = 'v9.10.347.202';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1447,7 +1447,7 @@
   // -- End CL_SEC_COLOR migration ---------------------------------------------
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
-<title>CardiacLens v9.10.347.201</title>
+<title>CardiacLens v9.10.347.202</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
@@ -2334,7 +2334,7 @@ input[type="time"].modal-input,input[type="time"]{-webkit-appearance:auto;appear
     <!-- Version + clock row -->
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid rgba(255,255,255,0.15);padding-top:12px">
       <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px">
-        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.347.201 · Medical Grade - Free</span>
+        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.347.202 · Medical Grade - Free</span>
         <span id="cl-gd-heartbeat" style="font-size:11px;color:rgba(125,211,252,0.55);font-weight:500;letter-spacing:0.01em">ð Eyes open...</span>
         <!-- ═══════════════════════════════════════════════════════════════════
              VERSION UPDATE CHECKLIST — update ALL 8 locations every release:
@@ -6142,7 +6142,7 @@ Custom Range
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.347.201';
+  var CURRENT='v9.10.347.202';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -10130,7 +10130,7 @@ var percentUsed=Math.min((dailyFluid/settings.fluidMax)*100,100);
 var isBelowMin=dailyFluid<settings.fluidMin;
 var isAboveMax=dailyFluid>settings.fluidMax;
 var barColor=isAboveMax?'#dc2626':isBelowMin?'#f59e0b':'#10b981';
-if(isBelowMin){
+if(isBelowMin&&!(_paceHtml&&_getFirstFluidTimeToday())){
 html+='<div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:12px;border-radius:6px;margin-bottom:12px">';
 html+='<div style="font-weight:600;color:#92400e">⚠️ Below Minimum</div>';
 html+='<div style="font-size:14px;color:#92400e;margin-top:4px">Need <strong>'+(settings.fluidMin-dailyFluid)+' more oz</strong> to reach your '+settings.fluidMin+' oz minimum goal</div>';
@@ -10141,6 +10141,10 @@ html+='<div style="background:#fee2e2;border:1px solid #ef4444;padding:10px 12px
 html+='📉 At current pace you will reach only <strong>'+projectedTotal+' oz</strong> today — below your '+settings.fluidMin+' oz minimum. Consider drinking sooner.';
 html+='</div>';
 }
+}else if(isBelowMin){
+// Pacing engine is active and will show its own ahead/on/behind-pace
+// message below -- nothing extra needed here, avoids showing a static
+// "below minimum" alarm next to a contradictory "ahead of pace" card.
 }else if(isAboveMax){
 html+='<div style="background:#fee2e2;border-left:4px solid #ef4444;padding:12px;border-radius:6px;margin-bottom:12px">';
 html+='<div style="font-weight:700;color:#991b1b">🚫 Above Maximum</div>';

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.201-no-spurious-cancel';
+const CACHE_NAME = 'cardiaclens-v9.10.347.202-pace-ui-consistency';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
