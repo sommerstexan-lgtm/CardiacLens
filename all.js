@@ -1629,7 +1629,11 @@ function fireOSNotification(title, body, tag){
         icon: 'icon-192.png',
         badge: 'icon-192.png',
         requireInteraction: true,
-        data: { url: window.location.href }
+        // v9.10.347.205: eventTag lets sw.js's notificationclick hand off
+        // which event was tapped, so the app can open that event's real
+        // action card instead of just focusing the app on whatever screen
+        // it was last showing.
+        data: { eventTag: tag||'cardiaclens-event' }
       }).catch(function(){ /* fallback below */ });
       return;
     }
@@ -1637,11 +1641,16 @@ function fireOSNotification(title, body, tag){
       body: body,
       tag:  tag||'cardiaclens-event',
       icon: 'icon-192.png',
-      requireInteraction: true
+      requireInteraction: true,
+      data: { eventTag: tag||'cardiaclens-event' }
     });
     n.onclick=function(){
       window.focus();
       n.close();
+      // v9.10.347.205: this fallback only ever fires while the page is
+      // still alive (Web Notifications without a SW require the tab to
+      // exist), so it's safe to resolve and route in-page directly.
+      try{ if(typeof _clOpenEventFromTag==='function') _clOpenEventFromTag(tag); }catch(e){}
     };
   }catch(e){
     console.warn('OS notification failed:',e);
@@ -2135,7 +2144,9 @@ if(activeReminderEvt){
   updateUpcomingEventsWidget();
   if(_evtAfterAction&&_evtAfterAction.actions&&_evtAfterAction.actions.length>1&&!_eventActionsCompletedToday(_evtAfterAction)){
     setTimeout(function(){try{_openEventActionModal(_evtAfterAction);}catch(e){}},120);
+    return; // same card is reshowing for remaining actions, the missed queue must wait
   }
+  _maybeAdvanceMissedQueue();
   return;
 }
 // v9.10.347.197: reminders no longer open a modal after the user finishes logging.
@@ -2146,6 +2157,18 @@ if(_pendingReminderEvt){
   _hideReminderQueueBadge();
   updateUpcomingEventsWidget();
 }
+_maybeAdvanceMissedQueue();
+}
+
+// v9.10.347.205: called from every real exit point of hideModal(). If the
+// card that just closed was one of the sequential missed-event cards, clear
+// that marker and, if more are queued, open the next one after a short
+// pause so it never overlaps the closing animation of the one before it.
+function _maybeAdvanceMissedQueue(){
+  if(_missedQueueCurrentEvt) _missedQueueCurrentEvt=null;
+  if(_missedEventQueue.length>0){
+    setTimeout(function(){ if(typeof _advanceMissedEventQueue==='function') _advanceMissedEventQueue(); },150);
+  }
 }
 
 // Universal close — called by the floating ✕ Close FAB.
@@ -20090,7 +20113,7 @@ html+=lbBadge;
 html+='<div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">';
 html+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
 html+='<div>';
-html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.347.197</span></div>';
+html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.347.205</span></div>';
 html+='<div id="settingsVersionStatus" style="font-size:13px;color:#6b7280;margin-top:3px">Tap "Check for Updates" to see if a newer version is available</div>';
 html+='</div>';
 html+='<button onclick="checkForUpdates(true)" id="checkUpdateBtn" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">🔍 Check for Updates</button>';
@@ -21412,29 +21435,153 @@ function buildMissedEventList() {
   return missed;
 }
 
+// v9.10.347.205: sequential missed-event card queue. Replaces the small
+// bottom toast + best-effort chime from v9.10.347.204, which had two real
+// problems: it was too easy to miss, and tapping it did nothing (it fell
+// through to whatever screen happened to be underneath). Newly-missed
+// events now open the same large action card already used for on-demand
+// "Run" from the Events widget, one at a time, in time order, advancing
+// automatically once each one is resolved.
+var _missedEventQueue = [];
+var _missedQueueCurrentEvt = null;
+
 function runCatchUpScan() {
   // v9.10.347.197: catch-up scan updates the Events tile/queue only.
   // It must never open an interrupting modal when the user opens the app.
-  // v9.10.347.204: now also surfaces an immediate visible alert (toast +
-  // sound) the first time an event is discovered newly missed, instead of
-  // only silently logging it. a missed BP/med event should never be
-  // purely silent just because the OS-level notification died in the
-  // background.
   var missed = buildMissedEventList();
   if (missed.length === 0) return;
   var existingStates={};
   _readEventQueue().forEach(function(q){existingStates[q.key]=q.state;});
+  var newlyMissed=[];
   missed.forEach(function(evt){
     var key=_eventQueueKey(evt);
     var isNewlyMissed = existingStates[key] !== 'missed';
     _recordEventQueueItem(evt,'missed');
     if(isNewlyMissed){
       _clDiagLog('catchup_alert',{name:evt.name, time:evt.time});
-      _showEventNotice('⏰ Missed: '+evt.name+' ('+evt.time+')');
-      if(typeof _playEventAttentionSound==='function') _playEventAttentionSound(evt);
+      newlyMissed.push(evt);
     }
   });
   updateUpcomingEventsWidget();
+  // v9.10.347.205: newly-missed events queue into the real action card
+  // instead of a toast. No sound is attempted here: iOS blocks audio
+  // triggered from a background/visibility event with no direct user
+  // gesture attached, so a forced chime here would silently fail every
+  // time anyway.
+  if(newlyMissed.length>0) _queueMissedEvents(newlyMissed);
+}
+
+function _queueMissedEvents(list){
+  if(!list||list.length===0)return;
+  list.sort(function(a,b){return a.time<b.time?-1:a.time>b.time?1:0;});
+  _missedEventQueue=_missedEventQueue.concat(list);
+  if(!_missedQueueCurrentEvt) _advanceMissedEventQueue();
+}
+
+function _advanceMissedEventQueue(){
+  if(_missedEventQueue.length===0)return;
+  var evt=_missedEventQueue.shift();
+  _missedQueueCurrentEvt=evt;
+  // _openEventActionModal already defers to a "Reminder waiting" toast
+  // (existing v9.10.34 behavior) if some other modal is genuinely open
+  // and this isn't already an active reminder session, instead of
+  // stealing the screen from whatever the user is actively doing.
+  _openEventActionModal(evt);
+}
+
+// ── Notification tap routing (v9.10.347.205) ─────────────────────────────
+// A tapped OS-level notification only carries a tag string (see
+// fireOSNotification/scheduleOSNotificationAt). By the time it's tapped,
+// the event list it was scheduled from may have changed, so this always
+// looks up the CURRENT settings.dailyEvents/dailyPlan, never a snapshot.
+function _clResolveEventByTag(tag){
+  if(!tag) return null;
+  // The 8am medicine-due reminder is not a scheduled event and has no
+  // matching entry in dailyEvents/dailyPlan — route it separately.
+  if(tag.indexOf('cardiaclens-med-')===0){
+    return {__med:true, name:tag.slice('cardiaclens-med-'.length).replace(/_/g,' ')};
+  }
+  // Strip the various prefixes/suffixes used across the different
+  // notification call sites down to a bare id/name so they can all be
+  // matched the same way.
+  var core=tag;
+  core=core.replace(/^cb_/,'').replace(/_d\d+_(at|adv)$/,'');
+  core=core.replace(/^cardiaclens-evt-/,'').replace(/^cardiaclens-audio-/,'');
+  var all=[];
+  if(settings.dailyEvents) all=all.concat(settings.dailyEvents);
+  if(dailyPlan) all=all.concat(dailyPlan.map(function(pe){
+    return {id:_planEventId(pe), name:pe.name, icon:pe.icon, time:pe.time,
+            fluidGoal:pe.amount||pe.fluidGoal||0, actions:pe.actions};
+  }));
+  var i,e,found=null;
+  for(i=0;i<all.length;i++){
+    e=all[i];
+    if(e.id && e.id===core){ found=e; break; }
+  }
+  if(!found){
+    var safeCoreName=core.replace(/[^a-zA-Z0-9]/g,'');
+    for(i=0;i<all.length;i++){
+      e=all[i];
+      if(e.name && e.name.replace(/[^a-zA-Z0-9]/g,'')===safeCoreName){ found=e; break; }
+    }
+  }
+  if(!found) return null;
+  return {
+    id: found.id||found.name,
+    name: found.name||'Scheduled event',
+    icon: found.icon||'📋',
+    time: found.time||'',
+    fluidGoal: found.fluidGoal||0,
+    actions: (found.actions&&found.actions.length)?found.actions:['logBP','logFluid']
+  };
+}
+
+// Open the right screen for a tapped notification. Falls back to the
+// Events queue if the event can't be resolved (e.g. deleted or renamed
+// since the notification was scheduled).
+function _clOpenEventFromTag(tag){
+  try{
+    var resolved=_clResolveEventByTag(tag);
+    if(resolved && resolved.__med){
+      if(typeof logMedicine==='function') logMedicine();
+      return;
+    }
+    if(resolved){
+      _openEventActionModal(resolved);
+      return;
+    }
+    if(typeof openEventsQueue==='function') openEventsQueue();
+  }catch(e){
+    console.warn('_clOpenEventFromTag failed:',e);
+    try{ if(typeof openEventsQueue==='function') openEventsQueue(); }catch(e2){}
+  }
+}
+
+// Cold-start entry point: if CardiacLens was fully closed when a real OS
+// notification was tapped, sw.js has no live page to message, so it opens
+// a fresh window with ?openEvent=<tag> instead. This picks that up once,
+// then cleans the URL so a refresh doesn't reopen the same card.
+function _clCheckOpenEventParam(){
+  try{
+    var params=new URLSearchParams(window.location.search);
+    var tag=params.get('openEvent');
+    if(!tag) return;
+    try{ window.history.replaceState(null,'',window.location.pathname); }catch(e){}
+    setTimeout(function(){ if(typeof _clOpenEventFromTag==='function') _clOpenEventFromTag(tag); }, 1800);
+  }catch(e){}
+}
+window.addEventListener('load', function(){ _clCheckOpenEventParam(); });
+
+// If CardiacLens was already open (foreground or background tab) when a
+// notification was tapped, sw.js focuses that tab and posts this message
+// instead of opening a new window.
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.addEventListener('message', function(event){
+    var data=event.data||{};
+    if(data.type==='OPEN_EVENT_CARD' && data.eventTag){
+      setTimeout(function(){ if(typeof _clOpenEventFromTag==='function') _clOpenEventFromTag(data.eventTag); }, 150);
+    }
+  });
 }
 
 function _showCatchUpModal() {
@@ -32146,7 +32293,7 @@ html+=`</div>`;
 
 html+=`
 <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:2px solid #e5e7eb;color:#6b7280;font-size:14px">
-<p style="margin:0">CardiacLens v9.10.347.197 — Free & Source-Available</p>
+<p style="margin:0">CardiacLens v9.10.347.205 - Free & Source-Available</p>
 <p style="margin:4px 0 0 0">Report Generated: ${reportDate}</p>
 </div>`;
 
@@ -32477,7 +32624,7 @@ Note: This report is based on patient self-tracked data. Clinical correlation
 and examination are essential for diagnosis and treatment decisions.
 
 ---
-CardiacLens v9.10.347.197 Medical Grade - Free
+CardiacLens v9.10.347.205 Medical Grade - Free
 Report Generated: ${reportDate}`;
 
 return text;
@@ -36614,7 +36761,7 @@ report.push(notes);
 report.push('');
 }
 report.push('═══════════════════════════════════════════════════════════');
-report.push('This report was generated by CardiacLens v9.10.347.197 Medical Grade - Free');
+report.push('This report was generated by CardiacLens v9.10.347.205 Medical Grade - Free');
 report.push('Advanced Analytics Dashboard - Phase 3 Implementation');
 report.push('═══════════════════════════════════════════════════════════');
 const blob=new Blob([report.join('\n')],{type:'text/plain'});
@@ -36704,7 +36851,7 @@ ${periodHTML}
 <h2>Key Insights</h2>
 ${insightsHTML}
 <div style="margin-top:40px;padding:20px;background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:8px">
-<strong>CardiacLens v9.10.347.197 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
+<strong>CardiacLens v9.10.347.205 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
 This report is not a substitute for professional medical advice.
 </div>
 </body>
@@ -37677,7 +37824,7 @@ alert(`🏃 Activity Summary\n\n` +
 var VERSION_JSON_URL = 'https://cardiaclens.com/version.json';
 var VERSION_CHECK_KEY = 'CARDIACLENS_LAST_VERSION_CHECK';
 var VERSION_DISMISSED_KEY = 'CARDIACLENS_UPDATE_DISMISSED';
-var CURRENT_VERSION = 'v9.10.347.197';
+var CURRENT_VERSION = 'v9.10.347.205';
 var _latestVersionData = null; // cached from last fetch
 
 // Detect whether running as an installed Home Screen PWA on iOS

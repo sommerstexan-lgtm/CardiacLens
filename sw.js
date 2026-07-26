@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.204-notif-reliability';
+const CACHE_NAME = 'cardiaclens-v9.10.347.205-notif-tap-routing';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
@@ -44,13 +44,24 @@ self.addEventListener('push', function(event) {
 });
 
 self.addEventListener('notificationclick', function(event) {
+  // v9.10.347.205: carry the event tag through so the app can open the
+  // specific event's action card, not just focus the app root.
+  var tag = (event.notification && event.notification.data && event.notification.data.eventTag) || null;
   event.notification.close();
   event.waitUntil(
-    self.clients.matchAll({ type: 'window' }).then(function(clientList) {
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
       for (var i = 0; i < clientList.length; i++) {
-        if ('focus' in clientList[i]) return clientList[i].focus();
+        var client = clientList[i];
+        if ('focus' in client) {
+          client.focus();
+          if (tag) client.postMessage({ type: 'OPEN_EVENT_CARD', eventTag: tag });
+          return;
+        }
       }
-      if (self.clients.openWindow) return self.clients.openWindow('./');
+      if (self.clients.openWindow) {
+        var url = tag ? ('./?openEvent=' + encodeURIComponent(tag)) : './';
+        return self.clients.openWindow(url);
+      }
     })
   );
 });
