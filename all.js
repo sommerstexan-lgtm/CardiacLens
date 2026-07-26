@@ -1648,6 +1648,27 @@ function fireOSNotification(title, body, tag){
   }
 }
 
+// ── Diagnostic notification log (persisted) ──────────────────────────────
+// v9.10.347.204: Survives page reloads/process kills, unlike in-memory
+// timers, so we can tell after the fact whether a scheduled notification
+// actually fired, was suppressed as too-late, or silently died because
+// iOS killed the page before its setTimeout ever ran.
+function _clDiagLog(event, detail){
+  try{
+    var key='CL_NOTIF_DIAG_LOG';
+    var log=JSON.parse(localStorage.getItem(key)||'[]');
+    log.push({t:new Date().toISOString(), event:event, detail:detail||null});
+    if(log.length>300) log=log.slice(log.length-300);
+    localStorage.setItem(key, JSON.stringify(log));
+  }catch(e){}
+}
+function _clReadPendingNotifs(){
+  try{return JSON.parse(localStorage.getItem('CL_PENDING_NOTIFS_'+getTodayKey())||'{}')||{};}catch(e){return {};}
+}
+function _clWritePendingNotifs(map){
+  try{localStorage.setItem('CL_PENDING_NOTIFS_'+getTodayKey(), JSON.stringify(map));}catch(e){}
+}
+
 // ── Service Worker Registration ───────────────────────────────────────────
 window._swRegistration = null;
 
@@ -1751,10 +1772,22 @@ function scheduleOSNotificationAt(fireDate, title, body, tag){
   if(msUntil < 0 || msUntil > 7*24*60*60*1000) return; // skip past/too-far events
   if(window._scheduledNotifTimeouts[tag]) clearTimeout(window._scheduledNotifTimeouts[tag]);
   var scheduledFor = fireDate.getTime();
+  // Persist so we can tell later whether this timer actually survived to fire, since
+  // in-memory setTimeouts vanish silently with no trace if iOS kills the page.
+  var pending=_clReadPendingNotifs();
+  pending[tag]={scheduledFor:scheduledFor, title:title, body:body};
+  _clWritePendingNotifs(pending);
   window._scheduledNotifTimeouts[tag] = setTimeout(function(){
     delete window._scheduledNotifTimeouts[tag];
+    var p=_clReadPendingNotifs();
+    delete p[tag];
+    _clWritePendingNotifs(p);
     // Suppress if iOS froze the process and we're firing more than 10 min late
-    if(Date.now() - scheduledFor > 10*60*1000) return;
+    if(Date.now() - scheduledFor > 10*60*1000){
+      _clDiagLog('suppressed_late',{tag:tag, lateMs:Date.now()-scheduledFor});
+      return;
+    }
+    _clDiagLog('fired',{tag:tag, title:title});
     fireOSNotification(title, body, tag);
   }, msUntil);
 }
@@ -1770,6 +1803,8 @@ function _planEventId(evt){
 function scheduleAllEventNotifications(){
   if(getNotifStatus() !== 'granted') return;
   cancelAllScheduledNotifications();
+  _clWritePendingNotifs({}); // fresh batch. any old pending entries are now stale
+  _clDiagLog('schedule_run',{at:new Date().toISOString()});
 
   var now = new Date();
   var allEvents = [];
@@ -1849,7 +1884,51 @@ function scheduleAllEventNotifications(){
 
   var count = Object.keys(window._scheduledNotifTimeouts).length;
   if(count > 0) console.log('[CardiacLens] Scheduled', count, 'OS notifications for next 7 days');
+  _clDiagLog('schedule_complete',{count:count});
 }
+
+// ── Stale-schedule recovery (v9.10.347.204) ─────────────────────────────────
+// Runs every time the app becomes visible again. If a notification was
+// scheduled (persisted in CL_PENDING_NOTIFS) and its fire time has already
+// passed without its own setTimeout callback ever clearing the entry, that
+// timer silently died. the page was suspended/killed by iOS before the
+// timer fired. This logs exactly what was lost, for diagnosis, without
+// firing a duplicate visible alert (runCatchUpScan below already surfaces
+// a visible "missed" toast for the underlying event).
+function _clRecoverStaleSchedule(){
+  try{
+    var pending=_clReadPendingNotifs();
+    var now=Date.now();
+    var changed=false;
+    Object.keys(pending).forEach(function(tag){
+      var p=pending[tag];
+      if(!p||!p.scheduledFor) return;
+      var lateMs=now-p.scheduledFor;
+      if(lateMs<=0) return; // not due yet, leave it scheduled
+      delete pending[tag];
+      changed=true;
+      if(lateMs<=30*60*1000){
+        _clDiagLog('recovered_stale',{tag:tag, title:p.title, lateMs:lateMs});
+      }else{
+        _clDiagLog('stale_too_old_dropped',{tag:tag, title:p.title, lateMs:lateMs});
+      }
+    });
+    if(changed) _clWritePendingNotifs(pending);
+  }catch(e){}
+}
+
+// v9.10.347.204: reschedule and re-check the moment the app is reopened.
+// previously this only ran at specific init points, so if iOS had already
+// silently killed the day's pending timers, nothing rebuilt them until one
+// of those init paths happened to run again.
+document.addEventListener('visibilitychange', function(){
+  if(document.visibilityState==='visible'){
+    _clDiagLog('app_visible',null);
+    _clRecoverStaleSchedule();
+    if(typeof scheduleAllEventNotifications==='function') scheduleAllEventNotifications();
+    if(typeof runCatchUpScan==='function') runCatchUpScan();
+  }
+});
 
 
 
@@ -21336,9 +21415,25 @@ function buildMissedEventList() {
 function runCatchUpScan() {
   // v9.10.347.197: catch-up scan updates the Events tile/queue only.
   // It must never open an interrupting modal when the user opens the app.
+  // v9.10.347.204: now also surfaces an immediate visible alert (toast +
+  // sound) the first time an event is discovered newly missed, instead of
+  // only silently logging it. a missed BP/med event should never be
+  // purely silent just because the OS-level notification died in the
+  // background.
   var missed = buildMissedEventList();
   if (missed.length === 0) return;
-  missed.forEach(function(evt){ _recordEventQueueItem(evt,'missed'); });
+  var existingStates={};
+  _readEventQueue().forEach(function(q){existingStates[q.key]=q.state;});
+  missed.forEach(function(evt){
+    var key=_eventQueueKey(evt);
+    var isNewlyMissed = existingStates[key] !== 'missed';
+    _recordEventQueueItem(evt,'missed');
+    if(isNewlyMissed){
+      _clDiagLog('catchup_alert',{name:evt.name, time:evt.time});
+      _showEventNotice('⏰ Missed: '+evt.name+' ('+evt.time+')');
+      if(typeof _playEventAttentionSound==='function') _playEventAttentionSound(evt);
+    }
+  });
   updateUpcomingEventsWidget();
 }
 

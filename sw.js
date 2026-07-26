@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.203-help-docs';
+const CACHE_NAME = 'cardiaclens-v9.10.347.204-notif-reliability';
 
 self.addEventListener('install', event => {
   self.skipWaiting();

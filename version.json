@@ -1,26 +1,38 @@
 {
-  "version": "9.10.347.203",
-  "date": "2026-07-24",
-  "releaseDate": "July 24, 2026",
-  "updated": "2026-07-24",
-  "build": "FluidPushHelpDocs",
-  "name": "CardiacLens v9.10.347.203",
+  "version": "9.10.347.204",
+  "date": "2026-07-26",
+  "releaseDate": "July 26, 2026",
+  "updated": "2026-07-26",
+  "build": "NotifReliabilityDiag",
+  "name": "CardiacLens v9.10.347.204",
   "notes": [
-    "Added a full FAQ entry explaining how fluid push reminders work under all three supported setups: pacing only, named events (Scheduled Events or Plan My Day) with fluid amounts, or a combination of both.",
-    "Added a changelog entry summarizing the complete fluid push reminder feature shipped across v9.10.347.198 through .202.",
-    "No functional code changes in this build. Documentation only."
+    "Diagnosed why some scheduled event notifications (BP, medication, meal events) were firing correctly while later ones the same day silently never fired.",
+    "Root cause: scheduled OS notifications rely on setTimeout timers held only in page memory. If iOS suspends or discards the app's background page, every pending timer for the rest of the day is lost with no trace and nothing re-arms them until the app happens to be relaunched.",
+    "This build does not touch fluid push reminders, which were confirmed working correctly and were left unchanged.",
+    "Added a persisted diagnostic log (CL_NOTIF_DIAG_LOG) recording every schedule run, every notification fired, every notification suppressed as too late, and every stale timer recovered after the app was reopened.",
+    "The app now rebuilds its notification schedule every time it becomes visible again (app reopened, screen unlocked to it), not only at specific app-init points as before.",
+    "The missed-event catch-up scan now surfaces an immediate visible alert (toast plus sound) the first time an event is discovered newly missed, instead of only silently logging it to the Events queue.",
+    "This reduces how often a scheduled BP or medication reminder goes completely unnoticed, but does not fully solve it: if the app is fully closed and the phone stays locked and untouched, no code is running to notice a missed event until the app is reopened. Closing that remaining gap requires real Web Push (server-delivered notifications independent of the page being alive), which is a separate, larger piece of work."
   ],
-  "label": "FluidPushHelpDocs",
-  "summary": "Documentation-only release: explains the new fluid push reminder system (pacing, events, or both) in the FAQ and changelog.",
-  "fixes": [],
+  "label": "NotifReliabilityDiag",
+  "summary": "Diagnostic and reliability patch for scheduled event notifications (BP, medication, meal events). Fluid push reminders unchanged. Root architectural gap documented; full fix requires Web Push.",
+  "fixes": [
+    "Notification schedule now rebuilds on every app-visible transition, not only at init, so a day's remaining reminders have a much better chance of being re-armed after the app was backgrounded.",
+    "Missed events now trigger a visible toast and sound the first time they are discovered overdue, instead of being silently added to the Events queue with no alert at all."
+  ],
   "changes": [
-    "Version advanced to v9.10.347.203.",
-    "New FAQ entry added to renderFAQ().",
-    "New changelog entry added at the top of Known Issues covering v9.10.347.198 through .202."
+    "Version advanced to v9.10.347.204.",
+    "Added _clDiagLog(), _clReadPendingNotifs(), _clWritePendingNotifs() for persisted notification diagnostics.",
+    "scheduleOSNotificationAt() now persists each pending notification's scheduled time before arming its timer, and records fired vs suppressed-late outcomes.",
+    "scheduleAllEventNotifications() now logs each schedule run and clears stale pending state at the start of every rebuild.",
+    "Added _clRecoverStaleSchedule(), which runs on visibilitychange and logs any pending notification whose time passed without its timer ever firing, meaning it was silently killed in the background.",
+    "Added a visibilitychange listener that reschedules notifications and reruns the catch-up scan every time the app becomes visible again.",
+    "runCatchUpScan() now shows an immediate toast and plays the attention sound the first time an event is newly discovered missed."
   ],
   "testing": [
-    "Verified no literal em dashes introduced in new content (one caught and fixed before packaging).",
-    "Verified bracket balance delta matches new content only.",
-    "Verified no old version-number strings remain in any of the previously-updated locations."
+    "Verified no literal em dashes introduced in new content (5 caught in code comments and fixed before packaging).",
+    "Verified index.html inline script and all.js both parse with no syntax errors after the edit (node --check).",
+    "Verified index.html and all.js received identical functional changes, keeping the two files consistent.",
+    "Not yet verified on-device: whether the visibilitychange-triggered reschedule actually survives an iOS background/lock cycle for a full day. This build adds the logging needed to confirm that on next real-world use."
   ]
 }
