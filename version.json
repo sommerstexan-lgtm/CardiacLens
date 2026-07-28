@@ -1,23 +1,23 @@
 {
-  "version": "9.10.347.208",
+  "version": "9.10.347.209",
   "date": "2026-07-28",
   "releaseDate": "July 28, 2026",
   "updated": "2026-07-28",
-  "build": "SecureAccessLockButtonHardening",
-  "name": "CardiacLens v9.10.347.208",
+  "build": "SecureAccessSaveUnification",
+  "name": "CardiacLens v9.10.347.209",
   "notes": [
-    "Could not reproduce Can's reported 100% Private lock failure in this environment, including against a full copy of his real device data (785 keys) with zero errors every time. This environment only has Chromium available, not Safari's actual rendering engine, so a real WebKit-specific behavior cannot be ruled out and could not be tested directly.",
-    "Regardless of root cause, found and fixed a real design fragility: the lock button's handler required _clSecIsConfigured() (a full re-derivation of the saved profile from localStorage) to return true before it would do anything at all. If that check ever failed for any reason on a real device, the button would do nothing with zero visible feedback -- exactly the reported symptom. The button no longer depends on that check succeeding to lock the screen; the check now only decides which screen to show after locking (the normal keyboard vs. first-time setup), wrapped in its own try/catch so it cannot block the lock action itself.",
-    "This is not a confirmed fix for a confirmed root cause. It removes a real category of silent-failure risk that matches the symptom, verified only against the versions of the app available in this sandbox."
+    "Fixed: Settings showed Secure Access as \"Not enabled\" even right after saving a new combination. Root cause: the dedicated Save Combination button and the main Save Settings button ran two separately-maintained copies of the save logic. One correctly wrote the profile mirror used elsewhere in the app; the other did not. Both buttons now call the exact same save function, eliminating the divergence.",
+    "Verified: created a fresh, never-configured profile through the real Settings UI (real letter tap, real color tap, real question/answer), saved, closed Settings, reopened it, and confirmed status reads Active. Repeated after a full page reload with the same result. Also reconfirmed the real 30-key unlock sequence and the 100% Private lock button both still work correctly with this change in place."
   ],
-  "label": "SecureAccessLockButtonHardening",
-  "summary": "Hardened the lock button so a failed configuration check can no longer silently block locking the app. Root cause not confirmed; this addresses a real fragility that matches the reported symptom.",
+  "label": "SecureAccessSaveUnification",
+  "summary": "Fixed Secure Access Settings showing Not enabled after a real save, caused by two divergent save code paths. Unified to one.",
   "fixes": [
-    "Lock button (100% Private pill) no longer gated behind a silent all-or-nothing configuration check."
+    "Settings > Secure Access: Save Combination and Save Settings now use one save function; status correctly shows Active after saving and after reload."
   ],
   "testing": [
-    "Re-ran the full real-click, real-hit-test pill test from v9.10.347.207 against v9.10.347.208 with Can's actual real backup data (785 keys) loaded instead of synthetic data: zero page errors, pill locks correctly.",
-    "Genuinely unable to reproduce the reported failure in this environment across multiple approaches: synthetic data, real backup data, real click() with hit-test verification of no overlapping elements, real iPhone and iPhone SE viewport dimensions. This sandbox has Chromium only, not WebKit, so a real Safari-specific behavior remains a possibility that could not be tested here.",
-    "Recommended next diagnostic step if this recurs: check Google Analytics (G-H2SESQBPXQ) for js_error or js_promise_rejection events, which this app already logs automatically on any real uncaught error, including the actual message, file, line, and stack trace from the real device."
+    "Real browser, real clicks, real Settings UI: fresh unconfigured profile set up end to end, saved, status confirmed Active immediately, after reopening Settings, and after a full page reload.",
+    "Real 30-key unlock sequence (real M/purple/purple/purple taps on the actual rendered keyboard) confirmed still working.",
+    "100% Private pill lock confirmed still working.",
+    "All JS syntax-checked, all.js regenerated and verified, no stray version strings, changelog entry verified against the correct version label."
   ]
 }
