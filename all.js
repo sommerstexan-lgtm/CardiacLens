@@ -1,5 +1,4 @@
 
-
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
@@ -11,7 +10,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.197' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.206' }, params || {}));
       }
     } catch(e) {}
   };
@@ -336,6 +335,11 @@
     window._clCurrentGrid = gd;
     var cont = document.getElementById(containerid);
     if(!cont) return;
+    // Release the lock set by _clKbFail. innerHTML below replaces the
+    // container's CHILDREN, not the container element itself, so a
+    // pointer-events lock on the container would otherwise survive the
+    // rebuild and permanently freeze the keyboard after one wrong sequence.
+    cont.style.pointerEvents = '';
     var html = '<div class="cl-kb-grid">';
     gd.keys.forEach(function(k,i){
       var col = gd.colors[i];
@@ -531,6 +535,16 @@
     } else {
       var left = Math.max(0, 3 - (_clKbState.fails || 0));
       _clUpdateKbStatus(left > 0 ? ('Wrong 4-tap sequence #'+_clKbState.fails+'. First cooldown after '+left+' more wrong sequence'+(left===1?'':'s')+'.') : ('Wrong 4-tap sequence #'+_clKbState.fails+'.'));
+      // v9.10.347.206: a completed wrong 4-tap sequence used to leave the OLD
+      // grid tappable for the full 450ms before _clRenderKeyboard replaced it.
+      // A tap already in flight when the DOM swap happened would land on
+      // whatever key ended up at that same screen position in the NEW,
+      // reshuffled grid -- registering the wrong key/color entirely. Locking
+      // the grid out immediately (not just visually via the shake class)
+      // closes that window: no tap can be interpreted by either the old or
+      // new grid during the rebuild gap.
+      var kbCont = document.getElementById('clKbContainer');
+      if(kbCont) kbCont.style.pointerEvents = 'none';
       setTimeout(function(){ _clRenderKeyboard('clKbContainer'); },450);
     }
   }
@@ -893,7 +907,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.347.197';
+    var GD_VERSION   = 'v9.10.347.206';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1192,7 +1206,7 @@
     // On every load: write a provisional heartbeat timestamp immediately.
     // This prevents "Guard Dog fell asleep" flashing during the 8-second
     // initialization window -- iOS suspends timers when backgrounded, so the
-    // stored timestamp can be stale even though Guard Dog is recorded.
+    // stored timestamp can be stale even though Guard Dog is healthy.
     // The provisional write shows "On patrol..." for up to 15 seconds.
     // The real health check at 8s overwrites it with a verified timestamp.
     (function() {
@@ -1432,13 +1446,14 @@
 
 
 
+
 // ============================================================
 // VERSION-GATED CACHE BUSTER (runs before anything else)
 // If the browser loaded a stale cached page, this forces a
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.347.197';
+  var CURRENT='v9.10.347.206';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -1514,6 +1529,64 @@ function disableOSNotifications(){
   openSettings();
 }
 
+// ---------- Fluid reminder push (background alerts, screen locked / tab closed) ----------
+window.CB_FLUID_PUSH_URL='https://cardiaclens-fluid-push.sommers-texan.workers.dev';
+window._cbFluidPushLastSynced=null;
+
+window.cbInitFluidPush=function(){
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)){
+    console.warn('Push not supported on this browser.');
+    return;
+  }
+  navigator.serviceWorker.ready.then(function(reg){
+    return reg.pushManager.getSubscription().then(function(existing){
+      if(existing) return existing;
+      return fetch(window.CB_FLUID_PUSH_URL+'/vapid-public-key')
+        .then(function(r){return r.json();})
+        .then(function(data){
+          var appKey=_cbUrlB64ToUint8Array(data.publicKey);
+          return reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:appKey});
+        });
+    });
+  }).then(function(subscription){
+    if(!subscription) return;
+    return fetch(window.CB_FLUID_PUSH_URL+'/sync',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({subscription:subscription.toJSON()})
+    });
+  }).catch(function(e){
+    console.warn('cbInitFluidPush failed:',e);
+  });
+};
+
+function _cbUrlB64ToUint8Array(base64String){
+  var padding='='.repeat((4-base64String.length%4)%4);
+  var base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/');
+  var rawData=atob(base64);
+  var outputArray=new Uint8Array(rawData.length);
+  for(var i=0;i<rawData.length;i++) outputArray[i]=rawData.charCodeAt(i);
+  return outputArray;
+}
+
+// Call whenever the next upcoming fluid event changes. Pass a JS Date for
+// the next due time, or null/omit to cancel the scheduled reminder.
+// Throttled to avoid POSTing on every render -- only sends when the target
+// time actually changes.
+window.cbSyncFluidReminder=function(nextDueDate){
+  var key=nextDueDate?nextDueDate.toISOString():'none';
+  if(window._cbFluidPushLastSynced===key) return;
+  window._cbFluidPushLastSynced=key;
+  var body=nextDueDate?{nextDueAt:nextDueDate.toISOString()}:{cancel:true};
+  fetch(window.CB_FLUID_PUSH_URL+'/sync',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  }).catch(function(e){
+    console.warn('cbSyncFluidReminder failed:',e);
+  });
+};
+
 function requestOSNotificationPermission(fromUser){
   if(!('Notification' in window)){
     if(fromUser)alert('Your browser does not support desktop notifications.\nTry Chrome or Edge for the best experience.');
@@ -1553,6 +1626,7 @@ function requestOSNotificationPermission(fromUser){
         'Reminders are active — alerts will appear when CardiacLens is open or on screen.',
         'cardiaclens-test'
       );
+      if(location.protocol!=='file:') window.cbInitFluidPush();
       setTimeout(function(){ openSettings(); },300);
     } else if(result==='denied'){
       if(location.protocol==='file:') localStorage.removeItem('CARDIACLENS_NOTIF_GRANTED');
@@ -1629,7 +1703,7 @@ function fireOSNotification(title, body, tag){
         icon: 'icon-192.png',
         badge: 'icon-192.png',
         requireInteraction: true,
-        // v9.10.347.205: eventTag lets sw.js's notificationclick hand off
+        // v9.10.347.206: eventTag lets sw.js's notificationclick hand off
         // which event was tapped, so the app can open that event's real
         // action card instead of just focusing the app on whatever screen
         // it was last showing.
@@ -1647,7 +1721,7 @@ function fireOSNotification(title, body, tag){
     n.onclick=function(){
       window.focus();
       n.close();
-      // v9.10.347.205: this fallback only ever fires while the page is
+      // v9.10.347.206: this fallback only ever fires while the page is
       // still alive (Web Notifications without a SW require the tab to
       // exist), so it's safe to resolve and route in-page directly.
       try{ if(typeof _clOpenEventFromTag==='function') _clOpenEventFromTag(tag); }catch(e){}
@@ -1698,6 +1772,9 @@ function registerServiceWorker(){
     .then(function(reg){
       window._swRegistration = reg;
       console.log('[CardiacLens] SW registered, scope:', reg.scope);
+      if(location.protocol!=='file:' && ('Notification' in window) && Notification.permission==='granted'){
+        window.cbInitFluidPush();
+      }
       // v9.10.347.197: iPhone/GitHub Pages deploy repair.
       // If a refreshed service worker is waiting, activate it now instead of
       // leaving the Home Screen app controlled by the old deploy until later.
@@ -2160,7 +2237,7 @@ if(_pendingReminderEvt){
 _maybeAdvanceMissedQueue();
 }
 
-// v9.10.347.205: called from every real exit point of hideModal(). If the
+// v9.10.347.206: called from every real exit point of hideModal(). If the
 // card that just closed was one of the sequential missed-event cards, clear
 // that marker and, if more are queued, open the next one after a short
 // pause so it never overlaps the closing animation of the one before it.
@@ -3212,7 +3289,7 @@ function _wzB_step3(el){
 function _wzB_end(el){
   _wzEndScreen(el,'B',{
     headline:"You're set up for Medication Effectiveness tracking!",
-    preview:'After logging BP readings before and after your medications for a few days, the <strong>Med Effectiveness</strong> dashboard will show each medication\'s average systolic and diastolic impact, a before/after comparison chart, and an effectiveness score. Your cardiologist can see at a glance whether each drug is operating within the recorded data shown — data they cannot get from an office visit alone.',
+    preview:'After logging BP readings before and after your medications for a few days, the <strong>Med Effectiveness</strong> dashboard will show each medication\'s average systolic and diastolic impact, a before/after comparison chart, and an effectiveness score. Your cardiologist can see at a glance whether each drug is doing its job — data they cannot get from an office visit alone.',
     items:[
       {key:'meds',label:'Medications added to your list'},
       {key:'bp',label:'Blood pressure target range set'},
@@ -3569,6 +3646,10 @@ function renderFAQ() {
 
   var faqs = [
 
+    {
+      q: 'How do fluid push reminders work, do I need to set up events, or can I just use pacing?',
+      a: 'You can use whichever fits how you actually live, and CardiacLens sends real background push notifications either way, even when the app is closed or your phone is locked.<br><br><strong>Pacing only (no setup beyond Settings):</strong> Set your daily fluid amount, start time, and end time (bedtime) once in Settings. CardiacLens calculates when you should drink next to stay on track and sends a push reminder at that calculated time automatically. No events to create, nothing to maintain day to day.<br><br><strong>Scheduled Events or Plan My Day with fluid amounts:</strong> If you prefer specific amounts at specific times (for example, drinking with a particular medication, or fitting fluid around a work schedule), add a fluid amount to a named event or Plan My Day entry. That exact time and amount drives its own push reminder, independent of pacing.<br><br><strong>Both together:</strong> You can mix the two freely. Named events with fluid amounts and the pacing engine both feed the same reminder system. Whichever gives the soonest upcoming time is what fires next. Events without a fluid amount (a doctor appointment, a walk, anything unrelated to drinking) are completely ignored by this system and never interfere.<br><br>Fluid is too important for cardiac patients to leave to guesswork, so this is built to be accurate under all three setups, not just the default one.'
+    },
     {
       q: 'What does Environment Context show on activity records?',
       a: 'Environment Context is a factual snapshot saved with the activity. It shows only directly stored context such as environment mode, saved weather snapshot, activity fluid, recovery snack or food typed with the activity, after-activity notes, stop notes, recent BP/HR snapshot, and recent symptoms snapshot when those fields exist. Activity analysis and the separate context-details button were removed from activity records in v9.10.347.197 to keep the activity record simple and avoid unverified activity analysis.'
@@ -4346,9 +4427,8 @@ alert(warnings.join('\n'));
 
 // === PHASE 2: UPDATE MEDICATION EFFECTIVENESS QUICK VIEW ===
 function updateMedEffectivenessQuickView(){
-// Get today's medication readings through the BP/HR retrieval helper path
-var bpData=(typeof _getTodayBPReadings==='function')?_getTodayBPReadings():(B||[]);
-var medReadingsToday=bpData.filter(function(r){
+// Get today's medication readings
+var medReadingsToday=B.filter(function(r){
 return r.medicationRelated&&r.medicationTiming!=='none';
 });
 
@@ -4633,7 +4713,7 @@ var fDiv2=document.getElementById('bpHistFiltersDiv');
 if(fDiv2){ fDiv2.style.display='none'; fDiv2.innerHTML=''; }
 // Reset filter state when leaving history
 bpHistFilter = { text:'', dateFrom:'', dateTo:'', sysMin:'', sysMax:'', diaMin:'', diaMax:'', hrMin:'', hrMax:'', sort:'newest' };
-var bpData=(typeof _getTodayBPReadings==='function')?_getTodayBPReadings():(B||[]);
+var bpData=B;
 var h='';
 // ── Personal baseline cross-reference ──────────────────────────────────────
 var _bpLoopBaseline = null;
@@ -5467,7 +5547,7 @@ var percentUsed=Math.min((dailyFluid/settings.fluidMax)*100,100);
 var isBelowMin=dailyFluid<settings.fluidMin;
 var isAboveMax=dailyFluid>settings.fluidMax;
 var barColor=isAboveMax?'#dc2626':isBelowMin?'#f59e0b':'#10b981';
-if(isBelowMin){
+if(isBelowMin&&!(_paceHtml&&_getFirstFluidTimeToday())){
 html+='<div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:12px;border-radius:6px;margin-bottom:12px">';
 html+='<div style="font-weight:600;color:#92400e">⚠️ Below Minimum</div>';
 html+='<div style="font-size:14px;color:#92400e;margin-top:4px">Need <strong>'+(settings.fluidMin-dailyFluid)+' more oz</strong> to reach your '+settings.fluidMin+' oz minimum goal</div>';
@@ -5478,6 +5558,10 @@ html+='<div style="background:#fee2e2;border:1px solid #ef4444;padding:10px 12px
 html+='📉 At current pace you will reach only <strong>'+projectedTotal+' oz</strong> today — below your '+settings.fluidMin+' oz minimum. Consider drinking sooner.';
 html+='</div>';
 }
+}else if(isBelowMin){
+// Pacing engine is active and will show its own ahead/on/behind-pace
+// message below -- nothing extra needed here, avoids showing a static
+// "below minimum" alarm next to a contradictory "ahead of pace" card.
 }else if(isAboveMax){
 html+='<div style="background:#fee2e2;border-left:4px solid #ef4444;padding:12px;border-radius:6px;margin-bottom:12px">';
 html+='<div style="font-weight:700;color:#991b1b">🚫 Above Maximum</div>';
@@ -5517,13 +5601,49 @@ for(var _ni=0;_ni<allFluEvts.length;_ni++){
   var _ep=allFluEvts[_ni];
   var _parts=_ep.time.split(':');
   var _eMins=parseInt(_parts[0])*60+parseInt(_parts[1]);
-  if(_eMins>nowMins){nextFluidEvt=_ep;break;}
+  // Grace window: keep treating this as the "next" event for a couple minutes
+  // past its nominal time before advancing. Without this, a dashboard render
+  // that lands right at the due moment jumps straight to the FOLLOWING event
+  // and resyncs the Worker with that later time, overwriting (and silently
+  // canceling) the alarm that was about to fire for this one.
+  if(_eMins>nowMins-2){nextFluidEvt=_ep;break;}
+}
+if(window.cbSyncFluidReminder){
+  // Two independent sources can suggest a next fluid time: named events
+  // (Plan My Day / Scheduled Events) and the pacing engine's calculated
+  // suggestion (_buildFluidPaceHtml, run earlier in this render and exposed
+  // via window._cbPaceNextDrinkMins). Neither is required -- a user relying
+  // purely on pacing, with no events set up, still gets a push reminder.
+  // When both exist, the sooner one wins.
+  var _cbCandidateDate=null;
+  if(nextFluidEvt){
+    var _evtParts=nextFluidEvt.time.split(':');
+    var _cbEvtDate=new Date();
+    _cbEvtDate.setHours(parseInt(_evtParts[0]),parseInt(_evtParts[1]),0,0);
+    _cbCandidateDate=_cbEvtDate;
+  }
+  if(typeof window._cbPaceNextDrinkMins==='number'){
+    var _cbPaceDate=new Date();
+    _cbPaceDate.setHours(Math.floor(window._cbPaceNextDrinkMins/60),window._cbPaceNextDrinkMins%60,0,0);
+    if(!_cbCandidateDate||_cbPaceDate<_cbCandidateDate) _cbCandidateDate=_cbPaceDate;
+  }
+  if(_cbCandidateDate){
+    window.cbSyncFluidReminder(_cbCandidateDate);
+  }else if(window._cbFluidDayComplete){
+    window.cbSyncFluidReminder(null);
+  }
+  // else: no fresh candidate right now (e.g. currently on/behind pace, no
+  // named event), but the day isn't over -- do nothing, so any reminder
+  // already scheduled on the server from an earlier "ahead of pace" render
+  // is left alone instead of being silently canceled.
 }
 if(nextFluidEvt){
   var _evtMins=nextFluidEvt.time.split(':').reduce(function(acc,v,i){return i===0?parseInt(v)*60:acc+parseInt(v);},0);
   var _diffMins=Math.round(_evtMins-nowMins);
   var _diffStr=_diffMins>=60?(Math.floor(_diffMins/60)+'h '+(_diffMins%60>0?_diffMins%60+'m':'')):'in '+_diffMins+' min';
   var _oz=(nextFluidEvt.fluidGoal||nextFluidEvt.amount||0);
+}
+if(nextFluidEvt){
   html+='<div style="margin-top:12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 14px;">';
   html+='<div style="font-size:12px;font-weight:700;color:#3b82f6;letter-spacing:0.05em;margin-bottom:4px">💧 NEXT FLUID EVENT</div>';
   html+='<div style="display:flex;justify-content:space-between;align-items:center">';
@@ -8517,7 +8637,6 @@ function updateActivityTimerWorkflowButtons(){
   }
   updateActivityTravelButton();
 }
-
 function toggleActivityTravelState(){
   // v9.10.347.197: transportation is Start -> Finish only. GPS derives stops automatically.
   return;
@@ -9108,28 +9227,6 @@ function clActivityDateTimeFromParts(dateKey,timeText){
 }
 function clActivityIsoOrDate(v){try{if(!v)return null;var d=new Date(v);return isNaN(d.getTime())?null:d;}catch(e){return null;}}
 function clActivityTimeDiffMinutes(fromDate,toDate){try{return Math.round((toDate.getTime()-fromDate.getTime())/60000);}catch(e){return null;}}
-function clActivityTimeDiffMinutesFromClock(stopTime,eventTime){
-  try{
-    var a=clActivityTimeToMinutes(stopTime), b=clActivityTimeToMinutes(eventTime);
-    if(a===null||b===null)return null;
-    if(b<a)b+=1440;
-    return b-a;
-  }catch(e){return null;}
-}
-function clActivityWindowLabelForPlus(p){
-  p=parseFloat(p);
-  if(isNaN(p))return 'Observation window unavailable';
-  if(p>=0&&p<=30)return 'Immediate Recovery';
-  if(p>30&&p<=120)return 'Delayed Recovery';
-  if(p>120&&p<=360)return 'Extended Recovery';
-  if(p>360&&p<=1440)return 'Background';
-  return 'Outside 24-hour observation window';
-}
-function clActivityWindowTimingText(x){
-  var t=x&&x.time?String(x.time):'';
-  var p=(x&&x.plus!==null&&x.plus!==undefined)?x.plus:null;
-  return (t?t+' ':'')+(p!==null?'(+'+p+' min after activity stop)':'');
-}
 function clActivityGetRecoveryBounds(a){
   if(!a)return null;
   var dateKey=a._date||a.date||getTodayKey();
@@ -9205,15 +9302,14 @@ function clActivityCollectRecoveryEvents(a){
   if(!b)return out;
   out.available=true;out.windowMinutes=b.minutes;out.stopTime=clActivityDateToTime(b.stop);out.endTime=clActivityDateToTime(b.end);
   var data=clActivityGetAllDataForRecovery(b.dateKey);
-  function plusOfRecovery(x){return clActivityPlusFromBounds(b,x);}
-  function inWin(x){var p=plusOfRecovery(x);return p!==null&&p>0&&p<=b.minutes;}
-  function mapBp(x){return {time:x.t||x.time||'',plus:plusOfRecovery(x),s:x.s||x.systolic,d:x.d||x.diastolic,h:x.h||x.hr||x.pulse,notes:x.notes||''};}
-  function mapFluid(x){return {time:x.t||x.time||'',plus:plusOfRecovery(x),amount:parseFloat(x.amount)||0,notes:x.notes||'',source:x.source||''};}
+  function inWin(x){var dt=clActivityDateTimeFromParts(x._date||b.dateKey,x.t||x.time);return dt&&dt>b.stop&&dt<=b.end;}
+  function mapBp(x){var dt=clActivityDateTimeFromParts(x._date||b.dateKey,x.t||x.time);return {time:x.t||x.time||'',plus:clActivityTimeDiffMinutes(b.stop,dt),s:x.s||x.systolic,d:x.d||x.diastolic,h:x.h||x.hr||x.pulse,notes:x.notes||''};}
+  function mapFluid(x){var dt=clActivityDateTimeFromParts(x._date||b.dateKey,x.t||x.time);return {time:x.t||x.time||'',plus:clActivityTimeDiffMinutes(b.stop,dt),amount:parseFloat(x.amount)||0,notes:x.notes||'',source:x.source||''};}
   try{
     out.bp=(data.bp||[]).filter(function(x){return inWin(x);}).map(mapBp).sort(function(x,y){return (x.plus||0)-(y.plus||0);});
     out.fluids=(data.fluids||[]).filter(function(x){if(!inWin(x))return false;return (parseFloat(x.amount)||0)>0;}).map(mapFluid).sort(function(x,y){return (x.plus||0)-(y.plus||0);});
-    out.symptoms=(data.symptoms||[]).filter(function(x){return inWin(x);}).map(function(x){return {time:x.t||x.time||'',plus:plusOfRecovery(x),name:x.symptom||x.name||'symptom',severity:x.severity||x.level||'',condition:x.condition||'',notes:x.notes||'',windowLabel:clActivityWindowLabelForPlus(plusOfRecovery(x))};}).sort(function(x,y){return (x.plus||0)-(y.plus||0);});
-    out.notes=(data.notes||[]).filter(function(x){return inWin(x)&&(x.eventId===a.id||clActivityNoteLooksRecoveryRelevant(x.text||x.notes));}).map(function(x){return {time:x.t||x.time||'',plus:plusOfRecovery(x),text:x.text||x.notes||''};}).sort(function(x,y){return (x.plus||0)-(y.plus||0);});
+    out.symptoms=(data.symptoms||[]).filter(function(x){return inWin(x);}).map(function(x){var dt=clActivityDateTimeFromParts(x._date||b.dateKey,x.t||x.time);return {time:x.t||x.time||'',plus:clActivityTimeDiffMinutes(b.stop,dt),name:x.symptom||x.name||'symptom',severity:x.severity||x.level||'',notes:x.notes||''};}).sort(function(x,y){return (x.plus||0)-(y.plus||0);});
+    out.notes=(data.notes||[]).filter(function(x){return inWin(x)&&(x.eventId===a.id||clActivityNoteLooksRecoveryRelevant(x.text||x.notes));}).map(function(x){var dt=clActivityDateTimeFromParts(x._date||b.dateKey,x.t||x.time);return {time:x.t||x.time||'',plus:clActivityTimeDiffMinutes(b.stop,dt),text:x.text||x.notes||''};}).sort(function(x,y){return (x.plus||0)-(y.plus||0);});
     out.directActivityFluidOz=parseFloat(a.activityFluidOz)||0;
     out.directActivityFood=String(a.activitySnackNotes||'').trim();
     if(out.directActivityFluidOz>0&&!out.fluids.some(function(f){return Math.abs((parseFloat(f.amount)||0)-out.directActivityFluidOz)<0.01 && (/activity/i.test(String(f.source||''))||/Activity:/i.test(String(f.notes||'')));})){
@@ -9232,7 +9328,7 @@ function clActivityRecoverySummaryText(a){
   if(r.bp.length){var first=r.bp[0],last=r.bp[r.bp.length-1];parts.push('First recovery BP: '+first.s+'/'+first.d+(first.h?' HR '+first.h:'')+' at +'+first.plus+' min');if(r.bp.length>1)parts.push('Last recovery BP: '+last.s+'/'+last.d+(last.h?' HR '+last.h:'')+' at +'+last.plus+' min');}
   parts.push('Fluids recorded: '+(r.fluidOz||0)+' oz');
   if(r.directActivityFood)parts.push('Recovery food: '+r.directActivityFood);
-  if(r.symptoms.length)parts.push('Symptoms noted: '+r.symptoms.map(function(x){return x.name+' at '+clActivityWindowTimingText(x)+(x.condition?' (condition tag: '+x.condition+')':'');}).join(', '));
+  if(r.symptoms.length)parts.push('Symptoms noted: '+r.symptoms.map(function(x){return x.name;}).join(', '));
   if(r.notes.length)parts.push('Recovery notes: '+r.notes.map(function(x){return x.text;}).join('; '));
   return parts.join(' | ');
 }
@@ -9245,7 +9341,7 @@ function clActivityRecoveryHtml(a){
   if(r.bp.length){var first=r.bp[0],last=r.bp[r.bp.length-1];h+='<br>• First recovery BP: '+clActivityEsc(first.s)+'/'+clActivityEsc(first.d)+(first.h?' HR '+clActivityEsc(first.h):'')+' at +'+first.plus+' min';if(r.bp.length>1)h+='<br>• Last recovery BP: '+clActivityEsc(last.s)+'/'+clActivityEsc(last.d)+(last.h?' HR '+clActivityEsc(last.h):'')+' at +'+last.plus+' min';}
   h+='<br>• Fluids recorded: '+(r.fluidOz||0)+' oz';
   if(r.directActivityFood)h+='<br>• Recovery food: '+clActivityEsc(r.directActivityFood);
-  if(r.symptoms.length)h+='<br>• Symptoms noted: '+r.symptoms.map(function(x){return clActivityEsc(x.name+' at '+clActivityWindowTimingText(x)+(x.condition?' (condition tag: '+x.condition+')':''));}).join(', ');
+  if(r.symptoms.length)h+='<br>• Symptoms noted: '+r.symptoms.map(function(x){return clActivityEsc(x.name);}).join(', ');
   h+='</div>';
   return h;
 }
@@ -9259,288 +9355,6 @@ function getActivityEnvironmentFormData(){
   var other=document.getElementById('envCtxOther');
   return {mode:mode,destination:selectedDestination||'',outsideWindowLabel:selectedActivityWindow||'',outsideWindowMinutes:selectedActivityWindowMinutes||null,manualConditionBand:selectedTempBand,manualEnvironmentFactors:manualFactors,manualEnvironmentOther:(other?other.value.trim():''),weatherSnapshot:((mode==='internet'&&settings.activityWeatherStoreSnapshot!==false)?activityEnvironmentSnapshot:null),contextSnapshot:getActivityEventContextSnapshot(document.getElementById('activitySelect')?document.getElementById('activitySelect').value:'')};
 }
-
-
-
-// v9.10.347.197 KISS: Environment Context display helpers (display only; no save/storage changes)
-function clActivityEsc(v){
-  return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
-}
-function clActivityWeatherText(a){
-  var es=(a&&a.environmentalSnapshot)||{};
-  var ws=es.weatherSnapshot||{};
-  var bits=[];
-  if(ws.summary) bits.push(ws.summary);
-  var feels=(ws.heatIndexF!==null&&ws.heatIndexF!==undefined)?ws.heatIndexF:((ws.feelsLike!==null&&ws.feelsLike!==undefined)?ws.feelsLike:ws.feelsLikeF);
-  var temp=(ws.temperature!==null&&ws.temperature!==undefined)?ws.temperature:ws.tempF;
-  if(feels!==null&&feels!==undefined&&!isNaN(parseFloat(feels))) bits.push('Feels like '+Math.round(parseFloat(feels))+'°');
-  if(temp!==null&&temp!==undefined&&!isNaN(parseFloat(temp))) bits.push('Temp '+Math.round(parseFloat(temp))+'°');
-  var rain=(ws.rainMaxProbability!==null&&ws.rainMaxProbability!==undefined)?ws.rainMaxProbability:((ws.rainChancePct!==null&&ws.rainChancePct!==undefined)?ws.rainChancePct:ws.precipChance);
-  if(rain!==null&&rain!==undefined&&!isNaN(parseFloat(rain))) bits.push('Rain '+Math.round(parseFloat(rain))+'%');
-  var wind=(ws.windSpeed!==null&&ws.windSpeed!==undefined)?ws.windSpeed:ws.windMph;
-  var windDir=ws.windCompass||ws.windDir||'';
-  if(wind!==null&&wind!==undefined&&!isNaN(parseFloat(wind))) bits.push('Wind '+Math.round(parseFloat(wind))+' mph'+(windDir?' '+windDir:''));
-  if(!bits.length&&a&&a.outdoorTempF) bits.push('Manual outdoor estimate '+Math.round(a.outdoorTempF)+'°');
-  return bits.join(' · ');
-}
-function clActivityContextLines(a){
-  var lines=[];
-  if(!a) return lines;
-  var es=a.environmentalSnapshot||{};
-  var cs=a.eventContextSnapshot||es.contextSnapshot||{};
-  var manual=[];
-  if(es.mode) manual.push('Mode: '+es.mode);
-  if(es.manualEnvironmentFactors&&es.manualEnvironmentFactors.length) manual=manual.concat(es.manualEnvironmentFactors);
-  if(es.manualEnvironmentOther) manual.push(es.manualEnvironmentOther);
-  if(manual.length) lines.push('Environment: '+manual.join(', '));
-  var w=clActivityWeatherText(a);
-  if(w) lines.push('Weather: '+w);
-  if(a.activitySymptomsNotes){ lines.push('Activity symptoms: '+a.activitySymptomsNotes); }
-  if(a.activityAfterNotes){ lines.push('After-activity notes: '+a.activityAfterNotes); }
-  if(a.activityFluidOz){ lines.push('Activity fluid: '+a.activityFluidOz+' oz'); }
-  if(a.activityStopLog&&a.activityStopLog.length){
-    var stopBits=a.activityStopLog.map(function(st){var b='Stop '+(st.stopNumber||'')+' '+(st.time||''); if(st.location)b+=' location: '+st.location; if(st.note)b+=' note: '+st.note; if(st.symptom)b+=' symptoms: '+st.symptom; if(st.fluidOz)b+=' fluid '+st.fluidOz+' oz'; if(st.snack)b+=' snack: '+st.snack; return b;});
-    lines.push('Activity stop log: '+stopBits.join(' | '));
-  }
-  if(a.activitySnackNotes){ lines.push('Recovery snack/food: '+a.activitySnackNotes); }
-  // v9.10.347.197 rollback: Environment Context is direct saved context only.
-  // Do not calculate or summarize activity hydration/recovery windows here.
-  if(cs.hydration&&cs.hydration.todayOz!==null&&cs.hydration.todayOz!==undefined) lines.push('Fluid today at save: '+cs.hydration.todayOz+' oz');
-  if(cs.recentBP) lines.push('Recent BP: '+cs.recentBP.systolic+'/'+cs.recentBP.diastolic+' HR '+cs.recentBP.pulse+(cs.recentBP.time?' at '+cs.recentBP.time:''));
-  if(cs.recentSymptoms&&cs.recentSymptoms.length){
-    var sx=cs.recentSymptoms.map(function(s){return (s.symptom||s.name||'symptom')+(s.severity?' sev '+s.severity:'')+(s.time?' at '+s.time:'');}).join('; ');
-    lines.push('Recent symptoms: '+sx);
-  }
-  return lines;
-}
-
-function clActivityFindLinkedBP(a, timing){
-  if(!a) return null;
-  try{
-    var pools=[];
-    if(typeof B!=='undefined' && B && B.length)pools=pools.concat(B);
-    if(typeof getAllHistoricalData==='function'){
-      var h=getAllHistoricalData();
-      if(h&&h.bp&&h.bp.length)pools=pools.concat(h.bp);
-    }
-    for(var i=pools.length-1;i>=0;i--){
-      if(pools[i] && a.id && pools[i].activityId===a.id && pools[i].activityTiming===timing) return pools[i];
-    }
-    var t=a.linkedBP&&a.linkedBP[timing];
-    if(t){
-      for(var j=pools.length-1;j>=0;j--){
-        if(pools[j] && (pools[j].t||pools[j].time)===t && (!a._date || !pools[j]._date || pools[j]._date===a._date)) return pools[j];
-      }
-    }
-  }catch(e){}
-  return null;
-}
-function clActivityAnalysisCompleteness(a){
-  var captured=[];
-  var missing=[];
-  if(!a){return {captured:captured,missing:['Activity record'],percent:0};}
-  var es=a.environmentalSnapshot||{};
-  var cs=a.eventContextSnapshot||es.contextSnapshot||{};
-  var weather=clActivityWeatherText(a);
-  var before=clActivityFindLinkedBP(a,'before');
-  var after=clActivityFindLinkedBP(a,'after');
-
-  if(a.duration) captured.push('Duration'); else missing.push('Duration');
-  if(es.mode||a.activityContext||a.environmentalMode) captured.push('Environment mode'); else missing.push('Environment mode');
-  if(weather) captured.push('Weather snapshot'); else missing.push('Weather snapshot');
-  if(a.distanceMiles) captured.push('GPS distance/elevation');
-  if(cs.hydration && cs.hydration.activity) captured.push('Activity fluid window'); else if(cs.hydration && cs.hydration.todayOz!==null && cs.hydration.todayOz!==undefined) captured.push('Fluid total at save'); else missing.push('Activity fluid window');
-  if(cs.recentBP) captured.push('Recent BP/HR'); else missing.push('Recent BP/HR');
-  if(before) captured.push('Before activity BP'); else missing.push('Before activity BP');
-  if(after) captured.push('After activity / recovery BP'); else missing.push('After activity / recovery BP');
-  var hasStopSymptoms=!!(a.activityStopLog&&a.activityStopLog.some&&a.activityStopLog.some(function(st){return !!(st&&st.symptom);}));
-  if(cs.recentSymptoms && cs.recentSymptoms.length) captured.push('Recent symptoms'); else if(hasStopSymptoms) captured.push('Stop symptoms'); else missing.push('Symptoms');
-  if(a.notes) captured.push('Notes'); else missing.push('Notes');
-  if(a.activitySymptomsNotes) captured.push('Activity symptoms');
-  if(a.activityAfterNotes) captured.push('After-activity notes');
-  if(a.activityStopLog&&a.activityStopLog.length) captured.push('Stop log');
-
-  var total=captured.length+missing.length;
-  var pct=total?Math.round((captured.length/total)*100):0;
-  return {captured:captured,missing:missing,percent:pct,beforeBP:before,afterBP:after};
-}
-function clActivityCompletenessHtml(a){
-  // v9.10.347.197: activity detail should stay clean; no analysis-completeness percentage panel.
-  return '';
-}
-function clActivityCompletenessText(a){
-  // v9.10.347.197: Ask/activity wording no longer uses analysis-completeness percentages.
-  return '';
-}
-
-function _clFindHistoricalActivity(dateKey,timeKey){
-  var list=(typeof _actHistAllData!=='undefined'&&_actHistAllData)||[];
-  for(var i=0;i<list.length;i++){if((list[i]._date||getTodayKey())===dateKey&&list[i].t===timeKey)return list[i];}
-  return null;
-}
-function _clActivityContextHtml(a){
-  var lines=clActivityContextLines(a);
-  if(!lines.length)return '';
-  var html='<details style="margin-top:12px;background:#ecfeff;border-left:4px solid #0891b2;border-radius:8px;padding:10px;color:#164e63;font-size:14px">';
-  html+='<summary style="font-weight:900;cursor:pointer">▼ Environment Context</summary>';
-  html+='<div style="margin-top:8px;line-height:1.6">'+lines.map(clActivityEsc).join('<br>')+'</div>';
-  html+='</details>';
-  return html;
-}
-function openActivityContextDetailsFor(a){
-  if(!a){alert('Activity not found');return;}
-  var lines=clActivityContextLines(a);
-  var html='<div class="modal-title">Environment Context</div>';
-  html+='<div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-bottom:12px">';
-  html+='<div style="font-size:22px;font-weight:900;color:#0f172a;margin-bottom:4px">'+clActivityEsc(a.activity||'Activity')+'</div>';
-  html+='<div style="font-size:15px;color:#475569">'+clActivityEsc(a._date||a.date||'')+' '+clActivityEsc(a.t||'')+' · '+clActivityEsc(a.duration||'')+' min · '+clActivityEsc(a.exertion||'')+' exertion</div>';
-  html+='</div>';
-  html+='<div style="background:#ecfeff;border-left:4px solid #0891b2;border-radius:10px;padding:14px;margin-bottom:12px;color:#164e63;font-size:15px;line-height:1.6">';
-  html+='<strong>Environment Context — saved facts only</strong><br>'+(lines.length?lines.map(clActivityEsc).join('<br>'):'No environment context saved for this activity.');
-  html+='</div>';
-  html+='<button class="modal-cancel" onclick="hideModal()" style="width:100%;margin-top:8px">Close</button>';
-  window._clCurrentActivityContextDetail=a;
-  showModal(html);
-}
-function openActivityContextDetails(i){
-  var a=(typeof A!=='undefined'&&A&&A[i])?A[i]:null;
-  openActivityContextDetailsFor(a);
-}
-function openActivityContextDetailsHistorical(dateKey,timeKey){
-  openActivityContextDetailsFor(_clFindHistoricalActivity(dateKey,timeKey));
-}
-
-function clActivityPriorActivitiesSameType(a){
-  var out=[], name=String((a&&a.activity)||'').split('(')[0].trim().toLowerCase();
-  function add(x){if(!x||x===a)return;var n=String(x.activity||'').split('(')[0].trim().toLowerCase();if(name&&n===name&&(!a.id||x.id!==a.id))out.push(x);}
-  try{(A||[]).forEach(add);}catch(e){}
-  try{var h=(typeof getAllHistoricalData==='function')?getAllHistoricalData():null;(h&&h.activities||[]).forEach(add);}catch(e){}
-  return out.slice(-12);
-}
-function clAvg(arr,fn){var n=0,c=0;(arr||[]).forEach(function(x){var v=parseFloat(fn(x));if(!isNaN(v)){n+=v;c++;}});return c?Math.round((n/c)*10)/10:null;}
-function clActivityBpLine(bp){return bp?(bp.s||bp.systolic)+'/'+(bp.d||bp.diastolic)+(bp.h||bp.hr||bp.pulse?' HR '+(bp.h||bp.hr||bp.pulse):'')+(bp.t?' at '+bp.t:''):'not recorded';}
-function clActivityDeltaLine(before,after){
-  if(!before||!after)return 'not enough BP data';
-  var ds=(parseFloat(after.s||after.systolic)-parseFloat(before.s||before.systolic));
-  var dd=(parseFloat(after.d||after.diastolic)-parseFloat(before.d||before.diastolic));
-  var dh=(parseFloat(after.h||after.hr||after.pulse)-parseFloat(before.h||before.hr||before.pulse));
-  var bits=[]; if(!isNaN(ds))bits.push('systolic '+(ds>=0?'+':'')+ds); if(!isNaN(dd))bits.push('diastolic '+(dd>=0?'+':'')+dd); if(!isNaN(dh))bits.push('HR '+(dh>=0?'+':'')+dh); return bits.join(', ')||'not enough BP data';
-}
-function clActivityTempVal(a){try{var ws=((a.environmentalSnapshot||{}).weatherSnapshot||{}).current||{};var v=ws.feelsLike||ws.temperature||a.outdoorTempF;return parseFloat(v);}catch(e){return parseFloat(a&&a.outdoorTempF);} }
-
-function clActivityCleanMealName(name){
-  name=String(name||'meal').split('\n')[0].trim();
-  // Saved recipe/template names sometimes include a date in parentheses, e.g. "Hard Boiled Eggs (6/3/26)".
-  // That date is part of the saved recipe name, not the event date; remove it for activity context display.
-  name=name.replace(/\s*\(\d{1,2}\/\d{1,2}\/\d{2,4}\)\s*/g,' ').replace(/\s+/g,' ').trim();
-  return name||'meal';
-}
-function clActivityFluidKey(f){
-  return [String(f.time||''),String(Math.round((parseFloat(f.plus)||0)*10)/10),String(Math.round((parseFloat(f.amount)||0)*10)/10),String(f.eventId||''),String(f.notes||'').toLowerCase(),String(f.source||'').toLowerCase()].join('|');
-}
-function clActivityDedupFluidList(list){
-  var seen={},out=[];
-  (list||[]).forEach(function(f){
-    var k=clActivityFluidKey(f);
-    var loose=[String(f.time||''),String(Math.round((parseFloat(f.plus)||0)*10)/10),String(Math.round((parseFloat(f.amount)||0)*10)/10)].join('|');
-    if(seen[k]||seen[loose])return;
-    seen[k]=true;seen[loose]=true;out.push(f);
-  });
-  return out;
-}
-function clActivityCollectObservationWindows(a){
-  var b=clActivityGetRecoveryBounds(a);
-  var wins=[
-    {key:'immediate',label:'Immediate Recovery',from:0,to:30},
-    {key:'delayed',label:'Delayed Recovery',from:30,to:120},
-    {key:'extended',label:'Extended Recovery',from:120,to:360},
-    {key:'background',label:'Background',from:360,to:1440}
-  ];
-  if(!b)return wins.map(function(w){w.available=false;w.bp=[];w.fluids=[];w.meals=[];w.symptoms=[];return w;});
-  var data=clActivityGetAllDataForRecovery(b.dateKey);
-  function plusOf(x){return clActivityPlusFromBounds(b,x);}
-  function inWindow(p,w){return p!==null&&p!==undefined&&p>=w.from&&p<=w.to&&(w.key==='immediate'||p>w.from);}
-  wins.forEach(function(w){
-    w.available=true;w.bp=[];w.fluids=[];w.meals=[];w.symptoms=[];
-    (data.bp||[]).forEach(function(x){var p=plusOf(x);if(inWindow(p,w))w.bp.push({time:x.t||x.time||'',plus:p,s:x.s||x.systolic,d:x.d||x.diastolic,h:x.h||x.hr||x.pulse});});
-    (data.fluids||[]).forEach(function(x){var p=plusOf(x),amt=parseFloat(x.amount)||0;if(inWindow(p,w)&&amt>0)w.fluids.push({time:x.t||x.time||'',plus:p,amount:amt,source:x.source||'',notes:x.notes||'',eventId:x.eventId||''});});
-    (data.meals||[]).forEach(function(x){var p=plusOf(x);if(inWindow(p,w))w.meals.push({time:x.t||x.time||'',plus:p,name:clActivityCleanMealName(x.m||x.meal||x.notes||'meal'),rawName:String(x.m||x.meal||x.notes||'meal').split('\n')[0],eventId:x.eventId||'',savedMealId:x.savedMealId||''});});
-    (data.symptoms||[]).forEach(function(x){var p=plusOf(x);if(inWindow(p,w))w.symptoms.push({time:x.t||x.time||'',plus:p,name:x.symptom||x.name||'symptom',severity:x.severity||x.level||'',condition:x.condition||'',notes:x.notes||'',windowLabel:w.label});});
-  });
-  var direct=parseFloat(a&&a.activityFluidOz)||0;
-  if(direct>0&&wins[0]&&!wins[0].fluids.some(function(f){return Math.abs((parseFloat(f.amount)||0)-direct)<0.01 && (/activity/i.test(String(f.source||''))||/Activity:/i.test(String(f.notes||''))||f.eventId===(a&&a.id));})){
-    wins[0].fluids.push({time:(a&&a.t)||clActivityDateToTime(b.stop),plus:0,amount:direct,source:'activity',notes:'Activity recovery fluid',eventId:(a&&a.id)||''});
-  }
-  var food=String((a&&a.activitySnackNotes)||'').trim();
-  if(food&&wins[0]&&!wins.some(function(w){return (w.meals||[]).some(function(m){return String(m.name||'').toLowerCase().indexOf(food.toLowerCase().split(' ')[0])>=0;});})){
-    wins[0].meals.push({time:(a&&a.t)||clActivityDateToTime(b.stop),plus:0,name:food,eventId:(a&&a.id)||'',source:'activity'});
-  }
-  wins.forEach(function(w){w.fluids=clActivityDedupFluidList(w.fluids);w.bp.sort(function(x,y){return x.plus-y.plus;});w.fluids.sort(function(x,y){return x.plus-y.plus;});w.meals.sort(function(x,y){return x.plus-y.plus;});w.symptoms.sort(function(x,y){return x.plus-y.plus;});});
-  return wins;
-}
-function clActivityObservationWindowLines(a){
-  var wins=clActivityCollectObservationWindows(a), lines=[];
-  wins.forEach(function(w){
-    var bp=w.bp.map(function(x){return '+'+x.plus+' min '+x.time+' '+x.s+'/'+x.d+(x.h?' HR '+x.h:'');}).join('; ')||'none recorded';
-    var fl=w.fluids.map(function(x){return '+'+x.plus+' min '+x.time+' '+x.amount+' oz'+(x.notes?' '+x.notes:'');}).join('; ')||'none recorded';
-    var ml=(w.meals||[]).map(function(x){return '+'+x.plus+' min '+x.time+' '+x.name;}).join('; ')||'none recorded';
-    var sx=w.symptoms.map(function(x){return '+'+x.plus+' min '+x.time+' '+x.name+(x.severity?' severity '+x.severity:'')+(x.condition?' (condition tag: '+x.condition+')':'')+' — timing only, no causation implied';}).join('; ')||'none recorded';
-    lines.push(w.label+' ('+w.from+'-'+w.to+' min after stop): BP/HR '+bp+'; fluids '+fl+'; meals/food '+ml+'; symptoms '+sx);
-  });
-  return lines;
-}
-function clActivityHistoricalPatternLines(a){
-  var prior=clActivityPriorActivitiesSameType(a), lines=[];
-  lines.push('Canonical activity timing: '+clActivityTimingSummary(a));
-  try{var bb=clActivityGetRecoveryBounds(a), pre=clActivityFindLinkedBP(a,'before'), post=clActivityFindLinkedBP(a,'after'); if(pre&&bb){lines.push('Exact pre-activity BP timing: '+(pre.t||'')+' is '+clActivityPlusFromBounds(bb,pre)+' min from activity stop. Do not describe it as minutes from activity start.');} if(post&&bb){lines.push('Exact first recovery BP timing: '+(post.t||'')+' is +'+clActivityPlusFromBounds(bb,post)+' min after activity stop.');}}catch(e){}
-  lines.push('Same-type prior activity count: '+prior.length);
-  if(!prior.length){lines.push('No previous same-type activities available for comparison yet.');return lines;}
-  var avgDur=clAvg(prior,function(x){return x.duration;});
-  var avgDist=clAvg(prior,function(x){return x.distanceMiles;});
-  var avgTemp=clAvg(prior,clActivityTempVal);
-  lines.push('Prior same-type average duration: '+(avgDur!==null?avgDur+' min':'not available')+'; today: '+(a.duration||'not recorded')+' min');
-  lines.push('Prior same-type average distance: '+(avgDist!==null?avgDist+' mi':'not available')+'; today: '+(a.distanceMiles||'not recorded'));
-  lines.push('Prior same-type average temperature/feels-like: '+(avgTemp!==null?avgTemp+'°':'not available')+'; today: '+(isNaN(clActivityTempVal(a))?'not recorded':clActivityTempVal(a)+'°'));
-  var h=clActivityEffectiveHydrationSnapshot(a)||{};
-  lines.push('Today hydration window: before '+(h.beforeOz||0)+' oz; during '+(h.duringOz||0)+' oz; immediate recovery '+(h.afterOz||0)+' oz');
-  var priorHyd=prior.map(function(x){return clActivityEffectiveHydrationSnapshot(x);}).filter(function(x){return x&&x.available;});
-  if(priorHyd.length){lines.push('Prior same-type hydration averages: before '+clAvg(priorHyd,function(x){return x.beforeOz||0;})+' oz; during '+clAvg(priorHyd,function(x){return x.duringOz||0;})+' oz; immediate recovery '+clAvg(priorHyd,function(x){return x.afterOz||0;})+' oz');}
-  var before=clActivityFindLinkedBP(a,'before'), after=clActivityFindLinkedBP(a,'after');
-  lines.push('Today pre-activity BP: '+clActivityBpLine(before));
-  lines.push('Today immediate/recovery BP: '+clActivityBpLine(after));
-  lines.push('Today BP/HR change: '+clActivityDeltaLine(before,after));
-  var priorDeltas=[];
-  prior.forEach(function(x){var b=clActivityFindLinkedBP(x,'before'), af=clActivityFindLinkedBP(x,'after');if(b&&af)priorDeltas.push({ds:(parseFloat(af.s)-parseFloat(b.s)),dd:(parseFloat(af.d)-parseFloat(b.d)),dh:(parseFloat(af.h)-parseFloat(b.h))});});
-  if(priorDeltas.length){lines.push('Prior same-type average BP/HR change: systolic '+clAvg(priorDeltas,function(x){return x.ds;})+'; diastolic '+clAvg(priorDeltas,function(x){return x.dd;})+'; HR '+clAvg(priorDeltas,function(x){return x.dh;}));}
-  lines.push('Observation windows: Immediate Recovery 0-30 min; Delayed Recovery 30-120 min; Extended Recovery 2-6 hr; Background 6-24 hr. These are association windows, not causation windows.');
-  lines=lines.concat(clActivityObservationWindowLines(a));
-  return lines;
-}
-function clActivityFmtOz(n){n=parseFloat(n)||0;return (Math.round(n*10)/10)+' oz';}
-function clActivityListFluids(w){return (w&&w.fluids&&w.fluids.length)?w.fluids.map(function(f){return clActivityFmtOz(f.amount)+' at +'+f.plus+' min'+(f.time?' ('+f.time+')':'')+(f.notes?' '+f.notes:'');}).join('; '):'none recorded';}
-function clActivityListMeals(w){return (w&&w.meals&&w.meals.length)?w.meals.map(function(m){return m.name+' at +'+m.plus+' min'+(m.time?' ('+m.time+')':'');}).join('; '):'none recorded';}
-function clActivityListSymptoms(w){return (w&&w.symptoms&&w.symptoms.length)?w.symptoms.map(function(s){return s.name+(s.severity?' severity '+s.severity:'')+' at +'+s.plus+' min'+(s.time?' ('+s.time+')':'')+(s.condition?' (condition tag: '+s.condition+')':'')+' — timing only, no causation implied';}).join('; '):'none recorded';}
-function clActivityListBp(w){return (w&&w.bp&&w.bp.length)?w.bp.map(function(b){return b.s+'/'+b.d+(b.h?' HR '+b.h:'')+' at +'+b.plus+' min'+(b.time?' ('+b.time+')':'');}).join('; '):'none recorded';}
-function clActivitySumWinFluids(w){var n=0;(w&&w.fluids||[]).forEach(function(f){n+=parseFloat(f.amount)||0;});return Math.round(n*10)/10;}
-function clActivityBuildDeterministicAskReport(a){
-  return 'Activity analysis has been removed from activity records in this version.';
-}
-function clActivityObservationWindowTimingRepairPrompt(a){
-  return clActivityBuildDeterministicAskReport(a);
-}
-function askActivityContextFor(a){
-  alert('Activity analysis has been removed from activity records in this version.');
-}
-function askActivityContext(i){
-  askActivityContextFor((typeof A!=='undefined'&&A&&A[i])?A[i]:null);
-}
-function askActivityContextHistorical(dateKey,timeKey){
-  askActivityContextFor(_clFindHistoricalActivity(dateKey,timeKey));
-}
-function askActivityContextForCurrentDetail(){
-  askActivityContextFor(window._clCurrentActivityContextDetail||null);
-}
-
 
 
 function _activityGpsActivityType(){var el=document.getElementById('activitySelect');return el?(el.value||''):'';}
@@ -10906,8 +10720,10 @@ return diff;
 function _showRecentBPCard(){
 var card=document.getElementById('recentBPCard');
 if(!card)return;
-var latest=(typeof _getRecentBPReading==='function')?_getRecentBPReading():null;
-if(!latest){card.innerHTML='';return;}
+if(!B||B.length===0){card.innerHTML='';return;}
+// Sort to find most recent by HH:MM string
+var sorted=B.slice().sort(function(a,b){return b.t.localeCompare(a.t);});
+var latest=sorted[0];
 // Already linked as before-reading for another activity?
 if(latest.activityId&&latest.activityTiming==='before'){
 card.innerHTML='<div style="background:#f3f4f6;border-left:4px solid #9ca3af;border-radius:8px;padding:10px 14px;font-size:14px;color:#6b7280;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center"><span>📊 Last reading ('+latest.s+'/'+latest.d+', HR '+latest.h+') already linked to a previous activity.</span><button type="button" onclick="document.getElementById(\'recentBPCard\').style.display=\'none\'" style="background:none;border:none;color:#6b7280;font-size:18px;cursor:pointer;padding:0 0 0 12px;line-height:1;flex-shrink:0">✕</button></div>';
@@ -11563,6 +11379,286 @@ function _actHistRenderFilters(){
   fDiv.style.display = 'block';
 }
 
+
+// v9.10.347.197 KISS: Environment Context display helpers (display only; no save/storage changes)
+function clActivityEsc(v){
+  return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
+}
+function clActivityWeatherText(a){
+  var es=(a&&a.environmentalSnapshot)||{};
+  var ws=es.weatherSnapshot||{};
+  var bits=[];
+  if(ws.summary) bits.push(ws.summary);
+  var feels=(ws.heatIndexF!==null&&ws.heatIndexF!==undefined)?ws.heatIndexF:((ws.feelsLike!==null&&ws.feelsLike!==undefined)?ws.feelsLike:ws.feelsLikeF);
+  var temp=(ws.temperature!==null&&ws.temperature!==undefined)?ws.temperature:ws.tempF;
+  if(feels!==null&&feels!==undefined&&!isNaN(parseFloat(feels))) bits.push('Feels like '+Math.round(parseFloat(feels))+'°');
+  if(temp!==null&&temp!==undefined&&!isNaN(parseFloat(temp))) bits.push('Temp '+Math.round(parseFloat(temp))+'°');
+  var rain=(ws.rainMaxProbability!==null&&ws.rainMaxProbability!==undefined)?ws.rainMaxProbability:((ws.rainChancePct!==null&&ws.rainChancePct!==undefined)?ws.rainChancePct:ws.precipChance);
+  if(rain!==null&&rain!==undefined&&!isNaN(parseFloat(rain))) bits.push('Rain '+Math.round(parseFloat(rain))+'%');
+  var wind=(ws.windSpeed!==null&&ws.windSpeed!==undefined)?ws.windSpeed:ws.windMph;
+  var windDir=ws.windCompass||ws.windDir||'';
+  if(wind!==null&&wind!==undefined&&!isNaN(parseFloat(wind))) bits.push('Wind '+Math.round(parseFloat(wind))+' mph'+(windDir?' '+windDir:''));
+  if(!bits.length&&a&&a.outdoorTempF) bits.push('Manual outdoor estimate '+Math.round(a.outdoorTempF)+'°');
+  return bits.join(' · ');
+}
+function clActivityContextLines(a){
+  var lines=[];
+  if(!a) return lines;
+  var es=a.environmentalSnapshot||{};
+  var cs=a.eventContextSnapshot||es.contextSnapshot||{};
+  var manual=[];
+  if(es.mode) manual.push('Mode: '+es.mode);
+  if(es.manualEnvironmentFactors&&es.manualEnvironmentFactors.length) manual=manual.concat(es.manualEnvironmentFactors);
+  if(es.manualEnvironmentOther) manual.push(es.manualEnvironmentOther);
+  if(manual.length) lines.push('Environment: '+manual.join(', '));
+  var w=clActivityWeatherText(a);
+  if(w) lines.push('Weather: '+w);
+  if(a.activitySymptomsNotes){ lines.push('Activity symptoms: '+a.activitySymptomsNotes); }
+  if(a.activityAfterNotes){ lines.push('After-activity notes: '+a.activityAfterNotes); }
+  if(a.activityFluidOz){ lines.push('Activity fluid: '+a.activityFluidOz+' oz'); }
+  if(a.activityStopLog&&a.activityStopLog.length){
+    var stopBits=a.activityStopLog.map(function(st){var b='Stop '+(st.stopNumber||'')+' '+(st.time||''); if(st.location)b+=' location: '+st.location; if(st.note)b+=' note: '+st.note; if(st.symptom)b+=' symptoms: '+st.symptom; if(st.fluidOz)b+=' fluid '+st.fluidOz+' oz'; if(st.snack)b+=' snack: '+st.snack; return b;});
+    lines.push('Activity stop log: '+stopBits.join(' | '));
+  }
+  if(a.activitySnackNotes){ lines.push('Recovery snack/food: '+a.activitySnackNotes); }
+  // v9.10.347.197 rollback: Environment Context is direct saved context only.
+  // Do not calculate or summarize activity hydration/recovery windows here.
+  if(cs.hydration&&cs.hydration.todayOz!==null&&cs.hydration.todayOz!==undefined) lines.push('Fluid today at save: '+cs.hydration.todayOz+' oz');
+  if(cs.recentBP) lines.push('Recent BP: '+cs.recentBP.systolic+'/'+cs.recentBP.diastolic+' HR '+cs.recentBP.pulse+(cs.recentBP.time?' at '+cs.recentBP.time:''));
+  if(cs.recentSymptoms&&cs.recentSymptoms.length){
+    var sx=cs.recentSymptoms.map(function(s){return (s.symptom||s.name||'symptom')+(s.severity?' sev '+s.severity:'')+(s.time?' at '+s.time:'');}).join('; ');
+    lines.push('Recent symptoms: '+sx);
+  }
+  return lines;
+}
+
+function clActivityFindLinkedBP(a, timing){
+  if(!a) return null;
+  try{
+    var pools=[];
+    if(typeof B!=='undefined' && B && B.length)pools=pools.concat(B);
+    if(typeof getAllHistoricalData==='function'){
+      var h=getAllHistoricalData();
+      if(h&&h.bp&&h.bp.length)pools=pools.concat(h.bp);
+    }
+    for(var i=pools.length-1;i>=0;i--){
+      if(pools[i] && a.id && pools[i].activityId===a.id && pools[i].activityTiming===timing) return pools[i];
+    }
+    var t=a.linkedBP&&a.linkedBP[timing];
+    if(t){
+      for(var j=pools.length-1;j>=0;j--){
+        if(pools[j] && (pools[j].t||pools[j].time)===t && (!a._date || !pools[j]._date || pools[j]._date===a._date)) return pools[j];
+      }
+    }
+  }catch(e){}
+  return null;
+}
+function clActivityAnalysisCompleteness(a){
+  var captured=[];
+  var missing=[];
+  if(!a){return {captured:captured,missing:['Activity record'],percent:0};}
+  var es=a.environmentalSnapshot||{};
+  var cs=a.eventContextSnapshot||es.contextSnapshot||{};
+  var weather=clActivityWeatherText(a);
+  var before=clActivityFindLinkedBP(a,'before');
+  var after=clActivityFindLinkedBP(a,'after');
+
+  if(a.duration) captured.push('Duration'); else missing.push('Duration');
+  if(es.mode||a.activityContext||a.environmentalMode) captured.push('Environment mode'); else missing.push('Environment mode');
+  if(weather) captured.push('Weather snapshot'); else missing.push('Weather snapshot');
+  if(a.distanceMiles) captured.push('GPS distance/elevation');
+  if(cs.hydration && cs.hydration.activity) captured.push('Activity fluid window'); else if(cs.hydration && cs.hydration.todayOz!==null && cs.hydration.todayOz!==undefined) captured.push('Fluid total at save'); else missing.push('Activity fluid window');
+  if(cs.recentBP) captured.push('Recent BP/HR'); else missing.push('Recent BP/HR');
+  if(before) captured.push('Before activity BP'); else missing.push('Before activity BP');
+  if(after) captured.push('After activity / recovery BP'); else missing.push('After activity / recovery BP');
+  var hasStopSymptoms=!!(a.activityStopLog&&a.activityStopLog.some&&a.activityStopLog.some(function(st){return !!(st&&st.symptom);}));
+  if(cs.recentSymptoms && cs.recentSymptoms.length) captured.push('Recent symptoms'); else if(hasStopSymptoms) captured.push('Stop symptoms'); else missing.push('Symptoms');
+  if(a.notes) captured.push('Notes'); else missing.push('Notes');
+  if(a.activitySymptomsNotes) captured.push('Activity symptoms');
+  if(a.activityAfterNotes) captured.push('After-activity notes');
+  if(a.activityStopLog&&a.activityStopLog.length) captured.push('Stop log');
+
+  var total=captured.length+missing.length;
+  var pct=total?Math.round((captured.length/total)*100):0;
+  return {captured:captured,missing:missing,percent:pct,beforeBP:before,afterBP:after};
+}
+function clActivityCompletenessHtml(a){
+  // v9.10.347.197: activity detail should stay clean; no analysis-completeness percentage panel.
+  return '';
+}
+function clActivityCompletenessText(a){
+  // v9.10.347.197: Ask/activity wording no longer uses analysis-completeness percentages.
+  return '';
+}
+
+function _clFindHistoricalActivity(dateKey,timeKey){
+  var list=(typeof _actHistAllData!=='undefined'&&_actHistAllData)||[];
+  for(var i=0;i<list.length;i++){if((list[i]._date||getTodayKey())===dateKey&&list[i].t===timeKey)return list[i];}
+  return null;
+}
+function _clActivityContextHtml(a){
+  var lines=clActivityContextLines(a);
+  if(!lines.length)return '';
+  var html='<details style="margin-top:12px;background:#ecfeff;border-left:4px solid #0891b2;border-radius:8px;padding:10px;color:#164e63;font-size:14px">';
+  html+='<summary style="font-weight:900;cursor:pointer">▼ Environment Context</summary>';
+  html+='<div style="margin-top:8px;line-height:1.6">'+lines.map(clActivityEsc).join('<br>')+'</div>';
+  html+='</details>';
+  return html;
+}
+function openActivityContextDetailsFor(a){
+  if(!a){alert('Activity not found');return;}
+  var lines=clActivityContextLines(a);
+  var html='<div class="modal-title">Environment Context</div>';
+  html+='<div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-bottom:12px">';
+  html+='<div style="font-size:22px;font-weight:900;color:#0f172a;margin-bottom:4px">'+clActivityEsc(a.activity||'Activity')+'</div>';
+  html+='<div style="font-size:15px;color:#475569">'+clActivityEsc(a._date||a.date||'')+' '+clActivityEsc(a.t||'')+' · '+clActivityEsc(a.duration||'')+' min · '+clActivityEsc(a.exertion||'')+' exertion</div>';
+  html+='</div>';
+  html+='<div style="background:#ecfeff;border-left:4px solid #0891b2;border-radius:10px;padding:14px;margin-bottom:12px;color:#164e63;font-size:15px;line-height:1.6">';
+  html+='<strong>Environment Context — saved facts only</strong><br>'+(lines.length?lines.map(clActivityEsc).join('<br>'):'No environment context saved for this activity.');
+  html+='</div>';
+  html+='<button class="modal-cancel" onclick="hideModal()" style="width:100%;margin-top:8px">Close</button>';
+  window._clCurrentActivityContextDetail=a;
+  showModal(html);
+}
+function openActivityContextDetails(i){
+  var a=(typeof A!=='undefined'&&A&&A[i])?A[i]:null;
+  openActivityContextDetailsFor(a);
+}
+function openActivityContextDetailsHistorical(dateKey,timeKey){
+  openActivityContextDetailsFor(_clFindHistoricalActivity(dateKey,timeKey));
+}
+
+function clActivityPriorActivitiesSameType(a){
+  var out=[], name=String((a&&a.activity)||'').split('(')[0].trim().toLowerCase();
+  function add(x){if(!x||x===a)return;var n=String(x.activity||'').split('(')[0].trim().toLowerCase();if(name&&n===name&&(!a.id||x.id!==a.id))out.push(x);}
+  try{(A||[]).forEach(add);}catch(e){}
+  try{var h=(typeof getAllHistoricalData==='function')?getAllHistoricalData():null;(h&&h.activities||[]).forEach(add);}catch(e){}
+  return out.slice(-12);
+}
+function clAvg(arr,fn){var n=0,c=0;(arr||[]).forEach(function(x){var v=parseFloat(fn(x));if(!isNaN(v)){n+=v;c++;}});return c?Math.round((n/c)*10)/10:null;}
+function clActivityBpLine(bp){return bp?(bp.s||bp.systolic)+'/'+(bp.d||bp.diastolic)+(bp.h||bp.hr||bp.pulse?' HR '+(bp.h||bp.hr||bp.pulse):'')+(bp.t?' at '+bp.t:''):'not recorded';}
+function clActivityDeltaLine(before,after){
+  if(!before||!after)return 'not enough BP data';
+  var ds=(parseFloat(after.s||after.systolic)-parseFloat(before.s||before.systolic));
+  var dd=(parseFloat(after.d||after.diastolic)-parseFloat(before.d||before.diastolic));
+  var dh=(parseFloat(after.h||after.hr||after.pulse)-parseFloat(before.h||before.hr||before.pulse));
+  var bits=[]; if(!isNaN(ds))bits.push('systolic '+(ds>=0?'+':'')+ds); if(!isNaN(dd))bits.push('diastolic '+(dd>=0?'+':'')+dd); if(!isNaN(dh))bits.push('HR '+(dh>=0?'+':'')+dh); return bits.join(', ')||'not enough BP data';
+}
+function clActivityTempVal(a){try{var ws=((a.environmentalSnapshot||{}).weatherSnapshot||{}).current||{};var v=ws.feelsLike||ws.temperature||a.outdoorTempF;return parseFloat(v);}catch(e){return parseFloat(a&&a.outdoorTempF);} }
+function clActivityCleanMealName(name){
+  name=String(name||'meal').split('\n')[0].trim();
+  // Saved recipe/template names sometimes include a date in parentheses, e.g. "Hard Boiled Eggs (6/3/26)".
+  // That date is part of the saved recipe name, not the event date; remove it for activity context display.
+  name=name.replace(/\s*\(\d{1,2}\/\d{1,2}\/\d{2,4}\)\s*/g,' ').replace(/\s+/g,' ').trim();
+  return name||'meal';
+}
+function clActivityFluidKey(f){
+  return [String(f.time||''),String(Math.round((parseFloat(f.plus)||0)*10)/10),String(Math.round((parseFloat(f.amount)||0)*10)/10),String(f.eventId||''),String(f.notes||'').toLowerCase(),String(f.source||'').toLowerCase()].join('|');
+}
+function clActivityDedupFluidList(list){
+  var seen={},out=[];
+  (list||[]).forEach(function(f){
+    var k=clActivityFluidKey(f);
+    var loose=[String(f.time||''),String(Math.round((parseFloat(f.plus)||0)*10)/10),String(Math.round((parseFloat(f.amount)||0)*10)/10)].join('|');
+    if(seen[k]||seen[loose])return;
+    seen[k]=true;seen[loose]=true;out.push(f);
+  });
+  return out;
+}
+function clActivityCollectObservationWindows(a){
+  var b=clActivityGetRecoveryBounds(a);
+  var wins=[
+    {key:'immediate',label:'Immediate Recovery',from:0,to:30},
+    {key:'delayed',label:'Delayed Recovery',from:30,to:120},
+    {key:'extended',label:'Extended Recovery',from:120,to:360},
+    {key:'background',label:'Background',from:360,to:1440}
+  ];
+  if(!b)return wins.map(function(w){w.available=false;w.bp=[];w.fluids=[];w.meals=[];w.symptoms=[];return w;});
+  var data=clActivityGetAllDataForRecovery(b.dateKey);
+  function plusOf(x){return clActivityPlusFromBounds(b,x);}
+  function inWindow(p,w){return p!==null&&p!==undefined&&p>=w.from&&p<=w.to&&(w.key==='immediate'||p>w.from);}
+  wins.forEach(function(w){
+    w.available=true;w.bp=[];w.fluids=[];w.meals=[];w.symptoms=[];
+    (data.bp||[]).forEach(function(x){var p=plusOf(x);if(inWindow(p,w))w.bp.push({time:x.t||x.time||'',plus:p,s:x.s||x.systolic,d:x.d||x.diastolic,h:x.h||x.hr||x.pulse});});
+    (data.fluids||[]).forEach(function(x){var p=plusOf(x),amt=parseFloat(x.amount)||0;if(inWindow(p,w)&&amt>0)w.fluids.push({time:x.t||x.time||'',plus:p,amount:amt,source:x.source||'',notes:x.notes||'',eventId:x.eventId||''});});
+    (data.meals||[]).forEach(function(x){var p=plusOf(x);if(inWindow(p,w))w.meals.push({time:x.t||x.time||'',plus:p,name:clActivityCleanMealName(x.m||x.meal||x.notes||'meal'),rawName:String(x.m||x.meal||x.notes||'meal').split('\n')[0],eventId:x.eventId||'',savedMealId:x.savedMealId||''});});
+    (data.symptoms||[]).forEach(function(x){var p=plusOf(x);if(inWindow(p,w))w.symptoms.push({time:x.t||x.time||'',plus:p,name:x.symptom||x.name||'symptom',severity:x.severity||x.level||'',condition:x.condition||'',notes:x.notes||'',windowLabel:w.label});});
+  });
+  var direct=parseFloat(a&&a.activityFluidOz)||0;
+  if(direct>0&&wins[0]&&!wins[0].fluids.some(function(f){return Math.abs((parseFloat(f.amount)||0)-direct)<0.01 && (/activity/i.test(String(f.source||''))||/Activity:/i.test(String(f.notes||''))||f.eventId===(a&&a.id));})){
+    wins[0].fluids.push({time:(a&&a.t)||clActivityDateToTime(b.stop),plus:0,amount:direct,source:'activity',notes:'Activity recovery fluid',eventId:(a&&a.id)||''});
+  }
+  var food=String((a&&a.activitySnackNotes)||'').trim();
+  if(food&&wins[0]&&!wins.some(function(w){return (w.meals||[]).some(function(m){return String(m.name||'').toLowerCase().indexOf(food.toLowerCase().split(' ')[0])>=0;});})){
+    wins[0].meals.push({time:(a&&a.t)||clActivityDateToTime(b.stop),plus:0,name:food,eventId:(a&&a.id)||'',source:'activity'});
+  }
+  wins.forEach(function(w){w.fluids=clActivityDedupFluidList(w.fluids);w.bp.sort(function(x,y){return x.plus-y.plus;});w.fluids.sort(function(x,y){return x.plus-y.plus;});w.meals.sort(function(x,y){return x.plus-y.plus;});w.symptoms.sort(function(x,y){return x.plus-y.plus;});});
+  return wins;
+}
+function clActivityObservationWindowLines(a){
+  var wins=clActivityCollectObservationWindows(a), lines=[];
+  wins.forEach(function(w){
+    var bp=w.bp.map(function(x){return '+'+x.plus+' min '+x.time+' '+x.s+'/'+x.d+(x.h?' HR '+x.h:'');}).join('; ')||'none recorded';
+    var fl=w.fluids.map(function(x){return '+'+x.plus+' min '+x.time+' '+x.amount+' oz'+(x.notes?' '+x.notes:'');}).join('; ')||'none recorded';
+    var ml=(w.meals||[]).map(function(x){return '+'+x.plus+' min '+x.time+' '+x.name;}).join('; ')||'none recorded';
+    var sx=w.symptoms.map(function(x){return '+'+x.plus+' min '+x.time+' '+x.name+(x.severity?' severity '+x.severity:'')+(x.condition?' (condition tag: '+x.condition+')':'')+' — timing only, no causation implied';}).join('; ')||'none recorded';
+    lines.push(w.label+' ('+w.from+'-'+w.to+' min after stop): BP/HR '+bp+'; fluids '+fl+'; meals/food '+ml+'; symptoms '+sx);
+  });
+  return lines;
+}
+function clActivityHistoricalPatternLines(a){
+  var prior=clActivityPriorActivitiesSameType(a), lines=[];
+  lines.push('Canonical activity timing: '+clActivityTimingSummary(a));
+  try{var bb=clActivityGetRecoveryBounds(a), pre=clActivityFindLinkedBP(a,'before'), post=clActivityFindLinkedBP(a,'after'); if(pre&&bb){lines.push('Exact pre-activity BP timing: '+(pre.t||'')+' is '+clActivityPlusFromBounds(bb,pre)+' min from activity stop. Do not describe it as minutes from activity start.');} if(post&&bb){lines.push('Exact first recovery BP timing: '+(post.t||'')+' is +'+clActivityPlusFromBounds(bb,post)+' min after activity stop.');}}catch(e){}
+  lines.push('Same-type prior activity count: '+prior.length);
+  if(!prior.length){lines.push('No previous same-type activities available for comparison yet.');return lines;}
+  var avgDur=clAvg(prior,function(x){return x.duration;});
+  var avgDist=clAvg(prior,function(x){return x.distanceMiles;});
+  var avgTemp=clAvg(prior,clActivityTempVal);
+  lines.push('Prior same-type average duration: '+(avgDur!==null?avgDur+' min':'not available')+'; today: '+(a.duration||'not recorded')+' min');
+  lines.push('Prior same-type average distance: '+(avgDist!==null?avgDist+' mi':'not available')+'; today: '+(a.distanceMiles||'not recorded'));
+  lines.push('Prior same-type average temperature/feels-like: '+(avgTemp!==null?avgTemp+'°':'not available')+'; today: '+(isNaN(clActivityTempVal(a))?'not recorded':clActivityTempVal(a)+'°'));
+  var h=clActivityEffectiveHydrationSnapshot(a)||{};
+  lines.push('Today hydration window: before '+(h.beforeOz||0)+' oz; during '+(h.duringOz||0)+' oz; immediate recovery '+(h.afterOz||0)+' oz');
+  var priorHyd=prior.map(function(x){return clActivityEffectiveHydrationSnapshot(x);}).filter(function(x){return x&&x.available;});
+  if(priorHyd.length){lines.push('Prior same-type hydration averages: before '+clAvg(priorHyd,function(x){return x.beforeOz||0;})+' oz; during '+clAvg(priorHyd,function(x){return x.duringOz||0;})+' oz; immediate recovery '+clAvg(priorHyd,function(x){return x.afterOz||0;})+' oz');}
+  var before=clActivityFindLinkedBP(a,'before'), after=clActivityFindLinkedBP(a,'after');
+  lines.push('Today pre-activity BP: '+clActivityBpLine(before));
+  lines.push('Today immediate/recovery BP: '+clActivityBpLine(after));
+  lines.push('Today BP/HR change: '+clActivityDeltaLine(before,after));
+  var priorDeltas=[];
+  prior.forEach(function(x){var b=clActivityFindLinkedBP(x,'before'), af=clActivityFindLinkedBP(x,'after');if(b&&af)priorDeltas.push({ds:(parseFloat(af.s)-parseFloat(b.s)),dd:(parseFloat(af.d)-parseFloat(b.d)),dh:(parseFloat(af.h)-parseFloat(b.h))});});
+  if(priorDeltas.length){lines.push('Prior same-type average BP/HR change: systolic '+clAvg(priorDeltas,function(x){return x.ds;})+'; diastolic '+clAvg(priorDeltas,function(x){return x.dd;})+'; HR '+clAvg(priorDeltas,function(x){return x.dh;}));}
+  lines.push('Observation windows: Immediate Recovery 0-30 min; Delayed Recovery 30-120 min; Extended Recovery 2-6 hr; Background 6-24 hr. These are association windows, not causation windows.');
+  lines=lines.concat(clActivityObservationWindowLines(a));
+  return lines;
+}
+function clActivityFmtOz(n){n=parseFloat(n)||0;return (Math.round(n*10)/10)+' oz';}
+function clActivityListFluids(w){return (w&&w.fluids&&w.fluids.length)?w.fluids.map(function(f){return clActivityFmtOz(f.amount)+' at +'+f.plus+' min'+(f.time?' ('+f.time+')':'')+(f.notes?' '+f.notes:'');}).join('; '):'none recorded';}
+function clActivityListMeals(w){return (w&&w.meals&&w.meals.length)?w.meals.map(function(m){return m.name+' at +'+m.plus+' min'+(m.time?' ('+m.time+')':'');}).join('; '):'none recorded';}
+function clActivityListSymptoms(w){return (w&&w.symptoms&&w.symptoms.length)?w.symptoms.map(function(s){return s.name+(s.severity?' severity '+s.severity:'')+' at +'+s.plus+' min'+(s.time?' ('+s.time+')':'')+(s.condition?' (condition tag: '+s.condition+')':'')+' — timing only, no causation implied';}).join('; '):'none recorded';}
+function clActivityListBp(w){return (w&&w.bp&&w.bp.length)?w.bp.map(function(b){return b.s+'/'+b.d+(b.h?' HR '+b.h:'')+' at +'+b.plus+' min'+(b.time?' ('+b.time+')':'');}).join('; '):'none recorded';}
+function clActivitySumWinFluids(w){var n=0;(w&&w.fluids||[]).forEach(function(f){n+=parseFloat(f.amount)||0;});return Math.round(n*10)/10;}
+function clActivityBuildDeterministicAskReport(a){
+  return 'Activity analysis has been removed from activity records in this version.';
+}
+function clActivityObservationWindowTimingRepairPrompt(a){
+  return clActivityBuildDeterministicAskReport(a);
+}
+function askActivityContextFor(a){
+  alert('Activity analysis has been removed from activity records in this version.');
+}
+function askActivityContext(i){
+  askActivityContextFor((typeof A!=='undefined'&&A&&A[i])?A[i]:null);
+}
+function askActivityContextHistorical(dateKey,timeKey){
+  askActivityContextFor(_clFindHistoricalActivity(dateKey,timeKey));
+}
+function askActivityContextForCurrentDetail(){
+  askActivityContextFor(window._clCurrentActivityContextDetail||null);
+}
+
+
 function _actHistRenderReadings(data){
   var filtered = _actHistApplyFilter(data);
   var countEl = document.getElementById('actHistCount');
@@ -11761,11 +11857,9 @@ for(var i=activityData.length-1;i>=0;i--){
   h+='<div style="margin-top:12px;padding:12px;background:#f0fdf4;border-left:4px solid '+exertionColor+';border-radius:6px">';
   h+='<div style="font-size:16px;font-weight:600;color:'+exertionColor+'">'+r.exertion+' Exertion</div></div>';
   if(r.notes){ h+='<div style="margin-top:12px;padding:12px;background:#f3f4f6;border-radius:6px;font-size:16px;color:#374151"><strong>Notes:</strong> '+r.notes+'</div>'; }
-  if(r.activityFluidOz||r.activitySnackNotes){ h+='<div style="margin-top:12px;padding:12px;background:#f0f9ff;border-left:4px solid #0ea5e9;border-radius:6px;font-size:15px;color:#0c4a6e"><strong>After activity:</strong> '+(r.activityFluidOz?('💧 '+r.activityFluidOz+' oz'):'')+(r.activityFluidOz&&r.activitySnackNotes?' · ':'')+(r.activitySnackNotes?('🍎 '+clActivityEsc(r.activitySnackNotes)):'')+'</div>'; }
-  h+=clRouteComparisonHtml(r);
-  var parts=clActivityContextLines(r);
-  if(parts.length){
-    h+='<div style="margin-top:12px;padding:12px;background:#ecfeff;border-left:4px solid #0891b2;border-radius:6px;font-size:14px;color:#164e63"><strong>Environment Context:</strong><br>'+parts.slice(0,4).map(clActivityEsc).join('<br>')+'</div>';
+  var todayCtxHtml=_clActivityContextHtml(r);
+  if(todayCtxHtml){
+    h+=todayCtxHtml;
 
   }
   h+='</div>';
@@ -14283,11 +14377,6 @@ var _medSafetyBlockedMeds = [];
 window._medSafetyWarnState = null;
 
 
-// Returns today's BP readings through the BP/HR retrieval helper path
-function _getTodayBPReadings(){
-  return (B||[]).map(function(r){ return Object.assign({}, r); });
-}
-
 // Returns all BP readings from local storage plus today's session, preserving full history
 function _getAllBPReadings(){
   var allBP=[];
@@ -14344,9 +14433,8 @@ function _getRecentBPReading(){
   var cutoffMs = 4 * 60 * 60 * 1000; // 4 hours in ms
   var best = null;
   var bestDiff = Infinity;
-  var bpData = (typeof _getTodayBPReadings === 'function') ? _getTodayBPReadings() : (B || []);
-  for(var i=0; i<bpData.length; i++){
-    var r = bpData[i];
+  for(var i=0; i<B.length; i++){
+    var r = B[i];
     if(!r.s || !r.d || !r.h || !r.t) continue;
     // Parse reading time as today
     var parts = r.t.split(':');
@@ -14362,23 +14450,6 @@ function _getRecentBPReading(){
   return best;
 }
 
-// Returns recent HR values from BP readings, newest first
-function _getRecentHRReadings(limit){
-  var values=[];
-  limit=limit||3;
-  var bpData = (typeof _getTodayBPReadings === 'function') ? _getTodayBPReadings() : (B || []);
-  for(var i=bpData.length-1;i>=0&&values.length<limit;i--){
-    if(bpData[i]&&bpData[i].h) values.push(bpData[i].h);
-  }
-  return values;
-}
-
-// Returns today's HR readings from BP readings, oldest first
-function _getTodayHRReadings(){
-  var bpData = (typeof _getTodayBPReadings === 'function') ? _getTodayBPReadings() : (B || []);
-  return (typeof _getHRReadingsFromBP === 'function') ? _getHRReadingsFromBP(bpData) : bpData.filter(function(r){return r&&r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
-}
-
 // Returns HR readings from a supplied BP record set, preserving existing order
 function _getHRReadingsFromBP(records){
   var values=[];
@@ -14387,12 +14458,6 @@ function _getHRReadingsFromBP(records){
     if(records[i]&&records[i].h&&records[i].h>0) values.push(Object.assign({},records[i],{hr:records[i].h}));
   }
   return values;
-}
-
-// Returns all HR readings from BP readings, preserving existing order
-function _getAllHRReadings(){
-  var bpData = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (B || []);
-  return _getHRReadingsFromBP(bpData);
 }
 
 // Returns minutes ago as formatted string
@@ -14587,7 +14652,7 @@ function _showRulesWarn(block) {
   h += '</div>';
   if(block.reading) h += _vitalsStatusHTML(block.reading);
   h += '</div>';
-  h += '<div style="font-size:14px;color:#374151;margin-bottom:16px;line-height:1.6">You can still log this dose — these readings are outside the configured thresholds for this medication. Discuss this pattern with your cardiologist.</div>';
+  h += '<div style="font-size:14px;color:#374151;margin-bottom:16px;line-height:1.6">You can still log this dose — but consider whether these readings are safe for this medication right now. Discuss this pattern with your cardiologist.</div>';
   h += '<div style="display:flex;flex-direction:column;gap:10px">';
   h += '<button onclick="_mipWarnProceed()" style="background:#d97706;color:#fff;border:none;border-radius:10px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;min-height:52px">⚠️ Log Anyway — I Understand the Risk</button>';
   h += '<button onclick="logMedicine()" style="background:#6b7280;color:#fff;border:none;border-radius:10px;padding:16px;font-size:17px;font-weight:700;cursor:pointer;min-height:52px">← Back</button>';
@@ -16211,8 +16276,11 @@ try {
 
 // Load Medication Intelligence Panel data
 try {
-  var _mipRaw = localStorage.getItem('CARDIACLENS_MED_INTEL');
-  if (_mipRaw) medIntelData = JSON.parse(_mipRaw);
+  if (typeof _clCanonicalizeMedIntelStorage === 'function') medIntelData = _clCanonicalizeMedIntelStorage();
+  else {
+    var _mipRaw = localStorage.getItem('CARDIACLENS_MED_INTEL') || localStorage.getItem('CLINBRIDGE_MED_INTEL');
+    if (_mipRaw) medIntelData = JSON.parse(_mipRaw);
+  }
 } catch(e) { medIntelData = {}; }
 
 // ===== SYMPTOM MANAGEMENT FUNCTIONS =====
@@ -17283,7 +17351,7 @@ try{
 var saved=localStorage.getItem('BP_TRACKER_'+dateKey);
 if(!saved)return null;
 var data=JSON.parse(saved);
-var bp=(typeof _getAllBPReadings==='function')?_getAllBPReadings().filter(function(r){return r&&r._date===dateKey;}):(data.B||data.bp||[]);
+var bp=data.B||[];
 var symptoms=data.S||[];
 var medLog=data.medLog||[];
 // Start at GREEN
@@ -17554,10 +17622,23 @@ function _openMedEffTile(){
   var hasMedData=medicineList&&medicineList.length>0;
   var hasMedReadings=false;
   try{
-    var _bpReadings=(typeof _getAllBPReadings==='function')?_getAllBPReadings():[];
-    hasMedReadings=_bpReadings.some(function(r){return r&&r.medicationRelated&&r.medicationTiming&&r.medicationTiming!=='none';});
+    var medTileBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():[];
+    hasMedReadings=medTileBP.some(function(r){return r&&r.medicationRelated&&r.medicationTiming&&r.medicationTiming!=='none';});
   }catch(e){
     hasMedReadings=false;
+  }
+  // Scan historical BP_TRACKER localStorage keys for tagged readings
+  if(!hasMedReadings){
+    try{
+      var _lsKeys=Object.keys(localStorage);
+      for(var _ki=0;_ki<_lsKeys.length&&!hasMedReadings;_ki++){
+        if(_lsKeys[_ki].indexOf('BP_TRACKER_')===0){
+          var _day=JSON.parse(localStorage.getItem(_lsKeys[_ki])||'{}');
+          var _rds=_day.bp||_day.B||[];
+          if(_rds.some(function(r){return r.medicationRelated&&r.medicationTiming!=='none';})) hasMedReadings=true;
+        }
+      }
+    }catch(e){}
   }
   if(hasMedReadings){
     openMedicationEffectiveness();
@@ -17568,7 +17649,7 @@ function _openMedEffTile(){
     html+='<div style="background:#f0fdf4;border:2px solid #10b981;border-radius:12px;padding:20px;margin-bottom:16px;text-align:center">';
     html+='<div style="font-size:40px;margin-bottom:10px">📊</div>';
     html+='<div style="font-size:18px;font-weight:700;color:#166534;margin-bottom:10px">See how your medications affect your BP</div>';
-    html+='<div style="font-size:15px;color:#374151;line-height:1.6;margin-bottom:16px">Once you add your medications in Settings and tag a few BP readings as taken before or after a dose, CardiacLens shows you a before/after comparison for each drug. Your cardiologist can review before-and-after recorded measurements for each medication over time—context that is difficult to obtain from a single office visit alone.</div>';
+    html+='<div style="font-size:15px;color:#374151;line-height:1.6;margin-bottom:16px">Once you add your medications in Settings and tag a few BP readings as taken before or after a dose, CardiacLens shows you a before/after comparison for each drug. Your cardiologist can see at a glance whether each medication is doing its job — data they cannot get from an office visit alone.</div>';
     html+='<div style="font-size:14px;color:#6b7280;margin-bottom:16px">Takes about 3–4 tagged readings per medication to generate meaningful data.</div>';
     html+='</div>';
     html+='<div class="modal-actions">';
@@ -18434,13 +18515,12 @@ if(zoneData){
 }
 
 // ── Activity counts ────────────────────────────────────────────────────
-var todayBPData = (typeof _getTodayBPReadings === 'function') ? _getTodayBPReadings() : (B || []);
-var bpCount   = todayBPData.length;
+var bpCount   = B ? B.length : 0;
 var mealCount = M ? M.length : 0;
 
 // Total fluid entries (standalone fluidLog + BP fluid entries + meal fluid)
 var fluidEntries = (fluidLog ? fluidLog.length : 0)
-                 + todayBPData.filter(function(r){return r.f>0;}).length
+                 + (B ? B.filter(function(r){return r.f>0;}).length : 0)
                  + (M ? M.filter(function(m){return m.mealFluidOz>0;}).length : 0);
 
 // Unique medicines taken today (by name, de-dup)
@@ -18450,9 +18530,9 @@ var medsCount = Object.keys(medsSet).length;
 
 // ── Option C: Event completion — data-linked OR dismissed ─────────────
 // Build a Set of every eventId that appears in today's logged entries
-// (BP readings, fluidLog, M, medLog, notes, S all support eventId)
+// (B, fluidLog, M, medLog, notes, S all support eventId)
 var loggedEventIds = {};
-todayBPData.forEach(function(r){ if(r.eventId) loggedEventIds[r.eventId]=true; });
+if(B)         B.forEach(function(r){ if(r.eventId) loggedEventIds[r.eventId]=true; });
 if(fluidLog)  fluidLog.forEach(function(r){ if(r.eventId) loggedEventIds[r.eventId]=true; });
 if(M)         M.forEach(function(r){ if(r.eventId) loggedEventIds[r.eventId]=true; });
 if(medLog)    medLog.forEach(function(r){ if(r.eventId) loggedEventIds[r.eventId]=true; });
@@ -19796,7 +19876,7 @@ html+='</div>';
 html+='</div>';
 html+='<div style="margin-bottom:20px">';
 html+='<label style="display:block;font-size:18px;font-weight:600;margin-bottom:4px">📉 Diastolic Blood Pressure Range</label>';
-html+='<p style="font-size:13px;color:#6b7280;margin-bottom:8px">The bottom number. Tracked alongside systolic on all charts. Low or high diastolic values can be important context for your doctor, especially when reviewed alongside systolic readings.</p>';
+html+='<p style="font-size:13px;color:#6b7280;margin-bottom:8px">The bottom number. Tracked alongside systolic on all charts. Low diastolic can indicate poor circulation; high diastolic alongside high systolic is a key pattern your doctor watches for.</p>';
 html+='<div style="display:flex;gap:12px">';
 html+='<div style="flex:1"><label style="font-size:13px;color:#6b7280">Min (mmHg)</label><input type="number" inputmode="numeric" id="settingDiaMin" class="modal-input" placeholder="e.g. 60" value="'+settings.diastolicMin+'" onblur="_sanitizeNumericInput(this)"/></div>';
 html+='<div style="flex:1"><label style="font-size:13px;color:#6b7280">Max (mmHg)</label><input type="number" inputmode="numeric" id="settingDiaMax" class="modal-input" placeholder="e.g. 90" value="'+settings.diastolicMax+'" onblur="_sanitizeNumericInput(this)"/></div>';
@@ -20113,7 +20193,7 @@ html+=lbBadge;
 html+='<div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">';
 html+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
 html+='<div>';
-html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.347.205</span></div>';
+html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.347.206</span></div>';
 html+='<div id="settingsVersionStatus" style="font-size:13px;color:#6b7280;margin-top:3px">Tap "Check for Updates" to see if a newer version is available</div>';
 html+='</div>';
 html+='<button onclick="checkForUpdates(true)" id="checkUpdateBtn" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">🔍 Check for Updates</button>';
@@ -21435,7 +21515,7 @@ function buildMissedEventList() {
   return missed;
 }
 
-// v9.10.347.205: sequential missed-event card queue. Replaces the small
+// v9.10.347.206: sequential missed-event card queue. Replaces the small
 // bottom toast + best-effort chime from v9.10.347.204, which had two real
 // problems: it was too easy to miss, and tapping it did nothing (it fell
 // through to whatever screen happened to be underneath). Newly-missed
@@ -21463,7 +21543,7 @@ function runCatchUpScan() {
     }
   });
   updateUpcomingEventsWidget();
-  // v9.10.347.205: newly-missed events queue into the real action card
+  // v9.10.347.206: newly-missed events queue into the real action card
   // instead of a toast. No sound is attempted here: iOS blocks audio
   // triggered from a background/visibility event with no direct user
   // gesture attached, so a forced chime here would silently fail every
@@ -21489,7 +21569,7 @@ function _advanceMissedEventQueue(){
   _openEventActionModal(evt);
 }
 
-// ── Notification tap routing (v9.10.347.205) ─────────────────────────────
+// ── Notification tap routing (v9.10.347.206) ─────────────────────────────
 // A tapped OS-level notification only carries a tag string (see
 // fireOSNotification/scheduleOSNotificationAt). By the time it's tapped,
 // the event list it was scheduled from may have changed, so this always
@@ -21541,6 +21621,16 @@ function _clResolveEventByTag(tag){
 // since the notification was scheduled).
 function _clOpenEventFromTag(tag){
   try{
+    // v9.10.347.206: real background fluid push notifications (pacing,
+    // and any fluid reminder delivered via the push worker rather than
+    // a foreground OS notification) carry this tag and have no matching
+    // dailyEvents/dailyPlan entry to resolve by design -- pacing works
+    // with zero events configured. Route straight to Log Fluid rather
+    // than falling through to the generic Events queue.
+    if(tag==='cardiaclens-fluid-reminder'){
+      if(typeof logFluid==='function') logFluid();
+      return;
+    }
     var resolved=_clResolveEventByTag(tag);
     if(resolved && resolved.__med){
       if(typeof logMedicine==='function') logMedicine();
@@ -21776,18 +21866,7 @@ function _recordEventQueueItem(evt,state){
     }
   }
   if(!found){
-    q.push({
-      key:key,
-      id:evt.id||null,
-      name:evt.name,
-      icon:evt.icon||'📋',
-      time:evt.time,
-      fluidGoal:evt.fluidGoal||evt.amount||0,
-      actions:evt.actions||[],
-      state:state||'due',
-      firstDueAt:new Date().toISOString(),
-      lastSeenAt:new Date().toISOString()
-    });
+    q.push({key:key,id:evt.id||null,name:evt.name,icon:evt.icon||'📋',time:evt.time,fluidGoal:evt.fluidGoal||evt.amount||0,actions:evt.actions||[],state:state||'due',firstDueAt:new Date().toISOString(),lastSeenAt:new Date().toISOString()});
   }
   _writeEventQueue(q);
 }
@@ -21889,9 +21968,6 @@ function _isEventLoggedToday(evt,loggedIds){
 }
 
 function showEventReminder(evt){
-  // v9.10.347.197: scheduled events never open a modal or cover the user's current work.
-  // They enter the Due & Missed queue, appear in Today's Events, and remain there
-  // until logged, snoozed, dismissed, or the day rolls over.
   if(!evt||!evt.time||!evt.name)return;
   _recordEventQueueItem(evt,'due');
   var alertBox=document.getElementById('audioAlertBox');
@@ -22503,8 +22579,7 @@ try{
 }
 
 function exportData(){
-var bpData=(typeof _getTodayBPReadings==='function')?_getTodayBPReadings():(B||[]);
-if(bpData.length===0&&M.length===0&&medLog.length===0&&fluidLog.length===0&&notes.length===0){
+if(B.length===0&&M.length===0&&medLog.length===0&&fluidLog.length===0&&notes.length===0){
 alert('No data to export');
 return;
 }
@@ -22516,35 +22591,34 @@ var tsv='Date\tType\tTime\tMeal Timing\tSystolic\tDiastolic\tPulse\tBarometric\t
 var today=new Date().toLocaleDateString('en-US');
 
 // Process BP readings with DROP calculations
-for(var i=0;i<bpData.length;i++){
-var r=bpData[i];
+for(var i=0;i<B.length;i++){
 var timing='';
 var dropSys='';
 var dropDia='';
 var preFluid='';
 var barometric='';
 var mealType='';
-if(r.meal){
-timing=r.meal+' '+r.type;
-mealType=r.meal;
-}else if(r.type){
-timing=r.type;
+if(B[i].meal){
+timing=B[i].meal+' '+B[i].type;
+mealType=B[i].meal;
+}else if(B[i].type){
+timing=B[i].type;
 }
-if(r.f>0){
-preFluid=r.f;
+if(B[i].f>0){
+preFluid=B[i].f;
 }
 // Calculate DROP values for "post" readings
-if(r.type==='post'){
+if(B[i].type==='post'){
 // Find the most recent "pre" reading for the same meal
 for(var j=i-1;j>=0;j--){
-if(bpData[j].meal===mealType&&bpData[j].type==='pre'){
-dropSys=r.s-bpData[j].s;
-dropDia=r.d-bpData[j].d;
+if(B[j].meal===mealType&&B[j].type==='pre'){
+dropSys=B[i].s-B[j].s;
+dropDia=B[i].d-B[j].d;
 break;
 }
 }
 }
-tsv+=today+'\tBP\t'+r.t+'\t'+timing+'\t'+r.s+'\t'+r.d+'\t'+r.h+'\t'+barometric+'\t'+preFluid+'\t'+dropSys+'\t'+dropDia+'\t\t\t\n';
+tsv+=today+'\tBP\t'+B[i].t+'\t'+timing+'\t'+B[i].s+'\t'+B[i].d+'\t'+B[i].h+'\t'+barometric+'\t'+preFluid+'\t'+dropSys+'\t'+dropDia+'\t\t\t\n';
 }
 
 // Process meals
@@ -22588,8 +22662,7 @@ document.getElementById('noChartData').style.display='block';
 document.getElementById('bpChart').style.display='none';
 return;
 }
-var bpChartData=(typeof _getTodayBPReadings==='function')?_getTodayBPReadings():(B||[]);
-if(bpChartData.length<2){
+if(B.length<2){
 document.getElementById('noChartData').style.display='block';
 document.getElementById('bpChart').style.display='none';
 return;
@@ -22600,11 +22673,11 @@ var times=[];
 var systolic=[];
 var diastolic=[];
 var hr=[];
-for(var i=0;i<bpChartData.length;i++){
-times.push(bpChartData[i].t);
-systolic.push(bpChartData[i].s);
-diastolic.push(bpChartData[i].d);
-hr.push(bpChartData[i].h);
+for(var i=0;i<B.length;i++){
+times.push(B[i].t);
+systolic.push(B[i].s);
+diastolic.push(B[i].d);
+hr.push(B[i].h);
 }
 var ctx=document.getElementById('bpChart').getContext('2d');
 if(bpChart){
@@ -22926,15 +22999,14 @@ function jumpToHRHistDate(dateStr){
 function renderRateDetector(){
 var card=document.getElementById('rateDetectorCard');
 if(card) card.style.display='block';
-var bpReadings=(typeof _getTodayBPReadings==='function')?_getTodayBPReadings():(B||[]);
-if(bpReadings.length<2){
+if(B.length<2){
 document.getElementById('rateDetectorBars').style.display='none';
 document.getElementById('rateDetectorNone').style.display='block';
 document.getElementById('hrInsightsPanel').style.display='none';
 return;
 }
 // Filter readings with HR data
-var hrReadings=(typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(bpReadings):bpReadings.filter(function(r){return r.h>0;});
+var hrReadings=B.filter(function(r){return r.h>0;});
 if(hrReadings.length===0){
 document.getElementById('rateDetectorBars').style.display='none';
 document.getElementById('rateDetectorNone').style.display='block';
@@ -23166,6 +23238,8 @@ function _getFluidEndTime(){
 }
 
 function _buildFluidPaceHtml(){
+  window._cbPaceNextDrinkMins=null;
+  window._cbFluidDayComplete=false;
   var target=(settings.fluidMode&&settings.fluidMode!=='none')?(settings.fluidMax||64):80;
   var firstFluid=_getFirstFluidTimeToday();
   var endTime=_getFluidEndTime();
@@ -23193,6 +23267,7 @@ function _buildFluidPaceHtml(){
   var endMins=toMins(endTime);
   var endTimeStr=fmtTime(endMins);
   if(nowMins>=endMins){
+    window._cbFluidDayComplete=true;
     return '<div style="margin-top:12px;background:#f0fdf4;border-left:4px solid #10b981;border-radius:8px;padding:10px 12px;font-size:14px;color:#065f46">'
       +'✓ Fluid day complete · End time '+endTimeStr+' reached'
       +'</div>';
@@ -23211,7 +23286,10 @@ function _buildFluidPaceHtml(){
   if(diff>0&&ozRemaining>0){
     var minsAhead=Math.round((diff/target)*windowMins);
     var ndMins=nowMins+minsAhead;
-    if(ndMins<endMins) nextDrinkStr='Next drink around '+fmtTime(ndMins);
+    if(ndMins<endMins){
+      nextDrinkStr='Next drink around '+fmtTime(ndMins);
+      window._cbPaceNextDrinkMins=ndMins;
+    }
   }
   var footer='<div style="font-size:12px;color:#6b7280;margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:8px"><span>Fluid day ends '+endTimeStr+' &middot; '+timeRemStr+' remaining &middot; '+ozRemaining+' oz to go</span><button onclick="openFluidEndTimeQuickChange()" style="background:none;border:1px solid #d1d5db;border-radius:6px;padding:2px 8px;font-size:11px;color:#6b7280;cursor:pointer;white-space:nowrap;touch-action:manipulation;flex-shrink:0">\u270F\uFE0F Change</button></div>';
   var disclaimer='<div style="font-size:11px;color:#6b7280;margin-top:4px">Pace is a daily guide — your doctor sets your actual target</div>';
@@ -23698,7 +23776,7 @@ function buildSCTimeline(){
   });
   // Render
   var html='<div style="font-size:13px;font-weight:700;color:#7c3aed;margin-bottom:8px">Cardiac Event Timeline \u2014 Last 60 Days</div>';
-  html+='<div style="font-size:12px;color:#6b7280;margin-bottom:10px">Highlighted rows = events meeting this report\'s configured threshold. Designed for your cardiologist appointment.</div>';
+  html+='<div style="font-size:12px;color:#6b7280;margin-bottom:10px">Highlighted rows = clinically significant events. Designed for your cardiologist appointment.</div>';
   html+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;font-size:11px">';
   html+='<span style="background:#fef2f2;border:1px solid #dc2626;padding:2px 6px;border-radius:4px;color:#dc2626">\🚨 HR Level Shift</span>';
   html+='<span style="background:#fef3c7;border:1px solid #f59e0b;padding:2px 6px;border-radius:4px;color:#92400e">\u26a0\ufe0f Rapid HR Change</span>';
@@ -24191,7 +24269,7 @@ function _dvBuildPPContent(dd, rd) {
     '</div>' +
     '<div style="background:white;border-radius:8px;padding:12px;border:1px solid #e5e7eb">' +
       '<div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:4px">Status: ' + (dd.statusTitle || 'Pulse Pressure Finding') + '</div>' +
-      '<div style="font-size:13px;color:#374151;line-height:1.6">Pulse pressure = systolic minus diastolic. CardiacLens tracks narrowing pulse pressure as a recorded BP pattern to review with your clinician.</div>' +
+      '<div style="font-size:13px;color:#374151;line-height:1.6">Pulse pressure = systolic minus diastolic. A narrowing pulse pressure can indicate the heart is working harder to maintain output.</div>' +
     '</div>' +
   '</div>';
   return html;
@@ -24799,7 +24877,7 @@ function _buildSentinelPPHSection() {
     var avgDrop = pairCount > 0 ? sysDropSum / pairCount : 0;
     if (pphCount < 3) return ''; // 3+ qualifying events is the only guard needed
 
-    // Pattern threshold met — build HTML
+    // Pattern confirmed — build HTML
     pphEvents.sort(function(a, b) { return b.date.localeCompare(a.date); });
     var avgEventDrop = 0;
     for (var ei = 0; ei < pphEvents.length; ei++) avgEventDrop += pphEvents[ei].drop;
@@ -24808,7 +24886,7 @@ function _buildSentinelPPHSection() {
     var h = '';
     h += '<div style="background:#fff7ed;border:2px solid #f97316;border-radius:12px;padding:18px;margin-bottom:20px">';
     h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px;flex-wrap:wrap">';
-    h +=   '<div style="font-size:17px;font-weight:900;color:#c2410c">\uD83C\uDF7D\uFE0F Post-Meal BP Pattern Threshold Met</div>';
+    h +=   '<div style="font-size:17px;font-weight:900;color:#c2410c">\uD83C\uDF7D\uFE0F Post-Meal BP Pattern Confirmed</div>';
     h +=   '<div style="background:#f97316;color:white;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:700;flex-shrink:0">' + pphCount + ' events / 30 days</div>';
     h += '</div>';
 
@@ -25790,7 +25868,7 @@ function togglePPDrill(btn){
 }
 
 function analyzePulsePressure(){
-  var allBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():[];
+  var allBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():((getAllHistoricalData().bp)||[]);
 
   // Only readings with both systolic and diastolic
   var validBP=allBP.filter(function(r){return r.s>0&&r.d>0;});
@@ -25856,27 +25934,27 @@ function analyzePulsePressure(){
     if(chronicNarrow&&trendStable){
       // Stable chronic baseline -- informational, not alarming
       statusColor='#0369a1';statusBg='#f0f9ff';statusEmoji='📊';
-      statusTitle='Chronically Narrow — Similar to Your Recorded Baseline';
-      statusText='Your pulse pressure has averaged '+allPPAvg.toFixed(1)+' mmHg across '+ppReadings.length+' readings. This is below the report reference range (40–60 mmHg) and has been similar across your recorded readings. '+
-        'Current 7-day change is '+(trend>=0?'+':'')+trend.toFixed(1)+' mmHg. '+
+      statusTitle='Chronically Narrow — Your Stable Baseline';
+      statusText='Your pulse pressure has averaged '+allPPAvg.toFixed(1)+' mmHg across '+ppReadings.length+' readings. This is below the textbook normal range (40–60 mmHg) but has been consistent across your readings. '+
+        'Current 7-day trend is stable ('+(trend>=0?'+':'')+trend.toFixed(1)+' mmHg). '+
         'Your cardiologist is the right person to contextualize this for your specific cardiac history. '+
         'The pattern worth watching: a decline from your own baseline, or new or worsening symptoms.';
     } else {
       // Newly narrow or no established baseline -- worth flagging
       statusColor='#d97706';statusBg='#fffbeb';statusEmoji='⚠️';
       statusTitle='Reduced Pulse Pressure';
-      statusText='Recent avg pulse pressure '+recentAvg.toFixed(1)+' mmHg is below the report reference range (40–60 mmHg). '+
-        'CardiacLens is reporting the recorded value only and is not assigning a cause. '+
+      statusText='Recent avg pulse pressure '+recentAvg.toFixed(1)+' mmHg is below the normal range (40–60 mmHg). '+
+        'Reduced pulse pressure can indicate the heart is working harder to maintain forward output. '+
         'This pattern is worth discussing with your cardiologist, especially if it represents a change from your recent readings.';
     }
   } else if(recentAvg!==null&&recentAvg<40){
     statusColor='#d97706';statusBg='#fffbeb';statusEmoji='⚠️';
     statusTitle='Narrow Pulse Pressure';
-    statusText='Recent avg pulse pressure '+recentAvg.toFixed(1)+' mmHg is below the report reference range (40–60 mmHg). Compare this with your own recorded baseline and review it with your cardiologist at your next visit.';
+    statusText='Recent avg pulse pressure '+recentAvg.toFixed(1)+' mmHg is below the normal range (40–60 mmHg). This is worth noting, though many cardiac patients have a lower personal baseline. Log consistently and mention this to your cardiologist at your next visit.';
   } else if(recentAvg!==null&&recentAvg>60){
     statusColor='#d97706';statusBg='#fffbeb';statusEmoji='⚠️';
     statusTitle='Wide Pulse Pressure';
-    statusText='Recent avg pulse pressure '+recentAvg.toFixed(1)+' mmHg is above the report reference range (40–60 mmHg). Review this recorded pattern with your cardiologist, particularly if it is a change from your usual readings.';
+    statusText='Recent avg pulse pressure '+recentAvg.toFixed(1)+' mmHg is above the normal range (40–60 mmHg). A wider pulse pressure can be associated with arterial stiffness or other factors. Worth mentioning to your cardiologist, particularly if this is a change from your usual readings.';
   } else if(trend!==null&&trend<=-5){
     statusColor='#d97706';statusBg='#fffbeb';statusEmoji='⚠️';
     statusTitle='Narrowing Trend';
@@ -25887,8 +25965,8 @@ function analyzePulsePressure(){
     statusText='Pulse pressure has widened '+trend.toFixed(1)+' mmHg over the last 7 days vs prior week. Monitor for further widening.';
   } else {
     statusColor='#059669';statusBg='#ecfdf5';statusEmoji='✅';
-    statusTitle='Within Reference Range';
-    statusText='Recorded pulse pressure is within the reference range (40–60 mmHg) for the selected period. Continue logging to build your personal history.';
+    statusTitle='Normal Range';
+    statusText='Pulse pressure within normal range (40–60 mmHg) and stable. Continue monitoring.';
   }
 
   // Render banner
@@ -25905,8 +25983,8 @@ function analyzePulsePressure(){
     {label:'Recent 7-Day Avg',value:recentAvg!==null?recentAvg.toFixed(1)+' mmHg':'N/A',sub:recentPP.length+' readings',color:statusColor},
     {label:'Prior 7-Day Avg',value:priorAvg!==null?priorAvg.toFixed(1)+' mmHg':'N/A',sub:priorPP.length+' readings',color:'#374151'},
     {label:'7-Day Trend',value:trend!==null?(trend>=0?'+':'')+trend.toFixed(1)+' mmHg':'N/A',sub:trend!==null?trendDir:'insufficient data',color:trend!==null&&Math.abs(trend)>=5?'#d97706':'#059669'},
-    {label:'Narrowest Reading',value:ppMin+' mmHg',sub:ppMin<40?'⚠️ Below reference':'✓',color:ppMin<40?'#dc2626':'#374151'},
-    {label:'Widest Reading',value:ppMax+' mmHg',sub:ppMax>60?'⚠️ Above reference':'✓',color:ppMax>60?'#d97706':'#374151'},
+    {label:'Narrowest Reading',value:ppMin+' mmHg',sub:ppMin<40?'⚠️ Below normal':'✓',color:ppMin<40?'#dc2626':'#374151'},
+    {label:'Widest Reading',value:ppMax+' mmHg',sub:ppMax>60?'⚠️ Above normal':'✓',color:ppMax>60?'#d97706':'#374151'},
   ];
 
   var statsHtml='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
@@ -25924,7 +26002,7 @@ function analyzePulsePressure(){
     '<div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:8px">Reading Distribution</div>'+
     '<div style="display:flex;gap:8px;font-size:13px">'+
     '<span style="color:#dc2626;font-weight:600">🔴 Narrow (<40): '+narrowCount+' ('+narrowPct+'%)</span>'+
-    '<span style="color:#059669;font-weight:600">🟢 Reference range: '+(ppReadings.length-narrowCount-wideCount)+' ('+Math.round((ppReadings.length-narrowCount-wideCount)/ppReadings.length*100)+'%)</span>'+
+    '<span style="color:#059669;font-weight:600">🟢 Normal: '+(ppReadings.length-narrowCount-wideCount)+' ('+Math.round((ppReadings.length-narrowCount-wideCount)/ppReadings.length*100)+'%)</span>'+
     '<span style="color:#d97706;font-weight:600">🟡 Wide (>60): '+wideCount+' ('+widePct+'%)</span>'+
     '</div></div>';
 
@@ -25932,15 +26010,15 @@ function analyzePulsePressure(){
   statsHtml+='<div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:14px">'+
     '<div style="font-size:13px;font-weight:700;color:#0369a1;margin-bottom:6px">📖 Clinical Context</div>'+
     '<div style="font-size:13px;color:#0c4a6e;line-height:1.6">'+
-    '<b>Report reference range:</b> 40–60 mmHg<br>'+
-    '<b>Narrow (<40):</b> Below this report reference range<br>'+
-    '<b>Wide (>60):</b> Above this report reference range<br>'+
-    '<b>Narrowing trend:</b> Compare with weight, HR, symptoms, and your prior readings<br>'+
-    '<b>Your conditions:</b> Review pulse pressure patterns with your clinician in the context of your known history'+
+    '<b>Normal range:</b> 40–60 mmHg<br>'+
+    '<b>Narrow (<40):</b> Heart may not be ejecting enough volume — common in CHF, reduced cardiac output<br>'+
+    '<b>Wide (>60):</b> Arterial stiffness or aortic regurgitation — common with CAD, aging, hypertension<br>'+
+    '<b>Narrowing trend:</b> Potential worsening cardiac output — watch alongside weight and HR<br>'+
+    '<b>Your conditions:</b> CHF + diastolic dysfunction make narrow PP particularly relevant'+
     '</div></div>';
 
   // Pull HR patterns from detectPatterns for cross-detector context
-  var hrForPatterns=(typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(allBP):allBP.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
+  var hrForPatterns=allBP.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
   var hrPatternsForPP=hrForPatterns.length>=6?detectPatterns(hrForPatterns.slice().sort(function(a,b){
     var aStr=a._date?a._date+'T'+a.t+':00':('1970-01-01T'+a.t+':00');
     var bStr=b._date?b._date+'T'+b.t+':00':('1970-01-01T'+b.t+':00');
@@ -25955,12 +26033,12 @@ function analyzePulsePressure(){
     crossContext='<div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:10px;padding:14px;margin-top:12px">';
     crossContext+='<div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:6px">⚠️ HR Rate Detector Events Found</div>';
     crossContext+='<div style="font-size:13px;color:#78350f;line-height:1.6">';
-    crossContext+='<b>Why this matters:</b> This view compares recorded HR changes with recorded pulse pressure patterns. It does not assign a cause.<br><br>';
+    crossContext+='<b>Why this matters:</b> Cardiac Output = HR × Stroke Volume. When PP (stroke volume proxy) is narrow, a rising HR shift suggests your heart is compensating.<br><br>';
     if(levelShifts.length>0){
       crossContext+='<b>Level Shift(s) detected:</b><br>';
       levelShifts.forEach(function(p){
         crossContext+='&nbsp;&nbsp;• Around <b>'+p.splitDate+'</b>: HR shifted '+p.beforeMean+' → '+p.afterMean+' bpm (Δ'+p.shiftMag+' bpm '+p.direction+')<br>';
-        crossContext+='&nbsp;&nbsp;&nbsp;&nbsp;With your PP at ~'+recentAvg.toFixed(1)+' mmHg, this '+(p.direction==='up'?'<b>shows a higher recorded heart rate than your recent average</b>':'shows a lower recorded heart rate than your recent average')+'. Discuss these recorded changes at your next cardiology appointment.<br>';
+        crossContext+='&nbsp;&nbsp;&nbsp;&nbsp;With your PP at ~'+recentAvg.toFixed(1)+' mmHg, this '+(p.direction==='up'?'<b>suggests compensatory tachycardia</b> — heart beating faster to maintain output with narrow stroke volume':'may indicate improved cardiac efficiency')+'. Discuss at your next cardiology appointment.<br>';
       });
     }
     if(rapidChanges.length>0){
@@ -25975,7 +26053,7 @@ function analyzePulsePressure(){
         var shiftDate=levelShifts[0].splitDate;
         var priorRapid=Object.keys(rapidByDate).filter(function(d){return d<shiftDate;});
         if(priorRapid.length>0){
-          crossContext+='<br><b>Earlier rapid-change events:</b> Rapid HR changes on '+priorRapid.join(', ')+' were recorded before the '+shiftDate+' level shift. Bring this timeline to your cardiologist.<br>';
+          crossContext+='<br><b>⚠️ Possible herald events:</b> Rapid HR changes on '+priorRapid.join(', ')+' occurred before the '+shiftDate+' level shift. These may represent early warning signals preceding the sustained change. Bring this timeline to your cardiologist.<br>';
         }
       }
     }
@@ -26119,7 +26197,7 @@ function updateAnalyticsBadges(){
 
     // ── HR RATE DETECTOR BADGE ─────────────────────────────────────────
     var hrCount=0;
-    var hrBadge=(typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(allBPB):allBPB.filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
+    var hrBadge=(allBPB.concat(B.map(function(r){return Object.assign({},r,{_date:todayKey});}))).filter(function(r){return r.h&&r.h>0;}).map(function(r){return Object.assign({},r,{hr:r.h});});
     if(hrBadge.length>=6){
       var hrBSorted=hrBadge.slice().sort(function(a,b){var aS=a._date?a._date+'T'+a.t+':00':'1970-01-01T'+a.t+':00';var bS=b._date?b._date+'T'+b.t+':00':'1970-01-01T'+b.t+':00';return new Date(aS)-new Date(bS);});
       var hrBPats=detectPatterns(hrBSorted);
@@ -26173,7 +26251,7 @@ function toggleDecompDrill(btn,id){
 
 function analyzeDecompensation(){
   var hist=getAllHistoricalData();
-  var allBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():[];
+  var allBP=(typeof _getAllBPReadings==='function')?_getAllBPReadings():(hist.bp||[]);
   var allWeight=hist.weight||[];
   var allSymptoms=hist.symptoms||[];
   var now=new Date();
@@ -26219,7 +26297,7 @@ function analyzeDecompensation(){
 
   // ── SIGNAL 2: CARDIAC OUTPUT (HR + PULSE PRESSURE) ───────────────────
   var signal2={id:'hr',label:'Cardiac Output Signal',icon:'💓',status:'grey',detail:'Not enough data (need 3+ days of BP + HR)',points:0,drilldown:''};
-  var hrReadings=(typeof _getHRReadingsFromBP==='function')?_getHRReadingsFromBP(allBP):allBP.filter(function(r){return r.h&&r.h>0;});
+  var hrReadings=allBP.filter(function(r){return r.h&&r.h>0;});
   var ppReadingsS2=allBP.filter(function(r){return r.s>0&&r.d>0;});
 
   if(hrReadings.length>=6){
@@ -26266,32 +26344,32 @@ function analyzeDecompensation(){
 
       if(compensatoryPattern){
         signal2.status='red';signal2.points=2;
-        signal2.detail=hrLine+ppLine+' — ⚠️ Recorded HR rose while PP was narrow or narrowing';
+        signal2.detail=hrLine+ppLine+' — ⚠️ Compensatory pattern: HR rising while PP narrow — heart may be compensating for reduced stroke volume';
       } else if(hrHighRising){
         signal2.status='red';signal2.points=2;
-        signal2.detail=hrLine+ppLine+' — Significant recorded HR rise';
+        signal2.detail=hrLine+ppLine+' — Significant HR rise, compensatory tachycardia possible';
       } else if(hrRising||(ppNarrow&&ppNarrowing)){
         signal2.status='yellow';signal2.points=1;
         signal2.detail=hrLine+ppLine+' — '+(hrRising?'HR elevated':'PP narrowing')+' — Monitor closely';
       } else {
         signal2.status='green';signal2.points=0;
-        signal2.detail=hrLine+ppLine+' — Recorded HR/PP comparison changed less than this report\'s alert criteria';
+        signal2.detail=hrLine+ppLine+' — Cardiac output signals stable ✓';
       }
 
       // Drilldown
       var last6hr=hrSorted.slice(-6);
       signal2.drilldown=
-        '<b>HR and pulse pressure comparison</b><br>'+
-        'This section compares recorded HR changes with recorded pulse pressure patterns. It does not assign a cause.<br><br>'+
+        '<b>Cardiac Output = Heart Rate × Stroke Volume</b><br>'+
+        'When stroke volume drops (narrow PP), heart compensates by beating faster (rising HR).<br><br>'+
         '<b>HR Thresholds:</b> +5 bpm = caution · +10 bpm = alert<br>'+
-        '<b>PP Threshold:</b> <40 mmHg = below the report reference range<br><br>'+
+        '<b>PP Threshold:</b> <40 mmHg = narrow (reduced stroke volume)<br><br>'+
         '<b>HR — Prior 3 days ('+priorHR.length+' readings):</b> avg '+priorAvgStr+' bpm<br>'+
         '<b>HR — Recent 3 days ('+recentHR.length+' readings):</b> avg '+recentAvgStr+' bpm<br>'+
         '<b>HR Delta:</b> '+deltaStr+' bpm<br>'+
         (recentPPAvg!==null?'<b>PP — Recent 3-day avg:</b> '+recentPPAvg.toFixed(1)+' mmHg<br>':'')+ 
         (priorPPAvg!==null?'<b>PP — Prior 3-day avg:</b> '+priorPPAvg.toFixed(1)+' mmHg<br>':'')+
         (ppDeltaS2!==null?'<b>PP Delta:</b> '+(ppDeltaS2>=0?'+':'')+ppDeltaS2.toFixed(1)+' mmHg<br>':'')+
-        (compensatoryPattern?'<br><b>⚠️ HR/PP pattern:</b> Recorded HR rose while PP was narrow or narrowing — discuss with cardiologist<br>':'')+
+        (compensatoryPattern?'<br><b>⚠️ Compensatory pattern detected:</b> HR rising while PP narrow — discuss with cardiologist<br>':'')+
         '<br><b>Last 6 HR readings:</b><br>'+
         last6hr.map(function(r){
           var pp=r.s>0&&r.d>0?(r.s-r.d):null;
@@ -28446,7 +28524,7 @@ var dChange=afterStats.diastolic-beforeStats.diastolic;
 var hChange=afterStats.hr-beforeStats.hr;
 
 if(Math.abs(sChange)<5&&Math.abs(dChange)<5&&Math.abs(hChange)<5){
-html+='<strong style="color:#10b981">✓ Stable Recovery:</strong> Your recorded BP and HR are similar to your pre-procedure values. Review these observations with your clinician as part of your recovery follow-up.';
+html+='<strong style="color:#10b981">✓ Stable Recovery:</strong> Your BP and HR are within normal range of pre-procedure values. This suggests good recovery progress.';
 }else if(sChange<-10||dChange<-10){
 html+='<strong style="color:#10b981">✓ Improved Readings:</strong> Your BP is lower than before the procedure, which may be positive depending on the procedure type.';
 }else if(sChange>10||dChange>10||hChange>15){
@@ -30697,8 +30775,11 @@ function _breathRunContextGate() {
   var decompGhost   = window._decompGhostFire;
   var decompGhostActive = decompGhost && decompGhost.dateKey === today;
 
-  // Recent BP/HR reading — use existing BP SSOT candidate instead of recalculating latest BP here.
-  var latestBP = (typeof _getRecentBPReading === 'function') ? _getRecentBPReading() : null;
+  // Today's BP readings
+  var todayBP = (B || []).filter(function(r) {
+    return (r._date || today) === today;
+  });
+  var latestBP = todayBP.length ? todayBP[todayBP.length - 1] : null;
   var latestHR  = latestBP ? (latestBP.h || 0) : 0;
   var latestSys = latestBP ? (latestBP.s || 0) : 0;
 
@@ -30754,26 +30835,26 @@ function _breathRunContextGate() {
     });
   }
 
-  // Level 2c — very high HR on recent BP/HR reading
+  // Level 2c — very high HR on today's most recent reading
   if (latestHR >= 110) {
     advisories.push({
       level: 2,
       color: '#fef3c7', border: '#f59e0b', textSymbol: '#92400e',
       icon: '⚠️',
-      title: 'Elevated HR on recent BP/HR reading',
-      body: 'Your recent BP/HR reading showed a heart rate of ' + latestHR + ' bpm. If this reflects your current resting HR — not activity-related — that elevation warrants a call to your cardiologist before using a breathing session as a response.',
+      title: 'Elevated HR on today\'s most recent reading',
+      body: 'Your most recent BP reading today showed a heart rate of ' + latestHR + ' bpm. If this reflects your current resting HR — not activity-related — that elevation warrants a call to your cardiologist before using a breathing session as a response.',
       action: null, actionLabel: null
     });
   }
 
-  // Level 2d — hypertensive crisis BP on recent BP/HR reading
+  // Level 2d — hypertensive crisis BP today
   if (latestSys >= 180) {
     advisories.push({
       level: 2,
       color: '#fef2f2', border: '#dc2626', textSymbol: '#991b1b',
       icon: '🚨',
-      title: 'Very high systolic BP on recent reading',
-      body: 'Your recent BP/HR reading shows a systolic BP of ' + latestSys + ' mmHg. A reading this high requires medical contact — not a breathing session. Call your cardiologist or go to the ER if you have additional symptoms.',
+      title: 'Very high systolic BP on today\'s reading',
+      body: 'Your most recent reading today shows a systolic BP of ' + latestSys + ' mmHg. A reading this high requires medical contact — not a breathing session. Call your cardiologist or go to the ER if you have additional symptoms.',
       action: null, actionLabel: null
     });
   }
@@ -31396,7 +31477,7 @@ function renderBreathingComparison() {
   // Footer note
   if (Object.keys(byTech).length > 1) {
     html += '<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;font-size:13px;color:#1e40af">';
-    html += '💡 HR Drop = average reduction in heart rate per session. A larger recorded drop was observed for that technique during the selected sessions.';
+    html += '💡 HR Drop = average reduction in heart rate per session. A larger drop indicates a stronger relaxation response for that technique.';
     html += '</div>';
   }
 
@@ -32129,11 +32210,11 @@ html+=`
 <ul style="margin:12px 0;padding-left:20px;line-height:1.8">`;
 
 if(avgSystolic>=140||avgDiastolic>=90){
-html+=`<li style="color:#dc2626;font-weight:600">⚠️ Average BP (${avgSystolic}/${avgDiastolic}) is within the report threshold for values at or above 140/90</li>`;
+html+=`<li style="color:#dc2626;font-weight:600">⚠️ Average BP (${avgSystolic}/${avgDiastolic}) indicates hypertension (≥140/90)</li>`;
 }else if(avgSystolic>=130||avgDiastolic>=80){
 html+=`<li style="color:#f59e0b">Average BP (${avgSystolic}/${avgDiastolic}) in Stage 1 range (130-139/80-89)</li>`;
 }else{
-html+=`<li style="color:#10b981">✓ Average BP (${avgSystolic}/${avgDiastolic}) is below this report's 130/80 reference threshold</li>`;
+html+=`<li style="color:#10b981">✓ Average BP (${avgSystolic}/${avgDiastolic}) within normal range (&lt;130/80)</li>`;
 }
 
 if(totalOutOfRange>=10){
@@ -32269,15 +32350,15 @@ var pphBorder=pphCount>=3?'#f97316':'#10b981';
 var pphColor=pphCount>=3?'#c2410c':'#065f46';
 html+=`<div class="report-section" style="background:${pphBg};border:1px solid ${pphBorder}">
 <div class="report-section-title" style="color:${pphColor}">🍽️ Post-Meal BP Pattern (PPH) <span style="font-size:13px;font-weight:400">(${pphEvts.length} meal pairs analyzed)</span></div>
-<p style="font-size:13px;color:${pphColor};margin:0 0 10px 0"><em>Configured threshold: ≥20 mmHg systolic drop within 2 hours of eating. Pre-meal = closest BP within 60 min before. Nadir = lowest systolic within 2 hours after. For pattern awareness and clinical discussion only.</em></p>
+<p style="font-size:13px;color:${pphColor};margin:0 0 10px 0"><em>Clinical definition: ≥20 mmHg systolic drop within 2 hours of eating. Pre-meal = closest BP within 60 min before. Nadir = lowest systolic within 2 hours after. For pattern awareness and clinical discussion only.</em></p>
 <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:10px">
 <tr style="background:${pphCount>=3?'#ffedd5':'#dcfce7'}"><th style="padding:6px;text-align:left">Metric</th><th style="padding:6px;text-align:left">Value</th></tr>
 <tr><td style="padding:6px;font-weight:600">Meal pairs analyzed:</td><td style="padding:6px">${pphEvts.length}</td></tr>
-<tr style="background:${pphBg}"><td style="padding:6px;font-weight:600">PPH events (≥20 mmHg drop):</td><td style="padding:6px;font-weight:700;color:${pphCount>0?'#dc2626':'#059669'}">${pphCount}${pphCount>=3?' — Pattern threshold met':pphCount>0?' — Below pattern threshold':' — None detected'}</td></tr>
+<tr style="background:${pphBg}"><td style="padding:6px;font-weight:600">PPH events (≥20 mmHg drop):</td><td style="padding:6px;font-weight:700;color:${pphCount>0?'#dc2626':'#059669'}">${pphCount}${pphCount>=3?' — Pattern confirmed':pphCount>0?' — Below pattern threshold':' — None detected'}</td></tr>
 <tr><td style="padding:6px;font-weight:600">Avg systolic change post-meal:</td><td style="padding:6px">${avgDrop>=0?'-'+avgDrop:'+'+Math.abs(avgDrop)} mmHg</td></tr>
 </table>`;
 if(pphCount>=3){
-html+=`<div style="font-size:13px;color:${pphColor};line-height:1.6;margin-bottom:8px"><strong>Pattern threshold met:</strong> ${pphCount} of ${pphEvts.length} analyzed meals produced a ≥20 mmHg systolic drop within 2 hours. This meets CardiacLens\' configured post-meal BP pattern threshold. Review these recorded meal/BP pairs with your clinician.</div>`;
+html+=`<div style="font-size:13px;color:${pphColor};line-height:1.6;margin-bottom:8px"><strong>Pattern confirmed:</strong> ${pphCount} of ${pphEvts.length} analyzed meals produced a ≥20 mmHg systolic drop within 2 hours. This meets the clinical definition of Postprandial Hypotension. Recommend clinical review — autonomic dysfunction, medication timing, and meal composition are common contributing factors.</div>`;
 var recentPPH=pphEvts.filter(function(e){return e.sysDrop>=20;}).sort(function(a,b){return b.date.localeCompare(a.date);}).slice(0,5);
 html+=`<div style="font-size:13px;color:#374151;margin-bottom:4px"><strong>Most recent PPH events:</strong></div>`;
 recentPPH.forEach(function(e){
@@ -32293,7 +32374,7 @@ html+=`</div>`;
 
 html+=`
 <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:2px solid #e5e7eb;color:#6b7280;font-size:14px">
-<p style="margin:0">CardiacLens v9.10.347.205 - Free & Source-Available</p>
+<p style="margin:0">CardiacLens v9.10.347.206 - Free & Source-Available</p>
 <p style="margin:4px 0 0 0">Report Generated: ${reportDate}</p>
 </div>`;
 
@@ -32556,7 +32637,7 @@ CLINICAL ASSESSMENT
 `;
 
 if(avgSystolic>=140||avgDiastolic>=90){
-text+=`* WARNING: Average BP (${avgSystolic}/${avgDiastolic}) is within the report threshold for values at or above 140/90\n`;
+text+=`* WARNING: Average BP (${avgSystolic}/${avgDiastolic}) indicates hypertension (≥140/90)\n`;
 }else if(avgSystolic>=130||avgDiastolic>=80){
 text+=`* Average BP (${avgSystolic}/${avgDiastolic}) in Stage 1 range (130-139/80-89)\n`;
 }else{
@@ -32604,14 +32685,14 @@ text+=`
 POST-MEAL BP PATTERN (PPH ANALYSIS)
 ------------------------------------
 Meal pairs analyzed: ${pphEvtsT.length}
-PPH events (>=20 mmHg systolic drop): ${pphCountT}${pphCountT>=3?' — PATTERN THRESHOLD MET':pphCountT>0?' — Below pattern threshold':' — None detected'}
+PPH events (>=20 mmHg systolic drop): ${pphCountT}${pphCountT>=3?' — PATTERN CONFIRMED':pphCountT>0?' — Below pattern threshold':' — None detected'}
 Avg systolic change post-meal: ${avgDropT>=0?'-'+avgDropT:'+'+Math.abs(avgDropT)} mmHg
 Definition: Postprandial Hypotension = >=20 mmHg systolic drop within 2 hours of eating.
 Pre-meal baseline = closest BP within 60 min before meal. Nadir = lowest systolic within 2 hours after.
 `;
 if(pphCountT>=3){
-text+=`*** PPH PATTERN THRESHOLD MET: ${pphCountT} of ${pphEvtsT.length} meals produced a ≥20 mmHg systolic drop.
-Review these recorded meal/BP pairs with your clinician.\n`;
+text+=`*** PPH PATTERN CONFIRMED: ${pphCountT} of ${pphEvtsT.length} meals produced a clinically significant drop.
+Recommend clinical review — autonomic dysfunction, medication timing, and meal composition are common contributing factors.\n`;
 var recentT=pphEvtsT.filter(function(e){return e.sysDrop>=20;}).sort(function(a,b){return b.date.localeCompare(a.date);}).slice(0,5);
 recentT.forEach(function(e){text+=`  ${e.date} | ${e.mealName.substring(0,22)} | ${e.preSys}->${e.postSys} sys (-${e.sysDrop} mmHg)\n`;});
 }
@@ -32624,7 +32705,7 @@ Note: This report is based on patient self-tracked data. Clinical correlation
 and examination are essential for diagnosis and treatment decisions.
 
 ---
-CardiacLens v9.10.347.205 Medical Grade - Free
+CardiacLens v9.10.347.206 Medical Grade - Free
 Report Generated: ${reportDate}`;
 
 return text;
@@ -33955,7 +34036,7 @@ function _flwStepB1(){
     {key:'cardiac',icon:'🫀',  label:'Other cardiac condition',             sub:'Arrhythmia, post-surgery, valve disease, hypertrophic'},
     {key:'renal',  icon:'🫘',  label:'Kidney / renal disease',              sub:'CKD, dialysis, renal insufficiency'},
     {key:'htn',    icon:'📈',  label:'High blood pressure (hypertension)',  sub:'Managing BP without a specific fluid restriction'},
-    {key:'other',  icon:'💧',  label:'General wellness / other',            sub:'Building recorded hydration habits'}
+    {key:'other',  icon:'💧',  label:'General wellness / other',            sub:'Building healthy hydration habits'}
   ];
   conditions.forEach(function(c){
     h+='<button onclick="_flwB1Select(\''+c.key+'\')" style="'+BG+'">';
@@ -35522,7 +35603,7 @@ html+='<div style="background:white;border-radius:8px;padding:10px;text-align:ce
 html+='<div style="background:white;border-radius:8px;padding:10px;text-align:center"><div style="font-size:20px;font-weight:800;color:'+(avgSysDrop>10?'#f97316':'#374151')+'">'+(avgSysDrop>=0?'-'+avgSysDrop.toFixed(0):'+'+Math.abs(avgSysDrop).toFixed(0))+' mmHg</div><div style="font-size:11px;color:#6b7280">Avg systolic change</div></div>';
 html+='</div>';
 if(notable){
-html+='<div style="font-size:13px;color:'+sColor+';line-height:1.6">Your data shows <strong>'+pphEvents+' post-meal BP events</strong> — systolic drops of ≥20 mmHg within 2 hours of eating ('+pctPPH+'% of tracked meals). This meets CardiacLens\' configured post-meal BP pattern threshold. Consider pinning this pattern for your next appointment.</div>';
+html+='<div style="font-size:13px;color:'+sColor+';line-height:1.6">Your data shows <strong>'+pphEvents+' PPH events</strong> — systolic drops of ≥20 mmHg within 2 hours of eating ('+pctPPH+'% of tracked meals). This meets the clinical definition of Postprandial Hypotension and is worth discussing with your care team. Consider pinning this pattern for your next appointment.</div>';
 }else{
 html+='<div style="font-size:13px;color:'+sColor+';line-height:1.6">'+(pphEvents>0?pphEvents+' meal(s) showed a ≥20 mmHg drop — below the 3-event threshold for a confirmed pattern.':'No PPH events (≥20 mmHg systolic drop) detected across '+events.length+' analyzed meal pairs.')+' Average systolic change: '+(avgSysDrop>=0?'-':'+')+''+Math.abs(avgSysDrop).toFixed(1)+' mmHg.</div>';
 }
@@ -36761,7 +36842,7 @@ report.push(notes);
 report.push('');
 }
 report.push('═══════════════════════════════════════════════════════════');
-report.push('This report was generated by CardiacLens v9.10.347.205 Medical Grade - Free');
+report.push('This report was generated by CardiacLens v9.10.347.206 Medical Grade - Free');
 report.push('Advanced Analytics Dashboard - Phase 3 Implementation');
 report.push('═══════════════════════════════════════════════════════════');
 const blob=new Blob([report.join('\n')],{type:'text/plain'});
@@ -36851,7 +36932,7 @@ ${periodHTML}
 <h2>Key Insights</h2>
 ${insightsHTML}
 <div style="margin-top:40px;padding:20px;background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:8px">
-<strong>CardiacLens v9.10.347.205 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
+<strong>CardiacLens v9.10.347.206 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
 This report is not a substitute for professional medical advice.
 </div>
 </body>
@@ -37824,7 +37905,7 @@ alert(`🏃 Activity Summary\n\n` +
 var VERSION_JSON_URL = 'https://cardiaclens.com/version.json';
 var VERSION_CHECK_KEY = 'CARDIACLENS_LAST_VERSION_CHECK';
 var VERSION_DISMISSED_KEY = 'CARDIACLENS_UPDATE_DISMISSED';
-var CURRENT_VERSION = 'v9.10.347.205';
+var CURRENT_VERSION = 'v9.10.347.206';
 var _latestVersionData = null; // cached from last fetch
 
 // Detect whether running as an installed Home Screen PWA on iOS
@@ -39997,6 +40078,126 @@ function executeDeleteAll() {
 
 
 
+
+
+
+// ── Evidence Library (v9.10.347.197) ─────────────────────────────
+(function(){
+  var EVIDENCE_KEY = 'CARDIACLENS_EVIDENCE_LIBRARY';
+  var EVIDENCE_DB_NAME = 'CardiacLensEvidenceDB';
+  var EVIDENCE_DB_VERSION = 1;
+  var EVIDENCE_IMG_STORE = 'images';
+  var EVIDENCE_SAVE_ERROR = 'This evidence event could not be saved because the images are too large for available browser storage. Try removing one image or cropping screenshots/photos first.';
+  var pendingImages = [];
+
+  function esc(v){ return String(v == null ? '' : v).replace(/[&<>'"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]; }); }
+  function uid(prefix){ return prefix + Date.now() + '_' + Math.random().toString(36).slice(2,8); }
+  function today(){ return new Date().toISOString().slice(0,10); }
+  function loadEventsMeta(){ try { var arr = JSON.parse(localStorage.getItem(EVIDENCE_KEY) || '[]'); return Array.isArray(arr) ? arr : []; } catch(e){ return []; } }
+  function stripImageData(img){ var out={}; Object.keys(img||{}).forEach(function(k){ if(k !== 'dataUrl') out[k]=img[k]; }); return out; }
+  function stripEventData(ev){ var copy={ id: ev.id, title: ev.title||'', date: ev.date||'', notes: ev.notes||'', images: [], createdAt: ev.createdAt||'', updatedAt: ev.updatedAt||'' }; copy.images=(Array.isArray(ev.images)?ev.images:[]).map(stripImageData); return copy; }
+  function saveEventsMeta(arr){ localStorage.setItem(EVIDENCE_KEY, JSON.stringify((arr || []).map(stripEventData))); }
+  function notePreview(n){ n = String(n || '').replace(/\s+/g,' ').trim(); return n.length > 120 ? n.slice(0,117) + '...' : n; }
+  function setError(msg){ var el = document.getElementById('evidenceError'); if (el) el.textContent = msg || ''; }
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function dateTimeLocalFromIso(iso){ if (!iso) return ''; var d = new Date(iso); if (isNaN(d.getTime())) return ''; return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+  function isoFromDateTimeLocal(v){ if (!v) return ''; var d = new Date(v); return isNaN(d.getTime()) ? '' : d.toISOString(); }
+  function formatEvidenceDate(isoOrDate){ if (!isoOrDate) return ''; var d = new Date(isoOrDate); if (isNaN(d.getTime())) return String(isoOrDate || ''); return d.toLocaleDateString([], { year:'numeric', month:'long', day:'numeric' }); }
+  function formatEvidenceTime(iso){ if (!iso) return ''; var d = new Date(iso); if (isNaN(d.getTime())) return ''; return d.toLocaleTimeString([], { hour:'numeric', minute:'2-digit' }); }
+  function imageWhen(img){ return img && (img.takenAt || img.addedAt || ''); }
+
+  function openDb(){
+    return new Promise(function(resolve,reject){
+      if (!window.indexedDB) { reject(new Error('IndexedDB is not available.')); return; }
+      var req = indexedDB.open(EVIDENCE_DB_NAME, EVIDENCE_DB_VERSION);
+      req.onupgradeneeded = function(){ var db=req.result; if(!db.objectStoreNames.contains(EVIDENCE_IMG_STORE)) db.createObjectStore(EVIDENCE_IMG_STORE,{keyPath:'id'}); };
+      req.onsuccess = function(){ resolve(req.result); };
+      req.onerror = function(){ reject(req.error || new Error('Could not open browser database storage.')); };
+    });
+  }
+  function dbPutImage(img){
+    return openDb().then(function(db){ return new Promise(function(resolve,reject){
+      var tx=db.transaction(EVIDENCE_IMG_STORE,'readwrite'); tx.objectStore(EVIDENCE_IMG_STORE).put({id:img.id,eventId:img.eventId||'',dataUrl:img.dataUrl||'',type:img.type||'image/jpeg',name:img.name||'Evidence image',updatedAt:new Date().toISOString()});
+      tx.oncomplete=function(){db.close();resolve();}; tx.onerror=function(){db.close();reject(tx.error||new Error('Could not save image.'));};
+    });});
+  }
+  function dbGetImage(id){
+    return openDb().then(function(db){ return new Promise(function(resolve){
+      var tx=db.transaction(EVIDENCE_IMG_STORE,'readonly'); var req=tx.objectStore(EVIDENCE_IMG_STORE).get(id);
+      req.onsuccess=function(){ var rec=req.result||null; db.close(); resolve(rec ? rec.dataUrl : ''); };
+      req.onerror=function(){ db.close(); resolve(''); };
+    });});
+  }
+  function dbDeleteImage(id){
+    return openDb().then(function(db){ return new Promise(function(resolve){
+      var tx=db.transaction(EVIDENCE_IMG_STORE,'readwrite'); tx.objectStore(EVIDENCE_IMG_STORE).delete(id);
+      tx.oncomplete=function(){db.close();resolve();}; tx.onerror=function(){db.close();resolve();};
+    });});
+  }
+  function dbAllImages(){
+    return openDb().then(function(db){ return new Promise(function(resolve){
+      var out=[]; var tx=db.transaction(EVIDENCE_IMG_STORE,'readonly'); var store=tx.objectStore(EVIDENCE_IMG_STORE);
+      if (store.getAll) { var req=store.getAll(); req.onsuccess=function(){out=req.result||[];}; }
+      else { store.openCursor().onsuccess=function(e){var c=e.target.result;if(c){out.push(c.value);c.continue();}}; }
+      tx.oncomplete=function(){db.close();resolve(out);}; tx.onerror=function(){db.close();resolve(out);};
+    });});
+  }
+  function hydrateImage(img){
+    img = Object.assign({}, img || {});
+    if (img.dataUrl || !img.id) return Promise.resolve(img);
+    return dbGetImage(img.id).then(function(dataUrl){ img.dataUrl = dataUrl || ''; return img; });
+  }
+  function hydrateEvent(ev){
+    if (!ev) return Promise.resolve(null);
+    var copy = Object.assign({}, ev); var imgs = Array.isArray(copy.images) ? copy.images : [];
+    return Promise.all(imgs.map(hydrateImage)).then(function(h){ copy.images = h; return copy; });
+  }
+  function findEventMeta(id){ return loadEventsMeta().filter(function(ev){ return ev && ev.id === id; })[0] || null; }
+  function findEvent(id){ return hydrateEvent(findEventMeta(id)); }
+  function migrateEvidenceImages(){
+    var events = loadEventsMeta(), changed = false, jobs = [];
+    events.forEach(function(ev){ (Array.isArray(ev.images)?ev.images:[]).forEach(function(img){ if(img && img.dataUrl && img.id){ jobs.push(dbPutImage(Object.assign({}, img, {eventId: ev.id}))); delete img.dataUrl; changed = true; } }); });
+    return Promise.all(jobs).then(function(){ if(changed) saveEventsMeta(events); return events; }).catch(function(){ return events; });
+  }
+  window._clEvidenceExportAll = function(){ return dbAllImages().then(function(imgs){ return imgs.map(function(r){ return {id:r.id,eventId:r.eventId||'',dataUrl:r.dataUrl||'',type:r.type||'image/jpeg',name:r.name||'',updatedAt:r.updatedAt||''}; }); }).catch(function(){ return []; }); };
+  window._clEvidenceImportAll = function(raw){
+    var imgs=[]; try { imgs = typeof raw === 'string' ? JSON.parse(raw||'[]') : (Array.isArray(raw)?raw:[]); } catch(e){ imgs=[]; }
+    return Promise.all(imgs.filter(function(r){return r&&r.id&&r.dataUrl;}).map(dbPutImage)).catch(function(){});
+  };
+
+  function syncEvidenceImageFields(){ pendingImages.forEach(function(img, idx){ var cap=document.getElementById('evidenceImgCaption_'+idx); var ts=document.getElementById('evidenceImgTime_'+idx); if(cap) img.caption=cap.value||''; if(ts) img.takenAt=isoFromDateTimeLocal(ts.value)||img.takenAt||img.addedAt||''; }); }
+  function renderImageThumbs(){
+    var box=document.getElementById('evidenceImagePreview'); if(!box)return;
+    if(!pendingImages.length){ box.innerHTML='<div style="font-size:14px;color:#6b7280;background:#f9fafb;border:1px dashed #d1d5db;border-radius:10px;padding:12px">No images added yet.</div>'; return; }
+    var html=''; pendingImages.forEach(function(img,idx){
+      html+='<div style="border:1px solid #e5e7eb;border-radius:10px;padding:8px;margin-bottom:10px;background:#fff">';
+      html+='<div style="display:flex;gap:10px;align-items:center">';
+      html+='<img src="'+esc(img.dataUrl||'')+'" alt="Evidence image" style="width:74px;height:74px;object-fit:cover;border-radius:8px;border:1px solid #d1d5db">';
+      html+='<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:800;color:#111827">Evidence Photo '+(idx+1)+'</div><div style="font-size:12px;color:#6b7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(img.name||'Evidence image')+'</div></div>';
+      html+='<button type="button" onclick="removeEvidenceImage('+idx+')" style="background:#fee2e2;color:#991b1b;border:none;border-radius:8px;padding:9px 10px;font-size:13px;font-weight:800;cursor:pointer">Remove</button></div>';
+      html+='<label style="display:block;font-size:12px;font-weight:800;color:#374151;margin:8px 0 3px">Image date/time</label><input id="evidenceImgTime_'+idx+'" type="datetime-local" value="'+esc(dateTimeLocalFromIso(imageWhen(img)))+'" style="width:100%;padding:9px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;box-sizing:border-box">';
+      html+='<label style="display:block;font-size:12px;font-weight:800;color:#374151;margin:8px 0 3px">Optional image caption</label><textarea id="evidenceImgCaption_'+idx+'" rows="2" placeholder="Example: Selfie taken after pushing bicycle approximately 3 miles." style="width:100%;padding:9px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;box-sizing:border-box;resize:vertical">'+esc(img.caption||'')+'</textarea></div>';
+    }); box.innerHTML=html;
+  }
+  function resizeImageFile(file){ return new Promise(function(resolve,reject){ if(!file||!file.type||!/^image\//.test(file.type)){reject(new Error('Only image files can be added.'));return;} var reader=new FileReader(); reader.onerror=function(){reject(new Error('Could not read this image.'));}; reader.onload=function(){ var img=new Image(); img.onerror=function(){reject(new Error('Could not process this image.'));}; img.onload=function(){ try{ var maxW=1200,w=img.naturalWidth||img.width,h=img.naturalHeight||img.height; if(!w||!h){reject(new Error('Could not process this image.'));return;} if(w>maxW){h=Math.round(h*(maxW/w));w=maxW;} var canvas=document.createElement('canvas'); canvas.width=w; canvas.height=h; var ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,w,h); var dataUrl=canvas.toDataURL('image/jpeg',0.75); var stamp=file.lastModified?new Date(file.lastModified).toISOString():new Date().toISOString(); resolve({id:uid('img_'),name:file.name||'Evidence image',type:'image/jpeg',dataUrl:dataUrl,takenAt:stamp,caption:'',addedAt:new Date().toISOString()}); }catch(e){reject(new Error('Could not compress this image.'));} }; img.src=reader.result; }; reader.readAsDataURL(file); }); }
+
+  window.openEvidenceLibrary = function(){ migrateEvidenceImages().then(function(){ var events=loadEventsMeta().sort(function(a,b){return String(b.date||'').localeCompare(String(a.date||''))||String(b.createdAt||'').localeCompare(String(a.createdAt||''));}); var html='<div class="modal-title" style="font-size:26px;margin-bottom:10px">📁 Evidence Library</div>'; html+='<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:12px;margin-bottom:12px;color:#1e3a8a;font-size:14px;line-height:1.45"><strong>Use this for one documented health event or investigation.</strong><br>Save the title, date, notes, and supporting photos or screenshots so you can review the story later or show it to your doctor.</div>'; html+='<button type="button" onclick="openEvidenceForm()" style="width:100%;background:#9d174d;color:#fff;border:none;border-radius:10px;padding:14px;font-size:17px;font-weight:800;margin-bottom:14px;cursor:pointer">+ New Evidence Event</button>'; if(!events.length){html+='<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:14px;color:#374151;font-size:15px;line-height:1.5">No evidence events saved yet. Create one event to preserve photos, screenshots, image times, captions, and notes for later review.</div>';} else {events.forEach(function(ev){ html+='<div style="border:1px solid #e5e7eb;border-radius:12px;padding:13px;margin-bottom:10px;background:#fff"><div style="font-size:17px;font-weight:800;color:#111827;margin-bottom:4px">'+esc(ev.title||'Untitled evidence event')+'</div><div style="font-size:13px;color:#6b7280;margin-bottom:6px">'+esc(ev.date||'')+' · '+((ev.images||[]).length)+' image'+(((ev.images||[]).length)===1?'':'s')+'</div>'; if(ev.notes) html+='<div style="font-size:14px;color:#374151;margin-bottom:10px;line-height:1.45">'+esc(notePreview(ev.notes))+'</div>'; html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"><button type="button" onclick="viewEvidenceEvent(\''+esc(ev.id)+'\')" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:800;cursor:pointer">View</button><button type="button" onclick="openEvidenceForm(\''+esc(ev.id)+'\')" style="background:#0f766e;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:800;cursor:pointer">Edit</button><button type="button" onclick="deleteEvidenceEvent(\''+esc(ev.id)+'\')" style="background:#dc2626;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:800;cursor:pointer">Delete</button></div></div>'; }); } html+='<div class="modal-actions"><button class="modal-cancel" onclick="hideModal()">Close</button></div>'; showModal(html); }); };
+  window.openEvidenceForm = function(id){ var evMeta=id?findEventMeta(id):null; (id?findEvent(id):Promise.resolve(null)).then(function(ev){ pendingImages=ev&&Array.isArray(ev.images)?ev.images.slice():[]; var html='<div class="modal-title" style="font-size:24px;margin-bottom:10px">'+(ev?'Edit Evidence Event':'New Evidence Event')+'</div>'; html+='<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:10px;margin-bottom:10px;color:#374151;font-size:14px;line-height:1.45">Add only images that support this event: photos, screenshots, BP readings, symptoms, or other evidence you may want to explain later.</div><div id="evidenceError" style="color:#b91c1c;font-size:14px;font-weight:700;margin-bottom:8px"></div>'; html+='<label style="display:block;font-size:14px;font-weight:800;color:#374151;margin:8px 0 4px">Title *</label><input id="evidenceTitle" type="text" value="'+esc(ev?ev.title:'')+'" style="width:100%;padding:11px;border:1px solid #d1d5db;border-radius:8px;font-size:16px;box-sizing:border-box">'; html+='<label style="display:block;font-size:14px;font-weight:800;color:#374151;margin:10px 0 4px">Event Date</label><input id="evidenceDate" type="date" value="'+esc(ev?(ev.date||today()):today())+'" style="width:100%;padding:11px;border:1px solid #d1d5db;border-radius:8px;font-size:16px;box-sizing:border-box">'; html+='<label style="display:block;font-size:14px;font-weight:800;color:#374151;margin:10px 0 4px">Notes</label><textarea id="evidenceNotes" rows="5" placeholder="What happened? Why does this evidence matter? What should you or your doctor understand later?" style="width:100%;padding:11px;border:1px solid #d1d5db;border-radius:8px;font-size:16px;box-sizing:border-box;resize:vertical">'+esc(ev?ev.notes:'')+'</textarea>'; html+='<label style="display:block;font-size:14px;font-weight:800;color:#374151;margin:12px 0 6px">Images</label><input id="evidenceFileInput" type="file" accept="image/*" multiple style="display:none" onchange="handleEvidenceFiles(this.files)"><button type="button" onclick="document.getElementById(\'evidenceFileInput\').click()" style="width:100%;background:#374151;color:#fff;border:none;border-radius:10px;padding:12px;font-size:16px;font-weight:800;margin-bottom:10px;cursor:pointer">Add Image</button><div id="evidenceImagePreview"></div>'; html+='<div class="modal-actions"><button class="modal-cancel" onclick="openEvidenceLibrary()">Cancel</button><button class="modal-ok" onclick="saveEvidenceEvent(\''+(evMeta?esc(evMeta.id):'')+'\')">Save</button></div>'; showModal(html); setTimeout(renderImageThumbs,20); }); };
+  window.handleEvidenceFiles=function(files){ syncEvidenceImageFields(); setError(''); files=Array.prototype.slice.call(files||[]); if(!files.length)return; var chain=Promise.resolve(); files.forEach(function(file){chain=chain.then(function(){return resizeImageFile(file).then(function(img){pendingImages.push(img);renderImageThumbs();});});}); chain.catch(function(err){setError((err&&err.message)?err.message:'Could not add this image.');renderImageThumbs();}); };
+  window.removeEvidenceImage=function(idx){ syncEvidenceImageFields(); if(idx<0||idx>=pendingImages.length)return; if(!confirm('Remove this image from the event?'))return; pendingImages.splice(idx,1); renderImageThumbs(); };
+  window.saveEvidenceEvent=function(id){ syncEvidenceImageFields(); setError(''); var title=(document.getElementById('evidenceTitle')||{}).value||''; var date=(document.getElementById('evidenceDate')||{}).value||today(); var notes=(document.getElementById('evidenceNotes')||{}).value||''; title=title.trim(); if(!title){setError('Title is required.');return;} var events=loadEventsMeta(); var now=new Date().toISOString(); var eventId=id||uid('ev_'); var old=(id?findEventMeta(id):null); var oldIds=(old&&Array.isArray(old.images)?old.images:[]).map(function(i){return i.id;}); pendingImages.forEach(function(img){ if(!img.id) img.id=uid('img_'); img.eventId=eventId; }); var newIds=pendingImages.map(function(i){return i.id;}); var record={id:eventId,title:title,date:date,notes:notes,images:pendingImages.map(stripImageData),createdAt:(old&&old.createdAt)||now,updatedAt:now}; var jobs=pendingImages.map(dbPutImage); Promise.all(jobs).then(function(){ var found=false; events=events.map(function(ev){ if(ev&&ev.id===eventId){found=true;return record;} return ev;}); if(!found) events.push(record); saveEventsMeta(events); return Promise.all(oldIds.filter(function(x){return newIds.indexOf(x)<0;}).map(dbDeleteImage)); }).then(function(){ pendingImages=[]; openEvidenceLibrary(); if(typeof showToast==='function')showToast('Evidence event saved'); }).catch(function(){ setError(EVIDENCE_SAVE_ERROR); }); };
+  window.viewEvidenceEvent=function(id){ findEvent(id).then(function(ev){ if(!ev){openEvidenceLibrary();return;} var html='<div class="modal-title" style="font-size:24px;margin-bottom:8px">'+esc(ev.title||'Evidence Event')+'</div><div style="font-size:14px;color:#6b7280;margin-bottom:12px">'+esc(ev.date||'')+'</div>'; if(ev.notes) html+='<div style="white-space:pre-wrap;font-size:15px;color:#374151;line-height:1.55;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:12px;margin-bottom:12px">'+esc(ev.notes)+'</div>'; var imgs=Array.isArray(ev.images)?ev.images:[]; if(!imgs.length) html+='<div style="font-size:14px;color:#6b7280;margin-bottom:12px">No images saved with this event.</div>'; imgs.forEach(function(img,idx){ var when=imageWhen(img); html+='<div style="font-size:13px;font-weight:800;color:#374151;margin:12px 0 4px">Evidence Photo '+(idx+1)+' of '+imgs.length+'</div>'; if(when) html+='<div style="font-size:13px;color:#6b7280;margin-bottom:6px">'+esc(formatEvidenceDate(when))+(formatEvidenceTime(when)?' · '+esc(formatEvidenceTime(when)):'')+'</div>'; if(img.caption) html+='<div style="font-size:14px;color:#374151;line-height:1.45;margin-bottom:6px">'+esc(img.caption)+'</div>'; html+='<button type="button" onclick="openEvidenceImage(\''+esc(ev.id)+'\','+idx+')" style="display:block;width:100%;padding:0;margin:0 0 12px 0;background:transparent;border:none;cursor:pointer;text-align:left"><img src="'+esc(img.dataUrl||'')+'" alt="Evidence image" style="width:100%;height:auto;border-radius:10px;border:1px solid #d1d5db"></button>'; }); html+='<div style="font-size:13px;color:#6b7280;margin:4px 0 12px">Tap an image to open it larger.</div><div class="modal-actions"><button class="modal-cancel" onclick="openEvidenceLibrary()">Back to Evidence Library</button><button class="modal-ok" onclick="openEvidenceForm(\''+esc(ev.id)+'\')">Edit</button></div><button type="button" onclick="deleteEvidenceEvent(\''+esc(ev.id)+'\')" style="width:100%;background:#dc2626;color:#fff;border:none;border-radius:10px;padding:12px;font-size:16px;font-weight:800;margin-top:8px;cursor:pointer">Delete</button>'; showModal(html); }); };
+  window.openEvidenceImage=function(id,idx){ findEvent(id).then(function(ev){ if(!ev){openEvidenceLibrary();return;} var imgs=Array.isArray(ev.images)?ev.images:[],img=imgs[idx]; if(!img){viewEvidenceEvent(id);return;} var when=imageWhen(img); var html='<div class="modal-title" style="font-size:22px;margin-bottom:6px">Evidence Photo '+(idx+1)+' of '+imgs.length+'</div><div style="font-size:14px;font-weight:800;color:#111827;margin-bottom:4px">'+esc(ev.title||'Evidence Event')+'</div>'; if(when) html+='<div style="font-size:13px;color:#6b7280;margin-bottom:8px">'+esc(formatEvidenceDate(when))+(formatEvidenceTime(when)?' · '+esc(formatEvidenceTime(when)):'')+'</div>'; if(img.caption) html+='<div style="font-size:14px;color:#374151;line-height:1.45;margin-bottom:8px">'+esc(img.caption)+'</div>'; html+='<img src="'+esc(img.dataUrl||'')+'" alt="Evidence image" style="width:100%;height:auto;border-radius:10px;border:1px solid #d1d5db;margin-bottom:12px"><div class="modal-actions"><button class="modal-cancel" onclick="viewEvidenceEvent(\''+esc(ev.id)+'\')">Back to Event</button><button class="modal-ok" onclick="hideModal()">Close</button></div>'; showModal(html); }); };
+  window.deleteEvidenceEvent=function(id){ var ev=findEventMeta(id); if(!ev){openEvidenceLibrary();return;} if(!confirm('Delete this evidence event? This cannot be undone.'))return; var ids=(Array.isArray(ev.images)?ev.images:[]).map(function(i){return i.id;}); Promise.all(ids.map(dbDeleteImage)).then(function(){ saveEventsMeta(loadEventsMeta().filter(function(item){return item&&item.id!==id;})); openEvidenceLibrary(); if(typeof showToast==='function')showToast('Evidence event deleted'); }); };
+  migrateEvidenceImages();
+})();
+
+
+
+
+
+
+
 // ── STORAGE ──────────────────────────────────────────────────────────────────
 var PINNED_EVENTS_KEY = 'cardiaclens_pinned_events';
 var PINNED_ARCHIVE_KEY = 'cardiaclens_pinned_archive';
@@ -40314,8 +40515,59 @@ function openPinnedEvents() {
 // Storage key: CARDIACLENS_MED_INTEL
 // ═══════════════════════════════════════════════════════════════════════
 
+
+function _clMedIntelParse(raw){
+  try{ var o=raw?JSON.parse(raw):{}; return (o&&typeof o==='object')?o:{}; }catch(e){ return {}; }
+}
+function _clMedIntelTime(rec){
+  try{ return rec&&rec.approvedAt ? (new Date(rec.approvedAt).getTime()||0) : 0; }catch(e){ return 0; }
+}
+function _clCanonicalizeMedIntelStorage(){
+  // v9.10.347.197: one source of truth for Medication Intelligence.
+  // Older code wrote/read both CLINBRIDGE_MED_INTEL and CARDIACLENS_MED_INTEL.
+  // Merge both safely, keeping the newest approvedAt for each medicine+metric,
+  // then write the same canonical object to both keys so old/new readers agree.
+  var card={}, clin={}, merged={};
+  try{ card=_clMedIntelParse(localStorage.getItem('CARDIACLENS_MED_INTEL')); }catch(e){}
+  try{ clin=_clMedIntelParse(localStorage.getItem('CLINBRIDGE_MED_INTEL')); }catch(e){}
+  function copyInto(src){
+    Object.keys(src||{}).forEach(function(med){
+      if(!merged[med]) merged[med]={};
+      if(med==='_weeklyReview'){
+        var existing=merged._weeklyReview&&merged._weeklyReview.completedAt?new Date(merged._weeklyReview.completedAt).getTime():0;
+        var incoming=src._weeklyReview&&src._weeklyReview.completedAt?new Date(src._weeklyReview.completedAt).getTime():0;
+        if(incoming>=existing) merged._weeklyReview=src._weeklyReview;
+        return;
+      }
+      var srcMed=src[med];
+      if(!srcMed||typeof srcMed!=='object') return;
+      Object.keys(srcMed).forEach(function(metric){
+        var incoming=srcMed[metric];
+        if(!incoming||typeof incoming!=='object') return;
+        var current=merged[med][metric];
+        if(!current || _clMedIntelTime(incoming)>=_clMedIntelTime(current)){
+          merged[med][metric]=incoming;
+        }
+      });
+    });
+  }
+  copyInto(clin);
+  copyInto(card);
+  try{
+    var out=JSON.stringify(merged);
+    localStorage.setItem('CARDIACLENS_MED_INTEL',out);
+    localStorage.setItem('CLINBRIDGE_MED_INTEL',out);
+  }catch(e){}
+  try{ medIntelData=merged; }catch(e){}
+  return merged;
+}
 function _mipSave() {
-  try { localStorage.setItem('CARDIACLENS_MED_INTEL', JSON.stringify(medIntelData)); } catch(e) {}
+  try {
+    if(!medIntelData||typeof medIntelData!=='object') medIntelData={};
+    var out=JSON.stringify(medIntelData);
+    localStorage.setItem('CARDIACLENS_MED_INTEL', out);
+    localStorage.setItem('CLINBRIDGE_MED_INTEL', out); // legacy mirror: prevents split-brain reads
+  } catch(e) {}
 }
 
 function _mipMarkWeeklyReviewComplete(){
@@ -40406,6 +40658,11 @@ function _mipComputeAll() {
 
 // Get approved thresholds for a medicine metric (returns null if none approved)
 function mipGetApproved(medName, metric) {
+  try {
+    if ((!medIntelData || !medIntelData[medName]) && typeof _clCanonicalizeMedIntelStorage === 'function') {
+      medIntelData = _clCanonicalizeMedIntelStorage();
+    }
+  } catch(e) {}
   if (!medIntelData || !medIntelData[medName]) return null;
   return medIntelData[medName][metric] || null;
 }
@@ -41103,23 +41360,23 @@ function _buildPinWhatToSay(evt) {
         lines.push(
           'My app flagged a cardiac output signal on ' + edDisplay +
           ': my heart rate has been increasing but my pulse pressure has not widened proportionally. ' +
-          'I wanted to ask whether this recorded pattern is clinically relevant.'
+          'I wanted to ask specifically about hemodynamic decompensation.'
         );
       } else {
         lines.push(
-          'My app flagged a high-level multi-signal pattern on ' + edDisplay +
+          'My app flagged a high-level decompensation warning on ' + edDisplay +
           ' with multiple converging signals: ' + sigStr +
           '. I am not in acute distress, but I wanted to report this to you directly rather than wait for my next scheduled appointment.'
         );
       }
     } else if (pts >= 3) {
       lines.push(
-        'My app flagged multiple recorded signals converging on ' + edDisplay + ': ' + sigStr +
+        'My app flagged multiple decompensation signals converging on ' + edDisplay + ': ' + sigStr +
         '. These signals appeared at the same time. I have been monitoring closely and wanted to bring this to your attention.'
       );
     } else {
       lines.push(
-        'My app flagged an early recorded pattern on ' + edDisplay + ': ' + sigStr +
+        'My app flagged an early decompensation indicator on ' + edDisplay + ': ' + sigStr +
         '. This was a single signal and has not escalated. I am logging it for your awareness.'
       );
     }
@@ -41133,13 +41390,13 @@ function _buildPinWhatToSay(evt) {
     if (isChronic) {
       lines.push(
         'My pulse pressure \u2014 the difference between my systolic and diastolic readings \u2014 has been persistently narrow across my entire tracking history. My average pulse pressure is ' + avgPP +
-        ' mmHg. Narrowing pulse pressure can be worth discussing as a recorded BP pattern.'
+        ' mmHg. Narrowing pulse pressure can be worth discussing as a possible indicator of reduced cardiac output.'
       );
     } else if (stTitle.indexOf('Narrowing') !== -1 || stTitle.indexOf('Reduced') !== -1 || stTitle.indexOf('Narrow') !== -1) {
       lines.push(
         'My app flagged a narrowing pulse pressure pattern on ' + edDisplay +
         '. My recent average pulse pressure is ' + avgPP +
-        ' mmHg. I wanted to flag this narrowing pulse pressure as a persistent recorded pattern.'
+        ' mmHg. I understand narrowing pulse pressure can sometimes reflect changes in cardiac output and I wanted to flag this as a persistent pattern.'
       );
     } else {
       lines.push(
@@ -41873,7 +42130,8 @@ function _injectPPPins() {
     var el2=document.getElementById('pp-pin-section');if(el2)el2.style.display='none';return;
   }
 
-  var allBP = ((typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : ((getAllHistoricalData().bp)||[])).filter(function(r){return r.s>0&&r.d>0;}).sort(function(a,b){
+  var hist = getAllHistoricalData();
+  var allBP = ((typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (hist.bp||[])).filter(function(r){return r.s>0&&r.d>0;}).sort(function(a,b){
     var da=a._date||'';var db=b._date||'';return da<db?1:da>db?-1:0;
   });
   var eventDate = allBP.length>0 ? allBP[0]._date : getTodayKey();
@@ -42130,15 +42388,15 @@ function _tcWeightRising(d) {
 // Signal B: HR elevated ≥5 bpm above 30-day baseline for 3+ consecutive days
 function _tcHRElevated(d) {
   var hrDays = {};
-  _getHRReadingsFromBP(d.allBP).forEach(function(r){
+  d.allBP.filter(function(r){return r.h&&r.h>0;}).forEach(function(r){
     if(!hrDays[r._date])hrDays[r._date]=[];
-    hrDays[r._date].push(r.hr);
+    hrDays[r._date].push(r.h);
   });
   var hrDatesSorted = Object.keys(hrDays).sort();
   if(hrDatesSorted.length < 6) return null;
 
   // 30-day baseline avg (all readings)
-  var allHR = _getHRReadingsFromBP(d.allBP).map(function(r){return r.hr;});
+  var allHR = d.allBP.filter(function(r){return r.h&&r.h>0;}).map(function(r){return r.h;});
   var baseline = allHR.reduce(function(s,v){return s+v;},0)/allHR.length;
 
   // Check last 14 days for streak
@@ -42280,7 +42538,8 @@ function _tdScore(d) {
   var scores = [];
 
   // Domain 1: HR level shift
-  var hrReadings = _getHRReadingsFromBP(d.allBP);
+  var hrReadings = d.allBP.filter(function(r){return r.h&&r.h>0;})
+    .map(function(r){return Object.assign({},r,{hr:r.h});});
   if(hrReadings.length >= 6) {
     var hrPats = detectPatterns(hrReadings);
     var shifts = hrPats.filter(function(p){return p.type==='level_shift';});
@@ -42575,6 +42834,9 @@ if(document.readyState !== 'loading') {
     _dismissInitGate(); // always fires — gate cannot be blocked by individual errors
   }, 1200);
 }
+
+
+
 
 
 // Block 'e','E','+','-' from all type=number inputs (browser scientific notation)
@@ -42994,7 +43256,7 @@ var cbBehavior = (function() {
         } catch(e) { return false; }
       },
       pools: [
-        'Your Post-Meal BP Patterns show 3 or more episodes where blood pressure dropped 20+ mmHg within 2 hours of eating. This meets CardiacLens\' configured post-meal BP pattern threshold and is worth bringing to your cardiologist.',
+        'Your Post-Meal BP Patterns show 3 or more episodes where blood pressure dropped 20+ mmHg within 2 hours of eating — the clinical definition of Postprandial Hypotension. This is a pattern worth bringing to your cardiologist.',
         'CardiacLens has detected a PPH pattern in your data: 3+ meals in the last 30 days produced a significant post-meal BP drop. Check Post-Meal BP Patterns in Advanced Analytics, then consider pinning it for your next appointment.',
         "A consistent post-meal blood pressure drop pattern has been detected. Three or more readings show drops of 20 mmHg or more after eating. Your Doctor's Report now includes a PPH summary — worth discussing at your next visit."
       ],
@@ -43093,8 +43355,8 @@ var cbBehavior = (function() {
         return d.screens.pulse_pressure.visits === 0;
       },
       pools: [
-        'You have enough BP data for the Pulse Pressure detector — and you\'ve never opened it. Pulse pressure can be useful context to review alongside your other BP readings. Find it in Advanced Analytics.',
-        'Twenty readings logged, conditions on file, but the Pulse Pressure detector hasn\'t been opened yet. For cardiac patients it can be useful context alongside systolic and diastolic readings — worth a look in Advanced Analytics.',
+        'You have enough BP data for the Pulse Pressure detector — and you\'ve never opened it. Pulse pressure is one of the most sensitive early indicators of cardiac stress. Find it in Advanced Analytics.',
+        'Twenty readings logged, conditions on file, but the Pulse Pressure detector hasn\'t been opened yet. For cardiac patients it reflects stroke volume efficiency — worth a look in Advanced Analytics.',
         'Pulse Pressure is a detector your cardiologist will recognize immediately. With your data and conditions, it\'s ready to run. Find it in Advanced Analytics.'
       ]
     },
@@ -43667,9 +43929,10 @@ function _silentDecompScore() {
       var prev   = wArr[wArr.length - 2].weight;
       if (latest - prev >= 2) score++;
     }
-    var recentHRs = (typeof _getRecentHRReadings === 'function') ? _getRecentHRReadings(3) : [];
-    if (recentHRs.length >= 3) {
-      var avgHR = recentHRs.reduce(function(a,r){ return a + r; }, 0) / recentHRs.length;
+    var bpCount = B ? B.filter(function(r){ return r.s && r.d; }).length : 0;
+    if (bpCount >= 3) {
+      var recent3 = B.slice(-3);
+      var avgHR = recent3.reduce(function(a,r){ return a + (r.h||0); }, 0) / 3;
       var settings2 = typeof settings !== 'undefined' ? settings : {};
       var hrHigh = settings2.hrHigh || 100;
       if (avgHR > hrHigh) score++;
@@ -44691,7 +44954,7 @@ function buildAskContext(dateFrom, dateTo) {
 
   // BP readings
   try {
-    var bArr = (typeof _getTodayBPReadings === 'function') ? _getTodayBPReadings() : [];
+    var bArr = (typeof B !== 'undefined') ? B : [];
     if (bArr.length > 0) {
       ctx.push('BP readings today (' + bArr.length + '):');
       bArr.forEach(function(r, i) {
@@ -44782,7 +45045,6 @@ function buildAskContext(dateFrom, dateTo) {
         if (act.t) line += ' at ' + act.t;
         if (act.notes) line += ' note:"' + act.notes + '"';
         ctx.push(line);
-        addActivityAskContextLines(ctx, act, '    Activity '+(i+1));
       });
     } else { ctx.push('Activities today: none logged'); }
   } catch(e) {}
@@ -44822,8 +45084,47 @@ function buildAskContext(dateFrom, dateTo) {
     var hAll = (typeof getAllHistoricalData === 'function') ? getAllHistoricalData() : {};
     var allBP = (typeof _getAllBPReadings === 'function') ? _getAllBPReadings() : (hAll.bp || []);
 
-    // BP/HR history is supplied by the SSOT helper. Do not supplement from raw
-    // localStorage BP arrays or today's in-memory B array here.
+    // DIRECT SUPPLEMENT: for every date in the query window, read localStorage directly.
+    // getAllHistoricalData() uses its own 90-day cutoff which can miss dates that inWindow()
+    // correctly includes. Direct read guarantees no readings are skipped for the queried window.
+    var _directDates = {};
+    allBP.forEach(function(r){ if(r._date) _directDates[r._date] = true; });
+    try {
+      var _todayKeyDirect = (typeof getTodayKey === 'function') ? getTodayKey() : '';
+      for (var _di = 0; _di < localStorage.length; _di++) {
+        var _dk = localStorage.key(_di);
+        if (!_dk || !_dk.startsWith('BP_TRACKER_') || _dk === 'BP_TRACKER_DAILY_DATA') continue;
+        var _dd = _dk.replace('BP_TRACKER_', '');
+        if (!_dd.match(/^\d{4}-\d{2}-\d{2}$/) || _dd === _todayKeyDirect) continue;
+        if (!inWindow(_dd)) continue;  // only read dates that are in the query window
+        // Always read directly for dates in the window — do not skip based on _directDates
+        // because getAllHistoricalData may have loaded them with a wrong _date value
+        var _dRaw = localStorage.getItem(_dk);
+        if (_dRaw) {
+          try {
+            var _dData = JSON.parse(_dRaw);
+            (_dData.bp || []).forEach(function(item){
+              item._date = _dd;
+            });
+            // Replace any existing entries for this date from getAllHistoricalData with direct read
+            allBP = allBP.filter(function(r){ return r._date !== _dd; });
+            (_dData.bp || []).forEach(function(item){
+              allBP.push(item);
+            });
+          } catch(e3) {}
+        }
+      }
+      // Also add today's B array readings if today is in window
+      if (inWindow(today)) {
+        allBP = allBP.filter(function(r){ return r._date !== today; });
+        if (typeof B !== 'undefined') {
+          B.forEach(function(item){
+            var copy = Object.assign({}, item, {_date: today});
+            allBP.push(copy);
+          });
+        }
+      }
+    } catch(e2) {}
 
     var windowBP = allBP.filter(function(r){ return inWindow(r._date); });
     ctx.push('Total BP readings on record: ' + allBP.length + ' | In period: ' + windowBP.length);
@@ -45129,7 +45430,6 @@ function buildAskContext(dateFrom, dateTo) {
         var aLine = '  ['+a._date+'] '+(a.activity||'activity')+(a.duration?' '+a.duration+' min':'')+(a.exertion?' exertion:'+a.exertion:'');
         if(a.notes) aLine += ' note:"'+a.notes+'"';
         ctx.push(aLine);
-        addActivityAskContextLines(ctx, a, '    ['+(a._date||'')+'] activity context');
       });
     } else { ctx.push('No activities in this period.'); }
   } catch(e) { ctx.push('Activity history: unavailable'); }
@@ -45249,7 +45549,7 @@ function buildAskContext(dateFrom, dateTo) {
       });
       var pphAskCount = pphAskEvts.filter(function(e) { return e.sysDrop >= 20; }).length;
       ctx.push('Meal pairs analyzed (last 30 days): ' + pphAskEvts.length);
-      ctx.push('PPH events (>=20 mmHg systolic drop): ' + pphAskCount + (pphAskCount >= 3 ? ' - pattern threshold met' : pphAskCount > 0 ? ' - below pattern threshold' : ' - none detected'));
+      ctx.push('PPH events (>=20 mmHg systolic drop): ' + pphAskCount + (pphAskCount >= 3 ? ' - PATTERN CONFIRMED' : pphAskCount > 0 ? ' - below pattern threshold' : ' - none detected'));
       if (pphAskEvts.length > 0) {
         var avgDropAsk = Math.round(pphAskEvts.reduce(function(s,e){return s+e.sysDrop;},0)/pphAskEvts.length);
         ctx.push('Avg post-meal systolic change: ' + (avgDropAsk >= 0 ? '-' : '+') + Math.abs(avgDropAsk) + ' mmHg');
@@ -45603,7 +45903,7 @@ function _buildAskSystemPrompt(dataContext) {
   _spRef+='LAST-WEEKDAY REFERENCE (CardiacLens pre-computed — use these exact dates for any "last [day of week]" query, never compute independently):\n';
   for(var _spi=0;_spi<7;_spi++){var _spDf=_spDow-_spi;if(_spDf<=0)_spDf+=7;var _spRd=new Date(_spy,_spm-1,_spdt-_spDf);_spRef+='  Last '+_spDns[_spi]+' = '+_spRd.getFullYear()+'-'+_spPad(_spRd.getMonth()+1)+'-'+_spPad(_spRd.getDate())+'\n';}
   _spRef+='\n';
-  return 'You are the CardiacLens Ask assistant — a knowledgeable, compassionate helper built into CardiacLens, a free cardiac health monitoring app for cardiac patients. You know every feature of CardiacLens and have full access to the user\'s logged data (provided below).\n\nYOUR ROLE:\n- Answer questions about how CardiacLens features work\n- Answer questions about the user\'s own logged data (fluid, BP, HR, weight, symptoms, notes, medications, meals, activities)\n- Answer questions about activity context snapshots: weather, feels-like temperature, rain, wind, hot kitchen/warm room, standing time, after-meal timing, activity-centered fluids 2 hours before/during/30-minute recovery, daily fluid total as context, recent BP, recovery-window BP/HR, and recent symptoms\n- Perform cross-stream pattern analysis: identify temporal correlations across data streams and report what the logged data shows\n- Mine notes text — symptom notes, general notes, morning check-in notes — for contextual patterns (body position, timing, activity state, emotional context, meal proximity) and report what patterns appear in the text\n- Help users understand patterns they see in the app\n- Help users log correctly and get the most from the app\n- Ask follow-up clarifications when a question is genuinely ambiguous\n\nDATA OBSERVATION GUIDANCE:\nWhen asked about correlations or patterns (e.g. "what happens before my HR exceeds 75?", "what triggers my cough?", "does fluid affect my BP?"):\n1. Filter readings to the target condition (e.g. HR > 75)\n2. For each qualifying reading, examine what was logged in the preceding 1-4 hours: meals, fluid entries with notes, activities, medications, symptoms, standalone notes\n3. Look at time-of-day distribution\n4. For activity/weather questions, compare activity context snapshots with nearby BP/HR, fluids, symptoms, meals, and notes; report only logged-data observations\n5. Scan symptom note text for repeated words or phrases: position words (laying, sitting, standing), timing words (after eating, waking, exercise), state words (anxious, stressed, tired)\n5. Report findings as structured data observations: "Of your 12 HR readings above 75 in this period, 9 occurred within 2 hours of waking. Your symptom notes mention \'laying down\' in 14 of 23 cough entries."\nAlways frame as: "The data shows...", "Looking at your logged entries...", "Of X readings in this period...", "Your notes frequently mention..."\n\nCLEAR BOUNDARY — YOU NEVER:\n- Interpret what patterns mean for the user\'s health or prognosis\n- Suggest changing medications, dosing, or care plans\n- Diagnose or suggest diagnoses\n- Replace medical advice\nWhen a finding moves from data observation toward clinical meaning, say: "That pattern is worth noting for your cardiologist — it would make a good Pinned Event for your next appointment." Never alarm the user.\n\nTONE: Calm, warm, clear, never alarming. These are cardiac patients who may be worried. Be the calm, knowledgeable helper who knows the app inside-out and the data clearly.\n\nINTENT CLARIFICATION FORMAT (use ONLY when the question is genuinely unclear):\n[CLARIFY]\nOption 1: (clearer version)\nOption 2: (another interpretation)\nOption 3: (another interpretation if applicable)\n[/CLARIFY]\n\nRESPONSE GUIDELINES:\n- Mobile app for seniors — keep answers clear and reasonably concise\n- Plain English, no jargon unless explaining a CardiacLens feature\n- For data answers, present facts plainly with structure where helpful\n- Accuracy is paramount — if you are not certain about a data answer, say so clearly\n- When notes text contains clinically interesting context (position, timing, triggers), surface it explicitly as a data finding\n- DATA WINDOW BOUNDARY — CRITICAL: The context header shows the exact analysis period (e.g. "ANALYSIS PERIOD: 2026-02-01 to 2026-03-05" or "last 14 days"). You MUST ONLY report statistics, counts, percentages, and averages from data within that window. NEVER produce numbers for a time period not represented in the context. If the user asks about a period that does not match the context window, respond: "The data I can see covers [period from context header]. I cannot compute accurate statistics for [requested period] from this context — please ask again and the data for that period will be loaded." Do not attempt to answer with data from the wrong period. Wrong medical statistics are dangerous.\n- HR THRESHOLD QUERIES — CRITICAL: When asked how many readings are "above X bpm" or "below X bpm", you MUST use the pre-computed "Pre-computed readings STRICTLY ABOVE X bpm" table in the context. NEVER count manually from the raw readings list — manual counting produces errors. If the exact threshold X is in the table, read the answer directly. If X falls between two table values, sum the relevant rows. State the answer as a verified fact from the table, not as an estimate. If your manually counted result differs from the pre-computed table, the TABLE IS CORRECT — discard your count.\n- FLUID DAILY TOTALS — CRITICAL: When asked about daily fluid intake amounts for any specific date or period, you MUST use the pre-computed "Daily fluid totals in period" list in the FLUID STATISTICS section. NEVER reconstruct daily totals by summing individual timed entries — that method produces incorrect results because entries span multiple sources and partial amounts. The individual timed entries section is provided only for timing and correlation analysis (e.g. "when did I drink on April 1?"). For any question about how much fluid was consumed on a given day, read the answer directly from the verified daily totals list. If a date is not in that list, the data was not logged for that day.\n- FLUID VS NEXT MORNING BP — CRITICAL: When asked to correlate fluid intake with next-morning BP, you MUST use the pre-computed FLUID VS NEXT MORNING BP table in the context. Each row already pairs the correct fluid date with the FIRST BP reading of the FOLLOWING day (date+1). NEVER construct this pairing yourself from raw data — off-by-one errors are guaranteed. Read the answer directly from that table.\n- N-WEEKS-AGO QUERIES: When the ANALYSIS PERIOD covers a multi-day range (e.g. "2026-04-21 to 2026-04-28") and the user asked "N weeks ago", that range IS the answer period. Report statistics for THE ENTIRE PERIOD shown in the ANALYSIS PERIOD, not just the anchor date. Do not describe it as "that specific date" — it is a 7-day window. Report total readings, averages, and days covered for the full period.\n- DATE WINDOW CONFIRMATION: Whenever your answer includes specific numbers derived from a time period (counts, averages, percentages, ranges), begin your response by stating the exact window you are analyzing, e.g. "Looking at all data through March 5, 2026..." or "For the period March 6 to today...". This lets the user catch any mismatch before reading statistics.\n- AMBIGUOUS DATE QUERIES — READ CAREFULLY: The date window in the context header was pre-computed by CardiacLens before this conversation. If the header shows ANY specific date (e.g. \"ANALYSIS PERIOD: 2026-05-05 to 2026-05-05\" or \"ANALYSIS PERIOD: 2026-04-28 to 2026-05-05\"), the date has already been resolved. TRUST THE WINDOW COMPLETELY — never ask the user to clarify a date that is already set. The following query types are ALWAYS pre-resolved — answer directly from the data in the window: ANY "last [day of week]" reference (last Monday, last Tuesday, last Wednesday, last Thursday, last Friday, last Saturday, last Sunday — ALL pre-resolved), relative days ("3 days ago"), relative weeks ("2 weeks ago"), week-of-date ("week of March 10"), quarters ("Q1", "first quarter"), month lists ("February, March, April"), year references ("last year"). CRITICAL FOR DAY-OF-WEEK: Use the LAST-WEEKDAY REFERENCE table in the context header to look up the exact date for "last Saturday", "last Thursday" etc. NEVER compute the date yourself. NEVER state what date "last Saturday" maps to. Simply begin your answer: "Looking at your data for [date from ANALYSIS PERIOD]:" and report the readings from that date. ONLY ask for a date when BOTH conditions are true simultaneously: (1) the context header still says "last 14 days" (no date could be parsed), AND (2) the question contains a vague historical reference with no date expression at all (e.g. "before my hospitalization", "around my procedure"). If only one condition is true, do not ask — answer from the available window.\"\n\nCARDIACLENS FEATURES:\n\nLOGGING: BP (systolic/diastolic + optional HR and notes), weight (lbs), fluid (oz with label and notes), symptoms (name + severity 1-10 + notes + condition tag), medications (name + dose + time), meals (name + notes + fluid), activities (name + duration + exertion + notes + Activity Context Snapshot including weather/environment, activity-centered fluids 2 hours before/during/30-minute recovery, daily fluid total as context, recent BP, recovery-window BP/HR, and recent symptoms), free-text notes (attached to any log entry or standalone, stored with timestamp).\n\nNOTES: Free-text notes can accompany any log entry or be entered standalone. Notes from within ±2 hours of a BP or weight reading are included as context in the Sentinel and Decompensation systems. Notes are searchable. They appear in the Doctor\'s Report. Ask can search them by keyword, date, or period. Symptom notes often capture body position (lying down, sitting, standing), activity context, timing relative to meals, and the user\'s own observations about triggers — these are analytically valuable.\n\nSENTINEL: Pattern intelligence system. Watches HR daily spread, symptom frequency, and pulse pressure against the user\'s own 14-day personal baseline (not population averages). When 2+ streams drift above personal normal simultaneously, Sentinel surfaces a pattern card. Clinical Events (pacemaker adjustments, hospitalizations, medication changes) can be logged to reset baselines. Sentinel Footprints capture pre-event data signatures for future comparison. "What to Tell Your Doctor" box auto-generates plain-language sentences when patterns are flagged.\n\nMORNING CHECK-IN: Daily prompt (once per day) asking how user feels, morning symptoms, yesterday context, waking hours, optional notes. Feeds Sentinel\'s pattern awareness.\n\nPINNED EVENTS: Communication layer for doctor appointments. Users pin observations, questions, data points. Each pin has: title, date, doctor name, response, status (pending/asked/urgent), and a Questions list with Asked checkboxes. Designed to be read aloud in the appointment room.\n\nHEAT & HUMIDITY ADVISORY: 2×2 grid of temperature/humidity bands. When thresholds are exceeded, fluid advisory appears recommending increased intake.\n\nPULSE PRESSURE DETECTOR: Calculates systolic minus diastolic for each reading. Tracks personal average. Flags narrow (<25 mmHg) or widening PP trends. Critically Narrow PP is a watch pattern.\n\nHR LEVEL-SHIFT DETECTOR: Detects sustained HR regime changes over days using a level-shift algorithm — distinguishes noise from genuine pattern shifts. Can detect HR changes that a pacemaker monitor may not flag.\n\nDECOMPENSATION WARNING SYSTEM: Monitors 5 simultaneous signals — weight trend, cardiac output proxy, symptom escalation, fluid pattern, notes keyword scan. Only escalates when multiple signals converge.\n\nSYMPTOM CONVERGENCE DETECTOR: Tracks symptom frequency trends. 60-day timeline view. Appointment Snapshot feature.\n\nADVANCED ANALYTICS: Anchor Date Investigation (20-day window, 3-stat pills). BP/HR/weight trends relative to a chosen anchor date (e.g. medication change date). Exportable.\n\nDOCTOR\'S REPORT: Formatted clinical summary of BP trend, HR pattern, weight, symptoms, medications. Exportable as PDF or text.\n\nFLUID TRACKING MODES: None (off), minimum only (must reach daily floor), range (min and max), maximum only (ceiling). Fluid goal tied to reminders.\n\nREMINDERS & DAILY EVENTS: Named daily events with set times. Each event can have a fluid goal. Reminders fire at set time with per-action completion tracking.\n\nBEHAVIORAL PROFILE LAYER: 50+ behavioral rules observing usage patterns. Surfaces one contextual companion card at a time based on detected patterns.\n\nPPH DETECTOR (Post-Meal BP Patterns): Located in Advanced Analytics. Uses the configured post-meal BP threshold: a drop of >=20 mmHg systolic within 2 hours of eating. Pre-meal baseline = closest BP within 60 min before meal. Post-meal nadir = lowest systolic within 0-120 min after. Counts PPH events, calculates avg post-meal BP change, flags a pattern threshold when 3+ post-meal BP events occur in 30 days. Results appear in the Doctor\'s Report PPH section and Ask context. Sentinel nudge fires when the pattern threshold is met.\n\n---\nUSER LOGGED DATA:\n' + _spRef + dataContext;
+  return 'You are the CardiacLens Ask assistant — a knowledgeable, compassionate helper built into CardiacLens, a free cardiac health monitoring app for cardiac patients. You know every feature of CardiacLens and have full access to the user\'s logged data (provided below).\n\nYOUR ROLE:\n- Answer questions about how CardiacLens features work\n- Answer questions about the user\'s own logged data (fluid, BP, HR, weight, symptoms, notes, medications, meals, activities)\n- Perform cross-stream pattern analysis: identify temporal correlations across data streams and report what the logged data shows\n- Mine notes text — symptom notes, general notes, morning check-in notes — for contextual patterns (body position, timing, activity state, emotional context, meal proximity) and report what patterns appear in the text\n- Help users understand patterns they see in the app\n- Help users log correctly and get the most from the app\n- Ask follow-up clarifications when a question is genuinely ambiguous\n\nDATA OBSERVATION GUIDANCE:\nWhen asked about correlations or patterns (e.g. "what happens before my HR exceeds 75?", "what triggers my cough?", "does fluid affect my BP?"):\n1. Filter readings to the target condition (e.g. HR > 75)\n2. For each qualifying reading, examine what was logged in the preceding 1-4 hours: meals, fluid entries with notes, activities, medications, symptoms, standalone notes\n3. Look at time-of-day distribution\n4. Scan symptom note text for repeated words or phrases: position words (laying, sitting, standing), timing words (after eating, waking, exercise), state words (anxious, stressed, tired)\n5. Report findings as structured data observations: "Of your 12 HR readings above 75 in this period, 9 occurred within 2 hours of waking. Your symptom notes mention \'laying down\' in 14 of 23 cough entries."\nAlways frame as: "The data shows...", "Looking at your logged entries...", "Of X readings in this period...", "Your notes frequently mention..."\n\nCLEAR BOUNDARY — YOU NEVER:\n- Interpret what patterns mean for the user\'s health or prognosis\n- Suggest changing medications, dosing, or care plans\n- Diagnose or suggest diagnoses\n- Replace medical advice\nWhen a finding moves from data observation toward clinical meaning, say: "That pattern is worth noting for your cardiologist — it would make a good Pinned Event for your next appointment." Never alarm the user.\n\nTONE: Calm, warm, clear, never alarming. These are cardiac patients who may be worried. Be the reassuring, knowledgeable friend who knows the app inside-out and the data clearly.\n\nINTENT CLARIFICATION FORMAT (use ONLY when the question is genuinely unclear):\n[CLARIFY]\nOption 1: (clearer version)\nOption 2: (another interpretation)\nOption 3: (another interpretation if applicable)\n[/CLARIFY]\n\nRESPONSE GUIDELINES:\n- Mobile app for seniors — keep answers clear and reasonably concise\n- Plain English, no jargon unless explaining a CardiacLens feature\n- For data answers, present facts plainly with structure where helpful\n- Accuracy is paramount — if you are not certain about a data answer, say so clearly\n- When notes text contains clinically interesting context (position, timing, triggers), surface it explicitly as a data finding\n- DATA WINDOW BOUNDARY — CRITICAL: The context header shows the exact analysis period (e.g. "ANALYSIS PERIOD: 2026-02-01 to 2026-03-05" or "last 14 days"). You MUST ONLY report statistics, counts, percentages, and averages from data within that window. NEVER produce numbers for a time period not represented in the context. If the user asks about a period that does not match the context window, respond: "The data I can see covers [period from context header]. I cannot compute accurate statistics for [requested period] from this context — please ask again and the data for that period will be loaded." Do not attempt to answer with data from the wrong period. Wrong medical statistics are dangerous.\n- HR THRESHOLD QUERIES — CRITICAL: When asked how many readings are "above X bpm" or "below X bpm", you MUST use the pre-computed "Pre-computed readings STRICTLY ABOVE X bpm" table in the context. NEVER count manually from the raw readings list — manual counting produces errors. If the exact threshold X is in the table, read the answer directly. If X falls between two table values, sum the relevant rows. State the answer as a verified fact from the table, not as an estimate. If your manually counted result differs from the pre-computed table, the TABLE IS CORRECT — discard your count.\n- FLUID DAILY TOTALS — CRITICAL: When asked about daily fluid intake amounts for any specific date or period, you MUST use the pre-computed "Daily fluid totals in period" list in the FLUID STATISTICS section. NEVER reconstruct daily totals by summing individual timed entries — that method produces incorrect results because entries span multiple sources and partial amounts. The individual timed entries section is provided only for timing and correlation analysis (e.g. "when did I drink on April 1?"). For any question about how much fluid was consumed on a given day, read the answer directly from the verified daily totals list. If a date is not in that list, the data was not logged for that day.\n- FLUID VS NEXT MORNING BP — CRITICAL: When asked to correlate fluid intake with next-morning BP, you MUST use the pre-computed FLUID VS NEXT MORNING BP table in the context. Each row already pairs the correct fluid date with the FIRST BP reading of the FOLLOWING day (date+1). NEVER construct this pairing yourself from raw data — off-by-one errors are guaranteed. Read the answer directly from that table.\n- N-WEEKS-AGO QUERIES: When the ANALYSIS PERIOD covers a multi-day range (e.g. "2026-04-21 to 2026-04-28") and the user asked "N weeks ago", that range IS the answer period. Report statistics for THE ENTIRE PERIOD shown in the ANALYSIS PERIOD, not just the anchor date. Do not describe it as "that specific date" — it is a 7-day window. Report total readings, averages, and days covered for the full period.\n- DATE WINDOW CONFIRMATION: Whenever your answer includes specific numbers derived from a time period (counts, averages, percentages, ranges), begin your response by stating the exact window you are analyzing, e.g. "Looking at all data through March 5, 2026..." or "For the period March 6 to today...". This lets the user catch any mismatch before reading statistics.\n- AMBIGUOUS DATE QUERIES — READ CAREFULLY: The date window in the context header was pre-computed by CardiacLens before this conversation. If the header shows ANY specific date (e.g. \"ANALYSIS PERIOD: 2026-05-05 to 2026-05-05\" or \"ANALYSIS PERIOD: 2026-04-28 to 2026-05-05\"), the date has already been resolved. TRUST THE WINDOW COMPLETELY — never ask the user to clarify a date that is already set. The following query types are ALWAYS pre-resolved — answer directly from the data in the window: ANY "last [day of week]" reference (last Monday, last Tuesday, last Wednesday, last Thursday, last Friday, last Saturday, last Sunday — ALL pre-resolved), relative days ("3 days ago"), relative weeks ("2 weeks ago"), week-of-date ("week of March 10"), quarters ("Q1", "first quarter"), month lists ("February, March, April"), year references ("last year"). CRITICAL FOR DAY-OF-WEEK: Use the LAST-WEEKDAY REFERENCE table in the context header to look up the exact date for "last Saturday", "last Thursday" etc. NEVER compute the date yourself. NEVER state what date "last Saturday" maps to. Simply begin your answer: "Looking at your data for [date from ANALYSIS PERIOD]:" and report the readings from that date. ONLY ask for a date when BOTH conditions are true simultaneously: (1) the context header still says "last 14 days" (no date could be parsed), AND (2) the question contains a vague historical reference with no date expression at all (e.g. "before my hospitalization", "around my procedure"). If only one condition is true, do not ask — answer from the available window.\"\n\nCARDIACLENS FEATURES:\n\nLOGGING: BP (systolic/diastolic + optional HR and notes), weight (lbs), fluid (oz with label and notes), symptoms (name + severity 1-10 + notes + condition tag), medications (name + dose + time), meals (name + notes + fluid), activities (name + duration + exertion + notes), free-text notes (attached to any log entry or standalone, stored with timestamp).\n\nNOTES: Free-text notes can accompany any log entry or be entered standalone. Notes from within ±2 hours of a BP or weight reading are included as context in the Sentinel and Decompensation systems. Notes are searchable. They appear in the Doctor\'s Report. Ask can search them by keyword, date, or period. Symptom notes often capture body position (lying down, sitting, standing), activity context, timing relative to meals, and the user\'s own observations about triggers — these are analytically valuable.\n\nSENTINEL: Pattern intelligence system. Watches HR daily spread, symptom frequency, and pulse pressure against the user\'s own 14-day personal baseline (not population averages). When 2+ streams drift above personal normal simultaneously, Sentinel surfaces a pattern card. Clinical Events (pacemaker adjustments, hospitalizations, medication changes) can be logged to reset baselines. Sentinel Footprints capture pre-event data signatures for future comparison. "What to Tell Your Doctor" box auto-generates plain-language sentences when patterns are flagged.\n\nMORNING CHECK-IN: Daily prompt (once per day) asking how user feels, morning symptoms, yesterday context, waking hours, optional notes. Feeds Sentinel\'s pattern awareness.\n\nPINNED EVENTS: Communication layer for doctor appointments. Users pin observations, questions, data points. Each pin has: title, date, doctor name, response, status (pending/asked/urgent), and a Questions list with Asked checkboxes. Designed to be read aloud in the appointment room.\n\nHEAT & HUMIDITY ADVISORY: 2×2 grid of temperature/humidity bands. When thresholds are exceeded, fluid advisory appears recommending increased intake.\n\nPULSE PRESSURE DETECTOR: Calculates systolic minus diastolic for each reading. Tracks personal average. Flags narrow (<25 mmHg) or widening PP trends. Critically Narrow PP is a watch pattern.\n\nHR LEVEL-SHIFT DETECTOR: Detects sustained HR regime changes over days using a level-shift algorithm — distinguishes noise from genuine pattern shifts. Can detect HR changes that a pacemaker monitor may not flag.\n\nDECOMPENSATION WARNING SYSTEM: Monitors 5 simultaneous signals — weight trend, cardiac output proxy, symptom escalation, fluid pattern, notes keyword scan. Only escalates when multiple signals converge.\n\nSYMPTOM CONVERGENCE DETECTOR: Tracks symptom frequency trends. 60-day timeline view. Appointment Snapshot feature.\n\nADVANCED ANALYTICS: Anchor Date Investigation (20-day window, 3-stat pills). BP/HR/weight trends relative to a chosen anchor date (e.g. medication change date). Exportable.\n\nDOCTOR\'S REPORT: Formatted clinical summary of BP trend, HR pattern, weight, symptoms, medications. Exportable as PDF or text.\n\nFLUID TRACKING MODES: None (off), minimum only (must reach daily floor), range (min and max), maximum only (ceiling). Fluid goal tied to reminders.\n\nREMINDERS & DAILY EVENTS: Named daily events with set times. Each event can have a fluid goal. Reminders fire at set time with per-action completion tracking.\n\nBEHAVIORAL PROFILE LAYER: 50+ behavioral rules observing usage patterns. Surfaces one contextual companion card at a time based on detected patterns.\n\nPPH DETECTOR (Post-Meal BP Patterns): Located in Advanced Analytics. Uses the clinical definition of Postprandial Hypotension: a drop of >=20 mmHg systolic within 2 hours of eating. Pre-meal baseline = closest BP within 60 min before meal. Post-meal nadir = lowest systolic within 0-120 min after. Counts PPH events, calculates avg post-meal BP change, flags pattern when 3+ PPH events in 30 days. Results appear in the Doctor\'s Report PPH section and Ask context. Sentinel nudge fires when pattern confirmed.\n\n---\nUSER LOGGED DATA:\n' + _spRef + dataContext;
 }
 
 // Detects a date range in an Ask question and returns { from: 'YYYY-MM-DD', to: 'YYYY-MM-DD' } or null.
@@ -46761,6 +47061,9 @@ function _showAskClarifyChips(options) {
 
 
 
+
+
+
 (function(){
   var _btn = document.getElementById('cl-back-to-top');
   var _activeScroller = null;
@@ -46831,6 +47134,9 @@ function _showAskClarifyChips(options) {
     if(window._clSyncLockBtn) window._clSyncLockBtn();
   })();
 })();
+
+
+
 
 
 /* CardiacLens Secure Access Takeover v9.10.287
@@ -47206,9 +47512,19 @@ function _showAskClarifyChips(options) {
 
   function takeoverFunctions(){window._clUnlock=function(force){if(cfg().active&&!unlocked&&force!==true){show();return;}var old=document.getElementById('clSecureLock');if(old)old.style.display='none';};window._clLockFromBtn=function(){unlocked=false;show();};window._clShowLock=function(){unlocked=false;show();};window._clKeyTap=function(){show();};window.CardiacLensSecureTakeover={version:VERSION,show:function(){unlocked=false;show();},status:cfg};}
   function boot(){installCss();takeoverFunctions();var c=cfg();if(c.active)show();document.addEventListener('click',function(e){var t=e.target;if(t&&(t.id==='clPrivacyLockPill'||(t.closest&&t.closest('#clPrivacyLockPill')))){e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation();unlocked=false;show();return false;}},true);}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,100);});else setTimeout(boot,100);setTimeout(boot,1000);setTimeout(boot,4000);
+  // v9.10.347.206: Takeover permanently disabled. It duplicated the original
+  // Secure Access system (same CL_SEC_* keys, same #clPrivacyLockPill button)
+  // but has no setup flow of its own -- it only ever consumed keys created by
+  // the ORIGINAL system's 3-step setup wizard. Its boot() also silently
+  // overwrote window._clKeyTap/_clShowLock/_clUnlock/_clLockFromBtn on three
+  // separate delayed timers (100ms/1s/4s), which is the confirmed root cause
+  // of taps registering against the wrong grid. Verified nothing outside this
+  // code block references Takeover-only globals, so disabling boot() here is
+  // safe: the original system is complete on its own and is now the sole
+  // active implementation. Code kept in place (not deleted) for a future
+  // dedicated cleanup pass rather than a same-session deletion of ~600 lines.
+  // if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(boot,100);});else setTimeout(boot,100);setTimeout(boot,1000);setTimeout(boot,4000);
 })();
-
 // ── v9.10.347.197: Weather hardening override ─────────────────────────────
 // Purpose: keep Today's Weather simple and predictable: Saved ZIP -> coordinates -> Open-Meteo -> render.
 // No GPS unless Use My Location is explicitly tapped. Older weather code remains below this override but these
@@ -47444,116 +47760,4 @@ function _showAskClarifyChips(options) {
     setTimeout(function(){ var sec = document.getElementById('sset-activity-weather'); if (sec) sec.style.display = 'block'; }, 100);
   };
 })();
-
-// ── Evidence Library (v9.10.347.197) ─────────────────────────────
-(function(){
-  var EVIDENCE_KEY = 'CARDIACLENS_EVIDENCE_LIBRARY';
-  var EVIDENCE_DB_NAME = 'CardiacLensEvidenceDB';
-  var EVIDENCE_DB_VERSION = 1;
-  var EVIDENCE_IMG_STORE = 'images';
-  var EVIDENCE_SAVE_ERROR = 'This evidence event could not be saved because the images are too large for available browser storage. Try removing one image or cropping screenshots/photos first.';
-  var pendingImages = [];
-
-  function esc(v){ return String(v == null ? '' : v).replace(/[&<>'"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]; }); }
-  function uid(prefix){ return prefix + Date.now() + '_' + Math.random().toString(36).slice(2,8); }
-  function today(){ return new Date().toISOString().slice(0,10); }
-  function loadEventsMeta(){ try { var arr = JSON.parse(localStorage.getItem(EVIDENCE_KEY) || '[]'); return Array.isArray(arr) ? arr : []; } catch(e){ return []; } }
-  function stripImageData(img){ var out={}; Object.keys(img||{}).forEach(function(k){ if(k !== 'dataUrl') out[k]=img[k]; }); return out; }
-  function stripEventData(ev){ var copy={ id: ev.id, title: ev.title||'', date: ev.date||'', notes: ev.notes||'', images: [], createdAt: ev.createdAt||'', updatedAt: ev.updatedAt||'' }; copy.images=(Array.isArray(ev.images)?ev.images:[]).map(stripImageData); return copy; }
-  function saveEventsMeta(arr){ localStorage.setItem(EVIDENCE_KEY, JSON.stringify((arr || []).map(stripEventData))); }
-  function notePreview(n){ n = String(n || '').replace(/\s+/g,' ').trim(); return n.length > 120 ? n.slice(0,117) + '...' : n; }
-  function setError(msg){ var el = document.getElementById('evidenceError'); if (el) el.textContent = msg || ''; }
-  function pad(n){ return String(n).padStart(2,'0'); }
-  function dateTimeLocalFromIso(iso){ if (!iso) return ''; var d = new Date(iso); if (isNaN(d.getTime())) return ''; return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
-  function isoFromDateTimeLocal(v){ if (!v) return ''; var d = new Date(v); return isNaN(d.getTime()) ? '' : d.toISOString(); }
-  function formatEvidenceDate(isoOrDate){ if (!isoOrDate) return ''; var d = new Date(isoOrDate); if (isNaN(d.getTime())) return String(isoOrDate || ''); return d.toLocaleDateString([], { year:'numeric', month:'long', day:'numeric' }); }
-  function formatEvidenceTime(iso){ if (!iso) return ''; var d = new Date(iso); if (isNaN(d.getTime())) return ''; return d.toLocaleTimeString([], { hour:'numeric', minute:'2-digit' }); }
-  function imageWhen(img){ return img && (img.takenAt || img.addedAt || ''); }
-
-  function openDb(){
-    return new Promise(function(resolve,reject){
-      if (!window.indexedDB) { reject(new Error('IndexedDB is not available.')); return; }
-      var req = indexedDB.open(EVIDENCE_DB_NAME, EVIDENCE_DB_VERSION);
-      req.onupgradeneeded = function(){ var db=req.result; if(!db.objectStoreNames.contains(EVIDENCE_IMG_STORE)) db.createObjectStore(EVIDENCE_IMG_STORE,{keyPath:'id'}); };
-      req.onsuccess = function(){ resolve(req.result); };
-      req.onerror = function(){ reject(req.error || new Error('Could not open browser database storage.')); };
-    });
-  }
-  function dbPutImage(img){
-    return openDb().then(function(db){ return new Promise(function(resolve,reject){
-      var tx=db.transaction(EVIDENCE_IMG_STORE,'readwrite'); tx.objectStore(EVIDENCE_IMG_STORE).put({id:img.id,eventId:img.eventId||'',dataUrl:img.dataUrl||'',type:img.type||'image/jpeg',name:img.name||'Evidence image',updatedAt:new Date().toISOString()});
-      tx.oncomplete=function(){db.close();resolve();}; tx.onerror=function(){db.close();reject(tx.error||new Error('Could not save image.'));};
-    });});
-  }
-  function dbGetImage(id){
-    return openDb().then(function(db){ return new Promise(function(resolve){
-      var tx=db.transaction(EVIDENCE_IMG_STORE,'readonly'); var req=tx.objectStore(EVIDENCE_IMG_STORE).get(id);
-      req.onsuccess=function(){ var rec=req.result||null; db.close(); resolve(rec ? rec.dataUrl : ''); };
-      req.onerror=function(){ db.close(); resolve(''); };
-    });});
-  }
-  function dbDeleteImage(id){
-    return openDb().then(function(db){ return new Promise(function(resolve){
-      var tx=db.transaction(EVIDENCE_IMG_STORE,'readwrite'); tx.objectStore(EVIDENCE_IMG_STORE).delete(id);
-      tx.oncomplete=function(){db.close();resolve();}; tx.onerror=function(){db.close();resolve();};
-    });});
-  }
-  function dbAllImages(){
-    return openDb().then(function(db){ return new Promise(function(resolve){
-      var out=[]; var tx=db.transaction(EVIDENCE_IMG_STORE,'readonly'); var store=tx.objectStore(EVIDENCE_IMG_STORE);
-      if (store.getAll) { var req=store.getAll(); req.onsuccess=function(){out=req.result||[];}; }
-      else { store.openCursor().onsuccess=function(e){var c=e.target.result;if(c){out.push(c.value);c.continue();}}; }
-      tx.oncomplete=function(){db.close();resolve(out);}; tx.onerror=function(){db.close();resolve(out);};
-    });});
-  }
-  function hydrateImage(img){
-    img = Object.assign({}, img || {});
-    if (img.dataUrl || !img.id) return Promise.resolve(img);
-    return dbGetImage(img.id).then(function(dataUrl){ img.dataUrl = dataUrl || ''; return img; });
-  }
-  function hydrateEvent(ev){
-    if (!ev) return Promise.resolve(null);
-    var copy = Object.assign({}, ev); var imgs = Array.isArray(copy.images) ? copy.images : [];
-    return Promise.all(imgs.map(hydrateImage)).then(function(h){ copy.images = h; return copy; });
-  }
-  function findEventMeta(id){ return loadEventsMeta().filter(function(ev){ return ev && ev.id === id; })[0] || null; }
-  function findEvent(id){ return hydrateEvent(findEventMeta(id)); }
-  function migrateEvidenceImages(){
-    var events = loadEventsMeta(), changed = false, jobs = [];
-    events.forEach(function(ev){ (Array.isArray(ev.images)?ev.images:[]).forEach(function(img){ if(img && img.dataUrl && img.id){ jobs.push(dbPutImage(Object.assign({}, img, {eventId: ev.id}))); delete img.dataUrl; changed = true; } }); });
-    return Promise.all(jobs).then(function(){ if(changed) saveEventsMeta(events); return events; }).catch(function(){ return events; });
-  }
-  window._clEvidenceExportAll = function(){ return dbAllImages().then(function(imgs){ return imgs.map(function(r){ return {id:r.id,eventId:r.eventId||'',dataUrl:r.dataUrl||'',type:r.type||'image/jpeg',name:r.name||'',updatedAt:r.updatedAt||''}; }); }).catch(function(){ return []; }); };
-  window._clEvidenceImportAll = function(raw){
-    var imgs=[]; try { imgs = typeof raw === 'string' ? JSON.parse(raw||'[]') : (Array.isArray(raw)?raw:[]); } catch(e){ imgs=[]; }
-    return Promise.all(imgs.filter(function(r){return r&&r.id&&r.dataUrl;}).map(dbPutImage)).catch(function(){});
-  };
-
-  function syncEvidenceImageFields(){ pendingImages.forEach(function(img, idx){ var cap=document.getElementById('evidenceImgCaption_'+idx); var ts=document.getElementById('evidenceImgTime_'+idx); if(cap) img.caption=cap.value||''; if(ts) img.takenAt=isoFromDateTimeLocal(ts.value)||img.takenAt||img.addedAt||''; }); }
-  function renderImageThumbs(){
-    var box=document.getElementById('evidenceImagePreview'); if(!box)return;
-    if(!pendingImages.length){ box.innerHTML='<div style="font-size:14px;color:#6b7280;background:#f9fafb;border:1px dashed #d1d5db;border-radius:10px;padding:12px">No images added yet.</div>'; return; }
-    var html=''; pendingImages.forEach(function(img,idx){
-      html+='<div style="border:1px solid #e5e7eb;border-radius:10px;padding:8px;margin-bottom:10px;background:#fff">';
-      html+='<div style="display:flex;gap:10px;align-items:center">';
-      html+='<img src="'+esc(img.dataUrl||'')+'" alt="Evidence image" style="width:74px;height:74px;object-fit:cover;border-radius:8px;border:1px solid #d1d5db">';
-      html+='<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:800;color:#111827">Evidence Photo '+(idx+1)+'</div><div style="font-size:12px;color:#6b7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(img.name||'Evidence image')+'</div></div>';
-      html+='<button type="button" onclick="removeEvidenceImage('+idx+')" style="background:#fee2e2;color:#991b1b;border:none;border-radius:8px;padding:9px 10px;font-size:13px;font-weight:800;cursor:pointer">Remove</button></div>';
-      html+='<label style="display:block;font-size:12px;font-weight:800;color:#374151;margin:8px 0 3px">Image date/time</label><input id="evidenceImgTime_'+idx+'" type="datetime-local" value="'+esc(dateTimeLocalFromIso(imageWhen(img)))+'" style="width:100%;padding:9px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;box-sizing:border-box">';
-      html+='<label style="display:block;font-size:12px;font-weight:800;color:#374151;margin:8px 0 3px">Optional image caption</label><textarea id="evidenceImgCaption_'+idx+'" rows="2" placeholder="Example: Selfie taken after pushing bicycle approximately 3 miles." style="width:100%;padding:9px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;box-sizing:border-box;resize:vertical">'+esc(img.caption||'')+'</textarea></div>';
-    }); box.innerHTML=html;
-  }
-  function resizeImageFile(file){ return new Promise(function(resolve,reject){ if(!file||!file.type||!/^image\//.test(file.type)){reject(new Error('Only image files can be added.'));return;} var reader=new FileReader(); reader.onerror=function(){reject(new Error('Could not read this image.'));}; reader.onload=function(){ var img=new Image(); img.onerror=function(){reject(new Error('Could not process this image.'));}; img.onload=function(){ try{ var maxW=1200,w=img.naturalWidth||img.width,h=img.naturalHeight||img.height; if(!w||!h){reject(new Error('Could not process this image.'));return;} if(w>maxW){h=Math.round(h*(maxW/w));w=maxW;} var canvas=document.createElement('canvas'); canvas.width=w; canvas.height=h; var ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,w,h); var dataUrl=canvas.toDataURL('image/jpeg',0.75); var stamp=file.lastModified?new Date(file.lastModified).toISOString():new Date().toISOString(); resolve({id:uid('img_'),name:file.name||'Evidence image',type:'image/jpeg',dataUrl:dataUrl,takenAt:stamp,caption:'',addedAt:new Date().toISOString()}); }catch(e){reject(new Error('Could not compress this image.'));} }; img.src=reader.result; }; reader.readAsDataURL(file); }); }
-
-  window.openEvidenceLibrary = function(){ migrateEvidenceImages().then(function(){ var events=loadEventsMeta().sort(function(a,b){return String(b.date||'').localeCompare(String(a.date||''))||String(b.createdAt||'').localeCompare(String(a.createdAt||''));}); var html='<div class="modal-title" style="font-size:26px;margin-bottom:10px">📁 Evidence Library</div>'; html+='<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:12px;margin-bottom:12px;color:#1e3a8a;font-size:14px;line-height:1.45"><strong>Use this for one documented health event or investigation.</strong><br>Save the title, date, notes, and supporting photos or screenshots so you can review the story later or show it to your doctor.</div>'; html+='<button type="button" onclick="openEvidenceForm()" style="width:100%;background:#9d174d;color:#fff;border:none;border-radius:10px;padding:14px;font-size:17px;font-weight:800;margin-bottom:14px;cursor:pointer">+ New Evidence Event</button>'; if(!events.length){html+='<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:14px;color:#374151;font-size:15px;line-height:1.5">No evidence events saved yet. Create one event to preserve photos, screenshots, image times, captions, and notes for later review.</div>';} else {events.forEach(function(ev){ html+='<div style="border:1px solid #e5e7eb;border-radius:12px;padding:13px;margin-bottom:10px;background:#fff"><div style="font-size:17px;font-weight:800;color:#111827;margin-bottom:4px">'+esc(ev.title||'Untitled evidence event')+'</div><div style="font-size:13px;color:#6b7280;margin-bottom:6px">'+esc(ev.date||'')+' · '+((ev.images||[]).length)+' image'+(((ev.images||[]).length)===1?'':'s')+'</div>'; if(ev.notes) html+='<div style="font-size:14px;color:#374151;margin-bottom:10px;line-height:1.45">'+esc(notePreview(ev.notes))+'</div>'; html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"><button type="button" onclick="viewEvidenceEvent(\''+esc(ev.id)+'\')" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:800;cursor:pointer">View</button><button type="button" onclick="openEvidenceForm(\''+esc(ev.id)+'\')" style="background:#0f766e;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:800;cursor:pointer">Edit</button><button type="button" onclick="deleteEvidenceEvent(\''+esc(ev.id)+'\')" style="background:#dc2626;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:800;cursor:pointer">Delete</button></div></div>'; }); } html+='<div class="modal-actions"><button class="modal-cancel" onclick="hideModal()">Close</button></div>'; showModal(html); }); };
-  window.openEvidenceForm = function(id){ var evMeta=id?findEventMeta(id):null; (id?findEvent(id):Promise.resolve(null)).then(function(ev){ pendingImages=ev&&Array.isArray(ev.images)?ev.images.slice():[]; var html='<div class="modal-title" style="font-size:24px;margin-bottom:10px">'+(ev?'Edit Evidence Event':'New Evidence Event')+'</div>'; html+='<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:10px;margin-bottom:10px;color:#374151;font-size:14px;line-height:1.45">Add only images that support this event: photos, screenshots, BP readings, symptoms, or other evidence you may want to explain later.</div><div id="evidenceError" style="color:#b91c1c;font-size:14px;font-weight:700;margin-bottom:8px"></div>'; html+='<label style="display:block;font-size:14px;font-weight:800;color:#374151;margin:8px 0 4px">Title *</label><input id="evidenceTitle" type="text" value="'+esc(ev?ev.title:'')+'" style="width:100%;padding:11px;border:1px solid #d1d5db;border-radius:8px;font-size:16px;box-sizing:border-box">'; html+='<label style="display:block;font-size:14px;font-weight:800;color:#374151;margin:10px 0 4px">Event Date</label><input id="evidenceDate" type="date" value="'+esc(ev?(ev.date||today()):today())+'" style="width:100%;padding:11px;border:1px solid #d1d5db;border-radius:8px;font-size:16px;box-sizing:border-box">'; html+='<label style="display:block;font-size:14px;font-weight:800;color:#374151;margin:10px 0 4px">Notes</label><textarea id="evidenceNotes" rows="5" placeholder="What happened? Why does this evidence matter? What should you or your doctor understand later?" style="width:100%;padding:11px;border:1px solid #d1d5db;border-radius:8px;font-size:16px;box-sizing:border-box;resize:vertical">'+esc(ev?ev.notes:'')+'</textarea>'; html+='<label style="display:block;font-size:14px;font-weight:800;color:#374151;margin:12px 0 6px">Images</label><input id="evidenceFileInput" type="file" accept="image/*" multiple style="display:none" onchange="handleEvidenceFiles(this.files)"><button type="button" onclick="document.getElementById(\'evidenceFileInput\').click()" style="width:100%;background:#374151;color:#fff;border:none;border-radius:10px;padding:12px;font-size:16px;font-weight:800;margin-bottom:10px;cursor:pointer">Add Image</button><div id="evidenceImagePreview"></div>'; html+='<div class="modal-actions"><button class="modal-cancel" onclick="openEvidenceLibrary()">Cancel</button><button class="modal-ok" onclick="saveEvidenceEvent(\''+(evMeta?esc(evMeta.id):'')+'\')">Save</button></div>'; showModal(html); setTimeout(renderImageThumbs,20); }); };
-  window.handleEvidenceFiles=function(files){ syncEvidenceImageFields(); setError(''); files=Array.prototype.slice.call(files||[]); if(!files.length)return; var chain=Promise.resolve(); files.forEach(function(file){chain=chain.then(function(){return resizeImageFile(file).then(function(img){pendingImages.push(img);renderImageThumbs();});});}); chain.catch(function(err){setError((err&&err.message)?err.message:'Could not add this image.');renderImageThumbs();}); };
-  window.removeEvidenceImage=function(idx){ syncEvidenceImageFields(); if(idx<0||idx>=pendingImages.length)return; if(!confirm('Remove this image from the event?'))return; pendingImages.splice(idx,1); renderImageThumbs(); };
-  window.saveEvidenceEvent=function(id){ syncEvidenceImageFields(); setError(''); var title=(document.getElementById('evidenceTitle')||{}).value||''; var date=(document.getElementById('evidenceDate')||{}).value||today(); var notes=(document.getElementById('evidenceNotes')||{}).value||''; title=title.trim(); if(!title){setError('Title is required.');return;} var events=loadEventsMeta(); var now=new Date().toISOString(); var eventId=id||uid('ev_'); var old=(id?findEventMeta(id):null); var oldIds=(old&&Array.isArray(old.images)?old.images:[]).map(function(i){return i.id;}); pendingImages.forEach(function(img){ if(!img.id) img.id=uid('img_'); img.eventId=eventId; }); var newIds=pendingImages.map(function(i){return i.id;}); var record={id:eventId,title:title,date:date,notes:notes,images:pendingImages.map(stripImageData),createdAt:(old&&old.createdAt)||now,updatedAt:now}; var jobs=pendingImages.map(dbPutImage); Promise.all(jobs).then(function(){ var found=false; events=events.map(function(ev){ if(ev&&ev.id===eventId){found=true;return record;} return ev;}); if(!found) events.push(record); saveEventsMeta(events); return Promise.all(oldIds.filter(function(x){return newIds.indexOf(x)<0;}).map(dbDeleteImage)); }).then(function(){ pendingImages=[]; openEvidenceLibrary(); if(typeof showToast==='function')showToast('Evidence event saved'); }).catch(function(){ setError(EVIDENCE_SAVE_ERROR); }); };
-  window.viewEvidenceEvent=function(id){ findEvent(id).then(function(ev){ if(!ev){openEvidenceLibrary();return;} var html='<div class="modal-title" style="font-size:24px;margin-bottom:8px">'+esc(ev.title||'Evidence Event')+'</div><div style="font-size:14px;color:#6b7280;margin-bottom:12px">'+esc(ev.date||'')+'</div>'; if(ev.notes) html+='<div style="white-space:pre-wrap;font-size:15px;color:#374151;line-height:1.55;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:12px;margin-bottom:12px">'+esc(ev.notes)+'</div>'; var imgs=Array.isArray(ev.images)?ev.images:[]; if(!imgs.length) html+='<div style="font-size:14px;color:#6b7280;margin-bottom:12px">No images saved with this event.</div>'; imgs.forEach(function(img,idx){ var when=imageWhen(img); html+='<div style="font-size:13px;font-weight:800;color:#374151;margin:12px 0 4px">Evidence Photo '+(idx+1)+' of '+imgs.length+'</div>'; if(when) html+='<div style="font-size:13px;color:#6b7280;margin-bottom:6px">'+esc(formatEvidenceDate(when))+(formatEvidenceTime(when)?' · '+esc(formatEvidenceTime(when)):'')+'</div>'; if(img.caption) html+='<div style="font-size:14px;color:#374151;line-height:1.45;margin-bottom:6px">'+esc(img.caption)+'</div>'; html+='<button type="button" onclick="openEvidenceImage(\''+esc(ev.id)+'\','+idx+')" style="display:block;width:100%;padding:0;margin:0 0 12px 0;background:transparent;border:none;cursor:pointer;text-align:left"><img src="'+esc(img.dataUrl||'')+'" alt="Evidence image" style="width:100%;height:auto;border-radius:10px;border:1px solid #d1d5db"></button>'; }); html+='<div style="font-size:13px;color:#6b7280;margin:4px 0 12px">Tap an image to open it larger.</div><div class="modal-actions"><button class="modal-cancel" onclick="openEvidenceLibrary()">Back to Evidence Library</button><button class="modal-ok" onclick="openEvidenceForm(\''+esc(ev.id)+'\')">Edit</button></div><button type="button" onclick="deleteEvidenceEvent(\''+esc(ev.id)+'\')" style="width:100%;background:#dc2626;color:#fff;border:none;border-radius:10px;padding:12px;font-size:16px;font-weight:800;margin-top:8px;cursor:pointer">Delete</button>'; showModal(html); }); };
-  window.openEvidenceImage=function(id,idx){ findEvent(id).then(function(ev){ if(!ev){openEvidenceLibrary();return;} var imgs=Array.isArray(ev.images)?ev.images:[],img=imgs[idx]; if(!img){viewEvidenceEvent(id);return;} var when=imageWhen(img); var html='<div class="modal-title" style="font-size:22px;margin-bottom:6px">Evidence Photo '+(idx+1)+' of '+imgs.length+'</div><div style="font-size:14px;font-weight:800;color:#111827;margin-bottom:4px">'+esc(ev.title||'Evidence Event')+'</div>'; if(when) html+='<div style="font-size:13px;color:#6b7280;margin-bottom:8px">'+esc(formatEvidenceDate(when))+(formatEvidenceTime(when)?' · '+esc(formatEvidenceTime(when)):'')+'</div>'; if(img.caption) html+='<div style="font-size:14px;color:#374151;line-height:1.45;margin-bottom:8px">'+esc(img.caption)+'</div>'; html+='<img src="'+esc(img.dataUrl||'')+'" alt="Evidence image" style="width:100%;height:auto;border-radius:10px;border:1px solid #d1d5db;margin-bottom:12px"><div class="modal-actions"><button class="modal-cancel" onclick="viewEvidenceEvent(\''+esc(ev.id)+'\')">Back to Event</button><button class="modal-ok" onclick="hideModal()">Close</button></div>'; showModal(html); }); };
-  window.deleteEvidenceEvent=function(id){ var ev=findEventMeta(id); if(!ev){openEvidenceLibrary();return;} if(!confirm('Delete this evidence event? This cannot be undone.'))return; var ids=(Array.isArray(ev.images)?ev.images:[]).map(function(i){return i.id;}); Promise.all(ids.map(dbDeleteImage)).then(function(){ saveEventsMeta(loadEventsMeta().filter(function(item){return item&&item.id!==id;})); openEvidenceLibrary(); if(typeof showToast==='function')showToast('Evidence event deleted'); }); };
-  migrateEvidenceImages();
-})();
-
 
