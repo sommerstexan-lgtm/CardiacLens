@@ -1,23 +1,27 @@
 {
-  "version": "9.10.347.209",
+  "version": "9.10.347.210",
   "date": "2026-07-28",
   "releaseDate": "July 28, 2026",
   "updated": "2026-07-28",
-  "build": "SecureAccessSaveUnification",
-  "name": "CardiacLens v9.10.347.209",
+  "build": "SecureAccessPersistAndStatusFix",
+  "name": "CardiacLens v9.10.347.210",
   "notes": [
-    "Fixed: Settings showed Secure Access as \"Not enabled\" even right after saving a new combination. Root cause: the dedicated Save Combination button and the main Save Settings button ran two separately-maintained copies of the save logic. One correctly wrote the profile mirror used elsewhere in the app; the other did not. Both buttons now call the exact same save function, eliminating the divergence.",
-    "Verified: created a fresh, never-configured profile through the real Settings UI (real letter tap, real color tap, real question/answer), saved, closed Settings, reopened it, and confirmed status reads Active. Repeated after a full page reload with the same result. Also reconfirmed the real 30-key unlock sequence and the 100% Private lock button both still work correctly with this change in place."
+    "Fixed: Secure Access Settings showed Not enabled after a successful save (or after keys were lost while the profile mirror still existed). Settings now restores from the profile mirror before computing Active/Not enabled.",
+    "Fixed: Main Save Settings no longer aborts the entire settings form when Secure Access fields are left blank. Incomplete Secure Access only blocks the dedicated Save Combination button.",
+    "Fixed: Save Combination now normalizes letter (uppercase) and symbol (lowercase), always writes CL_SEC_PROFILE_V1 and settings.securityProfile, and reopens Settings so the Active badge appears immediately.",
+    "Strengthened profile persistence so individual keys and the mirror stay in sync whenever Secure Access is saved."
   ],
-  "label": "SecureAccessSaveUnification",
-  "summary": "Fixed Secure Access Settings showing Not enabled after a real save, caused by two divergent save code paths. Unified to one.",
+  "label": "SecureAccessPersistAndStatusFix",
+  "summary": "Secure Access: restore-before-status, non-blocking Save Settings, normalized save with profile mirror, immediate Active badge after Save Combination.",
   "fixes": [
-    "Settings > Secure Access: Save Combination and Save Settings now use one save function; status correctly shows Active after saving and after reload."
+    "Settings > Secure Access: status restores from CL_SEC_PROFILE_V1 / settings.securityProfile before showing Not enabled.",
+    "Settings > Save Settings: incomplete Secure Access fields no longer block saving other settings.",
+    "Settings > Save Combination: normalizes values, writes profile mirror, refreshes Settings to show Active."
   ],
   "testing": [
-    "Real browser, real clicks, real Settings UI: fresh unconfigured profile set up end to end, saved, status confirmed Active immediately, after reopening Settings, and after a full page reload.",
-    "Real 30-key unlock sequence (real M/purple/purple/purple taps on the actual rendered keyboard) confirmed still working.",
-    "100% Private pill lock confirmed still working.",
-    "All JS syntax-checked, all.js regenerated and verified, no stray version strings, changelog entry verified against the correct version label."
+    "Open Settings > Secure Access, pick letter + symbol + question + answer, tap Save Combination. Expect success message, Settings reopens with Active, lock pill visible.",
+    "Close and reopen Settings: still Active.",
+    "Reload page: still Active; lock still works with the same combination.",
+    "Change other settings and tap Save Settings without touching Secure Access: other settings save; Secure Access stays Active."
   ]
 }

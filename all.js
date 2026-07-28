@@ -10,7 +10,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.209' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.210' }, params || {}));
       }
     } catch(e) {}
   };
@@ -219,12 +219,28 @@
     try{
       profile=profile||_clReadSecurityProfileFromKeys();
       if(!profile)return false;
-      profile.version=profile.version||1; profile.enabled=true; profile.updatedAt=profile.updatedAt||new Date().toISOString();
+      profile.version=profile.version||1; profile.enabled=true;
+      profile.letter=String(profile.letter||'').trim().toUpperCase();
+      profile.color=String(profile.color||'').trim().toLowerCase();
+      profile.question=String(profile.question||profile.q||'').trim();
+      profile.answer=String(profile.answer||profile.a||'').trim().toLowerCase();
+      profile.mode=profile.mode||'letter-symbol-recovery-v319';
+      profile.updatedAt=profile.updatedAt||new Date().toISOString();
+      if(!(profile.letter&&profile.color&&profile.question&&profile.answer)) return false;
+      // Keep individual keys in sync whenever we persist the mirror
+      _clWriteSecurityProfileToKeys(profile);
       localStorage.setItem(_CL_SEC_PROFILE_KEY,JSON.stringify(profile));
       if(typeof settings==='object'&&settings){
         settings.securityProfile=profile;
         try{localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(settings));}catch(e){}
+      } else {
+        try{
+          var sr=JSON.parse(localStorage.getItem('BP_TRACKER_SETTINGS')||'{}')||{};
+          sr.securityProfile=profile;
+          localStorage.setItem('BP_TRACKER_SETTINGS',JSON.stringify(sr));
+        }catch(e2){}
       }
+      try{ localStorage.setItem('CL_SEC_STATUS','active'); }catch(e3){}
       return true;
     }catch(e){return false;}
   }
@@ -535,7 +551,7 @@
     } else {
       var left = Math.max(0, 3 - (_clKbState.fails || 0));
       _clUpdateKbStatus(left > 0 ? ('Wrong 4-tap sequence #'+_clKbState.fails+'. First cooldown after '+left+' more wrong sequence'+(left===1?'':'s')+'.') : ('Wrong 4-tap sequence #'+_clKbState.fails+'.'));
-      // v9.10.347.209: a completed wrong 4-tap sequence used to leave the OLD
+      // v9.10.347.210: a completed wrong 4-tap sequence used to leave the OLD
       // grid tappable for the full 450ms before _clRenderKeyboard replaced it.
       // A tap already in flight when the DOM swap happened would land on
       // whatever key ended up at that same screen position in the NEW,
@@ -917,7 +933,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.347.209';
+    var GD_VERSION   = 'v9.10.347.210';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1463,7 +1479,7 @@
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.347.209';
+  var CURRENT='v9.10.347.210';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -1713,7 +1729,7 @@ function fireOSNotification(title, body, tag){
         icon: 'icon-192.png',
         badge: 'icon-192.png',
         requireInteraction: true,
-        // v9.10.347.209: eventTag lets sw.js's notificationclick hand off
+        // v9.10.347.210: eventTag lets sw.js's notificationclick hand off
         // which event was tapped, so the app can open that event's real
         // action card instead of just focusing the app on whatever screen
         // it was last showing.
@@ -1731,7 +1747,7 @@ function fireOSNotification(title, body, tag){
     n.onclick=function(){
       window.focus();
       n.close();
-      // v9.10.347.209: this fallback only ever fires while the page is
+      // v9.10.347.210: this fallback only ever fires while the page is
       // still alive (Web Notifications without a SW require the tab to
       // exist), so it's safe to resolve and route in-page directly.
       try{ if(typeof _clOpenEventFromTag==='function') _clOpenEventFromTag(tag); }catch(e){}
@@ -2247,7 +2263,7 @@ if(_pendingReminderEvt){
 _maybeAdvanceMissedQueue();
 }
 
-// v9.10.347.209: called from every real exit point of hideModal(). If the
+// v9.10.347.210: called from every real exit point of hideModal(). If the
 // card that just closed was one of the sequential missed-event cards, clear
 // that marker and, if more are queued, open the next one after a short
 // pause so it never overlaps the closing animation of the one before it.
@@ -20203,7 +20219,7 @@ html+=lbBadge;
 html+='<div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">';
 html+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
 html+='<div>';
-html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.347.209</span></div>';
+html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.347.210</span></div>';
 html+='<div id="settingsVersionStatus" style="font-size:13px;color:#6b7280;margin-top:3px">Tap "Check for Updates" to see if a newer version is available</div>';
 html+='</div>';
 html+='<button onclick="checkForUpdates(true)" id="checkUpdateBtn" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">🔍 Check for Updates</button>';
@@ -20244,12 +20260,16 @@ if (window._isBetaBuild && window._isBetaBuild()) {
 }
 
 // ── SECURE ACCESS SETTINGS SECTION ───────────────────────────────────────────
-var _clCurLetter = localStorage.getItem('CL_SEC_KEY')||'';
-var _clCurColor  = localStorage.getItem('CL_SEC_COLOR')||'';
-var _clCurQ      = localStorage.getItem('CL_SEC_Q')||'';
-var _clCurA      = localStorage.getItem('CL_SEC_A')||'';
+// v9.10.347.210: always restore from profile mirror before status check so
+// Settings does not report "Not enabled" when keys were wiped but the mirror
+// (CL_SEC_PROFILE_V1 / settings.securityProfile) still has the combination.
+try{ if(typeof _clSecIsConfigured==='function') _clSecIsConfigured(); else if(typeof _clRestoreSecurityProfile==='function') _clRestoreSecurityProfile(); }catch(_clSecBootE){}
+var _clCurLetter = (localStorage.getItem('CL_SEC_KEY')||'').trim().toUpperCase();
+var _clCurColor  = (localStorage.getItem('CL_SEC_COLOR')||'').trim().toLowerCase();
+var _clCurQ      = (localStorage.getItem('CL_SEC_Q')||'').trim();
+var _clCurA      = (localStorage.getItem('CL_SEC_A')||'').trim().toLowerCase();
 var _clSetupDone = !!(_clCurLetter && _clCurColor && _clCurQ && _clCurA);
-if(_clSetupDone){ try{ localStorage.setItem('CL_SEC_DONE','1'); localStorage.setItem('CL_SEC_MODE','letter-symbol-recovery-v319'); }catch(e){} }
+if(_clSetupDone){ try{ localStorage.setItem('CL_SEC_DONE','1'); localStorage.setItem('CL_SEC_MODE','letter-symbol-recovery-v319'); if(typeof _clPersistSecurityProfile==='function') _clPersistSecurityProfile(); }catch(e){} }
 var _clColorHexMap = {red:'#e53935',blue:'#1565c0',green:'#2e7d32',orange:'#e65100',purple:'#6a1b9a',teal:'#00695c',pink:'#c2185b',gold:'#f57f17'};
 var _clColorLblMap = {red:'○ Red',blue:'□ Blue',green:'△ Green',orange:'◇ Orange',purple:'★ Purple',teal:'⬡ Teal',pink:'♥ Pink',gold:'+ Gold'};
 var _clSecStatus = _clSetupDone
@@ -20477,17 +20497,20 @@ showModal(html);
     var ok  = document.getElementById('clInlineOK');
     var success = window._clSaveInlineSecureAccess ? window._clSaveInlineSecureAccess(false) : false;
     if(!success){
-      if(err) err.style.display='block';
+      if(err){ err.style.display='block'; }
       if(ok)  ok.style.display='none';
       return;
     }
     if(err) err.style.display='none';
     var verify = localStorage.getItem('CL_SEC_DONE');
-    if(verify === '1'){
+    var hasKeys = !!(localStorage.getItem('CL_SEC_KEY') && localStorage.getItem('CL_SEC_COLOR') && localStorage.getItem('CL_SEC_Q') && localStorage.getItem('CL_SEC_A'));
+    if(verify === '1' && hasKeys){
       if(window._clSyncLockBtn) window._clSyncLockBtn();
-      if(ok){ ok.textContent='\u2713 Saved! Lock button now visible bottom-left.'; ok.style.display='block'; }
+      if(ok){ ok.textContent='✓ Saved! Secure Access is active. Refreshing Settings…'; ok.style.display='block'; }
+      // v9.10.347.210: reopen Settings so the section title shows Active immediately
+      setTimeout(function(){ try{ if(typeof openSettings==='function') openSettings(); }catch(e){} }, 450);
     } else if(err){
-      err.textContent='\u26a0 Save failed \u2014 browser storage may be blocked. Try a different browser.';
+      err.textContent='⚠ Save failed — browser storage may be blocked. Try a different browser.';
       err.style.display='block';
     }
   });
@@ -20515,16 +20538,25 @@ showModal(html);
 })();
 
   window._clSaveInlineSecureAccess = function(silent){
-    var letter = (document.getElementById('clInlineSelLetter')||{}).value||'';
-    var color  = (document.getElementById('clInlineSelColor')||{}).value||'';
-    var q      = (document.getElementById('clInlineQ')||{}).value||'';
-    var a      = ((document.getElementById('clInlineA')||{}).value||'').trim().toLowerCase();
+    // v9.10.347.210: unified, normalized save.
+    // - Dedicated Save Combination (silent=false) requires all four fields.
+    // - Main Save Settings (silent=true) never blocks other settings when
+    //   Secure Access is left blank; only writes when the form is complete
+    //   or when already configured and form is empty (leave existing alone).
+    var letter = String((document.getElementById('clInlineSelLetter')||{}).value||'').trim().toUpperCase();
+    var color  = String((document.getElementById('clInlineSelColor')||{}).value||'').trim().toLowerCase();
+    var q      = String((document.getElementById('clInlineQ')||{}).value||'').trim();
+    var a      = String((document.getElementById('clInlineA')||{}).value||'').trim().toLowerCase();
     var err    = document.getElementById('clInlineErr');
     var ok     = document.getElementById('clInlineOK');
     if(!document.getElementById('clInlineSaveBtn')) return true;
     if(!letter || !color || !q || !a){
-      if(silent && _clSecIsConfigured()) return true;
-      if(!silent){ if(err) err.style.display='block'; if(ok) ok.style.display='none'; }
+      // Incomplete form:
+      // silent (Save Settings): do not abort the rest of settings — return true.
+      // non-silent (Save Combination): show error and return false.
+      if(silent) return true;
+      if(err){ err.textContent='⚠ Complete all steps: key letter, symbol, recovery question, and answer.'; err.style.display='block'; }
+      if(ok) ok.style.display='none';
       return false;
     }
     try{
@@ -20535,7 +20567,14 @@ showModal(html);
       localStorage.setItem('CL_SEC_DONE', '1');
       localStorage.setItem('CL_SEC_MODE', 'letter-symbol-recovery-v319');
       localStorage.setItem('CL_SEC_UPDATED_AT', new Date().toISOString());
-      _clPersistSecurityProfile();
+      // Write profile mirror so Settings status and unlock can restore after key loss
+      if(typeof _clPersistSecurityProfile==='function'){
+        _clPersistSecurityProfile({
+          version:1, enabled:true, letter:letter, color:color, question:q, answer:a,
+          mode:'letter-symbol-recovery-v319', updatedAt:new Date().toISOString()
+        });
+      }
+      try{ localStorage.setItem('CL_SEC_STATUS','active'); }catch(_st){}
       if(window._clSyncLockBtn) window._clSyncLockBtn();
       if(!silent && ok){ ok.textContent='✓ Saved! Secure Access is active.'; ok.style.display='block'; }
       return true;
@@ -21511,7 +21550,7 @@ function buildMissedEventList() {
   return missed;
 }
 
-// v9.10.347.209: sequential missed-event card queue. Replaces the small
+// v9.10.347.210: sequential missed-event card queue. Replaces the small
 // bottom toast + best-effort chime from v9.10.347.204, which had two real
 // problems: it was too easy to miss, and tapping it did nothing (it fell
 // through to whatever screen happened to be underneath). Newly-missed
@@ -21539,7 +21578,7 @@ function runCatchUpScan() {
     }
   });
   updateUpcomingEventsWidget();
-  // v9.10.347.209: newly-missed events queue into the real action card
+  // v9.10.347.210: newly-missed events queue into the real action card
   // instead of a toast. No sound is attempted here: iOS blocks audio
   // triggered from a background/visibility event with no direct user
   // gesture attached, so a forced chime here would silently fail every
@@ -21565,7 +21604,7 @@ function _advanceMissedEventQueue(){
   _openEventActionModal(evt);
 }
 
-// ── Notification tap routing (v9.10.347.209) ─────────────────────────────
+// ── Notification tap routing (v9.10.347.210) ─────────────────────────────
 // A tapped OS-level notification only carries a tag string (see
 // fireOSNotification/scheduleOSNotificationAt). By the time it's tapped,
 // the event list it was scheduled from may have changed, so this always
@@ -21617,7 +21656,7 @@ function _clResolveEventByTag(tag){
 // since the notification was scheduled).
 function _clOpenEventFromTag(tag){
   try{
-    // v9.10.347.209: real background fluid push notifications (pacing,
+    // v9.10.347.210: real background fluid push notifications (pacing,
     // and any fluid reminder delivered via the push worker rather than
     // a foreground OS notification) carry this tag and have no matching
     // dailyEvents/dailyPlan entry to resolve by design -- pacing works
@@ -32370,7 +32409,7 @@ html+=`</div>`;
 
 html+=`
 <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:2px solid #e5e7eb;color:#6b7280;font-size:14px">
-<p style="margin:0">CardiacLens v9.10.347.209 - Free & Source-Available</p>
+<p style="margin:0">CardiacLens v9.10.347.210 - Free & Source-Available</p>
 <p style="margin:4px 0 0 0">Report Generated: ${reportDate}</p>
 </div>`;
 
@@ -32701,7 +32740,7 @@ Note: This report is based on patient self-tracked data. Clinical correlation
 and examination are essential for diagnosis and treatment decisions.
 
 ---
-CardiacLens v9.10.347.209 Medical Grade - Free
+CardiacLens v9.10.347.210 Medical Grade - Free
 Report Generated: ${reportDate}`;
 
 return text;
@@ -36838,7 +36877,7 @@ report.push(notes);
 report.push('');
 }
 report.push('═══════════════════════════════════════════════════════════');
-report.push('This report was generated by CardiacLens v9.10.347.209 Medical Grade - Free');
+report.push('This report was generated by CardiacLens v9.10.347.210 Medical Grade - Free');
 report.push('Advanced Analytics Dashboard - Phase 3 Implementation');
 report.push('═══════════════════════════════════════════════════════════');
 const blob=new Blob([report.join('\n')],{type:'text/plain'});
@@ -36928,7 +36967,7 @@ ${periodHTML}
 <h2>Key Insights</h2>
 ${insightsHTML}
 <div style="margin-top:40px;padding:20px;background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:8px">
-<strong>CardiacLens v9.10.347.209 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
+<strong>CardiacLens v9.10.347.210 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
 This report is not a substitute for professional medical advice.
 </div>
 </body>
@@ -37901,7 +37940,7 @@ alert(`🏃 Activity Summary\n\n` +
 var VERSION_JSON_URL = 'https://cardiaclens.com/version.json';
 var VERSION_CHECK_KEY = 'CARDIACLENS_LAST_VERSION_CHECK';
 var VERSION_DISMISSED_KEY = 'CARDIACLENS_UPDATE_DISMISSED';
-var CURRENT_VERSION = 'v9.10.347.209';
+var CURRENT_VERSION = 'v9.10.347.210';
 var _latestVersionData = null; // cached from last fetch
 
 // Detect whether running as an installed Home Screen PWA on iOS
@@ -47508,7 +47547,7 @@ function _showAskClarifyChips(options) {
 
   function takeoverFunctions(){window._clUnlock=function(force){if(cfg().active&&!unlocked&&force!==true){show();return;}var old=document.getElementById('clSecureLock');if(old)old.style.display='none';};window._clLockFromBtn=function(){unlocked=false;show();};window._clShowLock=function(){unlocked=false;show();};window._clKeyTap=function(){show();};window.CardiacLensSecureTakeover={version:VERSION,show:function(){unlocked=false;show();},status:cfg};}
   function boot(){installCss();takeoverFunctions();var c=cfg();if(c.active)show();document.addEventListener('click',function(e){var t=e.target;if(t&&(t.id==='clPrivacyLockPill'||(t.closest&&t.closest('#clPrivacyLockPill')))){e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation();unlocked=false;show();return false;}},true);}
-  // v9.10.347.209: Takeover permanently disabled. It duplicated the original
+  // v9.10.347.210: Takeover permanently disabled. It duplicated the original
   // Secure Access system (same CL_SEC_* keys, same #clPrivacyLockPill button)
   // but has no setup flow of its own -- it only ever consumed keys created by
   // the ORIGINAL system's 3-step setup wizard. Its boot() also silently

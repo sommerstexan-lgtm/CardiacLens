@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.209-notif-tap-routing';
+const CACHE_NAME = 'cardiaclens-v9.10.347.210-secure-access-persist';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
