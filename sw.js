@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.207-notif-tap-routing';
+const CACHE_NAME = 'cardiaclens-v9.10.347.208-notif-tap-routing';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
@@ -40,7 +40,7 @@ self.addEventListener('push', function(event) {
     tag: tag,
     icon: './icon-192.png',
     badge: './icon-192.png',
-    // v9.10.347.207: without this, notificationclick has no way to know
+    // v9.10.347.208: without this, notificationclick has no way to know
     // what the push was for, since options.tag alone is not exposed on
     // event.notification.data. This was silently dropping every real
     // background fluid push's identity, causing tap routing to fall
@@ -51,7 +51,7 @@ self.addEventListener('push', function(event) {
 });
 
 self.addEventListener('notificationclick', function(event) {
-  // v9.10.347.207: carry the event tag through so the app can open the
+  // v9.10.347.208: carry the event tag through so the app can open the
   // specific event's action card, not just focus the app root.
   var tag = (event.notification && event.notification.data && event.notification.data.eventTag) || null;
   event.notification.close();

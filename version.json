@@ -1,23 +1,23 @@
 {
-  "version": "9.10.347.207",
+  "version": "9.10.347.208",
   "date": "2026-07-28",
   "releaseDate": "July 28, 2026",
   "updated": "2026-07-28",
-  "build": "SecureAccessGridOverflowHotfix",
-  "name": "CardiacLens v9.10.347.207",
+  "build": "SecureAccessLockButtonHardening",
+  "name": "CardiacLens v9.10.347.208",
   "notes": [
-    "HOTFIX for a real regression in v9.10.347.206. Disabling the duplicate 'Takeover' lock-screen system in .206 exposed a genuine, previously-hidden layout bug in the original keyboard: 30 keys arranged in a 4-column grid produced 7 rows, the last with only 2 keys, and the full grid ran 70-90px taller than a real iPhone's visible screen. This had been there for months but was always covered by Takeover's overlay rendering on top of it, so it was never actually seen or tested on a real device until .206 removed that overlay. The overflow made large parts of the keyboard unreachable, which is the most likely explanation for lock/unlock feeling broken or inconsistent in real use even though the underlying tap-handling logic (fixed in .206) was correct. Fixed: grid changed from 4 columns to 5, so 30 keys divide into exactly 6 even rows instead of 7 uneven ones. Confirmed by direct measurement on both a standard iPhone (390x844) and iPhone SE (375x667) viewport size, not estimated from CSS alone.",
-    "This release does not change any unlock/lock logic, only the grid's column count. The fixes shipped in .206 (Takeover disabled, async rebuild race closed, fluid notification routing) are unchanged and still in effect."
+    "Could not reproduce Can's reported 100% Private lock failure in this environment, including against a full copy of his real device data (785 keys) with zero errors every time. This environment only has Chromium available, not Safari's actual rendering engine, so a real WebKit-specific behavior cannot be ruled out and could not be tested directly.",
+    "Regardless of root cause, found and fixed a real design fragility: the lock button's handler required _clSecIsConfigured() (a full re-derivation of the saved profile from localStorage) to return true before it would do anything at all. If that check ever failed for any reason on a real device, the button would do nothing with zero visible feedback -- exactly the reported symptom. The button no longer depends on that check succeeding to lock the screen; the check now only decides which screen to show after locking (the normal keyboard vs. first-time setup), wrapped in its own try/catch so it cannot block the lock action itself.",
+    "This is not a confirmed fix for a confirmed root cause. It removes a real category of silent-failure risk that matches the symptom, verified only against the versions of the app available in this sandbox."
   ],
-  "label": "SecureAccessGridOverflowHotfix",
-  "summary": "Hotfix: the Secure Access keyboard grid did not fit on a real iPhone screen after v9.10.347.206 exposed a previously-hidden layout bug. Changed from 4 to 5 columns so all 30 keys fit in 6 even rows within the visible screen.",
+  "label": "SecureAccessLockButtonHardening",
+  "summary": "Hardened the lock button so a failed configuration check can no longer silently block locking the app. Root cause not confirmed; this addresses a real fragility that matches the reported symptom.",
   "fixes": [
-    "Secure Access keyboard grid changed from 4 columns (7 uneven rows, overflowed the screen) to 5 columns (6 even rows, fits the screen)."
+    "Lock button (100% Private pill) no longer gated behind a silent all-or-nothing configuration check."
   ],
   "testing": [
-    "Root cause found by direct measurement in real headless Chromium (pre-installed at /opt/pw-browsers) at real iPhone viewport sizes: prior to this fix, grid bottom edge measured 897px and 843px against visible viewports of 844px and 667px respectively (iPhone 13/14 and iPhone SE) -- genuinely overflowing on both. After the fix, grid bottom edge measured 756px and 632px against the same viewports -- fits with margin on both, and all 6 rows confirmed to hold exactly 5 keys each (no uneven row).",
-    "Re-ran a full real-browser pass after the fix: (1) grid fits and rows are even -- confirmed by measurement; (2) a real M/purple/purple/purple tap sequence via actual .click() on the actual rendered buttons genuinely unlocks the app; (3) changing the Secure Access combination through the real Settings UI (real button clicks, real dropdown selection, real text input) and reloading the page confirms the new combination survives the reload -- localStorage after reload matched localStorage before reload exactly. Zero uncaught page errors across the full sequence.",
-    "Correction to this session's own process: an earlier reload-persistence test incorrectly appeared to show Settings saves reverting after reload. That was traced to a mistake in the test script itself (Playwright's add_init_script re-fires on every navigation including reload, which was silently re-seeding old values at the moment of reload) rather than a real app bug. Corrected the test methodology and re-verified: Settings saves for Secure Access do genuinely persist across a real reload, through both the Settings-panel edit flow and the first-time 3-step setup wizard.",
-    "Not tested: an actual physical tap on a real iPhone touchscreen. Real DOM clicks in a real browser at real iPhone viewport dimensions were used as the closest available substitute in this environment."
+    "Re-ran the full real-click, real-hit-test pill test from v9.10.347.207 against v9.10.347.208 with Can's actual real backup data (785 keys) loaded instead of synthetic data: zero page errors, pill locks correctly.",
+    "Genuinely unable to reproduce the reported failure in this environment across multiple approaches: synthetic data, real backup data, real click() with hit-test verification of no overlapping elements, real iPhone and iPhone SE viewport dimensions. This sandbox has Chromium only, not WebKit, so a real Safari-specific behavior remains a possibility that could not be tested here.",
+    "Recommended next diagnostic step if this recurs: check Google Analytics (G-H2SESQBPXQ) for js_error or js_promise_rejection events, which this app already logs automatically on any real uncaught error, including the actual message, file, line, and stack trace from the real device."
   ]
 }
