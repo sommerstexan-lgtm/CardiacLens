@@ -10,7 +10,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.211' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.212' }, params || {}));
       }
     } catch(e) {}
   };
@@ -551,7 +551,7 @@
     } else {
       var left = Math.max(0, 3 - (_clKbState.fails || 0));
       _clUpdateKbStatus(left > 0 ? ('Wrong 4-tap sequence #'+_clKbState.fails+'. First cooldown after '+left+' more wrong sequence'+(left===1?'':'s')+'.') : ('Wrong 4-tap sequence #'+_clKbState.fails+'.'));
-      // v9.10.347.211: a completed wrong 4-tap sequence used to leave the OLD
+      // v9.10.347.212: a completed wrong 4-tap sequence used to leave the OLD
       // grid tappable for the full 450ms before _clRenderKeyboard replaced it.
       // A tap already in flight when the DOM swap happened would land on
       // whatever key ended up at that same screen position in the NEW,
@@ -933,7 +933,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.347.211';
+    var GD_VERSION   = 'v9.10.347.212';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1479,7 +1479,7 @@
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.347.211';
+  var CURRENT='v9.10.347.212';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -1729,7 +1729,7 @@ function fireOSNotification(title, body, tag){
         icon: 'icon-192.png',
         badge: 'icon-192.png',
         requireInteraction: true,
-        // v9.10.347.211: eventTag lets sw.js's notificationclick hand off
+        // v9.10.347.212: eventTag lets sw.js's notificationclick hand off
         // which event was tapped, so the app can open that event's real
         // action card instead of just focusing the app on whatever screen
         // it was last showing.
@@ -1747,7 +1747,7 @@ function fireOSNotification(title, body, tag){
     n.onclick=function(){
       window.focus();
       n.close();
-      // v9.10.347.211: this fallback only ever fires while the page is
+      // v9.10.347.212: this fallback only ever fires while the page is
       // still alive (Web Notifications without a SW require the tab to
       // exist), so it's safe to resolve and route in-page directly.
       try{ if(typeof _clOpenEventFromTag==='function') _clOpenEventFromTag(tag); }catch(e){}
@@ -2263,7 +2263,7 @@ if(_pendingReminderEvt){
 _maybeAdvanceMissedQueue();
 }
 
-// v9.10.347.211: called from every real exit point of hideModal(). If the
+// v9.10.347.212: called from every real exit point of hideModal(). If the
 // card that just closed was one of the sequential missed-event cards, clear
 // that marker and, if more are queued, open the next one after a short
 // pause so it never overlaps the closing animation of the one before it.
@@ -20219,7 +20219,7 @@ html+=lbBadge;
 html+='<div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">';
 html+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
 html+='<div>';
-html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.347.211</span></div>';
+html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.347.212</span></div>';
 html+='<div id="settingsVersionStatus" style="font-size:13px;color:#6b7280;margin-top:3px">Tap "Check for Updates" to see if a newer version is available</div>';
 html+='</div>';
 html+='<button onclick="checkForUpdates(true)" id="checkUpdateBtn" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">🔍 Check for Updates</button>';
@@ -20260,7 +20260,7 @@ if (window._isBetaBuild && window._isBetaBuild()) {
 }
 
 // ── SECURE ACCESS SETTINGS SECTION ───────────────────────────────────────────
-// v9.10.347.211: always restore from profile mirror before status check so
+// v9.10.347.212: always restore from profile mirror before status check so
 // Settings does not report "Not enabled" when keys were wiped but the mirror
 // (CL_SEC_PROFILE_V1 / settings.securityProfile) still has the combination.
 try{ if(typeof _clSecIsConfigured==='function') _clSecIsConfigured(); else if(typeof _clRestoreSecurityProfile==='function') _clRestoreSecurityProfile(); }catch(_clSecBootE){}
@@ -20507,7 +20507,7 @@ showModal(html);
     if(verify === '1' && hasKeys){
       if(window._clSyncLockBtn) window._clSyncLockBtn();
       if(ok){ ok.textContent='✓ Saved! Secure Access is active. Refreshing Settings…'; ok.style.display='block'; }
-      // v9.10.347.211: reopen Settings so the section title shows Active immediately
+      // v9.10.347.212: reopen Settings so the section title shows Active immediately
       setTimeout(function(){ try{ if(typeof openSettings==='function') openSettings(); }catch(e){} }, 450);
     } else if(err){
       err.textContent='⚠ Save failed — browser storage may be blocked. Try a different browser.';
@@ -20538,7 +20538,7 @@ showModal(html);
 })();
 
   window._clSaveInlineSecureAccess = function(silent){
-    // v9.10.347.211: unified, normalized save.
+    // v9.10.347.212: unified, normalized save.
     // - Dedicated Save Combination (silent=false) requires all four fields.
     // - Main Save Settings (silent=true) never blocks other settings when
     //   Secure Access is left blank; only writes when the form is complete
@@ -21550,7 +21550,7 @@ function buildMissedEventList() {
   return missed;
 }
 
-// v9.10.347.211: sequential missed-event card queue. Replaces the small
+// v9.10.347.212: sequential missed-event card queue. Replaces the small
 // bottom toast + best-effort chime from v9.10.347.204, which had two real
 // problems: it was too easy to miss, and tapping it did nothing (it fell
 // through to whatever screen happened to be underneath). Newly-missed
@@ -21578,7 +21578,7 @@ function runCatchUpScan() {
     }
   });
   updateUpcomingEventsWidget();
-  // v9.10.347.211: newly-missed events queue into the real action card
+  // v9.10.347.212: newly-missed events queue into the real action card
   // instead of a toast. No sound is attempted here: iOS blocks audio
   // triggered from a background/visibility event with no direct user
   // gesture attached, so a forced chime here would silently fail every
@@ -21604,7 +21604,7 @@ function _advanceMissedEventQueue(){
   _openEventActionModal(evt);
 }
 
-// ── Notification tap routing (v9.10.347.211) ─────────────────────────────
+// ── Notification tap routing (v9.10.347.212) ─────────────────────────────
 // A tapped OS-level notification only carries a tag string (see
 // fireOSNotification/scheduleOSNotificationAt). By the time it's tapped,
 // the event list it was scheduled from may have changed, so this always
@@ -21656,7 +21656,7 @@ function _clResolveEventByTag(tag){
 // since the notification was scheduled).
 function _clOpenEventFromTag(tag){
   try{
-    // v9.10.347.211: real background fluid push notifications (pacing,
+    // v9.10.347.212: real background fluid push notifications (pacing,
     // and any fluid reminder delivered via the push worker rather than
     // a foreground OS notification) carry this tag and have no matching
     // dailyEvents/dailyPlan entry to resolve by design -- pacing works
@@ -32409,7 +32409,7 @@ html+=`</div>`;
 
 html+=`
 <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:2px solid #e5e7eb;color:#6b7280;font-size:14px">
-<p style="margin:0">CardiacLens v9.10.347.211 - Free & Source-Available</p>
+<p style="margin:0">CardiacLens v9.10.347.212 - Free & Source-Available</p>
 <p style="margin:4px 0 0 0">Report Generated: ${reportDate}</p>
 </div>`;
 
@@ -32740,7 +32740,7 @@ Note: This report is based on patient self-tracked data. Clinical correlation
 and examination are essential for diagnosis and treatment decisions.
 
 ---
-CardiacLens v9.10.347.211 Medical Grade - Free
+CardiacLens v9.10.347.212 Medical Grade - Free
 Report Generated: ${reportDate}`;
 
 return text;
@@ -36877,7 +36877,7 @@ report.push(notes);
 report.push('');
 }
 report.push('═══════════════════════════════════════════════════════════');
-report.push('This report was generated by CardiacLens v9.10.347.211 Medical Grade - Free');
+report.push('This report was generated by CardiacLens v9.10.347.212 Medical Grade - Free');
 report.push('Advanced Analytics Dashboard - Phase 3 Implementation');
 report.push('═══════════════════════════════════════════════════════════');
 const blob=new Blob([report.join('\n')],{type:'text/plain'});
@@ -36967,7 +36967,7 @@ ${periodHTML}
 <h2>Key Insights</h2>
 ${insightsHTML}
 <div style="margin-top:40px;padding:20px;background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:8px">
-<strong>CardiacLens v9.10.347.211 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
+<strong>CardiacLens v9.10.347.212 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
 This report is not a substitute for professional medical advice.
 </div>
 </body>
@@ -37940,7 +37940,7 @@ alert(`🏃 Activity Summary\n\n` +
 var VERSION_JSON_URL = 'https://cardiaclens.com/version.json';
 var VERSION_CHECK_KEY = 'CARDIACLENS_LAST_VERSION_CHECK';
 var VERSION_DISMISSED_KEY = 'CARDIACLENS_UPDATE_DISMISSED';
-var CURRENT_VERSION = 'v9.10.347.211';
+var CURRENT_VERSION = 'v9.10.347.212';
 var _latestVersionData = null; // cached from last fetch
 
 // Detect whether running as an installed Home Screen PWA on iOS
@@ -47547,7 +47547,7 @@ function _showAskClarifyChips(options) {
 
   function takeoverFunctions(){window._clUnlock=function(force){if(cfg().active&&!unlocked&&force!==true){show();return;}var old=document.getElementById('clSecureLock');if(old)old.style.display='none';};window._clLockFromBtn=function(){unlocked=false;show();};window._clShowLock=function(){unlocked=false;show();};window._clKeyTap=function(){show();};window.CardiacLensSecureTakeover={version:VERSION,show:function(){unlocked=false;show();},status:cfg};}
   function boot(){installCss();takeoverFunctions();var c=cfg();if(c.active)show();document.addEventListener('click',function(e){var t=e.target;if(t&&(t.id==='clPrivacyLockPill'||(t.closest&&t.closest('#clPrivacyLockPill')))){e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation();unlocked=false;show();return false;}},true);}
-  // v9.10.347.211: Takeover permanently disabled. It duplicated the original
+  // v9.10.347.212: Takeover permanently disabled. It duplicated the original
   // Secure Access system (same CL_SEC_* keys, same #clPrivacyLockPill button)
   // but has no setup flow of its own -- it only ever consumed keys created by
   // the ORIGINAL system's 3-step setup wizard. Its boot() also silently

@@ -1,29 +1,30 @@
 {
-  "version": "9.10.347.211",
+  "version": "9.10.347.212",
   "date": "2026-07-29",
   "releaseDate": "July 29, 2026",
   "updated": "2026-07-29",
-  "build": "SecureAccessUnlockRecoveryHelp",
-  "name": "CardiacLens v9.10.347.211",
+  "build": "SecureAccessHardLock",
+  "name": "CardiacLens v9.10.347.212",
   "notes": [
-    "Secure Access: Forgot your code? now appears after 4 wrong sequences (was 20).",
-    "Secure Access: recovery answer limited to 3 attempts, then 5-minute lockout of the recovery panel.",
-    "Secure Access: hold any lock-grid key for 8 seconds (Keep holding… appears after ~2.5s) to open the recovery question; correct answer unlocks and opens Settings focused on Secure Access.",
-    "Help: added full 🔒 Security section with accurate unlock sequence (letter then three of chosen color), recovery, and emergency hold path. Updated Getting Started blurb that previously described a numeric PIN.",
-    "Help: Security tab now has a real section and is included in tab highlighting."
+    "CRITICAL FIX: Lock screen could open the app on a single key tap. Unlock now requires a full verified 4-tap sequence (letter then three matching color tiles). Partial sequences only fill progress dots and never dismiss the lock.",
+    "Hardened _clUnlock so a visible configured lock cannot be hidden unless authentication just succeeded.",
+    "Neutralized leftover Secure Access Takeover code that previously overwrote _clKeyTap / _clUnlock / _clShowLock.",
+    "Lock overlay forces pointer-events and blocks background scroll while visible.",
+    "Prior 211 recovery features retained: Forgot after 4 fails, 3 recovery attempts then 5-min lockout, 8s hold to recovery to Settings."
   ],
-  "label": "SecureAccessUnlockRecoveryHelp",
-  "summary": "Secure Access recovery UX + accurate Help. Forgot after 4 fails, 3 recovery attempts then 5-min lockout, 8s long-press emergency path into Settings, new Security help section.",
+  "label": "SecureAccessHardLock",
+  "summary": "Hard lock: single-tap can no longer open the app. Full 4-tap verification required. Takeover code neutralized.",
   "fixes": [
-    "Forgot link threshold reduced from 20 to 4 failed 4-tap sequences.",
-    "Recovery answer: 3 tries then 5-minute recovery-panel lockout.",
-    "Long-press any key ≥8s → recovery question; success opens Settings → Secure Access.",
-    "Help Security tab and Getting Started Secure Access description rewritten for the letter+color grid."
+    "Single key tap no longer unlocks the app.",
+    "Unlock only after verified letter + three matching color tiles.",
+    "Takeover handler overwrites removed.",
+    "Lock overlay blocks background interaction while shown."
   ],
   "testing": [
-    "With Secure Access active: wrong 4-tap sequence 4 times → Forgot link appears.",
-    "Tap Forgot or hold any key 8s → recovery question. Correct answer unlocks. From long-press path, Settings opens on Secure Access.",
-    "3 wrong recovery answers → 5-minute recovery lockout message.",
-    "Help → 🔒 Security shows the new how-to. Getting Started no longer says numeric PIN."
+    "Set Secure Access (letter M + Purple). Tap 100% Private to lock.",
+    "Tap only M — app must stay locked; one progress dot fills.",
+    "Tap only D — app must stay locked.",
+    "Correct sequence M then three purple tiles — unlocks.",
+    "Wrong 4-tap sequence — shakes, clears dots, stays locked."
   ]
 }

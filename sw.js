@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.211-secure-access-recovery';
+const CACHE_NAME = 'cardiaclens-v9.10.347.212-hard-lock';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
