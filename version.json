@@ -1,7 +1,1 @@
-{
-  "version": "9.10.347.218",
-  "date": "2026-07-29",
-  "build": "NoLockGate",
-  "name": "CardiacLens v9.10.347.218",
-  "notes": ["Secure Access lock gate fully disabled. App opens with no code screen."]
-}
+{"version":"9.10.347.219","date":"2026-07-29","build":"NoSecureAccessUI","notes":["Lock gate disabled","Secure Access section removed from Settings"]}
