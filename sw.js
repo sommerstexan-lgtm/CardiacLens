@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.347.217-fourtap';
+const CACHE_NAME = 'cardiaclens-v9.10.347.218-nolock';
 
 self.addEventListener('install', event => {
   self.skipWaiting();

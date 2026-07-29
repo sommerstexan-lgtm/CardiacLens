@@ -1,13 +1,7 @@
 {
-  "version": "9.10.347.217",
+  "version": "9.10.347.218",
   "date": "2026-07-29",
-  "build": "FourTapHardLock",
-  "name": "CardiacLens v9.10.347.217",
-  "notes": [
-    "Verified from user screenshots: grid showed then single-tap M opened app.",
-    "Dead takeover removeOldLock disabled so it cannot hide the primary lock.",
-    "Two-finger swipe clear disabled.",
-    "Unlock refuses to hide configured lock unless _clAuthPassed is true this session.",
-    "Keytap always shows Tap N of 4 and returns before any unlock when N < 4."
-  ]
+  "build": "NoLockGate",
+  "name": "CardiacLens v9.10.347.218",
+  "notes": ["Secure Access lock gate fully disabled. App opens with no code screen."]
 }
