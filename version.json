@@ -1,28 +1,27 @@
 {
-  "version": "9.10.347.213",
+  "version": "9.10.347.214",
   "date": "2026-07-29",
   "releaseDate": "July 29, 2026",
   "updated": "2026-07-29",
-  "build": "SecureAccessLockRestore",
-  "name": "CardiacLens v9.10.347.213",
+  "build": "SecureAccessExclusiveLockUI",
+  "name": "CardiacLens v9.10.347.214",
   "notes": [
-    "CRITICAL: Lock was treating Secure Access as not configured even when Settings showed Active (M + Purple). isConfigured now restores letter/color from every profile mirror and treats letter+color as sufficient to enforce the lock grid.",
-    "Single-tap unlock path closed again: partial taps only show Tap N of 4 and never dismiss the lock.",
-    "Go to Settings to Set Up now opens Settings already expanded on Secure Access (no more scroll-from-top).",
-    "Settings Active badge now matches lock rule (letter + color)."
+    "Lock UI is now exclusive: either the first-time setup card OR the unlock grid — never both (fixes the hybrid welcome+grid screen).",
+    "When not configured, any leftover keyboard HTML is cleared so old keys cannot be tapped.",
+    "Save Combination writes keys + CL_SEC_PROFILE_V1 + settings.securityProfile and read-back verifies letter/color stuck.",
+    "Lock screen shows build version (e.g. v9.10.347.214) so we can confirm the device is running this build, not a cached older one."
   ],
-  "label": "SecureAccessLockRestore",
-  "summary": "Restore profile so lock and Settings agree. Letter+color enforces grid. Settings deep-link to Secure Access.",
+  "label": "SecureAccessExclusiveLockUI",
+  "summary": "Exclusive lock UI + verified multi-target save + visible build on lock screen.",
   "fixes": [
-    "Lock no longer shows first-time setup when combination exists in profile mirror.",
-    "isConfigured restores keys from CL_SEC_PROFILE_V1 and settings.securityProfile.",
-    "Go to Settings to Set Up jumps to Secure Access section.",
-    "Progress shows Tap 1 of 4 / 2 of 4 while entering the combination."
+    "Hybrid welcome+grid lock screen eliminated.",
+    "Save Combination verifies storage read-back.",
+    "Lock screen shows CURRENT_VERSION for cache diagnosis."
   ],
   "testing": [
-    "With Active M+Purple: lock must show the color grid, NOT the first-time setup card.",
-    "Tap only M: stays locked, status shows Tap 1 of 4.",
-    "Full sequence M + three purple: unlocks.",
-    "From first-time prompt (if ever shown): Go to Settings opens Settings scrolled to Secure Access."
+    "After install: lock screen must show v9.10.347.214 in the Secure Access tagline.",
+    "Save Combination with M + Purple + question + answer → success message includes Letter M · purple.",
+    "Lock: grid only (no welcome card). Tap M only → Tap 1 of 4, stays locked.",
+    "If lock shows welcome only: combination was not saved — open Settings Secure Access and Save Combination again."
   ]
 }
