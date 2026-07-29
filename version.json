@@ -1,27 +1,28 @@
 {
-  "version": "9.10.347.214",
+  "version": "9.10.347.216",
   "date": "2026-07-29",
   "releaseDate": "July 29, 2026",
   "updated": "2026-07-29",
-  "build": "SecureAccessExclusiveLockUI",
-  "name": "CardiacLens v9.10.347.214",
+  "build": "SecureAccessStorageProof",
+  "name": "CardiacLens v9.10.347.216",
   "notes": [
-    "Lock UI is now exclusive: either the first-time setup card OR the unlock grid — never both (fixes the hybrid welcome+grid screen).",
-    "When not configured, any leftover keyboard HTML is cleared so old keys cannot be tapped.",
-    "Save Combination writes keys + CL_SEC_PROFILE_V1 + settings.securityProfile and read-back verifies letter/color stuck.",
-    "Lock screen shows build version (e.g. v9.10.347.214) so we can confirm the device is running this build, not a cached older one."
+    "Verified root cause from user backup: combination keys were never in localStorage (CL_SEC_KEY/COLOR/PROFILE missing) while CL_SEC_STATUS was stale-active.",
+    "Save Combination now shows on-screen storage proof of KEY/COLOR/DONE after write+read-back.",
+    "Secure Access settings shows live Storage proof panel of what the lock reads.",
+    "Stale STATUS without keys is cleared. Lock UI is exclusive (setup card OR grid). Unlock requires full 4-tap sequence."
   ],
-  "label": "SecureAccessExclusiveLockUI",
-  "summary": "Exclusive lock UI + verified multi-target save + visible build on lock screen.",
+  "label": "SecureAccessStorageProof",
+  "summary": "Definitive Secure Access build with on-screen storage proof after save.",
   "fixes": [
-    "Hybrid welcome+grid lock screen eliminated.",
-    "Save Combination verifies storage read-back.",
-    "Lock screen shows CURRENT_VERSION for cache diagnosis."
+    "On-screen storage proof after Save Combination.",
+    "Live diagnostic of CL_SEC_* keys in Settings.",
+    "Stale STATUS cleared when keys missing.",
+    "Exclusive lock UI; 4-tap unlock only."
   ],
   "testing": [
-    "After install: lock screen must show v9.10.347.214 in the Secure Access tagline.",
-    "Save Combination with M + Purple + question + answer → success message includes Letter M · purple.",
-    "Lock: grid only (no welcome card). Tap M only → Tap 1 of 4, stays locked.",
-    "If lock shows welcome only: combination was not saved — open Settings Secure Access and Save Combination again."
+    "Confirm lock tagline v9.10.347.216.",
+    "Settings → Secure Access → set M, Purple, question, answer → Save Combination.",
+    "Success text must include KEY=M COLOR=purple. Storage proof panel must match.",
+    "Lock shows grid only. One tap stays locked. Full sequence unlocks."
   ]
 }
