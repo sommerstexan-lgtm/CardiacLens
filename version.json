@@ -1,30 +1,28 @@
 {
-  "version": "9.10.347.212",
+  "version": "9.10.347.213",
   "date": "2026-07-29",
   "releaseDate": "July 29, 2026",
   "updated": "2026-07-29",
-  "build": "SecureAccessHardLock",
-  "name": "CardiacLens v9.10.347.212",
+  "build": "SecureAccessLockRestore",
+  "name": "CardiacLens v9.10.347.213",
   "notes": [
-    "CRITICAL FIX: Lock screen could open the app on a single key tap. Unlock now requires a full verified 4-tap sequence (letter then three matching color tiles). Partial sequences only fill progress dots and never dismiss the lock.",
-    "Hardened _clUnlock so a visible configured lock cannot be hidden unless authentication just succeeded.",
-    "Neutralized leftover Secure Access Takeover code that previously overwrote _clKeyTap / _clUnlock / _clShowLock.",
-    "Lock overlay forces pointer-events and blocks background scroll while visible.",
-    "Prior 211 recovery features retained: Forgot after 4 fails, 3 recovery attempts then 5-min lockout, 8s hold to recovery to Settings."
+    "CRITICAL: Lock was treating Secure Access as not configured even when Settings showed Active (M + Purple). isConfigured now restores letter/color from every profile mirror and treats letter+color as sufficient to enforce the lock grid.",
+    "Single-tap unlock path closed again: partial taps only show Tap N of 4 and never dismiss the lock.",
+    "Go to Settings to Set Up now opens Settings already expanded on Secure Access (no more scroll-from-top).",
+    "Settings Active badge now matches lock rule (letter + color)."
   ],
-  "label": "SecureAccessHardLock",
-  "summary": "Hard lock: single-tap can no longer open the app. Full 4-tap verification required. Takeover code neutralized.",
+  "label": "SecureAccessLockRestore",
+  "summary": "Restore profile so lock and Settings agree. Letter+color enforces grid. Settings deep-link to Secure Access.",
   "fixes": [
-    "Single key tap no longer unlocks the app.",
-    "Unlock only after verified letter + three matching color tiles.",
-    "Takeover handler overwrites removed.",
-    "Lock overlay blocks background interaction while shown."
+    "Lock no longer shows first-time setup when combination exists in profile mirror.",
+    "isConfigured restores keys from CL_SEC_PROFILE_V1 and settings.securityProfile.",
+    "Go to Settings to Set Up jumps to Secure Access section.",
+    "Progress shows Tap 1 of 4 / 2 of 4 while entering the combination."
   ],
   "testing": [
-    "Set Secure Access (letter M + Purple). Tap 100% Private to lock.",
-    "Tap only M — app must stay locked; one progress dot fills.",
-    "Tap only D — app must stay locked.",
-    "Correct sequence M then three purple tiles — unlocks.",
-    "Wrong 4-tap sequence — shakes, clears dots, stays locked."
+    "With Active M+Purple: lock must show the color grid, NOT the first-time setup card.",
+    "Tap only M: stays locked, status shows Tap 1 of 4.",
+    "Full sequence M + three purple: unlocks.",
+    "From first-time prompt (if ever shown): Go to Settings opens Settings scrolled to Secure Access."
   ]
 }
