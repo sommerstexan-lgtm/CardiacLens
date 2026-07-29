@@ -1,28 +1,13 @@
 {
-  "version": "9.10.347.216",
+  "version": "9.10.347.217",
   "date": "2026-07-29",
-  "releaseDate": "July 29, 2026",
-  "updated": "2026-07-29",
-  "build": "SecureAccessStorageProof",
-  "name": "CardiacLens v9.10.347.216",
+  "build": "FourTapHardLock",
+  "name": "CardiacLens v9.10.347.217",
   "notes": [
-    "Verified root cause from user backup: combination keys were never in localStorage (CL_SEC_KEY/COLOR/PROFILE missing) while CL_SEC_STATUS was stale-active.",
-    "Save Combination now shows on-screen storage proof of KEY/COLOR/DONE after write+read-back.",
-    "Secure Access settings shows live Storage proof panel of what the lock reads.",
-    "Stale STATUS without keys is cleared. Lock UI is exclusive (setup card OR grid). Unlock requires full 4-tap sequence."
-  ],
-  "label": "SecureAccessStorageProof",
-  "summary": "Definitive Secure Access build with on-screen storage proof after save.",
-  "fixes": [
-    "On-screen storage proof after Save Combination.",
-    "Live diagnostic of CL_SEC_* keys in Settings.",
-    "Stale STATUS cleared when keys missing.",
-    "Exclusive lock UI; 4-tap unlock only."
-  ],
-  "testing": [
-    "Confirm lock tagline v9.10.347.216.",
-    "Settings → Secure Access → set M, Purple, question, answer → Save Combination.",
-    "Success text must include KEY=M COLOR=purple. Storage proof panel must match.",
-    "Lock shows grid only. One tap stays locked. Full sequence unlocks."
+    "Verified from user screenshots: grid showed then single-tap M opened app.",
+    "Dead takeover removeOldLock disabled so it cannot hide the primary lock.",
+    "Two-finger swipe clear disabled.",
+    "Unlock refuses to hide configured lock unless _clAuthPassed is true this session.",
+    "Keytap always shows Tap N of 4 and returns before any unlock when N < 4."
   ]
 }

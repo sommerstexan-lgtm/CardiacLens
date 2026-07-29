@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- CardiacLens versioned archive: v9.10.347.216 - deploy reference copy -->
+<!-- CardiacLens versioned archive: v9.10.347.217 - deploy reference copy -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -28,7 +28,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.216' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.217' }, params || {}));
       }
     } catch(e) {}
   };
@@ -491,10 +491,7 @@
         var dy0 = e.changedTouches[0].clientY - _t0x;
         var dy1 = (e.changedTouches[1]||e.changedTouches[0]).clientY - _t1x;
         if(dy0 > 60 && dy1 > 60){
-          _clClearSecurityProfile();
-          var lock = document.getElementById('clSecureLock');
-          if(lock) lock.style.display='none';
-          if(window._clSyncLockBtn) window._clSyncLockBtn();
+          // Disabled: emergency clear must not bypass Secure Access.
         }
       };
       box.addEventListener('touchstart', box._clSwipeStart, {passive:true});
@@ -618,66 +615,72 @@
 
   // ── handle key tap: MUST complete exactly 4 taps before any unlock decision ──
   window._clKeyTap = function(key, idx){
-    // Hard rule: never unlock from this function unless a full valid 4-tap sequence is verified.
-    if(!_clSecIsConfigured()){
-      _clUpdateKbStatus('Secure Access is not fully set up. Use Settings → Secure Access.');
-      return;
-    }
-    var now = Date.now();
-    if(_clKbState.coolUntil > now){
-      _clStartCooldown(Math.ceil((_clKbState.coolUntil - now)/1000));
-      return;
-    }
-    var gd = window._clCurrentGrid;
-    if(!gd || !gd.symbolKeys){
-      _clRenderKeyboard('clKbContainer');
-      return;
-    }
-
-    // iPhone/Safari duplicate-event guard: suppress only the SAME key firing twice.
-    var tapSig = String(idx) + ':' + String(key||'').toUpperCase();
-    if(tapSig === (_clKbState.lastTapSig || '') && now - (_clKbState.lastTapAt || 0) < 280) return;
-    _clKbState.lastTapSig = tapSig;
-    _clKbState.lastTapAt = now;
-
-    var tapSymbol = (gd.symbolKeys[idx]) || '';
-    if(!_clKbState.entries) _clKbState.entries = [];
-    // Cap at 4 — never evaluate a partial sequence as success
-    if(_clKbState.entries.length >= 4) _clKbState.entries = [];
-    _clKbState.entries.push({ key:String(key||'').toUpperCase(), symbol:String(tapSymbol||'').toLowerCase() });
-    _clFlashKey(idx);
-    _clDrawKbProgress();
-
-    // Fewer than 4 taps: only update dots, never unlock
-    if(_clKbState.entries.length < 4){
-      _clUpdateKbStatus('Tap '+_clKbState.entries.length+' of 4');
-      return;
-    }
-
-    // Exactly 4 taps — evaluate
-    var storedLetter = (localStorage.getItem(_CL_SEC.KEY)||'').trim().toUpperCase();
-    var storedSymbol = (localStorage.getItem(_CL_SEC.COLOR)||'').trim().toLowerCase();
-    var e = _clKbState.entries;
-    var ok = !!(
-      storedLetter && storedSymbol &&
-      e.length === 4 &&
-      e[0].key === storedLetter &&
-      e[1].symbol === storedSymbol &&
-      e[2].symbol === storedSymbol &&
-      e[3].symbol === storedSymbol
-    );
-
-    if(ok){
+    // v9.10.347.217 — single path. Nothing unlocks before 4 verified taps.
+    try {
+      if(!_clSecIsConfigured()){
+        _clUpdateKbStatus('Not set up. Use Settings → Secure Access.');
+        return;
+      }
+      var now = Date.now();
+      if(_clKbState.coolUntil > now){
+        _clStartCooldown(Math.ceil((_clKbState.coolUntil - now)/1000));
+        return;
+      }
+      var gd = window._clCurrentGrid;
+      if(!gd || !gd.symbolKeys){
+        _clRenderKeyboard('clKbContainer');
+        return;
+      }
+      var tapSig = String(idx) + ':' + String(key||'').toUpperCase();
+      if(tapSig === (_clKbState.lastTapSig || '') && now - (_clKbState.lastTapAt || 0) < 280) return;
+      _clKbState.lastTapSig = tapSig;
+      _clKbState.lastTapAt = now;
+      if(!_clKbState.entries) _clKbState.entries = [];
+      if(_clKbState.entries.length >= 4) _clKbState.entries = [];
+      var tapSymbol = String((gd.symbolKeys[idx]) || '').toLowerCase();
+      _clKbState.entries.push({ key:String(key||'').toUpperCase(), symbol:tapSymbol });
+      _clFlashKey(idx);
+      _clDrawKbProgress();
+      var n = _clKbState.entries.length;
+      if(n < 4){
+        _clUpdateKbStatus('Tap ' + n + ' of 4 — keep going');
+        return;
+      }
+      if(n !== 4){
+        _clKbState.entries = [];
+        _clDrawKbProgress();
+        _clUpdateKbStatus('Reset — enter 4 taps');
+        return;
+      }
+      var storedLetter = (localStorage.getItem(_CL_SEC.KEY)||'').trim().toUpperCase();
+      var storedSymbol = (localStorage.getItem(_CL_SEC.COLOR)||'').trim().toLowerCase();
+      var e = _clKbState.entries;
+      if(!storedLetter || !storedSymbol){
+        _clKbState.entries = [];
+        _clDrawKbProgress();
+        _clUpdateKbStatus('Code missing from storage. Re-save in Settings.');
+        return;
+      }
+      var ok = (
+        e[0].key === storedLetter &&
+        e[1].symbol === storedSymbol &&
+        e[2].symbol === storedSymbol &&
+        e[3].symbol === storedSymbol
+      );
+      if(!ok){
+        _clKbFail();
+        return;
+      }
       _clKbState.fails = 0;
       _clKbState.coolUntil = 0;
       _clPersistSecurityCounters();
       _clAuthPassed = true;
+      try { localStorage.setItem('CL_SEC_LAST_UNLOCK', new Date().toISOString()); } catch(eU) {}
       _clUpdateKbStatus('Unlocked.');
-      _clUnlock(true); // force only after verified sequence
-      return;
+      _clUnlock(true);
+    } catch(err){
+      try { _clUpdateKbStatus('Tap error — try again'); } catch(e2) {}
     }
-
-    _clKbFail();
   };
 
   function _clKbFail(){
@@ -695,7 +698,7 @@
       var left = Math.max(0, 3 - (_clKbState.fails || 0));
       if(_clKbState.fails >= 4){ var fh2=document.getElementById('clForgotHint'); if(fh2) fh2.style.display='block'; }
       _clUpdateKbStatus(left > 0 ? ('Wrong 4-tap sequence #'+_clKbState.fails+'. First cooldown after '+left+' more wrong sequence'+(left===1?'':'s')+'.') : ('Wrong 4-tap sequence #'+_clKbState.fails+'.'));
-      // v9.10.347.216: a completed wrong 4-tap sequence used to leave the OLD
+      // v9.10.347.217: a completed wrong 4-tap sequence used to leave the OLD
       // grid tappable for the full 450ms before _clRenderKeyboard replaced it.
       // A tap already in flight when the DOM swap happened would land on
       // whatever key ended up at that same screen position in the NEW,
@@ -716,17 +719,9 @@
     var visible = !!(lock && lock.style.display !== 'none' && lock.style.display !== '');
     var configured = false;
     try { configured = !!_clSecIsConfigured(); } catch(e) { configured = false; }
-
-    // While the lock is visible and Secure Access is configured, refuse to hide
-    // unless auth just succeeded (_clAuthPassed) or force was set by the verified paths.
-    if(visible && configured && !_clAuthPassed && force !== true){
-      _clUpdateKbStatus('');
-      return;
-    }
-    // Extra safety: force alone is not enough if we are configured and never authenticated
-    // this session, unless caller explicitly set _clAuthPassed first (verified paths do).
-    if(visible && configured && force === true && !_clAuthPassed){
-      _clUpdateKbStatus('');
+    // Configured + lock visible: ONLY hide if this session already authenticated.
+    if(visible && configured && !_clAuthPassed){
+      try { _clUpdateKbStatus('Enter full code (4 taps)'); } catch(eS) {}
       return;
     }
     if(lock){
@@ -1158,7 +1153,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.347.216';
+    var GD_VERSION   = 'v9.10.347.217';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1695,7 +1690,7 @@
   // -- End CL_SEC_COLOR migration ---------------------------------------------
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
-<title>CardiacLens v9.10.347.216</title>
+<title>CardiacLens v9.10.347.217</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
@@ -2582,7 +2577,7 @@ input[type="time"].modal-input,input[type="time"]{-webkit-appearance:auto;appear
     <!-- Version + clock row -->
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid rgba(255,255,255,0.15);padding-top:12px">
       <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px">
-        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.347.216 · Medical Grade - Free</span>
+        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.347.217 · Medical Grade - Free</span>
         <span id="cl-gd-heartbeat" style="font-size:11px;color:rgba(125,211,252,0.55);font-weight:500;letter-spacing:0.01em">ð Eyes open...</span>
         <!-- ═══════════════════════════════════════════════════════════════════
              VERSION UPDATE CHECKLIST — update ALL 8 locations every release:
@@ -3698,7 +3693,7 @@ Custom Range
         <p style="font-size:15px;color:#4b5563;margin-bottom:4px">This tab tracks <strong>bugs that were reported and fixed</strong> — things that were broken and are now resolved. Each entry describes the defective behavior, the root cause, and the fix applied.</p>
         <p style="font-size:14px;color:#6b7280;margin-bottom:16px">For new features and capabilities, see the <strong>Planned Features</strong> tab.</p>
 
-<div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:14px 16px;border-radius:8px;margin-bottom:12px"><strong style="font-size:16px">🧪 New in v9.10.347.216 - July 28, 2026</strong><ul style="font-size:14px;margin:6px 0 0 0;padding-left:18px;color:#78350f;line-height:1.8"><li><strong>Secure Access &mdash; Settings showed "Not enabled" after saving a new combination.</strong> The dedicated Save Combination button and the main Save Settings button used two separately-written copies of the save logic; one of them never fully committed the change the way the other did, so the status shown when reopening Settings could read "Not enabled" even immediately after a successful-looking save. Both buttons now go through the exact same save function.</li></ul></div>
+<div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:14px 16px;border-radius:8px;margin-bottom:12px"><strong style="font-size:16px">🧪 New in v9.10.347.217 - July 28, 2026</strong><ul style="font-size:14px;margin:6px 0 0 0;padding-left:18px;color:#78350f;line-height:1.8"><li><strong>Secure Access &mdash; Settings showed "Not enabled" after saving a new combination.</strong> The dedicated Save Combination button and the main Save Settings button used two separately-written copies of the save logic; one of them never fully committed the change the way the other did, so the status shown when reopening Settings could read "Not enabled" even immediately after a successful-looking save. Both buttons now go through the exact same save function.</li></ul></div>
 <div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:14px 16px;border-radius:8px;margin-bottom:12px"><strong style="font-size:16px">🧪 New in v9.10.347.208 - July 28, 2026</strong><ul style="font-size:14px;margin:6px 0 0 0;padding-left:18px;color:#78350f;line-height:1.8"><li><strong>Secure Access &mdash; lock button hardened against a silent failure path.</strong> The lock button's handler required a full re-check of the saved combination to succeed before it would do anything, and if that re-check failed for any reason, the button did nothing at all with zero feedback. Could not be reproduced in this environment even against a full copy of real device data, but this exact failure mode (a guard that silently blocks the whole action instead of degrading gracefully) is a real category of risk regardless. The lock button no longer depends on that check succeeding to lock the screen; a failed check now falls back to showing the setup screen rather than doing nothing.</li></ul></div>
 <div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:14px 16px;border-radius:8px;margin-bottom:12px"><strong style="font-size:16px">🧪 New in v9.10.347.207 - July 28, 2026</strong><ul style="font-size:14px;margin:6px 0 0 0;padding-left:18px;color:#78350f;line-height:1.8"><li><strong>Secure Access &mdash; fixed lock screen keyboard not fitting the screen (hotfix).</strong> The v9.10.347.206 release, which disabled a duplicate lock-screen system, exposed a real layout bug in the original keyboard that had been hidden by the duplicate system's overlay for months: 30 keys in a 4-column grid meant 7 rows, the last with only 2 keys, and the whole grid ran 70-90px taller than the visible screen on a real iPhone. Nothing below the fold could be reliably seen or tapped, which is very likely why unlocking and locking felt broken or inconsistent even though the underlying logic was correct. Fixed: the grid is now 5 columns, giving 6 perfectly even rows that fit comfortably within the screen on both a standard iPhone and the smaller iPhone SE, confirmed by actual measurement, not estimate.</li></ul></div>
 <div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:14px 16px;border-radius:8px;margin-bottom:12px"><strong style="font-size:16px">🧪 New in v9.10.347.206 - July 28, 2026</strong><ul style="font-size:14px;margin:6px 0 0 0;padding-left:18px;color:#78350f;line-height:1.8"><li><strong>Secure Access &mdash; fixed intermittent wrong-key registration.</strong> Tapping one key on the unlock keyboard could occasionally register a different key elsewhere on the grid. Root cause: two full lock-screen implementations were both present and both wired to the same lock button, sharing the same stored key/color. The newer of the two was silently overwriting the older, working system's tap handling on a delay after every app load. The newer system has been disabled; the original, complete system (setup, unlock, cooldown, and recovery) is now the only one running. Separately, closed a real timing gap in the original system itself: after a wrong 4-tap sequence, the keyboard reshuffles 450ms later, and a tap already in progress at that exact moment could land on the wrong key in the new layout. The keyboard now locks to input the instant a wrong sequence completes and unlocks the instant the new layout is ready, closing that gap.</li><li><strong>Fluid reminders &mdash; real background push notifications now open Log Fluid reliably.</strong> Tapping a fluid push notification (the kind that arrives when the app is closed or the phone is locked) sometimes opened Log Fluid and sometimes just opened the app to whatever screen it was last on. Root cause: the notification-handling code was never attaching the information needed to route the tap, so there was nothing to act on. Fixed: fluid push notifications now open Log Fluid directly and consistently.</li></ul></div>
@@ -6441,7 +6436,7 @@ Custom Range
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.347.216';
+  var CURRENT='v9.10.347.217';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -6691,7 +6686,7 @@ function fireOSNotification(title, body, tag){
         icon: 'icon-192.png',
         badge: 'icon-192.png',
         requireInteraction: true,
-        // v9.10.347.216: eventTag lets sw.js's notificationclick hand off
+        // v9.10.347.217: eventTag lets sw.js's notificationclick hand off
         // which event was tapped, so the app can open that event's real
         // action card instead of just focusing the app on whatever screen
         // it was last showing.
@@ -6709,7 +6704,7 @@ function fireOSNotification(title, body, tag){
     n.onclick=function(){
       window.focus();
       n.close();
-      // v9.10.347.216: this fallback only ever fires while the page is
+      // v9.10.347.217: this fallback only ever fires while the page is
       // still alive (Web Notifications without a SW require the tab to
       // exist), so it's safe to resolve and route in-page directly.
       try{ if(typeof _clOpenEventFromTag==='function') _clOpenEventFromTag(tag); }catch(e){}
@@ -7225,7 +7220,7 @@ if(_pendingReminderEvt){
 _maybeAdvanceMissedQueue();
 }
 
-// v9.10.347.216: called from every real exit point of hideModal(). If the
+// v9.10.347.217: called from every real exit point of hideModal(). If the
 // card that just closed was one of the sequential missed-event cards, clear
 // that marker and, if more are queued, open the next one after a short
 // pause so it never overlaps the closing animation of the one before it.
@@ -25181,7 +25176,7 @@ html+=lbBadge;
 html+='<div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">';
 html+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
 html+='<div>';
-html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.347.216</span></div>';
+html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.347.217</span></div>';
 html+='<div id="settingsVersionStatus" style="font-size:13px;color:#6b7280;margin-top:3px">Tap "Check for Updates" to see if a newer version is available</div>';
 html+='</div>';
 html+='<button onclick="checkForUpdates(true)" id="checkUpdateBtn" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">🔍 Check for Updates</button>';
@@ -25222,7 +25217,7 @@ if (window._isBetaBuild && window._isBetaBuild()) {
 }
 
 // ── SECURE ACCESS SETTINGS SECTION ───────────────────────────────────────────
-// v9.10.347.216: always restore from profile mirror before status check so
+// v9.10.347.217: always restore from profile mirror before status check so
 // Settings does not report "Not enabled" when keys were wiped but the mirror
 // (CL_SEC_PROFILE_V1 / settings.securityProfile) still has the combination.
 try{ if(typeof _clSecIsConfigured==='function') _clSecIsConfigured(); else if(typeof _clRestoreSecurityProfile==='function') _clRestoreSecurityProfile(); }catch(_clSecBootE){}
@@ -25476,7 +25471,7 @@ showModal(html);
     if(verify === '1' && hasKeys){
       if(window._clSyncLockBtn) window._clSyncLockBtn();
       if(ok){ ok.textContent='✓ Saved! Secure Access is active. Refreshing Settings…'; ok.style.display='block'; }
-      // v9.10.347.216: reopen Settings so the section title shows Active immediately
+      // v9.10.347.217: reopen Settings so the section title shows Active immediately
       setTimeout(function(){ try{ if(typeof openSettings==='function') openSettings(); }catch(e){} }, 450);
     } else if(err){
       err.textContent='⚠ Save failed — browser storage may be blocked. Try a different browser.';
@@ -25528,7 +25523,7 @@ showModal(html);
   };
 
   window._clSaveInlineSecureAccess = function(silent){
-    // v9.10.347.216: unified, normalized save.
+    // v9.10.347.217: unified, normalized save.
     // - Dedicated Save Combination (silent=false) requires all four fields.
     // - Main Save Settings (silent=true) never blocks other settings when
     //   Secure Access is left blank; only writes when the form is complete
@@ -26565,7 +26560,7 @@ function buildMissedEventList() {
   return missed;
 }
 
-// v9.10.347.216: sequential missed-event card queue. Replaces the small
+// v9.10.347.217: sequential missed-event card queue. Replaces the small
 // bottom toast + best-effort chime from v9.10.347.204, which had two real
 // problems: it was too easy to miss, and tapping it did nothing (it fell
 // through to whatever screen happened to be underneath). Newly-missed
@@ -26593,7 +26588,7 @@ function runCatchUpScan() {
     }
   });
   updateUpcomingEventsWidget();
-  // v9.10.347.216: newly-missed events queue into the real action card
+  // v9.10.347.217: newly-missed events queue into the real action card
   // instead of a toast. No sound is attempted here: iOS blocks audio
   // triggered from a background/visibility event with no direct user
   // gesture attached, so a forced chime here would silently fail every
@@ -26619,7 +26614,7 @@ function _advanceMissedEventQueue(){
   _openEventActionModal(evt);
 }
 
-// ── Notification tap routing (v9.10.347.216) ─────────────────────────────
+// ── Notification tap routing (v9.10.347.217) ─────────────────────────────
 // A tapped OS-level notification only carries a tag string (see
 // fireOSNotification/scheduleOSNotificationAt). By the time it's tapped,
 // the event list it was scheduled from may have changed, so this always
@@ -26671,7 +26666,7 @@ function _clResolveEventByTag(tag){
 // since the notification was scheduled).
 function _clOpenEventFromTag(tag){
   try{
-    // v9.10.347.216: real background fluid push notifications (pacing,
+    // v9.10.347.217: real background fluid push notifications (pacing,
     // and any fluid reminder delivered via the push worker rather than
     // a foreground OS notification) carry this tag and have no matching
     // dailyEvents/dailyPlan entry to resolve by design -- pacing works
@@ -37424,7 +37419,7 @@ html+=`</div>`;
 
 html+=`
 <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:2px solid #e5e7eb;color:#6b7280;font-size:14px">
-<p style="margin:0">CardiacLens v9.10.347.216 - Free & Source-Available</p>
+<p style="margin:0">CardiacLens v9.10.347.217 - Free & Source-Available</p>
 <p style="margin:4px 0 0 0">Report Generated: ${reportDate}</p>
 </div>`;
 
@@ -37755,7 +37750,7 @@ Note: This report is based on patient self-tracked data. Clinical correlation
 and examination are essential for diagnosis and treatment decisions.
 
 ---
-CardiacLens v9.10.347.216 Medical Grade - Free
+CardiacLens v9.10.347.217 Medical Grade - Free
 Report Generated: ${reportDate}`;
 
 return text;
@@ -41892,7 +41887,7 @@ report.push(notes);
 report.push('');
 }
 report.push('═══════════════════════════════════════════════════════════');
-report.push('This report was generated by CardiacLens v9.10.347.216 Medical Grade - Free');
+report.push('This report was generated by CardiacLens v9.10.347.217 Medical Grade - Free');
 report.push('Advanced Analytics Dashboard - Phase 3 Implementation');
 report.push('═══════════════════════════════════════════════════════════');
 const blob=new Blob([report.join('\n')],{type:'text/plain'});
@@ -41982,7 +41977,7 @@ ${periodHTML}
 <h2>Key Insights</h2>
 ${insightsHTML}
 <div style="margin-top:40px;padding:20px;background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:8px">
-<strong>CardiacLens v9.10.347.216 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
+<strong>CardiacLens v9.10.347.217 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
 This report is not a substitute for professional medical advice.
 </div>
 </body>
@@ -42955,7 +42950,7 @@ alert(`🏃 Activity Summary\n\n` +
 var VERSION_JSON_URL = 'https://cardiaclens.com/version.json';
 var VERSION_CHECK_KEY = 'CARDIACLENS_LAST_VERSION_CHECK';
 var VERSION_DISMISSED_KEY = 'CARDIACLENS_UPDATE_DISMISSED';
-var CURRENT_VERSION = 'v9.10.347.216';
+var CURRENT_VERSION = 'v9.10.347.217';
 var _latestVersionData = null; // cached from last fetch
 
 // Detect whether running as an installed Home Screen PWA on iOS
@@ -52782,7 +52777,7 @@ function _showAskClarifyChips(options) {
     return {active:active,letter:letter,color:color,q:q,a:a};
   }
   function qText(q){if(!q)return 'Security question';if(q.indexOf('custom:')===0)return q.slice(7);var m={pet:'What was the name of your first pet?',city:'What city were you born in?',mother:"What was your mother's maiden name?",school:'What was the name of your childhood school?',sibling:"What is your oldest sibling's middle name?"};return m[q]||q;}
-  function removeOldLock(){try{var old=document.getElementById('clSecureLock');if(old)old.style.display='none';}catch(e){}}
+  function removeOldLock(){/* disabled permanently — must not hide primary lock */}
   function flash(btn){if(!btn)return;try{btn.classList.remove('clToTap');void btn.offsetWidth;btn.classList.add('clToTap');if(navigator.vibrate)navigator.vibrate(20);setTimeout(function(){try{btn.classList.remove('clToTap');}catch(e){}},220);}catch(e){}}
   function status(msg){var el=document.getElementById('clTakeoverStatus');if(el)el.textContent=msg||'';}
   function drawProgress(){
@@ -53091,7 +53086,7 @@ function _showAskClarifyChips(options) {
   // Takeover permanently neutralized — must not overwrite original Secure Access handlers.
   function takeoverFunctions(){ /* no-op */ }
   function boot(){ /* no-op — original system is sole implementation */ }
-  // v9.10.347.216: Takeover permanently disabled. It duplicated the original
+  // v9.10.347.217: Takeover permanently disabled. It duplicated the original
   // Secure Access system (same CL_SEC_* keys, same #clPrivacyLockPill button)
   // but has no setup flow of its own -- it only ever consumed keys created by
   // the ORIGINAL system's 3-step setup wizard. Its boot() also silently
