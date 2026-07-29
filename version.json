@@ -1,27 +1,29 @@
 {
-  "version": "9.10.347.210",
-  "date": "2026-07-28",
-  "releaseDate": "July 28, 2026",
-  "updated": "2026-07-28",
-  "build": "SecureAccessPersistAndStatusFix",
-  "name": "CardiacLens v9.10.347.210",
+  "version": "9.10.347.211",
+  "date": "2026-07-29",
+  "releaseDate": "July 29, 2026",
+  "updated": "2026-07-29",
+  "build": "SecureAccessUnlockRecoveryHelp",
+  "name": "CardiacLens v9.10.347.211",
   "notes": [
-    "Fixed: Secure Access Settings showed Not enabled after a successful save (or after keys were lost while the profile mirror still existed). Settings now restores from the profile mirror before computing Active/Not enabled.",
-    "Fixed: Main Save Settings no longer aborts the entire settings form when Secure Access fields are left blank. Incomplete Secure Access only blocks the dedicated Save Combination button.",
-    "Fixed: Save Combination now normalizes letter (uppercase) and symbol (lowercase), always writes CL_SEC_PROFILE_V1 and settings.securityProfile, and reopens Settings so the Active badge appears immediately.",
-    "Strengthened profile persistence so individual keys and the mirror stay in sync whenever Secure Access is saved."
+    "Secure Access: Forgot your code? now appears after 4 wrong sequences (was 20).",
+    "Secure Access: recovery answer limited to 3 attempts, then 5-minute lockout of the recovery panel.",
+    "Secure Access: hold any lock-grid key for 8 seconds (Keep holding… appears after ~2.5s) to open the recovery question; correct answer unlocks and opens Settings focused on Secure Access.",
+    "Help: added full 🔒 Security section with accurate unlock sequence (letter then three of chosen color), recovery, and emergency hold path. Updated Getting Started blurb that previously described a numeric PIN.",
+    "Help: Security tab now has a real section and is included in tab highlighting."
   ],
-  "label": "SecureAccessPersistAndStatusFix",
-  "summary": "Secure Access: restore-before-status, non-blocking Save Settings, normalized save with profile mirror, immediate Active badge after Save Combination.",
+  "label": "SecureAccessUnlockRecoveryHelp",
+  "summary": "Secure Access recovery UX + accurate Help. Forgot after 4 fails, 3 recovery attempts then 5-min lockout, 8s long-press emergency path into Settings, new Security help section.",
   "fixes": [
-    "Settings > Secure Access: status restores from CL_SEC_PROFILE_V1 / settings.securityProfile before showing Not enabled.",
-    "Settings > Save Settings: incomplete Secure Access fields no longer block saving other settings.",
-    "Settings > Save Combination: normalizes values, writes profile mirror, refreshes Settings to show Active."
+    "Forgot link threshold reduced from 20 to 4 failed 4-tap sequences.",
+    "Recovery answer: 3 tries then 5-minute recovery-panel lockout.",
+    "Long-press any key ≥8s → recovery question; success opens Settings → Secure Access.",
+    "Help Security tab and Getting Started Secure Access description rewritten for the letter+color grid."
   ],
   "testing": [
-    "Open Settings > Secure Access, pick letter + symbol + question + answer, tap Save Combination. Expect success message, Settings reopens with Active, lock pill visible.",
-    "Close and reopen Settings: still Active.",
-    "Reload page: still Active; lock still works with the same combination.",
-    "Change other settings and tap Save Settings without touching Secure Access: other settings save; Secure Access stays Active."
+    "With Secure Access active: wrong 4-tap sequence 4 times → Forgot link appears.",
+    "Tap Forgot or hold any key 8s → recovery question. Correct answer unlocks. From long-press path, Settings opens on Secure Access.",
+    "3 wrong recovery answers → 5-minute recovery lockout message.",
+    "Help → 🔒 Security shows the new how-to. Getting Started no longer says numeric PIN."
   ]
 }
