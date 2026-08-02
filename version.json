@@ -1,10 +1,11 @@
 {
-  "version": "9.10.349.221",
+  "version": "9.10.350.222",
   "date": "2026-08-02",
-  "build": "AskWeekCompare",
+  "build": "AskCompareDetail",
   "notes": [
-    "Ask: this week vs last week comparison now loads both periods (was only loading this week)",
-    "Ask: standalone 'last week' is previous calendar week (Sun\u2013Sat), not trailing 7 days through today",
-    "Prior 220: Grok Ask engine + precision system prompt"
+    "Ask period comparison now includes day-level BP readings and daily fluid totals for both periods (not aggregates only)",
+    "Fixes inability to answer threshold/same-day fluid questions across this week vs last week",
+    "Footer label: powered by Grok",
+    "Prior 221: this week vs last week comparison window detection"
   ]
 }
