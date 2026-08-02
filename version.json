@@ -1,11 +1,10 @@
 {
-  "version": "9.10.350.222",
+  "version": "9.10.351.223",
   "date": "2026-08-02",
-  "build": "AskCompareDetail",
+  "build": "HelpAskGrokSeries",
   "notes": [
-    "Ask period comparison now includes day-level BP readings and daily fluid totals for both periods (not aggregates only)",
-    "Fixes inability to answer threshold/same-day fluid questions across this week vs last week",
-    "Footer label: powered by Grok",
-    "Prior 221: this week vs last week comparison window detection"
+    "Help What's New: accurate notes for Ask Grok switch (220), week vs week (221), comparison day-level detail (222)",
+    "Help/Ask copy: user-facing Claude references changed to Grok/Ask",
+    "Restored mis-labeled Secure Access note under v9.10.347.209"
   ]
 }
