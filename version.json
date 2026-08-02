@@ -1,14 +1,10 @@
 {
-  "version": "9.10.348.220",
+  "version": "9.10.349.221",
   "date": "2026-08-02",
-  "build": "GrokAsk",
+  "build": "AskWeekCompare",
   "notes": [
-    "Ask switched from Claude (Anthropic) to Grok (xAI grok-4.5) via Cloudflare Worker",
-    "System prompt strengthened: precision over fluency, never assume/guess, layman-first explanations, clinical grounding when appropriate",
-    "Worker preserves client request/response contract (system + messages \u2192 content[0].text + stop_reason)",
-    "reasoning_effort=medium; max_completion_tokens=4096; temperature=0.25",
-    "Client Ask timeouts raised to 40s / 55s (attachments) for Grok reasoning headroom",
-    "Daily limit, clarify chips, truncation messaging preserved",
-    "Image attachments supported; PDF attachments return clear guidance (Files API can be added later)"
+    "Ask: this week vs last week comparison now loads both periods (was only loading this week)",
+    "Ask: standalone 'last week' is previous calendar week (Sun\u2013Sat), not trailing 7 days through today",
+    "Prior 220: Grok Ask engine + precision system prompt"
   ]
 }
