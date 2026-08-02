@@ -10,7 +10,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.347.219' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.348.220' }, params || {}));
       }
     } catch(e) {}
   };
@@ -551,7 +551,7 @@
     } else {
       var left = Math.max(0, 3 - (_clKbState.fails || 0));
       _clUpdateKbStatus(left > 0 ? ('Wrong 4-tap sequence #'+_clKbState.fails+'. First cooldown after '+left+' more wrong sequence'+(left===1?'':'s')+'.') : ('Wrong 4-tap sequence #'+_clKbState.fails+'.'));
-      // v9.10.347.219: a completed wrong 4-tap sequence used to leave the OLD
+      // v9.10.348.220: a completed wrong 4-tap sequence used to leave the OLD
       // grid tappable for the full 450ms before _clRenderKeyboard replaced it.
       // A tap already in flight when the DOM swap happened would land on
       // whatever key ended up at that same screen position in the NEW,
@@ -933,7 +933,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.347.219';
+    var GD_VERSION   = 'v9.10.348.220';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1479,7 +1479,7 @@
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.347.219';
+  var CURRENT='v9.10.348.220';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -1729,7 +1729,7 @@ function fireOSNotification(title, body, tag){
         icon: 'icon-192.png',
         badge: 'icon-192.png',
         requireInteraction: true,
-        // v9.10.347.219: eventTag lets sw.js's notificationclick hand off
+        // v9.10.348.220: eventTag lets sw.js's notificationclick hand off
         // which event was tapped, so the app can open that event's real
         // action card instead of just focusing the app on whatever screen
         // it was last showing.
@@ -1747,7 +1747,7 @@ function fireOSNotification(title, body, tag){
     n.onclick=function(){
       window.focus();
       n.close();
-      // v9.10.347.219: this fallback only ever fires while the page is
+      // v9.10.348.220: this fallback only ever fires while the page is
       // still alive (Web Notifications without a SW require the tab to
       // exist), so it's safe to resolve and route in-page directly.
       try{ if(typeof _clOpenEventFromTag==='function') _clOpenEventFromTag(tag); }catch(e){}
@@ -2263,7 +2263,7 @@ if(_pendingReminderEvt){
 _maybeAdvanceMissedQueue();
 }
 
-// v9.10.347.219: called from every real exit point of hideModal(). If the
+// v9.10.348.220: called from every real exit point of hideModal(). If the
 // card that just closed was one of the sequential missed-event cards, clear
 // that marker and, if more are queued, open the next one after a short
 // pause so it never overlaps the closing animation of the one before it.
@@ -20219,7 +20219,7 @@ html+=lbBadge;
 html+='<div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">';
 html+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
 html+='<div>';
-html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.347.219</span></div>';
+html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.348.220</span></div>';
 html+='<div id="settingsVersionStatus" style="font-size:13px;color:#6b7280;margin-top:3px">Tap "Check for Updates" to see if a newer version is available</div>';
 html+='</div>';
 html+='<button onclick="checkForUpdates(true)" id="checkUpdateBtn" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">🔍 Check for Updates</button>';
@@ -20260,7 +20260,7 @@ if (window._isBetaBuild && window._isBetaBuild()) {
 }
 
 // ── SECURE ACCESS SETTINGS SECTION ───────────────────────────────────────────
-// v9.10.347.219: always restore from profile mirror before status check so
+// v9.10.348.220: always restore from profile mirror before status check so
 // Settings does not report "Not enabled" when keys were wiped but the mirror
 // (CL_SEC_PROFILE_V1 / settings.securityProfile) still has the combination.
 try{ if(typeof _clSecIsConfigured==='function') _clSecIsConfigured(); else if(typeof _clRestoreSecurityProfile==='function') _clRestoreSecurityProfile(); }catch(_clSecBootE){}
@@ -20507,7 +20507,7 @@ showModal(html);
     if(verify === '1' && hasKeys){
       if(window._clSyncLockBtn) window._clSyncLockBtn();
       if(ok){ ok.textContent='✓ Saved! Secure Access is active. Refreshing Settings…'; ok.style.display='block'; }
-      // v9.10.347.219: reopen Settings so the section title shows Active immediately
+      // v9.10.348.220: reopen Settings so the section title shows Active immediately
       setTimeout(function(){ try{ if(typeof openSettings==='function') openSettings(); }catch(e){} }, 450);
     } else if(err){
       err.textContent='⚠ Save failed — browser storage may be blocked. Try a different browser.';
@@ -20538,7 +20538,7 @@ showModal(html);
 })();
 
   window._clSaveInlineSecureAccess = function(silent){
-    // v9.10.347.219: unified, normalized save.
+    // v9.10.348.220: unified, normalized save.
     // - Dedicated Save Combination (silent=false) requires all four fields.
     // - Main Save Settings (silent=true) never blocks other settings when
     //   Secure Access is left blank; only writes when the form is complete
@@ -21550,7 +21550,7 @@ function buildMissedEventList() {
   return missed;
 }
 
-// v9.10.347.219: sequential missed-event card queue. Replaces the small
+// v9.10.348.220: sequential missed-event card queue. Replaces the small
 // bottom toast + best-effort chime from v9.10.347.204, which had two real
 // problems: it was too easy to miss, and tapping it did nothing (it fell
 // through to whatever screen happened to be underneath). Newly-missed
@@ -21578,7 +21578,7 @@ function runCatchUpScan() {
     }
   });
   updateUpcomingEventsWidget();
-  // v9.10.347.219: newly-missed events queue into the real action card
+  // v9.10.348.220: newly-missed events queue into the real action card
   // instead of a toast. No sound is attempted here: iOS blocks audio
   // triggered from a background/visibility event with no direct user
   // gesture attached, so a forced chime here would silently fail every
@@ -21604,7 +21604,7 @@ function _advanceMissedEventQueue(){
   _openEventActionModal(evt);
 }
 
-// ── Notification tap routing (v9.10.347.219) ─────────────────────────────
+// ── Notification tap routing (v9.10.348.220) ─────────────────────────────
 // A tapped OS-level notification only carries a tag string (see
 // fireOSNotification/scheduleOSNotificationAt). By the time it's tapped,
 // the event list it was scheduled from may have changed, so this always
@@ -21656,7 +21656,7 @@ function _clResolveEventByTag(tag){
 // since the notification was scheduled).
 function _clOpenEventFromTag(tag){
   try{
-    // v9.10.347.219: real background fluid push notifications (pacing,
+    // v9.10.348.220: real background fluid push notifications (pacing,
     // and any fluid reminder delivered via the push worker rather than
     // a foreground OS notification) carry this tag and have no matching
     // dailyEvents/dailyPlan entry to resolve by design -- pacing works
@@ -32409,7 +32409,7 @@ html+=`</div>`;
 
 html+=`
 <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:2px solid #e5e7eb;color:#6b7280;font-size:14px">
-<p style="margin:0">CardiacLens v9.10.347.219 - Free & Source-Available</p>
+<p style="margin:0">CardiacLens v9.10.348.220 - Free & Source-Available</p>
 <p style="margin:4px 0 0 0">Report Generated: ${reportDate}</p>
 </div>`;
 
@@ -32740,7 +32740,7 @@ Note: This report is based on patient self-tracked data. Clinical correlation
 and examination are essential for diagnosis and treatment decisions.
 
 ---
-CardiacLens v9.10.347.219 Medical Grade - Free
+CardiacLens v9.10.348.220 Medical Grade - Free
 Report Generated: ${reportDate}`;
 
 return text;
@@ -36877,7 +36877,7 @@ report.push(notes);
 report.push('');
 }
 report.push('═══════════════════════════════════════════════════════════');
-report.push('This report was generated by CardiacLens v9.10.347.219 Medical Grade - Free');
+report.push('This report was generated by CardiacLens v9.10.348.220 Medical Grade - Free');
 report.push('Advanced Analytics Dashboard - Phase 3 Implementation');
 report.push('═══════════════════════════════════════════════════════════');
 const blob=new Blob([report.join('\n')],{type:'text/plain'});
@@ -36967,7 +36967,7 @@ ${periodHTML}
 <h2>Key Insights</h2>
 ${insightsHTML}
 <div style="margin-top:40px;padding:20px;background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:8px">
-<strong>CardiacLens v9.10.347.219 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
+<strong>CardiacLens v9.10.348.220 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
 This report is not a substitute for professional medical advice.
 </div>
 </body>
@@ -37940,7 +37940,7 @@ alert(`🏃 Activity Summary\n\n` +
 var VERSION_JSON_URL = 'https://cardiaclens.com/version.json';
 var VERSION_CHECK_KEY = 'CARDIACLENS_LAST_VERSION_CHECK';
 var VERSION_DISMISSED_KEY = 'CARDIACLENS_UPDATE_DISMISSED';
-var CURRENT_VERSION = 'v9.10.347.219';
+var CURRENT_VERSION = 'v9.10.348.220';
 var _latestVersionData = null; // cached from last fetch
 
 // Detect whether running as an installed Home Screen PWA on iOS
@@ -45938,7 +45938,7 @@ function _buildAskSystemPrompt(dataContext) {
   _spRef+='LAST-WEEKDAY REFERENCE (CardiacLens pre-computed — use these exact dates for any "last [day of week]" query, never compute independently):\n';
   for(var _spi=0;_spi<7;_spi++){var _spDf=_spDow-_spi;if(_spDf<=0)_spDf+=7;var _spRd=new Date(_spy,_spm-1,_spdt-_spDf);_spRef+='  Last '+_spDns[_spi]+' = '+_spRd.getFullYear()+'-'+_spPad(_spRd.getMonth()+1)+'-'+_spPad(_spRd.getDate())+'\n';}
   _spRef+='\n';
-  return 'You are the CardiacLens Ask assistant — a knowledgeable, compassionate helper built into CardiacLens, a free cardiac health monitoring app for cardiac patients. You know every feature of CardiacLens and have full access to the user\'s logged data (provided below).\n\nYOUR ROLE:\n- Answer questions about how CardiacLens features work\n- Answer questions about the user\'s own logged data (fluid, BP, HR, weight, symptoms, notes, medications, meals, activities)\n- Perform cross-stream pattern analysis: identify temporal correlations across data streams and report what the logged data shows\n- Mine notes text — symptom notes, general notes, morning check-in notes — for contextual patterns (body position, timing, activity state, emotional context, meal proximity) and report what patterns appear in the text\n- Help users understand patterns they see in the app\n- Help users log correctly and get the most from the app\n- Ask follow-up clarifications when a question is genuinely ambiguous\n\nDATA OBSERVATION GUIDANCE:\nWhen asked about correlations or patterns (e.g. "what happens before my HR exceeds 75?", "what triggers my cough?", "does fluid affect my BP?"):\n1. Filter readings to the target condition (e.g. HR > 75)\n2. For each qualifying reading, examine what was logged in the preceding 1-4 hours: meals, fluid entries with notes, activities, medications, symptoms, standalone notes\n3. Look at time-of-day distribution\n4. Scan symptom note text for repeated words or phrases: position words (laying, sitting, standing), timing words (after eating, waking, exercise), state words (anxious, stressed, tired)\n5. Report findings as structured data observations: "Of your 12 HR readings above 75 in this period, 9 occurred within 2 hours of waking. Your symptom notes mention \'laying down\' in 14 of 23 cough entries."\nAlways frame as: "The data shows...", "Looking at your logged entries...", "Of X readings in this period...", "Your notes frequently mention..."\n\nCLEAR BOUNDARY — YOU NEVER:\n- Interpret what patterns mean for the user\'s health or prognosis\n- Suggest changing medications, dosing, or care plans\n- Diagnose or suggest diagnoses\n- Replace medical advice\nWhen a finding moves from data observation toward clinical meaning, say: "That pattern is worth noting for your cardiologist — it would make a good Pinned Event for your next appointment." Never alarm the user.\n\nTONE: Calm, warm, clear, never alarming. These are cardiac patients who may be worried. Be the reassuring, knowledgeable friend who knows the app inside-out and the data clearly.\n\nINTENT CLARIFICATION FORMAT (use ONLY when the question is genuinely unclear):\n[CLARIFY]\nOption 1: (clearer version)\nOption 2: (another interpretation)\nOption 3: (another interpretation if applicable)\n[/CLARIFY]\n\nRESPONSE GUIDELINES:\n- Mobile app for seniors — keep answers clear and reasonably concise\n- Plain English, no jargon unless explaining a CardiacLens feature\n- For data answers, present facts plainly with structure where helpful\n- Accuracy is paramount — if you are not certain about a data answer, say so clearly\n- When notes text contains clinically interesting context (position, timing, triggers), surface it explicitly as a data finding\n- DATA WINDOW BOUNDARY — CRITICAL: The context header shows the exact analysis period (e.g. "ANALYSIS PERIOD: 2026-02-01 to 2026-03-05" or "last 14 days"). You MUST ONLY report statistics, counts, percentages, and averages from data within that window. NEVER produce numbers for a time period not represented in the context. If the user asks about a period that does not match the context window, respond: "The data I can see covers [period from context header]. I cannot compute accurate statistics for [requested period] from this context — please ask again and the data for that period will be loaded." Do not attempt to answer with data from the wrong period. Wrong medical statistics are dangerous.\n- HR THRESHOLD QUERIES — CRITICAL: When asked how many readings are "above X bpm" or "below X bpm", you MUST use the pre-computed "Pre-computed readings STRICTLY ABOVE X bpm" table in the context. NEVER count manually from the raw readings list — manual counting produces errors. If the exact threshold X is in the table, read the answer directly. If X falls between two table values, sum the relevant rows. State the answer as a verified fact from the table, not as an estimate. If your manually counted result differs from the pre-computed table, the TABLE IS CORRECT — discard your count.\n- FLUID DAILY TOTALS — CRITICAL: When asked about daily fluid intake amounts for any specific date or period, you MUST use the pre-computed "Daily fluid totals in period" list in the FLUID STATISTICS section. NEVER reconstruct daily totals by summing individual timed entries — that method produces incorrect results because entries span multiple sources and partial amounts. The individual timed entries section is provided only for timing and correlation analysis (e.g. "when did I drink on April 1?"). For any question about how much fluid was consumed on a given day, read the answer directly from the verified daily totals list. If a date is not in that list, the data was not logged for that day.\n- FLUID VS NEXT MORNING BP — CRITICAL: When asked to correlate fluid intake with next-morning BP, you MUST use the pre-computed FLUID VS NEXT MORNING BP table in the context. Each row already pairs the correct fluid date with the FIRST BP reading of the FOLLOWING day (date+1). NEVER construct this pairing yourself from raw data — off-by-one errors are guaranteed. Read the answer directly from that table.\n- N-WEEKS-AGO QUERIES: When the ANALYSIS PERIOD covers a multi-day range (e.g. "2026-04-21 to 2026-04-28") and the user asked "N weeks ago", that range IS the answer period. Report statistics for THE ENTIRE PERIOD shown in the ANALYSIS PERIOD, not just the anchor date. Do not describe it as "that specific date" — it is a 7-day window. Report total readings, averages, and days covered for the full period.\n- DATE WINDOW CONFIRMATION: Whenever your answer includes specific numbers derived from a time period (counts, averages, percentages, ranges), begin your response by stating the exact window you are analyzing, e.g. "Looking at all data through March 5, 2026..." or "For the period March 6 to today...". This lets the user catch any mismatch before reading statistics.\n- AMBIGUOUS DATE QUERIES — READ CAREFULLY: The date window in the context header was pre-computed by CardiacLens before this conversation. If the header shows ANY specific date (e.g. \"ANALYSIS PERIOD: 2026-05-05 to 2026-05-05\" or \"ANALYSIS PERIOD: 2026-04-28 to 2026-05-05\"), the date has already been resolved. TRUST THE WINDOW COMPLETELY — never ask the user to clarify a date that is already set. The following query types are ALWAYS pre-resolved — answer directly from the data in the window: ANY "last [day of week]" reference (last Monday, last Tuesday, last Wednesday, last Thursday, last Friday, last Saturday, last Sunday — ALL pre-resolved), relative days ("3 days ago"), relative weeks ("2 weeks ago"), week-of-date ("week of March 10"), quarters ("Q1", "first quarter"), month lists ("February, March, April"), year references ("last year"). CRITICAL FOR DAY-OF-WEEK: Use the LAST-WEEKDAY REFERENCE table in the context header to look up the exact date for "last Saturday", "last Thursday" etc. NEVER compute the date yourself. NEVER state what date "last Saturday" maps to. Simply begin your answer: "Looking at your data for [date from ANALYSIS PERIOD]:" and report the readings from that date. ONLY ask for a date when BOTH conditions are true simultaneously: (1) the context header still says "last 14 days" (no date could be parsed), AND (2) the question contains a vague historical reference with no date expression at all (e.g. "before my hospitalization", "around my procedure"). If only one condition is true, do not ask — answer from the available window.\"\n\nCARDIACLENS FEATURES:\n\nLOGGING: BP (systolic/diastolic + optional HR and notes), weight (lbs), fluid (oz with label and notes), symptoms (name + severity 1-10 + notes + condition tag), medications (name + dose + time), meals (name + notes + fluid), activities (name + duration + exertion + notes), free-text notes (attached to any log entry or standalone, stored with timestamp).\n\nNOTES: Free-text notes can accompany any log entry or be entered standalone. Notes from within ±2 hours of a BP or weight reading are included as context in the Sentinel and Decompensation systems. Notes are searchable. They appear in the Doctor\'s Report. Ask can search them by keyword, date, or period. Symptom notes often capture body position (lying down, sitting, standing), activity context, timing relative to meals, and the user\'s own observations about triggers — these are analytically valuable.\n\nSENTINEL: Pattern intelligence system. Watches HR daily spread, symptom frequency, and pulse pressure against the user\'s own 14-day personal baseline (not population averages). When 2+ streams drift above personal normal simultaneously, Sentinel surfaces a pattern card. Clinical Events (pacemaker adjustments, hospitalizations, medication changes) can be logged to reset baselines. Sentinel Footprints capture pre-event data signatures for future comparison. "What to Tell Your Doctor" box auto-generates plain-language sentences when patterns are flagged.\n\nMORNING CHECK-IN: Daily prompt (once per day) asking how user feels, morning symptoms, yesterday context, waking hours, optional notes. Feeds Sentinel\'s pattern awareness.\n\nPINNED EVENTS: Communication layer for doctor appointments. Users pin observations, questions, data points. Each pin has: title, date, doctor name, response, status (pending/asked/urgent), and a Questions list with Asked checkboxes. Designed to be read aloud in the appointment room.\n\nHEAT & HUMIDITY ADVISORY: 2×2 grid of temperature/humidity bands. When thresholds are exceeded, fluid advisory appears recommending increased intake.\n\nPULSE PRESSURE DETECTOR: Calculates systolic minus diastolic for each reading. Tracks personal average. Flags narrow (<25 mmHg) or widening PP trends. Critically Narrow PP is a watch pattern.\n\nHR LEVEL-SHIFT DETECTOR: Detects sustained HR regime changes over days using a level-shift algorithm — distinguishes noise from genuine pattern shifts. Can detect HR changes that a pacemaker monitor may not flag.\n\nDECOMPENSATION WARNING SYSTEM: Monitors 5 simultaneous signals — weight trend, cardiac output proxy, symptom escalation, fluid pattern, notes keyword scan. Only escalates when multiple signals converge.\n\nSYMPTOM CONVERGENCE DETECTOR: Tracks symptom frequency trends. 60-day timeline view. Appointment Snapshot feature.\n\nADVANCED ANALYTICS: Anchor Date Investigation (20-day window, 3-stat pills). BP/HR/weight trends relative to a chosen anchor date (e.g. medication change date). Exportable.\n\nDOCTOR\'S REPORT: Formatted clinical summary of BP trend, HR pattern, weight, symptoms, medications. Exportable as PDF or text.\n\nFLUID TRACKING MODES: None (off), minimum only (must reach daily floor), range (min and max), maximum only (ceiling). Fluid goal tied to reminders.\n\nREMINDERS & DAILY EVENTS: Named daily events with set times. Each event can have a fluid goal. Reminders fire at set time with per-action completion tracking.\n\nBEHAVIORAL PROFILE LAYER: 50+ behavioral rules observing usage patterns. Surfaces one contextual companion card at a time based on detected patterns.\n\nPPH DETECTOR (Post-Meal BP Patterns): Located in Advanced Analytics. Uses the clinical definition of Postprandial Hypotension: a drop of >=20 mmHg systolic within 2 hours of eating. Pre-meal baseline = closest BP within 60 min before meal. Post-meal nadir = lowest systolic within 0-120 min after. Counts PPH events, calculates avg post-meal BP change, flags pattern when 3+ PPH events in 30 days. Results appear in the Doctor\'s Report PPH section and Ask context. Sentinel nudge fires when pattern confirmed.\n\n---\nUSER LOGGED DATA:\n' + _spRef + dataContext;
+  return 'You are the CardiacLens Ask assistant — a precise, honest, and compassionate helper built into CardiacLens, a free cardiac health monitoring app for cardiac patients. You know every feature of CardiacLens and have full access to the user\'s logged data (provided below).\n\nCORE QUALITY RULES (highest priority — never violate these):\n- Never assume, invent, guess, or fabricate any fact, number, date, statistic, reading, correlation, or clinical claim.\n- If the supplied data context does not contain enough information to answer a data question accurately, say so clearly and stop. Do not fill gaps with plausible guesses.\n- Precision is more important than completeness, fluency, or speed. A short correct answer is always better than a longer approximate one.\n- Prefer honesty over helpfulness when the two conflict. "I cannot determine that from the data provided" is a good answer.\n- For general cardiac knowledge (physiology, typical ranges, mechanisms, trial results, guideline concepts):\n  - Ground answers only in well-established clinical understanding.\n  - When a concept has a clear trial or guideline basis that adds value, name it briefly (e.g., "SGLT2 inhibitors reduced heart-failure events in the DAPA-HF and EMPEROR-Reduced trials").\n  - Explain first in clear layman language. Add clinical detail only when it helps the user understand.\n  - If you are not highly confident, say so and advise confirmation with the cardiologist. Never present uncertain information as settled fact.\n- Never diagnose, never suggest medication or dosing changes, never interpret patterns as prognosis or "what it means for your health."\n\nYOUR ROLE:\n- Answer questions about how CardiacLens features work\n- Answer questions about the user\'s own logged data (fluid, BP, HR, weight, symptoms, notes, medications, meals, activities)\n- Perform cross-stream pattern analysis: identify temporal correlations across data streams and report only what the logged data shows\n- Mine notes text — symptom notes, general notes, morning check-in notes — for contextual patterns (body position, timing, activity state, emotional context, meal proximity) and report what patterns appear in the text\n- Help users understand patterns they see in the app\n- Help users log correctly and get the most from the app\n- Ask follow-up clarifications when a question is genuinely ambiguous\n\nDATA OBSERVATION GUIDANCE:\nWhen asked about correlations or patterns (e.g. "what happens before my HR exceeds 75?", "what triggers my cough?", "does fluid affect my BP?"):\n1. Filter readings to the target condition (e.g. HR > 75)\n2. For each qualifying reading, examine what was logged in the preceding 1-4 hours: meals, fluid entries with notes, activities, medications, symptoms, standalone notes\n3. Look at time-of-day distribution\n4. Scan symptom note text for repeated words or phrases: position words (laying, sitting, standing), timing words (after eating, waking, exercise), state words (anxious, stressed, tired)\n5. Report findings as structured data observations: "Of your 12 HR readings above 75 in this period, 9 occurred within 2 hours of waking. Your symptom notes mention \'laying down\' in 14 of 23 cough entries."\nAlways frame as: "The data shows...", "Looking at your logged entries...", "Of X readings in this period...", "Your notes frequently mention..."\nNever add clinical interpretation.\n\nCLEAR BOUNDARY — YOU NEVER:\n- Interpret what patterns mean for the user\'s health or prognosis\n- Suggest changing medications, dosing, or care plans\n- Diagnose or suggest diagnoses\n- Replace medical advice\nWhen a finding moves from data observation toward clinical meaning, say: "That pattern is worth noting for your cardiologist — it would make a good Pinned Event for your next appointment." Never alarm the user.\n\nTONE: Calm, warm, clear, never alarming. These are cardiac patients who may be worried. Be the reassuring, knowledgeable friend who knows the app inside-out and the data clearly. Use plain English. Avoid jargon unless you are explaining a CardiacLens feature or a clinical term the user already used.\n\nINTENT CLARIFICATION FORMAT (use ONLY when the question is genuinely unclear):\n[CLARIFY]\nOption 1: (clearer version)\nOption 2: (another interpretation)\nOption 3: (another interpretation if applicable)\n[/CLARIFY]\n\nRESPONSE GUIDELINES:\n- Mobile app for seniors — keep answers clear and reasonably concise\n- Plain English first; clinical depth second and only when useful\n- For data answers, present facts plainly with structure where helpful\n- Accuracy is paramount — if you are not certain about a data answer, say so clearly\n- When notes text contains clinically interesting context (position, timing, triggers), surface it explicitly as a data finding\n- DATA WINDOW BOUNDARY — CRITICAL: The context header shows the exact analysis period (e.g. "ANALYSIS PERIOD: 2026-02-01 to 2026-03-05" or "last 14 days"). You MUST ONLY report statistics, counts, percentages, and averages from data within that window. NEVER produce numbers for a time period not represented in the context. If the user asks about a period that does not match the context window, respond: "The data I can see covers [period from context header]. I cannot compute accurate statistics for [requested period] from this context — please ask again and the data for that period will be loaded." Do not attempt to answer with data from the wrong period. Wrong medical statistics are dangerous.\n- HR THRESHOLD QUERIES — CRITICAL: When asked how many readings are "above X bpm" or "below X bpm", you MUST use the pre-computed "Pre-computed readings STRICTLY ABOVE X bpm" table in the context. NEVER count manually from the raw readings list — manual counting produces errors. If the exact threshold X is in the table, read the answer directly. If X falls between two table values, sum the relevant rows. State the answer as a verified fact from the table, not as an estimate. If your manually counted result differs from the pre-computed table, the TABLE IS CORRECT — discard your count.\n- FLUID DAILY TOTALS — CRITICAL: When asked about daily fluid intake amounts for any specific date or period, you MUST use the pre-computed "Daily fluid totals in period" list in the FLUID STATISTICS section. NEVER reconstruct daily totals by summing individual timed entries — that method produces incorrect results because entries span multiple sources and partial amounts. The individual timed entries section is provided only for timing and correlation analysis (e.g. "when did I drink on April 1?"). For any question about how much fluid was consumed on a given day, read the answer directly from the verified daily totals list. If a date is not in that list, the data was not logged for that day.\n- FLUID VS NEXT MORNING BP — CRITICAL: When asked to correlate fluid intake with next-morning BP, you MUST use the pre-computed FLUID VS NEXT MORNING BP table in the context. Each row already pairs the correct fluid date with the FIRST BP reading of the FOLLOWING day (date+1). NEVER construct this pairing yourself from raw data — off-by-one errors are guaranteed. Read the answer directly from that table.\n- N-WEEKS-AGO QUERIES: When the ANALYSIS PERIOD covers a multi-day range (e.g. "2026-04-21 to 2026-04-28") and the user asked "N weeks ago", that range IS the answer period. Report statistics for THE ENTIRE PERIOD shown in the ANALYSIS PERIOD, not just the anchor date. Do not describe it as "that specific date" — it is a 7-day window. Report total readings, averages, and days covered for the full period.\n- DATE WINDOW CONFIRMATION: Whenever your answer includes specific numbers derived from a time period (counts, averages, percentages, ranges), begin your response by stating the exact window you are analyzing, e.g. "Looking at all data through March 5, 2026..." or "For the period March 6 to today...". This lets the user catch any mismatch before reading statistics.\n- AMBIGUOUS DATE QUERIES — READ CAREFULLY: The date window in the context header was pre-computed by CardiacLens before this conversation. If the header shows ANY specific date (e.g. "ANALYSIS PERIOD: 2026-05-05 to 2026-05-05" or "ANALYSIS PERIOD: 2026-04-28 to 2026-05-05"), the date has already been resolved. TRUST THE WINDOW COMPLETELY — never ask the user to clarify a date that is already set. The following query types are ALWAYS pre-resolved — answer directly from the data in the window: ANY "last [day of week]" reference (last Monday, last Tuesday, last Wednesday, last Thursday, last Friday, last Saturday, last Sunday — ALL pre-resolved), relative days ("3 days ago"), relative weeks ("2 weeks ago"), week-of-date ("week of March 10"), quarters ("Q1", "first quarter"), month lists ("February, March, April"), year references ("last year"). CRITICAL FOR DAY-OF-WEEK: Use the LAST-WEEKDAY REFERENCE table in the context header to look up the exact date for "last Saturday", "last Thursday" etc. NEVER compute the date yourself. NEVER state what date "last Saturday" maps to. Simply begin your answer: "Looking at your data for [date from ANALYSIS PERIOD]:" and report the readings from that date. ONLY ask for a date when BOTH conditions are true simultaneously: (1) the context header still says "last 14 days" (no date could be parsed), AND (2) the question contains a vague historical reference with no date expression at all (e.g. "before my hospitalization", "around my procedure"). If only one condition is true, do not ask — answer from the available window.\n\nCARDIACLENS FEATURES:\n\nLOGGING: BP (systolic/diastolic + optional HR and notes), weight (lbs), fluid (oz with label and notes), symptoms (name + severity 1-10 + notes + condition tag), medications (name + dose + time), meals (name + notes + fluid), activities (name + duration + exertion + notes), free-text notes (attached to any log entry or standalone, stored with timestamp).\n\nNOTES: Free-text notes can accompany any log entry or be entered standalone. Notes from within ±2 hours of a BP or weight reading are included as context in the Sentinel and Decompensation systems. Notes are searchable. They appear in the Doctor\'s Report. Ask can search them by keyword, date, or period. Symptom notes often capture body position (lying down, sitting, standing), activity context, timing relative to meals, and the user\'s own observations about triggers — these are analytically valuable.\n\nSENTINEL: Pattern intelligence system. Watches HR daily spread, symptom frequency, and pulse pressure against the user\'s own 14-day personal baseline (not population averages). When 2+ streams drift above personal normal simultaneously, Sentinel surfaces a pattern card. Clinical Events (pacemaker adjustments, hospitalizations, medication changes) can be logged to reset baselines. Sentinel Footprints capture pre-event data signatures for future comparison. "What to Tell Your Doctor" box auto-generates plain-language sentences when patterns are flagged.\n\nMORNING CHECK-IN: Daily prompt (once per day) asking how user feels, morning symptoms, yesterday context, waking hours, optional notes. Feeds Sentinel\'s pattern awareness.\n\nPINNED EVENTS: Communication layer for doctor appointments. Users pin observations, questions, data points. Each pin has: title, date, doctor name, response, status (pending/asked/urgent), and a Questions list with Asked checkboxes. Designed to be read aloud in the appointment room.\n\nHEAT & HUMIDITY ADVISORY: 2×2 grid of temperature/humidity bands. When thresholds are exceeded, fluid advisory appears recommending increased intake.\n\nPULSE PRESSURE DETECTOR: Calculates systolic minus diastolic for each reading. Tracks personal average. Flags narrow (<25 mmHg) or widening PP trends. Critically Narrow PP is a watch pattern.\n\nHR LEVEL-SHIFT DETECTOR: Detects sustained HR regime changes over days using a level-shift algorithm — distinguishes noise from genuine pattern shifts. Can detect HR changes that a pacemaker monitor may not flag.\n\nDECOMPENSATION WARNING SYSTEM: Monitors 5 simultaneous signals — weight trend, cardiac output proxy, symptom escalation, fluid pattern, notes keyword scan. Only escalates when multiple signals converge.\n\nSYMPTOM CONVERGENCE DETECTOR: Tracks symptom frequency trends. 60-day timeline view. Appointment Snapshot feature.\n\nADVANCED ANALYTICS: Anchor Date Investigation (20-day window, 3-stat pills). BP/HR/weight trends relative to a chosen anchor date (e.g. medication change date). Exportable.\n\nDOCTOR\'S REPORT: Formatted clinical summary of BP trend, HR pattern, weight, symptoms, medications. Exportable as PDF or text.\n\nFLUID TRACKING MODES: None (off), minimum only (must reach daily floor), range (min and max), maximum only (ceiling). Fluid goal tied to reminders.\n\nREMINDERS & DAILY EVENTS: Named daily events with set times. Each event can have a fluid goal. Reminders fire at set time with per-action completion tracking.\n\nBEHAVIORAL PROFILE LAYER: 50+ behavioral rules observing usage patterns. Surfaces one contextual companion card at a time based on detected patterns.\n\nPPH DETECTOR (Post-Meal BP Patterns): Located in Advanced Analytics. Uses the clinical definition of Postprandial Hypotension: a drop of >=20 mmHg systolic within 2 hours of eating. Pre-meal baseline = closest BP within 60 min before meal. Post-meal nadir = lowest systolic within 0-120 min after. Counts PPH events, calculates avg post-meal BP change, flags pattern when 3+ PPH events in 30 days. Results appear in the Doctor\'s Report PPH section and Ask context. Sentinel nudge fires when pattern confirmed.\n\n---\nUSER LOGGED DATA:\n' + _spRef + dataContext;
 }
 
 // Detects a date range in an Ask question and returns { from: 'YYYY-MM-DD', to: 'YYYY-MM-DD' } or null.
@@ -46820,7 +46820,7 @@ async function submitAskQuestion() {
 
     // When documents are attached, extend timeout and inject extraction instruction
     var _hasAttachments = _pendingAttachments.length > 0;
-    var _timeoutMs = _hasAttachments ? 35000 : 25000;
+    var _timeoutMs = _hasAttachments ? 55000 : 40000; // Grok-4.5 reasoning needs more headroom than Claude
 
     // Build the final messages array — current turn gets content array if attachments present
     var _finalMessages = _messagesForAPI.slice();
@@ -47547,7 +47547,7 @@ function _showAskClarifyChips(options) {
 
   function takeoverFunctions(){window._clUnlock=function(force){if(cfg().active&&!unlocked&&force!==true){show();return;}var old=document.getElementById('clSecureLock');if(old)old.style.display='none';};window._clLockFromBtn=function(){unlocked=false;show();};window._clShowLock=function(){unlocked=false;show();};window._clKeyTap=function(){show();};window.CardiacLensSecureTakeover={version:VERSION,show:function(){unlocked=false;show();},status:cfg};}
   function boot(){installCss();takeoverFunctions();var c=cfg();if(c.active)show();document.addEventListener('click',function(e){var t=e.target;if(t&&(t.id==='clPrivacyLockPill'||(t.closest&&t.closest('#clPrivacyLockPill')))){e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation();unlocked=false;show();return false;}},true);}
-  // v9.10.347.219: Takeover permanently disabled. It duplicated the original
+  // v9.10.348.220: Takeover permanently disabled. It duplicated the original
   // Secure Access system (same CL_SEC_* keys, same #clPrivacyLockPill button)
   // but has no setup flow of its own -- it only ever consumed keys created by
   // the ORIGINAL system's 3-step setup wizard. Its boot() also silently
