@@ -10,7 +10,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.351.223' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.351.226' }, params || {}));
       }
     } catch(e) {}
   };
@@ -551,7 +551,7 @@
     } else {
       var left = Math.max(0, 3 - (_clKbState.fails || 0));
       _clUpdateKbStatus(left > 0 ? ('Wrong 4-tap sequence #'+_clKbState.fails+'. First cooldown after '+left+' more wrong sequence'+(left===1?'':'s')+'.') : ('Wrong 4-tap sequence #'+_clKbState.fails+'.'));
-      // v9.10.351.223: a completed wrong 4-tap sequence used to leave the OLD
+      // v9.10.351.226: a completed wrong 4-tap sequence used to leave the OLD
       // grid tappable for the full 450ms before _clRenderKeyboard replaced it.
       // A tap already in flight when the DOM swap happened would land on
       // whatever key ended up at that same screen position in the NEW,
@@ -933,7 +933,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.351.223';
+    var GD_VERSION   = 'v9.10.351.226';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1479,7 +1479,7 @@
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.351.223';
+  var CURRENT='v9.10.351.226';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -1729,7 +1729,7 @@ function fireOSNotification(title, body, tag){
         icon: 'icon-192.png',
         badge: 'icon-192.png',
         requireInteraction: true,
-        // v9.10.351.223: eventTag lets sw.js's notificationclick hand off
+        // v9.10.351.226: eventTag lets sw.js's notificationclick hand off
         // which event was tapped, so the app can open that event's real
         // action card instead of just focusing the app on whatever screen
         // it was last showing.
@@ -1747,7 +1747,7 @@ function fireOSNotification(title, body, tag){
     n.onclick=function(){
       window.focus();
       n.close();
-      // v9.10.351.223: this fallback only ever fires while the page is
+      // v9.10.351.226: this fallback only ever fires while the page is
       // still alive (Web Notifications without a SW require the tab to
       // exist), so it's safe to resolve and route in-page directly.
       try{ if(typeof _clOpenEventFromTag==='function') _clOpenEventFromTag(tag); }catch(e){}
@@ -2263,7 +2263,7 @@ if(_pendingReminderEvt){
 _maybeAdvanceMissedQueue();
 }
 
-// v9.10.351.223: called from every real exit point of hideModal(). If the
+// v9.10.351.226: called from every real exit point of hideModal(). If the
 // card that just closed was one of the sequential missed-event cards, clear
 // that marker and, if more are queued, open the next one after a short
 // pause so it never overlaps the closing animation of the one before it.
@@ -20219,7 +20219,7 @@ html+=lbBadge;
 html+='<div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">';
 html+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
 html+='<div>';
-html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.351.223</span></div>';
+html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.351.226</span></div>';
 html+='<div id="settingsVersionStatus" style="font-size:13px;color:#6b7280;margin-top:3px">Tap "Check for Updates" to see if a newer version is available</div>';
 html+='</div>';
 html+='<button onclick="checkForUpdates(true)" id="checkUpdateBtn" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">🔍 Check for Updates</button>';
@@ -20260,7 +20260,7 @@ if (window._isBetaBuild && window._isBetaBuild()) {
 }
 
 // ── SECURE ACCESS SETTINGS SECTION ───────────────────────────────────────────
-// v9.10.351.223: always restore from profile mirror before status check so
+// v9.10.351.226: always restore from profile mirror before status check so
 // Settings does not report "Not enabled" when keys were wiped but the mirror
 // (CL_SEC_PROFILE_V1 / settings.securityProfile) still has the combination.
 try{ if(typeof _clSecIsConfigured==='function') _clSecIsConfigured(); else if(typeof _clRestoreSecurityProfile==='function') _clRestoreSecurityProfile(); }catch(_clSecBootE){}
@@ -20507,7 +20507,7 @@ showModal(html);
     if(verify === '1' && hasKeys){
       if(window._clSyncLockBtn) window._clSyncLockBtn();
       if(ok){ ok.textContent='✓ Saved! Secure Access is active. Refreshing Settings…'; ok.style.display='block'; }
-      // v9.10.351.223: reopen Settings so the section title shows Active immediately
+      // v9.10.351.226: reopen Settings so the section title shows Active immediately
       setTimeout(function(){ try{ if(typeof openSettings==='function') openSettings(); }catch(e){} }, 450);
     } else if(err){
       err.textContent='⚠ Save failed — browser storage may be blocked. Try a different browser.';
@@ -20538,7 +20538,7 @@ showModal(html);
 })();
 
   window._clSaveInlineSecureAccess = function(silent){
-    // v9.10.351.223: unified, normalized save.
+    // v9.10.351.226: unified, normalized save.
     // - Dedicated Save Combination (silent=false) requires all four fields.
     // - Main Save Settings (silent=true) never blocks other settings when
     //   Secure Access is left blank; only writes when the form is complete
@@ -21550,7 +21550,7 @@ function buildMissedEventList() {
   return missed;
 }
 
-// v9.10.351.223: sequential missed-event card queue. Replaces the small
+// v9.10.351.226: sequential missed-event card queue. Replaces the small
 // bottom toast + best-effort chime from v9.10.347.204, which had two real
 // problems: it was too easy to miss, and tapping it did nothing (it fell
 // through to whatever screen happened to be underneath). Newly-missed
@@ -21578,7 +21578,7 @@ function runCatchUpScan() {
     }
   });
   updateUpcomingEventsWidget();
-  // v9.10.351.223: newly-missed events queue into the real action card
+  // v9.10.351.226: newly-missed events queue into the real action card
   // instead of a toast. No sound is attempted here: iOS blocks audio
   // triggered from a background/visibility event with no direct user
   // gesture attached, so a forced chime here would silently fail every
@@ -21604,7 +21604,7 @@ function _advanceMissedEventQueue(){
   _openEventActionModal(evt);
 }
 
-// ── Notification tap routing (v9.10.351.223) ─────────────────────────────
+// ── Notification tap routing (v9.10.351.226) ─────────────────────────────
 // A tapped OS-level notification only carries a tag string (see
 // fireOSNotification/scheduleOSNotificationAt). By the time it's tapped,
 // the event list it was scheduled from may have changed, so this always
@@ -21656,7 +21656,7 @@ function _clResolveEventByTag(tag){
 // since the notification was scheduled).
 function _clOpenEventFromTag(tag){
   try{
-    // v9.10.351.223: real background fluid push notifications (pacing,
+    // v9.10.351.226: real background fluid push notifications (pacing,
     // and any fluid reminder delivered via the push worker rather than
     // a foreground OS notification) carry this tag and have no matching
     // dailyEvents/dailyPlan entry to resolve by design -- pacing works
@@ -32409,7 +32409,7 @@ html+=`</div>`;
 
 html+=`
 <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:2px solid #e5e7eb;color:#6b7280;font-size:14px">
-<p style="margin:0">CardiacLens v9.10.351.223 - Free & Source-Available</p>
+<p style="margin:0">CardiacLens v9.10.351.226 - Free & Source-Available</p>
 <p style="margin:4px 0 0 0">Report Generated: ${reportDate}</p>
 </div>`;
 
@@ -32740,7 +32740,7 @@ Note: This report is based on patient self-tracked data. Clinical correlation
 and examination are essential for diagnosis and treatment decisions.
 
 ---
-CardiacLens v9.10.351.223 Medical Grade - Free
+CardiacLens v9.10.351.226 Medical Grade - Free
 Report Generated: ${reportDate}`;
 
 return text;
@@ -36877,7 +36877,7 @@ report.push(notes);
 report.push('');
 }
 report.push('═══════════════════════════════════════════════════════════');
-report.push('This report was generated by CardiacLens v9.10.351.223 Medical Grade - Free');
+report.push('This report was generated by CardiacLens v9.10.351.226 Medical Grade - Free');
 report.push('Advanced Analytics Dashboard - Phase 3 Implementation');
 report.push('═══════════════════════════════════════════════════════════');
 const blob=new Blob([report.join('\n')],{type:'text/plain'});
@@ -36967,7 +36967,7 @@ ${periodHTML}
 <h2>Key Insights</h2>
 ${insightsHTML}
 <div style="margin-top:40px;padding:20px;background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:8px">
-<strong>CardiacLens v9.10.351.223 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
+<strong>CardiacLens v9.10.351.226 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
 This report is not a substitute for professional medical advice.
 </div>
 </body>
@@ -37940,7 +37940,7 @@ alert(`🏃 Activity Summary\n\n` +
 var VERSION_JSON_URL = 'https://cardiaclens.com/version.json';
 var VERSION_CHECK_KEY = 'CARDIACLENS_LAST_VERSION_CHECK';
 var VERSION_DISMISSED_KEY = 'CARDIACLENS_UPDATE_DISMISSED';
-var CURRENT_VERSION = 'v9.10.351.223';
+var CURRENT_VERSION = 'v9.10.351.226';
 var _latestVersionData = null; // cached from last fetch
 
 // Detect whether running as an installed Home Screen PWA on iOS
@@ -45351,7 +45351,20 @@ function buildAskContext(dateFrom, dateTo) {
   try {
     var hAllW2 = (typeof getAllHistoricalData === 'function') ? getAllHistoricalData() : {};
     var allW = hAllW2.weight || [];
+    // Include today's in-memory weight if in window
+    var _wTodayKey = (typeof getTodayKey === 'function') ? getTodayKey() : '';
+    if (_wTodayKey && inWindow(_wTodayKey) && typeof W !== 'undefined' && W && W.length) {
+      W.forEach(function(w){
+        var exists = allW.some(function(x){ return x._date===_wTodayKey && String(x.w)===String(w.w) && (x.t||'')===(w.t||''); });
+        if (!exists) allW.push(Object.assign({}, w, { _date: _wTodayKey }));
+      });
+    }
     var windowW = allW.filter(function(w){ return inWindow(w._date); });
+    windowW.sort(function(a,b){
+      var c = (a._date||'').localeCompare(b._date||'');
+      if (c !== 0) return c;
+      return (a.t||'').localeCompare(b.t||'');
+    });
     if (windowW.length > 0) {
       ctx.push('Weight readings in period (' + windowW.length + '):');
       windowW.forEach(function(w){
@@ -45359,6 +45372,50 @@ function buildAskContext(dateFrom, dateTo) {
         if(w.notes) wLine += ' note:"' + w.notes + '"';
         ctx.push(wLine);
       });
+      // Day-to-day change table (last reading per day only — never invent values)
+      var _byDayW = {};
+      windowW.forEach(function(w){
+        if (!w._date) return;
+        var lbs = parseFloat(w.w);
+        if (isNaN(lbs)) return;
+        // keep latest reading that day (by time string order)
+        if (!_byDayW[w._date] || (w.t||'') >= (_byDayW[w._date].t||'')) {
+          _byDayW[w._date] = { date: w._date, w: lbs, t: w.t||'' };
+        }
+      });
+      var _wDays = Object.keys(_byDayW).sort();
+      if (_wDays.length >= 2) {
+        ctx.push('Day-to-day weight change (latest reading each day; only days with logged weight):');
+        for (var _wi = 1; _wi < _wDays.length; _wi++) {
+          var _prev = _byDayW[_wDays[_wi-1]];
+          var _cur  = _byDayW[_wDays[_wi]];
+          var _dlt  = Math.round((_cur.w - _prev.w) * 10) / 10;
+          ctx.push('  ' + _prev.date + ' ' + _prev.w + ' lbs → ' + _cur.date + ' ' + _cur.w + ' lbs (Δ ' + (_dlt>0?'+':'') + _dlt + ' lbs)');
+        }
+        // 24h / 7d style summary from actual last two and last-vs-7-days-ago if present
+        var _last = _byDayW[_wDays[_wDays.length-1]];
+        var _prevDay = _byDayW[_wDays[_wDays.length-2]];
+        var _d24 = Math.round((_last.w - _prevDay.w) * 10) / 10;
+        ctx.push('Most recent day-to-day change: ' + (_d24>0?'+':'') + _d24 + ' lbs (' + _prevDay.date + ' → ' + _last.date + ')');
+        // Find reading ~7 days before last if any day exists within window
+        var _target7 = null;
+        try {
+          var _lp = _last.date.split('-');
+          var _ld = new Date(parseInt(_lp[0]), parseInt(_lp[1])-1, parseInt(_lp[2]));
+          _ld.setDate(_ld.getDate() - 7);
+          var _tk = _ld.getFullYear() + '-' + ('0'+(_ld.getMonth()+1)).slice(-2) + '-' + ('0'+_ld.getDate()).slice(-2);
+          // nearest day on or before target that has weight
+          for (var _wj = _wDays.length-2; _wj >= 0; _wj--) {
+            if (_wDays[_wj] <= _tk) { _target7 = _byDayW[_wDays[_wj]]; break; }
+          }
+        } catch(_we) {}
+        if (_target7) {
+          var _d7 = Math.round((_last.w - _target7.w) * 10) / 10;
+          ctx.push('Approx 7-day change (last vs nearest reading on/before ' + _target7.date + '): ' + (_d7>0?'+':'') + _d7 + ' lbs');
+        } else {
+          ctx.push('7-day change: not enough earlier weight readings in this period to compute.');
+        }
+      }
     } else { ctx.push('No weight readings in this period.'); }
   } catch(e) { ctx.push('Weight history: unavailable'); }
 
@@ -45457,29 +45514,417 @@ function buildAskContext(dateFrom, dateTo) {
   ctx.push('\n=== ACTIVITY HISTORY (' + windowLabel + ') ===');
   try {
     var hAllA = (typeof getAllHistoricalData === 'function') ? getAllHistoricalData() : {};
-    var allActs = hAllA.activities || [];
-    var windowActs = allActs.filter(function(a){ return inWindow(a._date); });
+    var allActs = (hAllA.activities || []).slice();
+    var _aToday = (typeof getTodayKey === 'function') ? getTodayKey() : '';
+    if (_aToday && inWindow(_aToday) && typeof A !== 'undefined' && A && A.length) {
+      A.forEach(function(a){
+        var exists = allActs.some(function(x){ return x.id && a.id && x.id===a.id; });
+        if (!exists) allActs.push(Object.assign({}, a, { _date: a._date || _aToday }));
+      });
+    }
+    var windowActs = allActs.filter(function(a){ return inWindow(a._date || a.date); });
+    windowActs.sort(function(a,b){
+      return ((a._date||'')+(a.startTime||a.t||'')).localeCompare((b._date||'')+(b.startTime||b.t||''));
+    });
+    // BP pool for activity pairing
+    var _actBP = [];
+    if (typeof _getAllBPReadings === 'function') {
+      _actBP = _getAllBPReadings().filter(function(r){ return r && inWindow(r._date); });
+    } else {
+      _actBP = ((hAllA.bp)||[]).filter(function(r){ return r && inWindow(r._date); });
+    }
+    function _actMins(t) {
+      if (!t) return null;
+      var m = String(t).match(/^(\d{1,2}):(\d{2})/);
+      if (!m) return null;
+      return parseInt(m[1],10)*60 + parseInt(m[2],10);
+    }
+    function _actAvg(arr, field) {
+      var vals = arr.map(function(r){ return r[field]; }).filter(function(v){ return typeof v === 'number' && !isNaN(v); });
+      if (!vals.length) return null;
+      return Math.round(vals.reduce(function(s,v){ return s+v; },0) / vals.length * 10) / 10;
+    }
     if (windowActs.length > 0) {
       ctx.push('Activities in period (' + windowActs.length + '):');
+      ctx.push('BP windows: tagged Before/After Activity when present; else same-day BP within 60 min before start and 0–120 min after stop (recovery). Missing times are stated, never invented.');
       windowActs.forEach(function(a){
-        var aLine = '  ['+a._date+'] '+(a.activity||'activity')+(a.duration?' '+a.duration+' min':'')+(a.exertion?' exertion:'+a.exertion:'');
-        if(a.notes) aLine += ' note:"'+a.notes+'"';
+        var day = a._date || a.date || '';
+        var startT = a.startTime || a.t || '';
+        var stopT  = a.stopTime || '';
+        var aLine = '  [' + day + '] ' + (a.activity||'activity');
+        if (startT) aLine += ' start:' + startT;
+        if (stopT)  aLine += ' stop:' + stopT;
+        if (a.duration) aLine += ' ' + a.duration + ' min';
+        if (a.exertion) aLine += ' exertion:' + a.exertion;
+        if (a.activityFluidOz) aLine += ' fluid:' + a.activityFluidOz + 'oz';
+        if (a.notes) aLine += ' note:"' + a.notes + '"';
         ctx.push(aLine);
+
+        // Pair BP: prefer explicit activityId tags, else time windows
+        var beforeR = [], afterR = [];
+        if (a.id) {
+          _actBP.forEach(function(r){
+            if (r.activityId === a.id) {
+              if (r.activityTiming === 'before') beforeR.push(r);
+              else if (r.activityTiming === 'after') afterR.push(r);
+            }
+          });
+        }
+        if (beforeR.length === 0 && afterR.length === 0 && day) {
+          var startM = _actMins(startT);
+          var stopM  = _actMins(stopT || startT);
+          var dayBP = _actBP.filter(function(r){ return r._date === day && r.t; });
+          dayBP.forEach(function(r){
+            var rm = _actMins(r.t);
+            if (rm === null) return;
+            if (startM !== null) {
+              var db = startM - rm;
+              if (db > 0 && db <= 60) beforeR.push(r);
+            }
+            if (stopM !== null) {
+              var da = rm - stopM;
+              if (da >= 0 && da <= 120) afterR.push(r);
+            }
+          });
+        }
+        if (beforeR.length || afterR.length) {
+          var bSys=_actAvg(beforeR,'s'), bDia=_actAvg(beforeR,'d'), bHR=_actAvg(beforeR,'h');
+          var aSys=_actAvg(afterR,'s'), aDia=_actAvg(afterR,'d'), aHR=_actAvg(afterR,'h');
+          var pair = '    BP before(' + beforeR.length + '): ' + (bSys!==null?bSys:'—') + '/' + (bDia!==null?bDia:'—') + (bHR!==null?' HR:'+bHR:'');
+          pair += ' → after(' + afterR.length + '): ' + (aSys!==null?aSys:'—') + '/' + (aDia!==null?aDia:'—') + (aHR!==null?' HR:'+aHR:'');
+          if (bSys!==null && aSys!==null) {
+            var ds = Math.round((aSys-bSys)*10)/10;
+            pair += ' | Δsys ' + (ds>0?'+':'') + ds;
+            if (bDia!==null && aDia!==null) { var dd=Math.round((aDia-bDia)*10)/10; pair += ' Δdia '+(dd>0?'+':'')+dd; }
+            if (bHR!==null && aHR!==null) { var dh=Math.round((aHR-bHR)*10)/10; pair += ' ΔHR '+(dh>0?'+':'')+dh; }
+          }
+          ctx.push(pair);
+        } else {
+          if (!startT && !stopT) ctx.push('    BP pairing: activity has no start/stop clock time — cannot time-window pair');
+          else ctx.push('    BP pairing: no BP readings in before/after windows for this activity');
+        }
       });
     } else { ctx.push('No activities in this period.'); }
   } catch(e) { ctx.push('Activity history: unavailable'); }
 
   ctx.push('\n=== MEDICATION HISTORY (' + windowLabel + ') ===');
   try {
-    var hAllMed = (typeof getAllHistoricalData === 'function') ? getAllHistoricalData() : {};
-    var allMeds = hAllMed.medicines || [];
-    var windowMeds = allMeds.filter(function(m){ return inWindow(m._date); });
+    // Collect medication log entries with direct localStorage read so the Ask
+    // window is not limited by getAllHistoricalData's 90-day cutoff.
+    var windowMeds = [];
+    var _medSeenKeys = {};
+    function _pushMedEntry(item, dateStr) {
+      if (!item) return;
+      var copy = Object.assign({}, item, { _date: dateStr || item._date || '' });
+      var tKey = (copy.time || copy.t || '') + '|' + (copy.medicine || '') + '|' + (copy._date || '');
+      if (_medSeenKeys[tKey]) return;
+      _medSeenKeys[tKey] = true;
+      windowMeds.push(copy);
+    }
+    // Today (in-memory)
+    var _medTodayKey = (typeof getTodayKey === 'function') ? getTodayKey() : '';
+    if (_medTodayKey && inWindow(_medTodayKey) && typeof medLog !== 'undefined' && medLog) {
+      medLog.forEach(function(m){ _pushMedEntry(m, _medTodayKey); });
+    }
+    // Historical days in the query window
+    try {
+      for (var _mi = 0; _mi < localStorage.length; _mi++) {
+        var _mk = localStorage.key(_mi);
+        if (!_mk || !_mk.startsWith('BP_TRACKER_') || _mk === 'BP_TRACKER_DAILY_DATA') continue;
+        var _md = _mk.replace('BP_TRACKER_', '');
+        if (!_md.match(/^\d{4}-\d{2}-\d{2}$/) || _md === _medTodayKey) continue;
+        if (!inWindow(_md)) continue;
+        var _mRaw = localStorage.getItem(_mk);
+        if (!_mRaw) continue;
+        try {
+          var _mData = JSON.parse(_mRaw);
+          (_mData.medLog || []).forEach(function(item){ _pushMedEntry(item, _md); });
+        } catch(_me) {}
+      }
+    } catch(_me2) {}
+    // Fallback: also include anything getAllHistoricalData already has
+    try {
+      var hAllMed = (typeof getAllHistoricalData === 'function') ? getAllHistoricalData() : {};
+      (hAllMed.medicines || []).forEach(function(m){
+        if (inWindow(m._date)) _pushMedEntry(m, m._date);
+      });
+    } catch(_me3) {}
+
+    windowMeds.sort(function(a,b){
+      return ((a._date||'')+(a.time||a.t||'')).localeCompare((b._date||'')+(b.time||b.t||''));
+    });
+
     if (windowMeds.length > 0) {
       var medCounts = {};
       windowMeds.forEach(function(m){ var name = m.medicine||'unknown'; medCounts[name]=(medCounts[name]||0)+1; });
       ctx.push('Medications in period: ' + Object.keys(medCounts).map(function(k){ return k+' ('+medCounts[k]+'x)'; }).join(', '));
+      ctx.push('Individual medication log entries (only entries with a real clock time are usable for before/after pairing):');
+      var _untimedByMed = {};
+      windowMeds.forEach(function(m){
+        var nm = m.medicine || 'unknown';
+        var tm = m.time || m.t || '';
+        var hasClock = /^\d{1,2}:\d{2}/.test(String(tm));
+        if (hasClock) {
+          ctx.push('  [' + (m._date||'') + ' ' + tm + '] ' + nm + (m.timing ? ' ('+m.timing+')' : '') + (m.notes ? ' note:"'+m.notes+'"' : ''));
+        } else {
+          if (!_untimedByMed[nm]) _untimedByMed[nm] = [];
+          _untimedByMed[nm].push(m._date || 'unknown-date');
+          ctx.push('  [' + (m._date||'') + ' --:--] ' + nm + ' (NO CLOCK TIME — cannot pair with BP/HR)');
+        }
+      });
+      var _untimedMeds = Object.keys(_untimedByMed);
+      if (_untimedMeds.length > 0) {
+        ctx.push('Days lacking timed dose entries (do NOT invent times for these):');
+        _untimedMeds.forEach(function(nm){
+          var days = _untimedByMed[nm].filter(function(d,i,a){ return a.indexOf(d)===i; }).sort();
+          ctx.push('  ' + nm + ': ' + days.join(', '));
+        });
+      }
     } else { ctx.push('No medications logged in this period.'); }
   } catch(e) { ctx.push('Medication history: unavailable'); }
+
+  // ── TIMED DOSE BEFORE/AFTER ANALYSIS (v9.10.351.226) ─────────────────────────
+  // Pre-computes first-of-day vs subsequent-dose BP/HR pairs using only actual
+  // clock times on medication log entries. Windows match existing app conventions:
+  //   before = BP on same calendar day within 60 min before the dose
+  //   after  = BP on same calendar day 0–120 min after the dose
+  // Never invents or imputes missing clock times.
+  ctx.push('\n=== TIMED DOSE BEFORE/AFTER ANALYSIS (' + windowLabel + ') ===');
+  try {
+    var _tdMeds = [];
+    var _tdSeen = {};
+    function _tdPush(item, dateStr) {
+      if (!item) return;
+      var copy = Object.assign({}, item, { _date: dateStr || item._date || '' });
+      var key = (copy._date||'') + '|' + (copy.medicine||'') + '|' + (copy.time||copy.t||'');
+      if (_tdSeen[key]) return;
+      _tdSeen[key] = true;
+      _tdMeds.push(copy);
+    }
+    var _tdToday = (typeof getTodayKey === 'function') ? getTodayKey() : '';
+    if (_tdToday && inWindow(_tdToday) && typeof medLog !== 'undefined' && medLog) {
+      medLog.forEach(function(m){ _tdPush(m, _tdToday); });
+    }
+    try {
+      for (var _ti = 0; _ti < localStorage.length; _ti++) {
+        var _tk = localStorage.key(_ti);
+        if (!_tk || !_tk.startsWith('BP_TRACKER_') || _tk === 'BP_TRACKER_DAILY_DATA') continue;
+        var _td = _tk.replace('BP_TRACKER_', '');
+        if (!_td.match(/^\d{4}-\d{2}-\d{2}$/) || _td === _tdToday) continue;
+        if (!inWindow(_td)) continue;
+        var _tr = localStorage.getItem(_tk);
+        if (!_tr) continue;
+        try {
+          var _tp = JSON.parse(_tr);
+          (_tp.medLog || []).forEach(function(item){ _tdPush(item, _td); });
+        } catch(_te) {}
+      }
+    } catch(_te2) {}
+    try {
+      var _hMed = (typeof getAllHistoricalData === 'function') ? getAllHistoricalData() : {};
+      (_hMed.medicines || []).forEach(function(m){ if (inWindow(m._date)) _tdPush(m, m._date); });
+    } catch(_te3) {}
+
+    // BP pool for the same window (reuse SSOT + direct read already done above when available)
+    var _tdBP = [];
+    if (typeof _getAllBPReadings === 'function') {
+      _tdBP = _getAllBPReadings().filter(function(r){ return r && inWindow(r._date); });
+    } else {
+      try {
+        var _hBP = (typeof getAllHistoricalData === 'function') ? getAllHistoricalData() : {};
+        _tdBP = (_hBP.bp || []).filter(function(r){ return r && inWindow(r._date); });
+      } catch(_be) { _tdBP = []; }
+    }
+    // Ensure today BP included
+    if (_tdToday && inWindow(_tdToday) && typeof B !== 'undefined' && B) {
+      B.forEach(function(r){
+        var c = Object.assign({}, r, { _date: _tdToday });
+        var exists = _tdBP.some(function(x){ return x._date===c._date && (x.t||'')===(c.t||'') && x.s===c.s && x.d===c.d; });
+        if (!exists) _tdBP.push(c);
+      });
+    }
+
+    function _tdMins(t) {
+      if (!t) return null;
+      var m = String(t).match(/^(\d{1,2}):(\d{2})/);
+      if (!m) return null;
+      return parseInt(m[1],10)*60 + parseInt(m[2],10);
+    }
+    function _tdAvg(arr, field) {
+      var vals = arr.map(function(r){ return r[field]; }).filter(function(v){ return typeof v === 'number' && !isNaN(v); });
+      if (!vals.length) return null;
+      return Math.round(vals.reduce(function(s,v){ return s+v; },0) / vals.length * 10) / 10;
+    }
+
+    // Group timed doses by medication name
+    var _byMed = {};
+    var _untimedDaysByMed = {};
+    _tdMeds.forEach(function(m){
+      var nm = m.medicine || 'unknown';
+      var tm = m.time || m.t || '';
+      var mins = _tdMins(tm);
+      if (mins === null) {
+        if (!_untimedDaysByMed[nm]) _untimedDaysByMed[nm] = {};
+        if (m._date) _untimedDaysByMed[nm][m._date] = true;
+        return;
+      }
+      if (!_byMed[nm]) _byMed[nm] = [];
+      _byMed[nm].push({ date: m._date, time: tm, mins: mins, timing: m.timing || '' });
+    });
+
+    var _medNames = Object.keys(_byMed).sort();
+    if (_medNames.length === 0) {
+      ctx.push('No timed medication dose entries in this period. Before/after pairing requires clock times on dose logs — none found.');
+      var _uNames = Object.keys(_untimedDaysByMed).sort();
+      if (_uNames.length) {
+        ctx.push('Untimed dose days (cannot pair):');
+        _uNames.forEach(function(nm){
+          ctx.push('  ' + nm + ': ' + Object.keys(_untimedDaysByMed[nm]).sort().join(', '));
+        });
+      }
+    } else {
+      ctx.push('Windows: BEFORE = BP on same day within 60 min before dose; AFTER = BP on same day 0–120 min after dose.');
+      ctx.push('Dose rank: first-of-day = earliest timed dose that day; subsequent = any later timed dose the same day.');
+      ctx.push('Only days with at least one timed dose entry are included. Days without clock times are listed and excluded.');
+
+      _medNames.forEach(function(nm){
+        var doses = _byMed[nm];
+        // Group by day, sort by time
+        var byDay = {};
+        doses.forEach(function(d){
+          if (!d.date) return;
+          if (!byDay[d.date]) byDay[d.date] = [];
+          byDay[d.date].push(d);
+        });
+        Object.keys(byDay).forEach(function(day){
+          byDay[day].sort(function(a,b){ return a.mins - b.mins; });
+        });
+
+        var firstPairs = []; // {date, doseTime, bSys,bDia,bHR,bPP, aSys,aDia,aHR,aPP, beforeN, afterN}
+        var laterPairs = [];
+        var daysWithTimed = Object.keys(byDay).sort();
+        var daysMissingPair = [];
+
+        daysWithTimed.forEach(function(day){
+          var dayDoses = byDay[day];
+          var dayBP = _tdBP.filter(function(r){ return r._date === day && r.t; });
+          dayDoses.forEach(function(dose, idx){
+            var beforeR = [];
+            var afterR = [];
+            dayBP.forEach(function(r){
+              var rm = _tdMins(r.t);
+              if (rm === null) return;
+              var diffBefore = dose.mins - rm;
+              var diffAfter = rm - dose.mins;
+              if (diffBefore > 0 && diffBefore <= 60) beforeR.push(r);
+              if (diffAfter >= 0 && diffAfter <= 120) afterR.push(r);
+            });
+            var pair = {
+              date: day,
+              doseTime: dose.time,
+              rank: idx === 0 ? 'first-of-day' : ('dose-' + (idx+1)),
+              beforeN: beforeR.length,
+              afterN: afterR.length,
+              bSys: _tdAvg(beforeR, 's'),
+              bDia: _tdAvg(beforeR, 'd'),
+              bHR:  _tdAvg(beforeR, 'h'),
+              aSys: _tdAvg(afterR, 's'),
+              aDia: _tdAvg(afterR, 'd'),
+              aHR:  _tdAvg(afterR, 'h')
+            };
+            if (pair.bSys !== null && pair.bDia !== null) pair.bPP = Math.round((pair.bSys - pair.bDia)*10)/10;
+            else pair.bPP = null;
+            if (pair.aSys !== null && pair.aDia !== null) pair.aPP = Math.round((pair.aSys - pair.aDia)*10)/10;
+            else pair.aPP = null;
+
+            if (beforeR.length === 0 && afterR.length === 0) {
+              daysMissingPair.push(day + ' ' + dose.time + ' (' + pair.rank + ') — no BP in before or after window');
+            }
+            if (idx === 0) firstPairs.push(pair);
+            else laterPairs.push(pair);
+          });
+        });
+
+        ctx.push('');
+        ctx.push('--- ' + nm + ' ---');
+        ctx.push('Timed dose days: ' + daysWithTimed.length + ' (' + daysWithTimed.join(', ') + ')');
+        if (_untimedDaysByMed[nm]) {
+          var uDays = Object.keys(_untimedDaysByMed[nm]).sort();
+          ctx.push('Days with dose logged but NO clock time (excluded from pairing): ' + uDays.join(', '));
+        }
+        ctx.push('First-of-day dose pairs: ' + firstPairs.length + ' | Subsequent-dose pairs: ' + laterPairs.length);
+
+        function _emitGroup(label, pairs) {
+          if (!pairs.length) {
+            ctx.push(label + ': none with timed doses in this period.');
+            return;
+          }
+          var withBoth = pairs.filter(function(p){ return p.bSys !== null && p.aSys !== null; });
+          ctx.push(label + ' (' + pairs.length + ' timed doses, ' + withBoth.length + ' with both before+after BP):');
+          // Aggregate averages only over pairs that have the value
+          function agg(field) {
+            var vals = pairs.map(function(p){ return p[field]; }).filter(function(v){ return v !== null && v !== undefined; });
+            if (!vals.length) return null;
+            return Math.round(vals.reduce(function(s,v){ return s+v; },0) / vals.length * 10) / 10;
+          }
+          var bSys = agg('bSys'), aSys = agg('aSys');
+          var bDia = agg('bDia'), aDia = agg('aDia');
+          var bHR  = agg('bHR'),  aHR  = agg('aHR');
+          var bPP  = agg('bPP'),  aPP  = agg('aPP');
+          if (bSys !== null || aSys !== null) {
+            var dSys = (bSys !== null && aSys !== null) ? Math.round((aSys - bSys)*10)/10 : null;
+            ctx.push('  Systolic:  before avg ' + (bSys!==null?bSys:'N/A') + ' → after avg ' + (aSys!==null?aSys:'N/A') + (dSys!==null?' (Δ '+(dSys>0?'+':'')+dSys+' mmHg)':''));
+          }
+          if (bDia !== null || aDia !== null) {
+            var dDia = (bDia !== null && aDia !== null) ? Math.round((aDia - bDia)*10)/10 : null;
+            ctx.push('  Diastolic: before avg ' + (bDia!==null?bDia:'N/A') + ' → after avg ' + (aDia!==null?aDia:'N/A') + (dDia!==null?' (Δ '+(dDia>0?'+':'')+dDia+' mmHg)':''));
+          }
+          if (bPP !== null || aPP !== null) {
+            var dPP = (bPP !== null && aPP !== null) ? Math.round((aPP - bPP)*10)/10 : null;
+            ctx.push('  Pulse pressure: before avg ' + (bPP!==null?bPP:'N/A') + ' → after avg ' + (aPP!==null?aPP:'N/A') + (dPP!==null?' (Δ '+(dPP>0?'+':'')+dPP+' mmHg)':''));
+          }
+          if (bHR !== null || aHR !== null) {
+            var dHR = (bHR !== null && aHR !== null) ? Math.round((aHR - bHR)*10)/10 : null;
+            ctx.push('  HR:        before avg ' + (bHR!==null?bHR:'N/A') + ' → after avg ' + (aHR!==null?aHR:'N/A') + (dHR!==null?' (Δ '+(dHR>0?'+':'')+dHR+' bpm)':''));
+          }
+          // Per-dose detail so Ask can answer day-level questions without inventing
+          pairs.forEach(function(p){
+            var line = '  [' + p.date + ' dose ' + p.doseTime + ' ' + p.rank + ']';
+            line += ' before(' + p.beforeN + '): ' + (p.bSys!==null?p.bSys:'—') + '/' + (p.bDia!==null?p.bDia:'—');
+            if (p.bHR!==null) line += ' HR:' + p.bHR;
+            if (p.bPP!==null) line += ' PP:' + p.bPP;
+            line += ' → after(' + p.afterN + '): ' + (p.aSys!==null?p.aSys:'—') + '/' + (p.aDia!==null?p.aDia:'—');
+            if (p.aHR!==null) line += ' HR:' + p.aHR;
+            if (p.aPP!==null) line += ' PP:' + p.aPP;
+            if (p.bSys!==null && p.aSys!==null) {
+              var ds = Math.round((p.aSys-p.bSys)*10)/10;
+              var dd = (p.bDia!==null&&p.aDia!==null)?Math.round((p.aDia-p.bDia)*10)/10:null;
+              var dh = (p.bHR!==null&&p.aHR!==null)?Math.round((p.aHR-p.bHR)*10)/10:null;
+              line += ' | Δsys ' + (ds>0?'+':'') + ds;
+              if (dd!==null) line += ' Δdia ' + (dd>0?'+':'') + dd;
+              if (dh!==null) line += ' ΔHR ' + (dh>0?'+':'') + dh;
+            }
+            ctx.push(line);
+          });
+        }
+
+        _emitGroup('FIRST-OF-DAY doses', firstPairs);
+        _emitGroup('SUBSEQUENT (2nd+) doses', laterPairs);
+
+        if (daysMissingPair.length) {
+          ctx.push('Timed doses with no BP in either window: ' + daysMissingPair.slice(0,20).join('; ') + (daysMissingPair.length>20?' …':''));
+        }
+      });
+
+      // Meds that only appear as untimed
+      Object.keys(_untimedDaysByMed).sort().forEach(function(nm){
+        if (_byMed[nm]) return;
+        ctx.push('');
+        ctx.push('--- ' + nm + ' ---');
+        ctx.push('No timed dose entries. Days with untimed logs only (cannot pair): ' + Object.keys(_untimedDaysByMed[nm]).sort().join(', '));
+      });
+    }
+  } catch(e) { ctx.push('Timed dose before/after analysis: unavailable (' + (e && e.message ? e.message : 'error') + ')'); }
 
   // ── MEDICATION EFFECTIVENESS ─────────────────────────────────────────────────
   ctx.push('\n=== MEDICATION EFFECTIVENESS (all available data) ===');
@@ -45784,11 +46229,26 @@ function buildAskContext(dateFrom, dateTo) {
       pins.forEach(function(p){
         var commStatus = p.commLog ? p.commLog.status : 'not communicated';
         var line = '  [' + commStatus + '] ' + (p.title||'untitled');
+        if (p.source) line += ' | source:' + p.source;
+        if (p.severity) line += ' | severity:' + p.severity;
         if (p.eventDate) line += ' (event: ' + p.eventDate + ')';
         if (p.commLog && p.commLog.to) line += ' — discussed with: ' + p.commLog.to;
         if (p.commLog && p.commLog.date) line += ' on ' + p.commLog.date;
         ctx.push(line);
         if (p.summary) ctx.push('    Summary: ' + p.summary);
+        if (p.detectorData) {
+          var dd = p.detectorData;
+          var dParts = [];
+          if (dd.points !== undefined) dParts.push('points:' + dd.points);
+          if (dd.signals) dParts.push('signals:' + (Array.isArray(dd.signals) ? dd.signals.join(', ') : dd.signals));
+          if (dd.avgPP !== undefined) dParts.push('avgPP:' + dd.avgPP);
+          if (dd.beforeMean !== undefined) dParts.push('HR before:' + dd.beforeMean);
+          if (dd.afterMean !== undefined) dParts.push('HR after:' + dd.afterMean);
+          if (dd.shiftMag !== undefined) dParts.push('shift:' + dd.shiftMag);
+          if (dd.direction) dParts.push('dir:' + dd.direction);
+          if (dd.ghost) dParts.push('ghost:true');
+          if (dParts.length) ctx.push('    Detector data: ' + dParts.join(' | '));
+        }
         if (p.commLog && p.commLog.response) ctx.push('    Response: ' + p.commLog.response);
         if (p.questions && p.questions.length) {
           p.questions.forEach(function(q){ ctx.push('    Q: ' + q.text + (q.asked ? ' [asked ✓]' : ' [not yet asked]') + (q.response ? ' — Response: ' + q.response : '')); });
@@ -45922,6 +46382,205 @@ function buildAskContext(dateFrom, dateTo) {
     }
   }catch(e){}
 
+
+  // ── PROCEDURES (v9.10.351.226) ─────────────────────────────────────────────
+  ctx.push('\n=== PROCEDURES (' + windowLabel + ') ===');
+  try {
+    var _procList = [];
+    try {
+      if (typeof procedures !== 'undefined' && Array.isArray(procedures) && procedures.length) {
+        _procList = procedures.slice();
+      } else {
+        var _pRaw = localStorage.getItem('BP_TRACKER_PROCEDURES');
+        if (_pRaw) _procList = JSON.parse(_pRaw) || [];
+      }
+    } catch(_pe) { _procList = []; }
+    var _procWin = _procList.filter(function(p){
+      var d = p.date || p._date || '';
+      return d && inWindow(d);
+    });
+    _procWin.sort(function(a,b){ return ((a.date||'')+(a.time||'')).localeCompare((b.date||'')+(b.time||'')); });
+    if (_procWin.length > 0) {
+      ctx.push('Procedures in period (' + _procWin.length + '):');
+      _procWin.forEach(function(p){
+        var line = '  [' + (p.date||'') + (p.time ? ' ' + p.time : '') + '] ' + (p.name || 'unnamed');
+        if (p.category) line += ' | ' + p.category;
+        if (p.facility) line += ' | facility:' + p.facility;
+        if (p.physician) line += ' | physician:' + p.physician;
+        if (p.notes) line += ' note:"' + p.notes + '"';
+        ctx.push(line);
+      });
+    } else {
+      ctx.push('No procedures logged in this period.');
+    }
+  } catch(e) { ctx.push('Procedures: unavailable'); }
+
+  // ── SENTINEL CLINICAL EVENTS (v9.10.351.226) ───────────────────────────────
+  ctx.push('\n=== SENTINEL CLINICAL EVENTS ===');
+  try {
+    var _seList = (typeof getSentinelEvents === 'function') ? getSentinelEvents() : [];
+    if (!_seList.length) {
+      try { _seList = JSON.parse(localStorage.getItem('cardiaclens_sentinel_events') || '[]'); } catch(_se) { _seList = []; }
+    }
+    var _seWin = _seList.filter(function(e){
+      var d = e.date || '';
+      // If no window bounds, include all; otherwise filter
+      if (useFrom !== null || useTo !== null) return d && inWindow(d);
+      return true;
+    });
+    _seWin.sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+    if (_seWin.length > 0) {
+      ctx.push('Clinical events logged in Sentinel (' + _seWin.length + ' in scope):');
+      _seWin.forEach(function(e){
+        var line = '  [' + (e.date||'') + '] ' + (e.type || 'event');
+        if (e.resetBaseline) line += ' | baseline-reset:yes';
+        if (e.note) line += ' note:"' + e.note + '"';
+        ctx.push(line);
+      });
+    } else {
+      ctx.push('No Sentinel clinical events logged in this period.');
+    }
+  } catch(e) { ctx.push('Sentinel clinical events: unavailable'); }
+
+  // ── DECOMPENSATION / WEIGHT-SIGNAL SNAPSHOT (from actual readings only) ───
+  ctx.push('\n=== DECOMPENSATION WEIGHT SIGNALS (computed from logged weight only) ===');
+  try {
+    var _dwAll = [];
+    try {
+      var _dwH = (typeof getAllHistoricalData === 'function') ? getAllHistoricalData() : {};
+      _dwAll = (_dwH.weight || []).slice();
+    } catch(_dwe) {}
+    var _dwToday = (typeof getTodayKey === 'function') ? getTodayKey() : '';
+    if (_dwToday && typeof W !== 'undefined' && W) {
+      W.forEach(function(w){ _dwAll.push(Object.assign({}, w, { _date: _dwToday })); });
+    }
+    var _dwValid = _dwAll.filter(function(w){ return w._date && !isNaN(parseFloat(w.w)); });
+    _dwValid.sort(function(a,b){
+      var c = (a._date||'').localeCompare(b._date||'');
+      if (c) return c;
+      return (a.t||'').localeCompare(b.t||'');
+    });
+    if (_dwValid.length < 2) {
+      ctx.push('Not enough weight readings to compute decompensation weight signals (need 2+).');
+    } else {
+      var _byD = {};
+      _dwValid.forEach(function(w){
+        var lbs = parseFloat(w.w);
+        if (!_byD[w._date] || (w.t||'') >= (_byD[w._date].t||'')) _byD[w._date] = { date:w._date, w:lbs, t:w.t||'' };
+      });
+      var _days = Object.keys(_byD).sort();
+      var _latest = _byD[_days[_days.length-1]];
+      ctx.push('Latest weight: ' + _latest.w + ' lbs on ' + _latest.date + (_latest.t?' at '+_latest.t:''));
+      if (_days.length >= 2) {
+        var _prev = _byD[_days[_days.length-2]];
+        var _g24 = Math.round((_latest.w - _prev.w)*10)/10;
+        var _s24 = 'prior day (' + _prev.date + '): Δ ' + (_g24>0?'+':'') + _g24 + ' lbs';
+        if (_g24 >= 2) _s24 += ' — RED threshold (≥2 lbs day-to-day, AHA/ACC-style alert used by Sentinel)';
+        else if (_g24 >= 1) _s24 += ' — YELLOW threshold (≥1 lb day-to-day)';
+        else _s24 += ' — within green range';
+        ctx.push(_s24);
+      }
+      // ~7 day
+      var _t7 = null;
+      try {
+        var _lp = _latest.date.split('-');
+        var _ld = new Date(parseInt(_lp[0]), parseInt(_lp[1])-1, parseInt(_lp[2]));
+        _ld.setDate(_ld.getDate()-7);
+        var _tk = _ld.getFullYear()+'-'+('0'+(_ld.getMonth()+1)).slice(-2)+'-'+('0'+_ld.getDate()).slice(-2);
+        for (var _i = _days.length-2; _i >= 0; _i--) {
+          if (_days[_i] <= _tk) { _t7 = _byD[_days[_i]]; break; }
+        }
+      } catch(_e7) {}
+      if (_t7) {
+        var _g7 = Math.round((_latest.w - _t7.w)*10)/10;
+        var _s7 = 'vs ~7 days earlier (' + _t7.date + '): Δ ' + (_g7>0?'+':'') + _g7 + ' lbs';
+        if (_g7 >= 5) _s7 += ' — RED threshold (≥5 lbs / 7 days)';
+        else if (_g7 >= 2) _s7 += ' — YELLOW threshold (≥2 lbs / 7 days)';
+        else _s7 += ' — within green range';
+        ctx.push(_s7);
+      } else {
+        ctx.push('7-day weight signal: not enough earlier readings to compute.');
+      }
+      ctx.push('Note: Full Sentinel decompensation also uses BP/HR proxy, symptoms, fluid, and notes. See PINNED EVENTS with source:decompensation and SENTINEL CLINICAL EVENTS for recorded warnings. This section only reports weight-derived signals from actual logs.');
+    }
+  } catch(e) { ctx.push('Decompensation weight signals: unavailable'); }
+
+  // ── PULSE PRESSURE SUMMARY (from actual BP only) ───────────────────────────
+  ctx.push('\n=== PULSE PRESSURE SUMMARY (' + windowLabel + ') ===');
+  try {
+    var _ppBP = [];
+    if (typeof _getAllBPReadings === 'function') {
+      _ppBP = _getAllBPReadings().filter(function(r){ return r && inWindow(r._date) && r.s>0 && r.d>0; });
+    } else {
+      var _ppH = (typeof getAllHistoricalData === 'function') ? getAllHistoricalData() : {};
+      _ppBP = (_ppH.bp || []).filter(function(r){ return r && inWindow(r._date) && r.s>0 && r.d>0; });
+    }
+    if (_ppBP.length < 1) {
+      ctx.push('No BP readings with both systolic and diastolic in this period.');
+    } else {
+      var _ppVals = _ppBP.map(function(r){ return { pp: r.s - r.d, date: r._date, t: r.t||'', s:r.s, d:r.d }; });
+      var _sum = _ppVals.reduce(function(s,x){ return s + x.pp; }, 0);
+      var _avg = Math.round(_sum / _ppVals.length * 10) / 10;
+      var _min = _ppVals[0], _max = _ppVals[0];
+      _ppVals.forEach(function(x){ if (x.pp < _min.pp) _min=x; if (x.pp > _max.pp) _max=x; });
+      ctx.push('Readings: ' + _ppVals.length + ' | Avg PP: ' + _avg + ' mmHg | Low: ' + _min.pp + ' on ' + _min.date + ' | High: ' + _max.pp + ' on ' + _max.date);
+      var _narrow = _ppVals.filter(function(x){ return x.pp < 25; });
+      var _wide = _ppVals.filter(function(x){ return x.pp > 60; });
+      ctx.push('Narrow PP (<25 mmHg): ' + _narrow.length + ( _narrow.length ? ' — ' + _narrow.slice(0,8).map(function(x){ return '['+x.date+' '+(x.t||'')+'] '+x.pp+' ('+x.s+'/'+x.d+')'; }).join('; ') : ''));
+      ctx.push('Wide PP (>60 mmHg): ' + _wide.length + ( _wide.length ? ' — ' + _wide.slice(0,8).map(function(x){ return '['+x.date+' '+(x.t||'')+'] '+x.pp+' ('+x.s+'/'+x.d+')'; }).join('; ') : ''));
+      // Recent 7d vs prior 7d if enough data
+      var _todayD = new Date();
+      var _r7 = new Date(_todayD.getTime() - 7*86400000);
+      var _r14 = new Date(_todayD.getTime() - 14*86400000);
+      function _iso(d){ return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+      var _k7 = _iso(_r7), _k14 = _iso(_r14);
+      var _recent = _ppVals.filter(function(x){ return x.date >= _k7; });
+      var _prior  = _ppVals.filter(function(x){ return x.date >= _k14 && x.date < _k7; });
+      if (_recent.length && _prior.length) {
+        var _ra = Math.round(_recent.reduce(function(s,x){return s+x.pp;},0)/_recent.length*10)/10;
+        var _pa = Math.round(_prior.reduce(function(s,x){return s+x.pp;},0)/_prior.length*10)/10;
+        var _pd = Math.round((_ra-_pa)*10)/10;
+        ctx.push('Recent 7d avg PP: ' + _ra + ' (n=' + _recent.length + ') | Prior 7d avg PP: ' + _pa + ' (n=' + _prior.length + ') | Δ ' + (_pd>0?'+':'') + _pd);
+      }
+      ctx.push('Pinned pulse-pressure detector cards (if any) appear under PINNED EVENTS with source:pulse_pressure.');
+    }
+  } catch(e) { ctx.push('Pulse pressure summary: unavailable'); }
+
+  // ── CROSS-DOMAIN DAY OVERLAP (actual co-occurrence only) ───────────────────
+  ctx.push('\n=== CROSS-DOMAIN DAY OVERLAP (' + windowLabel + ') ===');
+  try {
+    var _dayFlags = {};
+    function _flag(date, key) {
+      if (!date || !inWindow(date)) return;
+      if (!_dayFlags[date]) _dayFlags[date] = {};
+      _dayFlags[date][key] = true;
+    }
+    // Reuse data already gathered where possible via fresh light reads
+    try {
+      var _xd = (typeof getAllHistoricalData === 'function') ? getAllHistoricalData() : {};
+      (_xd.bp||[]).forEach(function(r){ if(r._date) _flag(r._date,'bp'); });
+      (_xd.weight||[]).forEach(function(r){ if(r._date) _flag(r._date,'weight'); });
+      (_xd.symptoms||[]).forEach(function(r){ if(r._date) _flag(r._date,'symptom'); });
+      (_xd.activities||[]).forEach(function(r){ if(r._date) _flag(r._date,'activity'); });
+      (_xd.meals||[]).forEach(function(r){ if(r._date) _flag(r._date,'meal'); });
+      (_xd.medicines||[]).forEach(function(r){ if(r._date) _flag(r._date,'med'); });
+      (_xd.notes||[]).forEach(function(r){ if(r._date) _flag(r._date,'note'); });
+      (_xd.fluids||[]).forEach(function(r){ if(r._date) _flag(r._date,'fluid'); });
+    } catch(_xe) {}
+    try {
+      var _pr = JSON.parse(localStorage.getItem('BP_TRACKER_PROCEDURES')||'[]');
+      (_pr||[]).forEach(function(p){ if(p.date) _flag(p.date,'procedure'); });
+    } catch(_xe2) {}
+    var _multi = Object.keys(_dayFlags).sort().filter(function(d){
+      return Object.keys(_dayFlags[d]).length >= 3;
+    });
+    ctx.push('Days with 3+ different log types in this period: ' + _multi.length);
+    _multi.slice(-15).forEach(function(d){
+      ctx.push('  ' + d + ': ' + Object.keys(_dayFlags[d]).sort().join(', '));
+    });
+    if (!_multi.length) ctx.push('No days with 3+ concurrent log types in this period (or insufficient data).');
+  } catch(e) { ctx.push('Cross-domain overlap: unavailable'); }
+
   return ctx.join('\n');
 }
 
@@ -45938,7 +46597,7 @@ function _buildAskSystemPrompt(dataContext) {
   _spRef+='LAST-WEEKDAY REFERENCE (CardiacLens pre-computed — use these exact dates for any "last [day of week]" query, never compute independently):\n';
   for(var _spi=0;_spi<7;_spi++){var _spDf=_spDow-_spi;if(_spDf<=0)_spDf+=7;var _spRd=new Date(_spy,_spm-1,_spdt-_spDf);_spRef+='  Last '+_spDns[_spi]+' = '+_spRd.getFullYear()+'-'+_spPad(_spRd.getMonth()+1)+'-'+_spPad(_spRd.getDate())+'\n';}
   _spRef+='\n';
-  return 'You are the CardiacLens Ask assistant — a precise, honest, and compassionate helper built into CardiacLens, a free cardiac health monitoring app for cardiac patients. You know every feature of CardiacLens and have full access to the user\'s logged data (provided below).\n\nCORE QUALITY RULES (highest priority — never violate these):\n- Never assume, invent, guess, or fabricate any fact, number, date, statistic, reading, correlation, or clinical claim.\n- If the supplied data context does not contain enough information to answer a data question accurately, say so clearly and stop. Do not fill gaps with plausible guesses.\n- Precision is more important than completeness, fluency, or speed. A short correct answer is always better than a longer approximate one.\n- Prefer honesty over helpfulness when the two conflict. "I cannot determine that from the data provided" is a good answer.\n- For general cardiac knowledge (physiology, typical ranges, mechanisms, trial results, guideline concepts):\n  - Ground answers only in well-established clinical understanding.\n  - When a concept has a clear trial or guideline basis that adds value, name it briefly (e.g., "SGLT2 inhibitors reduced heart-failure events in the DAPA-HF and EMPEROR-Reduced trials").\n  - Explain first in clear layman language. Add clinical detail only when it helps the user understand.\n  - If you are not highly confident, say so and advise confirmation with the cardiologist. Never present uncertain information as settled fact.\n- Never diagnose, never suggest medication or dosing changes, never interpret patterns as prognosis or "what it means for your health."\n\nYOUR ROLE:\n- Answer questions about how CardiacLens features work\n- Answer questions about the user\'s own logged data (fluid, BP, HR, weight, symptoms, notes, medications, meals, activities)\n- Perform cross-stream pattern analysis: identify temporal correlations across data streams and report only what the logged data shows\n- Mine notes text — symptom notes, general notes, morning check-in notes — for contextual patterns (body position, timing, activity state, emotional context, meal proximity) and report what patterns appear in the text\n- Help users understand patterns they see in the app\n- Help users log correctly and get the most from the app\n- Ask follow-up clarifications when a question is genuinely ambiguous\n\nDATA OBSERVATION GUIDANCE:\nWhen asked about correlations or patterns (e.g. "what happens before my HR exceeds 75?", "what triggers my cough?", "does fluid affect my BP?"):\n1. Filter readings to the target condition (e.g. HR > 75)\n2. For each qualifying reading, examine what was logged in the preceding 1-4 hours: meals, fluid entries with notes, activities, medications, symptoms, standalone notes\n3. Look at time-of-day distribution\n4. Scan symptom note text for repeated words or phrases: position words (laying, sitting, standing), timing words (after eating, waking, exercise), state words (anxious, stressed, tired)\n5. Report findings as structured data observations: "Of your 12 HR readings above 75 in this period, 9 occurred within 2 hours of waking. Your symptom notes mention \'laying down\' in 14 of 23 cough entries."\nAlways frame as: "The data shows...", "Looking at your logged entries...", "Of X readings in this period...", "Your notes frequently mention..."\nNever add clinical interpretation.\n\nCLEAR BOUNDARY — YOU NEVER:\n- Interpret what patterns mean for the user\'s health or prognosis\n- Suggest changing medications, dosing, or care plans\n- Diagnose or suggest diagnoses\n- Replace medical advice\nWhen a finding moves from data observation toward clinical meaning, say: "That pattern is worth noting for your cardiologist — it would make a good Pinned Event for your next appointment." Never alarm the user.\n\nTONE: Calm, warm, clear, never alarming. These are cardiac patients who may be worried. Be the reassuring, knowledgeable friend who knows the app inside-out and the data clearly. Use plain English. Avoid jargon unless you are explaining a CardiacLens feature or a clinical term the user already used.\n\nINTENT CLARIFICATION FORMAT (use ONLY when the question is genuinely unclear):\n[CLARIFY]\nOption 1: (clearer version)\nOption 2: (another interpretation)\nOption 3: (another interpretation if applicable)\n[/CLARIFY]\n\nRESPONSE GUIDELINES:\n- Mobile app for seniors — keep answers clear and reasonably concise\n- Plain English first; clinical depth second and only when useful\n- For data answers, present facts plainly with structure where helpful\n- Accuracy is paramount — if you are not certain about a data answer, say so clearly\n- When notes text contains clinically interesting context (position, timing, triggers), surface it explicitly as a data finding\n- DATA WINDOW BOUNDARY — CRITICAL: The context header shows the exact analysis period (e.g. "ANALYSIS PERIOD: 2026-02-01 to 2026-03-05" or "last 14 days"). You MUST ONLY report statistics, counts, percentages, and averages from data within that window. NEVER produce numbers for a time period not represented in the context. If the user asks about a period that does not match the context window, respond: "The data I can see covers [period from context header]. I cannot compute accurate statistics for [requested period] from this context — please ask again and the data for that period will be loaded." Do not attempt to answer with data from the wrong period. Wrong medical statistics are dangerous.\n- HR THRESHOLD QUERIES — CRITICAL: When asked how many readings are "above X bpm" or "below X bpm", you MUST use the pre-computed "Pre-computed readings STRICTLY ABOVE X bpm" table in the context. NEVER count manually from the raw readings list — manual counting produces errors. If the exact threshold X is in the table, read the answer directly. If X falls between two table values, sum the relevant rows. State the answer as a verified fact from the table, not as an estimate. If your manually counted result differs from the pre-computed table, the TABLE IS CORRECT — discard your count.\n- FLUID DAILY TOTALS — CRITICAL: When asked about daily fluid intake amounts for any specific date or period, you MUST use the pre-computed "Daily fluid totals in period" list in the FLUID STATISTICS section. NEVER reconstruct daily totals by summing individual timed entries — that method produces incorrect results because entries span multiple sources and partial amounts. The individual timed entries section is provided only for timing and correlation analysis (e.g. "when did I drink on April 1?"). For any question about how much fluid was consumed on a given day, read the answer directly from the verified daily totals list. If a date is not in that list, the data was not logged for that day.\n- FLUID VS NEXT MORNING BP — CRITICAL: When asked to correlate fluid intake with next-morning BP, you MUST use the pre-computed FLUID VS NEXT MORNING BP table in the context. Each row already pairs the correct fluid date with the FIRST BP reading of the FOLLOWING day (date+1). NEVER construct this pairing yourself from raw data — off-by-one errors are guaranteed. Read the answer directly from that table.\n- N-WEEKS-AGO QUERIES: When the ANALYSIS PERIOD covers a multi-day range (e.g. "2026-04-21 to 2026-04-28") and the user asked "N weeks ago", that range IS the answer period. Report statistics for THE ENTIRE PERIOD shown in the ANALYSIS PERIOD, not just the anchor date. Do not describe it as "that specific date" — it is a 7-day window. Report total readings, averages, and days covered for the full period.\n- DATE WINDOW CONFIRMATION: Whenever your answer includes specific numbers derived from a time period (counts, averages, percentages, ranges), begin your response by stating the exact window you are analyzing, e.g. "Looking at all data through March 5, 2026..." or "For the period March 6 to today...". This lets the user catch any mismatch before reading statistics.\n- AMBIGUOUS DATE QUERIES — READ CAREFULLY: The date window in the context header was pre-computed by CardiacLens before this conversation. If the header shows ANY specific date (e.g. "ANALYSIS PERIOD: 2026-05-05 to 2026-05-05" or "ANALYSIS PERIOD: 2026-04-28 to 2026-05-05"), the date has already been resolved. TRUST THE WINDOW COMPLETELY — never ask the user to clarify a date that is already set. The following query types are ALWAYS pre-resolved — answer directly from the data in the window: ANY "last [day of week]" reference (last Monday, last Tuesday, last Wednesday, last Thursday, last Friday, last Saturday, last Sunday — ALL pre-resolved), relative days ("3 days ago"), relative weeks ("2 weeks ago"), week-of-date ("week of March 10"), quarters ("Q1", "first quarter"), month lists ("February, March, April"), year references ("last year"). CRITICAL FOR DAY-OF-WEEK: Use the LAST-WEEKDAY REFERENCE table in the context header to look up the exact date for "last Saturday", "last Thursday" etc. NEVER compute the date yourself. NEVER state what date "last Saturday" maps to. Simply begin your answer: "Looking at your data for [date from ANALYSIS PERIOD]:" and report the readings from that date. ONLY ask for a date when BOTH conditions are true simultaneously: (1) the context header still says "last 14 days" (no date could be parsed), AND (2) the question contains a vague historical reference with no date expression at all (e.g. "before my hospitalization", "around my procedure"). If only one condition is true, do not ask — answer from the available window.\n\nCARDIACLENS FEATURES:\n\nLOGGING: BP (systolic/diastolic + optional HR and notes), weight (lbs), fluid (oz with label and notes), symptoms (name + severity 1-10 + notes + condition tag), medications (name + dose + time), meals (name + notes + fluid), activities (name + duration + exertion + notes), free-text notes (attached to any log entry or standalone, stored with timestamp).\n\nNOTES: Free-text notes can accompany any log entry or be entered standalone. Notes from within ±2 hours of a BP or weight reading are included as context in the Sentinel and Decompensation systems. Notes are searchable. They appear in the Doctor\'s Report. Ask can search them by keyword, date, or period. Symptom notes often capture body position (lying down, sitting, standing), activity context, timing relative to meals, and the user\'s own observations about triggers — these are analytically valuable.\n\nSENTINEL: Pattern intelligence system. Watches HR daily spread, symptom frequency, and pulse pressure against the user\'s own 14-day personal baseline (not population averages). When 2+ streams drift above personal normal simultaneously, Sentinel surfaces a pattern card. Clinical Events (pacemaker adjustments, hospitalizations, medication changes) can be logged to reset baselines. Sentinel Footprints capture pre-event data signatures for future comparison. "What to Tell Your Doctor" box auto-generates plain-language sentences when patterns are flagged.\n\nMORNING CHECK-IN: Daily prompt (once per day) asking how user feels, morning symptoms, yesterday context, waking hours, optional notes. Feeds Sentinel\'s pattern awareness.\n\nPINNED EVENTS: Communication layer for doctor appointments. Users pin observations, questions, data points. Each pin has: title, date, doctor name, response, status (pending/asked/urgent), and a Questions list with Asked checkboxes. Designed to be read aloud in the appointment room.\n\nHEAT & HUMIDITY ADVISORY: 2×2 grid of temperature/humidity bands. When thresholds are exceeded, fluid advisory appears recommending increased intake.\n\nPULSE PRESSURE DETECTOR: Calculates systolic minus diastolic for each reading. Tracks personal average. Flags narrow (<25 mmHg) or widening PP trends. Critically Narrow PP is a watch pattern.\n\nHR LEVEL-SHIFT DETECTOR: Detects sustained HR regime changes over days using a level-shift algorithm — distinguishes noise from genuine pattern shifts. Can detect HR changes that a pacemaker monitor may not flag.\n\nDECOMPENSATION WARNING SYSTEM: Monitors 5 simultaneous signals — weight trend, cardiac output proxy, symptom escalation, fluid pattern, notes keyword scan. Only escalates when multiple signals converge.\n\nSYMPTOM CONVERGENCE DETECTOR: Tracks symptom frequency trends. 60-day timeline view. Appointment Snapshot feature.\n\nADVANCED ANALYTICS: Anchor Date Investigation (20-day window, 3-stat pills). BP/HR/weight trends relative to a chosen anchor date (e.g. medication change date). Exportable.\n\nDOCTOR\'S REPORT: Formatted clinical summary of BP trend, HR pattern, weight, symptoms, medications. Exportable as PDF or text.\n\nFLUID TRACKING MODES: None (off), minimum only (must reach daily floor), range (min and max), maximum only (ceiling). Fluid goal tied to reminders.\n\nREMINDERS & DAILY EVENTS: Named daily events with set times. Each event can have a fluid goal. Reminders fire at set time with per-action completion tracking.\n\nBEHAVIORAL PROFILE LAYER: 50+ behavioral rules observing usage patterns. Surfaces one contextual companion card at a time based on detected patterns.\n\nPPH DETECTOR (Post-Meal BP Patterns): Located in Advanced Analytics. Uses the clinical definition of Postprandial Hypotension: a drop of >=20 mmHg systolic within 2 hours of eating. Pre-meal baseline = closest BP within 60 min before meal. Post-meal nadir = lowest systolic within 0-120 min after. Counts PPH events, calculates avg post-meal BP change, flags pattern when 3+ PPH events in 30 days. Results appear in the Doctor\'s Report PPH section and Ask context. Sentinel nudge fires when pattern confirmed.\n\n---\nUSER LOGGED DATA:\n' + _spRef + dataContext;
+  return 'You are the CardiacLens Ask assistant — a precise, honest, and compassionate helper built into CardiacLens, a free cardiac health monitoring app for cardiac patients. You know every feature of CardiacLens and have full access to the user\'s logged data (provided below).\n\nCORE QUALITY RULES (highest priority — never violate these):\n- Never assume, invent, guess, or fabricate any fact, number, date, statistic, reading, correlation, or clinical claim.\n- If the supplied data context does not contain enough information to answer a data question accurately, say so clearly and stop. Do not fill gaps with plausible guesses.\n- Precision is more important than completeness, fluency, or speed. A short correct answer is always better than a longer approximate one.\n- Prefer honesty over helpfulness when the two conflict. "I cannot determine that from the data provided" is a good answer.\n- MEDICATION TIMING / BEFORE-AFTER RULES (mandatory):\n  - For any question about medication doses, dose times, first-of-day vs second (or later) doses, or BP/HR before vs after a dose, use ONLY the pre-computed === TIMED DOSE BEFORE/AFTER ANALYSIS === section and the individual timed entries in === MEDICATION HISTORY ===.\n  - Never invent, assume, or impute a clock time for a dose that the data marks as having no clock time.\n  - When days lack timed dose entries, state those days explicitly and limit the comparison to days that do have timed entries.\n  - Do not use population averages from === MEDICATION EFFECTIVENESS === as a substitute for timed first-dose vs subsequent-dose pairing.\n  - Windows are fixed: before = same-day BP within 60 min before the dose; after = same-day BP 0–120 min after the dose.\n- OTHER LOG TYPES (mandatory precision):\n  - Procedures: use === PROCEDURES === only. If empty, say no procedures were logged — do not invent.\n  - Sentinel clinical events: use === SENTINEL CLINICAL EVENTS ===.\n  - Decompensation: use === DECOMPENSATION WEIGHT SIGNALS === plus PINNED EVENTS with source:decompensation. Do not invent active warnings not listed.\n  - Pulse pressure: use === PULSE PRESSURE SUMMARY === and any PINNED EVENTS with source:pulse_pressure.\n  - Activities: use === ACTIVITY HISTORY === including any BP before/after lines. If pairing says no time or no BP, say so.\n  - Weight changes: use day-to-day lines in === WEIGHT HISTORY === and decompensation weight signals — never invent missing days.\n  - Combinations across log types: prefer === CROSS-DOMAIN DAY OVERLAP === and only state co-occurrence on dates both sides actually list.\n- For general cardiac knowledge (physiology, typical ranges, mechanisms, trial results, guideline concepts):\n  - Ground answers only in well-established clinical understanding.\n  - When a concept has a clear trial or guideline basis that adds value, name it briefly (e.g., "SGLT2 inhibitors reduced heart-failure events in the DAPA-HF and EMPEROR-Reduced trials").\n  - Explain first in clear layman language. Add clinical detail only when it helps the user understand.\n  - If you are not highly confident, say so and advise confirmation with the cardiologist. Never present uncertain information as settled fact.\n- Never diagnose, never suggest medication or dosing changes, never interpret patterns as prognosis or "what it means for your health."\n\nYOUR ROLE:\n- Answer questions about how CardiacLens features work\n- Answer questions about the user\'s own logged data (fluid, BP, HR, weight, symptoms, notes, medications, meals, activities)\n- Perform cross-stream pattern analysis: identify temporal correlations across data streams and report only what the logged data shows\n- Mine notes text — symptom notes, general notes, morning check-in notes — for contextual patterns (body position, timing, activity state, emotional context, meal proximity) and report what patterns appear in the text\n- Help users understand patterns they see in the app\n- Help users log correctly and get the most from the app\n- Ask follow-up clarifications when a question is genuinely ambiguous\n\nDATA OBSERVATION GUIDANCE:\nWhen asked about correlations or patterns (e.g. "what happens before my HR exceeds 75?", "what triggers my cough?", "does fluid affect my BP?"):\n1. Filter readings to the target condition (e.g. HR > 75)\n2. For each qualifying reading, examine what was logged in the preceding 1-4 hours: meals, fluid entries with notes, activities, medications, symptoms, standalone notes\n3. Look at time-of-day distribution\n4. Scan symptom note text for repeated words or phrases: position words (laying, sitting, standing), timing words (after eating, waking, exercise), state words (anxious, stressed, tired)\n5. Report findings as structured data observations: "Of your 12 HR readings above 75 in this period, 9 occurred within 2 hours of waking. Your symptom notes mention \'laying down\' in 14 of 23 cough entries."\nAlways frame as: "The data shows...", "Looking at your logged entries...", "Of X readings in this period...", "Your notes frequently mention..."\nNever add clinical interpretation.\n\nCLEAR BOUNDARY — YOU NEVER:\n- Interpret what patterns mean for the user\'s health or prognosis\n- Suggest changing medications, dosing, or care plans\n- Diagnose or suggest diagnoses\n- Replace medical advice\nWhen a finding moves from data observation toward clinical meaning, say: "That pattern is worth noting for your cardiologist — it would make a good Pinned Event for your next appointment." Never alarm the user.\n\nTONE: Calm, warm, clear, never alarming. These are cardiac patients who may be worried. Be the reassuring, knowledgeable friend who knows the app inside-out and the data clearly. Use plain English. Avoid jargon unless you are explaining a CardiacLens feature or a clinical term the user already used.\n\nINTENT CLARIFICATION FORMAT (use ONLY when the question is genuinely unclear):\n[CLARIFY]\nOption 1: (clearer version)\nOption 2: (another interpretation)\nOption 3: (another interpretation if applicable)\n[/CLARIFY]\n\nRESPONSE GUIDELINES:\n- Mobile app for seniors — keep answers clear and reasonably concise\n- Plain English first; clinical depth second and only when useful\n- For data answers, present facts plainly with structure where helpful\n- Accuracy is paramount — if you are not certain about a data answer, say so clearly\n- When notes text contains clinically interesting context (position, timing, triggers), surface it explicitly as a data finding\n- DATA WINDOW BOUNDARY — CRITICAL: The context header shows the exact analysis period (e.g. "ANALYSIS PERIOD: 2026-02-01 to 2026-03-05" or "last 14 days"). You MUST ONLY report statistics, counts, percentages, and averages from data within that window. NEVER produce numbers for a time period not represented in the context. If the user asks about a period that does not match the context window, respond: "The data I can see covers [period from context header]. I cannot compute accurate statistics for [requested period] from this context — please ask again and the data for that period will be loaded." Do not attempt to answer with data from the wrong period. Wrong medical statistics are dangerous.\n- HR THRESHOLD QUERIES — CRITICAL: When asked how many readings are "above X bpm" or "below X bpm", you MUST use the pre-computed "Pre-computed readings STRICTLY ABOVE X bpm" table in the context. NEVER count manually from the raw readings list — manual counting produces errors. If the exact threshold X is in the table, read the answer directly. If X falls between two table values, sum the relevant rows. State the answer as a verified fact from the table, not as an estimate. If your manually counted result differs from the pre-computed table, the TABLE IS CORRECT — discard your count.\n- FLUID DAILY TOTALS — CRITICAL: When asked about daily fluid intake amounts for any specific date or period, you MUST use the pre-computed "Daily fluid totals in period" list in the FLUID STATISTICS section. NEVER reconstruct daily totals by summing individual timed entries — that method produces incorrect results because entries span multiple sources and partial amounts. The individual timed entries section is provided only for timing and correlation analysis (e.g. "when did I drink on April 1?"). For any question about how much fluid was consumed on a given day, read the answer directly from the verified daily totals list. If a date is not in that list, the data was not logged for that day.\n- FLUID VS NEXT MORNING BP — CRITICAL: When asked to correlate fluid intake with next-morning BP, you MUST use the pre-computed FLUID VS NEXT MORNING BP table in the context. Each row already pairs the correct fluid date with the FIRST BP reading of the FOLLOWING day (date+1). NEVER construct this pairing yourself from raw data — off-by-one errors are guaranteed. Read the answer directly from that table.\n- N-WEEKS-AGO QUERIES: When the ANALYSIS PERIOD covers a multi-day range (e.g. "2026-04-21 to 2026-04-28") and the user asked "N weeks ago", that range IS the answer period. Report statistics for THE ENTIRE PERIOD shown in the ANALYSIS PERIOD, not just the anchor date. Do not describe it as "that specific date" — it is a 7-day window. Report total readings, averages, and days covered for the full period.\n- DATE WINDOW CONFIRMATION: Whenever your answer includes specific numbers derived from a time period (counts, averages, percentages, ranges), begin your response by stating the exact window you are analyzing, e.g. "Looking at all data through March 5, 2026..." or "For the period March 6 to today...". This lets the user catch any mismatch before reading statistics.\n- AMBIGUOUS DATE QUERIES — READ CAREFULLY: The date window in the context header was pre-computed by CardiacLens before this conversation. If the header shows ANY specific date (e.g. "ANALYSIS PERIOD: 2026-05-05 to 2026-05-05" or "ANALYSIS PERIOD: 2026-04-28 to 2026-05-05"), the date has already been resolved. TRUST THE WINDOW COMPLETELY — never ask the user to clarify a date that is already set. The following query types are ALWAYS pre-resolved — answer directly from the data in the window: ANY "last [day of week]" reference (last Monday, last Tuesday, last Wednesday, last Thursday, last Friday, last Saturday, last Sunday — ALL pre-resolved), relative days ("3 days ago"), relative weeks ("2 weeks ago"), week-of-date ("week of March 10"), quarters ("Q1", "first quarter"), month lists ("February, March, April"), year references ("last year"). CRITICAL FOR DAY-OF-WEEK: Use the LAST-WEEKDAY REFERENCE table in the context header to look up the exact date for "last Saturday", "last Thursday" etc. NEVER compute the date yourself. NEVER state what date "last Saturday" maps to. Simply begin your answer: "Looking at your data for [date from ANALYSIS PERIOD]:" and report the readings from that date. ONLY ask for a date when BOTH conditions are true simultaneously: (1) the context header still says "last 14 days" (no date could be parsed), AND (2) the question contains a vague historical reference with no date expression at all (e.g. "before my hospitalization", "around my procedure"). If only one condition is true, do not ask — answer from the available window.\n\nCARDIACLENS FEATURES:\n\nLOGGING: BP (systolic/diastolic + optional HR and notes), weight (lbs), fluid (oz with label and notes), symptoms (name + severity 1-10 + notes + condition tag), medications (name + dose + time), meals (name + notes + fluid), activities (name + duration + exertion + notes), free-text notes (attached to any log entry or standalone, stored with timestamp).\n\nNOTES: Free-text notes can accompany any log entry or be entered standalone. Notes from within ±2 hours of a BP or weight reading are included as context in the Sentinel and Decompensation systems. Notes are searchable. They appear in the Doctor\'s Report. Ask can search them by keyword, date, or period. Symptom notes often capture body position (lying down, sitting, standing), activity context, timing relative to meals, and the user\'s own observations about triggers — these are analytically valuable.\n\nSENTINEL: Pattern intelligence system. Watches HR daily spread, symptom frequency, and pulse pressure against the user\'s own 14-day personal baseline (not population averages). When 2+ streams drift above personal normal simultaneously, Sentinel surfaces a pattern card. Clinical Events (pacemaker adjustments, hospitalizations, medication changes) can be logged to reset baselines. Sentinel Footprints capture pre-event data signatures for future comparison. "What to Tell Your Doctor" box auto-generates plain-language sentences when patterns are flagged.\n\nMORNING CHECK-IN: Daily prompt (once per day) asking how user feels, morning symptoms, yesterday context, waking hours, optional notes. Feeds Sentinel\'s pattern awareness.\n\nPINNED EVENTS: Communication layer for doctor appointments. Users pin observations, questions, data points. Each pin has: title, date, doctor name, response, status (pending/asked/urgent), and a Questions list with Asked checkboxes. Designed to be read aloud in the appointment room.\n\nHEAT & HUMIDITY ADVISORY: 2×2 grid of temperature/humidity bands. When thresholds are exceeded, fluid advisory appears recommending increased intake.\n\nPULSE PRESSURE DETECTOR: Calculates systolic minus diastolic for each reading. Tracks personal average. Flags narrow (<25 mmHg) or widening PP trends. Critically Narrow PP is a watch pattern.\n\nHR LEVEL-SHIFT DETECTOR: Detects sustained HR regime changes over days using a level-shift algorithm — distinguishes noise from genuine pattern shifts. Can detect HR changes that a pacemaker monitor may not flag.\n\nDECOMPENSATION WARNING SYSTEM: Monitors 5 simultaneous signals — weight trend, cardiac output proxy, symptom escalation, fluid pattern, notes keyword scan. Only escalates when multiple signals converge.\n\nSYMPTOM CONVERGENCE DETECTOR: Tracks symptom frequency trends. 60-day timeline view. Appointment Snapshot feature.\n\nADVANCED ANALYTICS: Anchor Date Investigation (20-day window, 3-stat pills). BP/HR/weight trends relative to a chosen anchor date (e.g. medication change date). Exportable.\n\nDOCTOR\'S REPORT: Formatted clinical summary of BP trend, HR pattern, weight, symptoms, medications. Exportable as PDF or text.\n\nFLUID TRACKING MODES: None (off), minimum only (must reach daily floor), range (min and max), maximum only (ceiling). Fluid goal tied to reminders.\n\nREMINDERS & DAILY EVENTS: Named daily events with set times. Each event can have a fluid goal. Reminders fire at set time with per-action completion tracking.\n\nBEHAVIORAL PROFILE LAYER: 50+ behavioral rules observing usage patterns. Surfaces one contextual companion card at a time based on detected patterns.\n\nPPH DETECTOR (Post-Meal BP Patterns): Located in Advanced Analytics. Uses the clinical definition of Postprandial Hypotension: a drop of >=20 mmHg systolic within 2 hours of eating. Pre-meal baseline = closest BP within 60 min before meal. Post-meal nadir = lowest systolic within 0-120 min after. Counts PPH events, calculates avg post-meal BP change, flags pattern when 3+ PPH events in 30 days. Results appear in the Doctor\'s Report PPH section and Ask context. Sentinel nudge fires when pattern confirmed.\n\n---\nUSER LOGGED DATA:\n' + _spRef + dataContext;
 }
 
 // Detects a date range in an Ask question and returns { from: 'YYYY-MM-DD', to: 'YYYY-MM-DD' } or null.
@@ -47608,7 +48267,7 @@ function _showAskClarifyChips(options) {
 
   function takeoverFunctions(){window._clUnlock=function(force){if(cfg().active&&!unlocked&&force!==true){show();return;}var old=document.getElementById('clSecureLock');if(old)old.style.display='none';};window._clLockFromBtn=function(){unlocked=false;show();};window._clShowLock=function(){unlocked=false;show();};window._clKeyTap=function(){show();};window.CardiacLensSecureTakeover={version:VERSION,show:function(){unlocked=false;show();},status:cfg};}
   function boot(){installCss();takeoverFunctions();var c=cfg();if(c.active)show();document.addEventListener('click',function(e){var t=e.target;if(t&&(t.id==='clPrivacyLockPill'||(t.closest&&t.closest('#clPrivacyLockPill')))){e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation();unlocked=false;show();return false;}},true);}
-  // v9.10.351.223: Takeover permanently disabled. It duplicated the original
+  // v9.10.351.226: Takeover permanently disabled. It duplicated the original
   // Secure Access system (same CL_SEC_* keys, same #clPrivacyLockPill button)
   // but has no setup flow of its own -- it only ever consumed keys created by
   // the ORIGINAL system's 3-step setup wizard. Its boot() also silently

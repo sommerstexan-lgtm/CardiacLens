@@ -1,10 +1,20 @@
 {
-  "version": "9.10.351.223",
-  "date": "2026-08-02",
+  "version": "9.10.351.226",
+  "date": "2026-08-04",
+  "releaseDate": "August 4, 2026",
   "build": "HelpAskGrokSeries",
   "notes": [
-    "Help What's New: accurate notes for Ask Grok switch (220), week vs week (221), comparison day-level detail (222)",
-    "Help/Ask copy: user-facing Claude references changed to Grok/Ask",
-    "Restored mis-labeled Secure Access note under v9.10.347.209"
+    "Help: Ask tab documents timed dose pairing, procedures, Sentinel, decompensation weight signals, pulse pressure, activities, cross-domain overlap",
+    "Help What's New: accurate notes for Ask precision series (224-226)",
+    "Ask: never invents missing clock times; uses only logged data"
+  ],
+  "whatsNew": [
+    "Ask timed medication dose pairing — first-of-day vs later doses using real clock times only",
+    "Ask covers procedures, Sentinel clinical events, decompensation weight signals, and pulse pressure",
+    "Ask activity history includes start/stop times and BP before/after recovery windows",
+    "Help → Ask tab updated with precision capabilities and example questions"
+  ],
+  "fixes": [
+    "Help What's New now matches the Ask precision features shipped in this series"
   ]
 }
