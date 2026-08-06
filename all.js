@@ -10,7 +10,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.351.227' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.351.228' }, params || {}));
       }
     } catch(e) {}
   };
@@ -933,7 +933,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.351.227';
+    var GD_VERSION   = 'v9.10.351.228';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1479,7 +1479,7 @@
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.351.227';
+  var CURRENT='v9.10.351.228';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -5498,7 +5498,7 @@ function updateFluid(){
 
   var mode=settings.fluidMode||'range';
 var _paceHtml=_buildFluidPaceHtml();
-// v9.10.351.227 — prefer real fluid-window projection; fall back to clock only if needed
+// v9.10.351.228 — prefer real fluid-window projection; fall back to clock only if needed
 var _updPace = (typeof _getFluidPaceMetrics === 'function') ? _getFluidPaceMetrics() : null;
 var projectedTotal = _updPace ? _updPace.projected : (function(){
   var now=new Date();
@@ -20218,7 +20218,7 @@ html+=lbBadge;
 html+='<div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">';
 html+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
 html+='<div>';
-html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.351.227</span></div>';
+html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.351.228</span></div>';
 html+='<div id="settingsVersionStatus" style="font-size:13px;color:#6b7280;margin-top:3px">Tap "Check for Updates" to see if a newer version is available</div>';
 html+='</div>';
 html+='<button onclick="checkForUpdates(true)" id="checkUpdateBtn" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">🔍 Check for Updates</button>';
@@ -23249,7 +23249,7 @@ function saveFluidEndTimeOverride(){
 }
 
 
-// ── Shared fluid-pace metrics (v9.10.351.227) ─────────────────────────────
+// ── Shared fluid-pace metrics (v9.10.351.228) ─────────────────────────────
 // Single source of truth for "what does the fluid day look like right now?"
 // Window = first logged fluid → fluidEndTime (or last fluid-goal event).
 // Falls back to clock-from-midnight ONLY when no usable window exists.
@@ -26601,7 +26601,7 @@ function analyzeDecompensation(){
     signals.push(signal4);
   } else {
 
-    // v9.10.351.227 — use shared pace metrics (first-fluid → endTime window)
+    // v9.10.351.228 — use shared pace metrics (first-fluid → endTime window)
     var _paceM = (typeof _getFluidPaceMetrics === 'function') ? _getFluidPaceMetrics() : null;
     var _fluidHoursElapsed = _paceM ? _paceM.hoursElapsedClock : (new Date().getHours() + new Date().getMinutes()/60);
     // Guard 2 — day is complete when fluid end-time has been reached (or noon fallback)
@@ -26626,7 +26626,7 @@ function analyzeDecompensation(){
     // Guard 3 — if a limit is prescribed, evaluate pace against the REAL fluid window
     var _hasLimit=settings.fluidMax&&settings.fluidMax>0;
     if(_hasLimit&&dailyFluid>0&&!_todayIsComplete){
-      // v9.10.351.227 — status follows the same "actual vs expected-at-this-point"
+      // v9.10.351.228 — status follows the same "actual vs expected-at-this-point"
       // model as _buildFluidPaceHtml. Rate-based end-of-window projection is
       // still shown for transparency but is no longer the sole yellow trigger
       // (it is unstable when only a few minutes of the fluid window have elapsed).
@@ -32520,7 +32520,7 @@ html+=`</div>`;
 
 html+=`
 <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:2px solid #e5e7eb;color:#6b7280;font-size:14px">
-<p style="margin:0">CardiacLens v9.10.351.227 - Free & Source-Available</p>
+<p style="margin:0">CardiacLens v9.10.351.228 - Free & Source-Available</p>
 <p style="margin:4px 0 0 0">Report Generated: ${reportDate}</p>
 </div>`;
 
@@ -32851,7 +32851,7 @@ Note: This report is based on patient self-tracked data. Clinical correlation
 and examination are essential for diagnosis and treatment decisions.
 
 ---
-CardiacLens v9.10.351.227 Medical Grade - Free
+CardiacLens v9.10.351.228 Medical Grade - Free
 Report Generated: ${reportDate}`;
 
 return text;
@@ -36988,7 +36988,7 @@ report.push(notes);
 report.push('');
 }
 report.push('═══════════════════════════════════════════════════════════');
-report.push('This report was generated by CardiacLens v9.10.351.227 Medical Grade - Free');
+report.push('This report was generated by CardiacLens v9.10.351.228 Medical Grade - Free');
 report.push('Advanced Analytics Dashboard - Phase 3 Implementation');
 report.push('═══════════════════════════════════════════════════════════');
 const blob=new Blob([report.join('\n')],{type:'text/plain'});
@@ -37078,7 +37078,7 @@ ${periodHTML}
 <h2>Key Insights</h2>
 ${insightsHTML}
 <div style="margin-top:40px;padding:20px;background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:8px">
-<strong>CardiacLens v9.10.351.227 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
+<strong>CardiacLens v9.10.351.228 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
 This report is not a substitute for professional medical advice.
 </div>
 </body>
@@ -38051,7 +38051,7 @@ alert(`🏃 Activity Summary\n\n` +
 var VERSION_JSON_URL = 'https://cardiaclens.com/version.json';
 var VERSION_CHECK_KEY = 'CARDIACLENS_LAST_VERSION_CHECK';
 var VERSION_DISMISSED_KEY = 'CARDIACLENS_UPDATE_DISMISSED';
-var CURRENT_VERSION = 'v9.10.351.226';
+var CURRENT_VERSION = 'v9.10.351.228';
 var _latestVersionData = null; // cached from last fetch
 
 // Detect whether running as an installed Home Screen PWA on iOS

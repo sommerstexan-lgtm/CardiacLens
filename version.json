@@ -1,21 +1,21 @@
 {
-  "version": "9.10.351.227",
+  "version": "9.10.351.228",
   "date": "2026-08-06",
   "releaseDate": "August 6, 2026",
-  "build": "FluidPaceWindowFix",
+  "build": "FluidPaceWindowFix-complete",
   "notes": [
-    "Fluid Intake Pattern & pacing: day window now starts at first logged fluid (not midnight)",
-    "Shared _getFluidPaceMetrics() used by Sentinel signal and Fluid tab projection",
-    "Drill-down shows real fluid-window elapsed time; day-complete respects fluidEndTime"
+    "Completes the v227 version-bump checklist (CURRENT_VERSION, sw.js CACHE_NAME, header date)",
+    "Fluid Intake Pattern & pacing: day window starts at first logged fluid (not midnight)",
+    "Shared _getFluidPaceMetrics() used by Sentinel signal and Fluid tab projection"
   ],
   "whatsNew": [
     "Fluid pace projection uses first-fluid \u2192 bedtime window instead of midnight clock",
     "Sentinel Fluid Intake Pattern card no longer false-flags late starters",
-    "Consistent pace metrics shared across status cards and reminders"
+    "Version display and service-worker cache name fully aligned at 228"
   ],
   "fixes": [
-    "Fluid Intake Pattern signal used midnight-based 24 h projection, producing incorrect % of limit for late day starts",
-    "updateFluid contained duplicated midnight projection lines",
-    "Help text claimed a configurable start time that did not exist; start remains derived from first log"
+    "v227 shipped with CURRENT_VERSION and sw.js CACHE_NAME still at 226 (visible version drift)",
+    "Fluid Intake Pattern signal used midnight-based 24 h projection",
+    "updateFluid contained duplicated midnight projection lines"
   ]
 }
