@@ -1,21 +1,20 @@
 {
-  "version": "9.10.351.228",
+  "version": "9.10.351.229",
   "date": "2026-08-06",
   "releaseDate": "August 6, 2026",
-  "build": "FluidPaceWindowFix-complete",
+  "build": "TodayFluidReview",
   "notes": [
-    "Completes the v227 version-bump checklist (CURRENT_VERSION, sw.js CACHE_NAME, header date)",
-    "Fluid Intake Pattern & pacing: day window starts at first logged fluid (not midnight)",
-    "Shared _getFluidPaceMetrics() used by Sentinel signal and Fluid tab projection"
+    "Total Today card: Review today's logs \u2014 time (Central), amount, source, note, running total, delete",
+    "Catches mistaken double entries that inflate pace/total",
+    "Help updated for fluid pace window + review logs"
   ],
   "whatsNew": [
-    "Fluid pace projection uses first-fluid \u2192 bedtime window instead of midnight clock",
-    "Sentinel Fluid Intake Pattern card no longer false-flags late starters",
-    "Version display and service-worker cache name fully aligned at 228"
+    "Review today's logs on the Total Today / pace card",
+    "Each entry shows Central Time, ounces, source (fluid log / BP / meal), note, running total",
+    "Delete mistaken entries directly from the review list"
   ],
   "fixes": [
-    "v227 shipped with CURRENT_VERSION and sw.js CACHE_NAME still at 226 (visible version drift)",
-    "Fluid Intake Pattern signal used midnight-based 24 h projection",
-    "updateFluid contained duplicated midnight projection lines"
+    "No one-tap audit of ounces making up Total Today (double-log could stay hidden)",
+    "Help still implied a configurable fluid start time; start is first logged drink"
   ]
 }

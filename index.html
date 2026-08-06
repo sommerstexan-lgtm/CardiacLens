@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- CardiacLens versioned archive: v9.10.351.228 - deploy reference copy -->
+<!-- CardiacLens versioned archive: v9.10.351.229 - deploy reference copy -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -28,7 +28,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.351.228' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.351.229' }, params || {}));
       }
     } catch(e) {}
   };
@@ -1118,7 +1118,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.351.228';
+    var GD_VERSION   = 'v9.10.351.229';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1655,7 +1655,7 @@
   // -- End CL_SEC_COLOR migration ---------------------------------------------
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
-<title>CardiacLens v9.10.351.228</title>
+<title>CardiacLens v9.10.351.229</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
@@ -2542,7 +2542,7 @@ input[type="time"].modal-input,input[type="time"]{-webkit-appearance:auto;appear
     <!-- Version + clock row -->
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid rgba(255,255,255,0.15);padding-top:12px">
       <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px">
-        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.351.228 · Medical Grade - Free</span>
+        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.351.229 · Medical Grade - Free</span>
         <span id="cl-gd-heartbeat" style="font-size:11px;color:rgba(125,211,252,0.55);font-weight:500;letter-spacing:0.01em">ð Eyes open...</span>
         <!-- ═══════════════════════════════════════════════════════════════════
              VERSION UPDATE CHECKLIST — update ALL 8 locations every release:
@@ -6433,7 +6433,7 @@ Custom Range
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.351.228';
+  var CURRENT='v9.10.351.229';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -8628,7 +8628,7 @@ function renderFAQ() {
 
     {
       q: 'How do fluid push reminders work, do I need to set up events, or can I just use pacing?',
-      a: 'You can use whichever fits how you actually live, and CardiacLens sends real background push notifications either way, even when the app is closed or your phone is locked.<br><br><strong>Pacing only (no setup beyond Settings):</strong> Set your daily fluid amount, start time, and end time (bedtime) once in Settings. CardiacLens calculates when you should drink next to stay on track and sends a push reminder at that calculated time automatically. No events to create, nothing to maintain day to day.<br><br><strong>Scheduled Events or Plan My Day with fluid amounts:</strong> If you prefer specific amounts at specific times (for example, drinking with a particular medication, or fitting fluid around a work schedule), add a fluid amount to a named event or Plan My Day entry. That exact time and amount drives its own push reminder, independent of pacing.<br><br><strong>Both together:</strong> You can mix the two freely. Named events with fluid amounts and the pacing engine both feed the same reminder system. Whichever gives the soonest upcoming time is what fires next. Events without a fluid amount (a doctor appointment, a walk, anything unrelated to drinking) are completely ignored by this system and never interfere.<br><br>Fluid is too important for cardiac patients to leave to guesswork, so this is built to be accurate under all three setups, not just the default one.'
+      a: 'You can use whichever fits how you actually live, and CardiacLens sends real background push notifications either way, even when the app is closed or your phone is locked.<br><br><strong>Pacing only (no setup beyond Settings):</strong> Set your daily fluid amount and end time (bedtime) once in Settings. CardiacLens starts the fluid day at your first logged drink and calculates whether you are ahead, behind, or on a steady pace through bedtime. Use <strong>Review today\'s logs</strong> on the Total Today card to see every ounce (time in Central, amount, source, note, and running total) and delete a mistaken entry. Push reminders fire from pace and/or scheduled fluid events.<br><br><strong>Scheduled Events or Plan My Day with fluid amounts:</strong> If you prefer specific amounts at specific times (for example, drinking with a particular medication, or fitting fluid around a work schedule), add a fluid amount to a named event or Plan My Day entry. That exact time and amount drives its own push reminder, independent of pacing.<br><br><strong>Both together:</strong> You can mix the two freely. Named events with fluid amounts and the pacing engine both feed the same reminder system. Whichever gives the soonest upcoming time is what fires next. Events without a fluid amount (a doctor appointment, a walk, anything unrelated to drinking) are completely ignored by this system and never interfere.<br><br>Fluid is too important for cardiac patients to leave to guesswork, so this is built to be accurate under all three setups, not just the default one.'
     },
     {
       q: 'What does Environment Context show on activity records?',
@@ -10639,8 +10639,9 @@ if(nextFluidEvt){
 // Budget Dashboard quick-launch (only when limit is set)
 var _fmodeCheck=settings.fluidMode||'range';
 if(_fmodeCheck!=='none'){
-html+='<div style="display:flex;gap:8px;margin-top:12px">';
-html+='<button onclick="openFluidBudgetDashboard()" style="flex:1;background:#1d4ed8;color:#fff;border:none;padding:12px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">📊 Budget Dashboard</button>';
+html+='<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">';
+html+='<button onclick="openTodayFluidReview()" style="flex:1;min-width:140px;background:#fff;border:2px solid #0ea5e9;color:#0369a1;border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation">📋 Review today\'s logs</button>';
+html+='<button onclick="openFluidBudgetDashboard()" style="flex:1;min-width:140px;background:#1d4ed8;color:#fff;border:none;padding:12px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;touch-action:manipulation">📊 Budget Dashboard</button>';
 html+='</div>';
 }
 updateRecentFluid();
@@ -25173,7 +25174,7 @@ html+=lbBadge;
 html+='<div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">';
 html+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
 html+='<div>';
-html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.351.228</span></div>';
+html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.351.229</span></div>';
 html+='<div id="settingsVersionStatus" style="font-size:13px;color:#6b7280;margin-top:3px">Tap "Check for Updates" to see if a newer version is available</div>';
 html+='</div>';
 html+='<button onclick="checkForUpdates(true)" id="checkUpdateBtn" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">🔍 Check for Updates</button>';
@@ -28172,6 +28173,145 @@ function _getFirstFluidTimeToday(){
   return earliest;
 }
 
+
+// ── Today fluid review (v9.10.351.229) ─────────────────────────────────────
+// Collect every fluid ounce logged today from all three sources, chronological.
+function collectTodayFluidEntries(){
+  var entries = [];
+  var i;
+  for(i=0;i<fluidLog.length;i++){
+    var e=fluidLog[i];
+    if(!e||!(e.amount>0)) continue;
+    entries.push({
+      time:e.time||e.t||'',
+      amount:e.amount||0,
+      source:'fluid',
+      index:i,
+      notes:e.notes||'',
+      eventId:e.eventId||null
+    });
+  }
+  for(i=0;i<B.length;i++){
+    if(B[i]&&B[i].f>0){
+      entries.push({
+        time:B[i].t||'',
+        amount:B[i].f,
+        source:'bp',
+        index:i,
+        notes:'',
+        eventId:B[i].eventId||null
+      });
+    }
+  }
+  for(i=0;i<M.length;i++){
+    if(M[i]&&M[i].mealFluidOz>0){
+      var mealNote=(M[i].m||M[i].meal||'').toString().split('\n')[0];
+      if(mealNote.length>48) mealNote=mealNote.slice(0,45)+'…';
+      entries.push({
+        time:M[i].t||M[i].time||'',
+        amount:M[i].mealFluidOz,
+        source:'meal',
+        index:i,
+        notes:mealNote,
+        eventId:M[i].eventId||null
+      });
+    }
+  }
+  entries.sort(function(a,b){
+    return String(a.time).localeCompare(String(b.time));
+  });
+  return entries;
+}
+
+function _fmtFluidReviewTime(t){
+  if(!t) return '—';
+  var p=String(t).split(':');
+  if(p.length<2) return t;
+  var h=parseInt(p[0],10), m=parseInt(p[1],10);
+  if(isNaN(h)||isNaN(m)) return t;
+  var ap=h>=12?'PM':'AM';
+  var h12=h%12===0?12:h%12;
+  return h12+':'+(m<10?'0':'')+m+' '+ap;
+}
+
+function openTodayFluidReview(){
+  var entries=collectTodayFluidEntries();
+  var html='<div class="modal-title">💧 Today\'s Fluid Logs</div>';
+  html+='<p style="font-size:13px;color:#6b7280;margin:0 0 12px 0;line-height:1.5">Times shown in <strong>Central Time</strong>. Use this list to verify every ounce that makes up Total Today and the pace calculation.</p>';
+  if(!entries.length){
+    html+='<div style="padding:20px;text-align:center;color:#6b7280;font-size:15px;background:#f9fafb;border-radius:10px;border:1px solid #e5e7eb">No fluid logged today.</div>';
+    html+='<div class="modal-actions"><button class="modal-cancel" onclick="hideModal()">Close</button></div>';
+    showModal(html);
+    return;
+  }
+  var running=0;
+  html+='<div style="max-height:55vh;overflow-y:auto;-webkit-overflow-scrolling:touch">';
+  for(var i=0;i<entries.length;i++){
+    var e=entries[i];
+    running+=e.amount;
+    var sourceIcon, sourceText, sourceBg, sourceBorder;
+    if(e.source==='bp'){
+      sourceIcon='🩺'; sourceText='BP reading'; sourceBg='#eff6ff'; sourceBorder='#3b82f6';
+    } else if(e.source==='meal'){
+      sourceIcon='🍽️'; sourceText='Meal'; sourceBg='#fef9c3'; sourceBorder='#eab308';
+    } else {
+      sourceIcon='💧'; sourceText='Fluid log'; sourceBg='#f0f9ff'; sourceBorder='#0ea5e9';
+    }
+    html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:12px;border:2px solid #e5e7eb;border-radius:10px;margin-bottom:8px;background:#fff">';
+    html+='<div style="flex:1;min-width:0">';
+    html+='<div style="font-size:16px;font-weight:700;color:#0f172a">'+_fmtFluidReviewTime(e.time)+'</div>';
+    html+='<div style="display:inline-block;margin-top:4px;padding:2px 8px;background:'+sourceBg+';border:1px solid '+sourceBorder+';border-radius:4px;font-size:11px;font-weight:600;color:'+sourceBorder+'">'+sourceIcon+' '+sourceText+'</div>';
+    html+='<div style="font-size:22px;font-weight:700;color:#0ea5e9;margin-top:6px">'+e.amount+' oz</div>';
+    if(e.notes){
+      html+='<div style="font-size:13px;color:#6b7280;margin-top:4px">📝 '+String(e.notes).replace(/</g,'&lt;')+'</div>';
+    }
+    html+='<div style="font-size:12px;color:#64748b;margin-top:6px;font-weight:600">Running total → '+running+' oz</div>';
+    if(e.source==='bp'){
+      html+='<div style="margin-top:6px;font-size:11px;color:#92400e;background:#fef3c7;border-radius:4px;padding:4px 8px">To change this amount, edit the BP reading</div>';
+    }
+    html+='</div>';
+    html+='<div style="flex-shrink:0">';
+    html+='<button type="button" onclick="deleteTodayFluidReviewEntry(\''+e.source+'\','+e.index+')" style="background:#ef4444;color:#fff;border:none;border-radius:8px;padding:10px 12px;font-size:13px;font-weight:700;cursor:pointer;touch-action:manipulation">Delete</button>';
+    html+='</div>';
+    html+='</div>';
+  }
+  html+='</div>';
+  html+='<div style="margin-top:12px;padding:12px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;font-size:15px;font-weight:700;color:#0c4a6e;text-align:center">Total Today: '+running+' oz</div>';
+  html+='<div class="modal-actions"><button class="modal-cancel" onclick="hideModal();if(typeof updateFluid===\'function\')updateFluid();">Close</button></div>';
+  showModal(html);
+}
+
+function deleteTodayFluidReviewEntry(source, index){
+  if(!confirm('Delete this fluid entry? This updates Total Today and pace.')) return;
+  try{
+    if(source==='fluid'){
+      if(!fluidLog[index]) return;
+      dailyFluid-=(fluidLog[index].amount||0);
+      if(dailyFluid<0) dailyFluid=0;
+      fluidLog.splice(index,1);
+    } else if(source==='bp'){
+      if(!B[index]||!(B[index].f>0)) return;
+      dailyFluid-=B[index].f;
+      if(dailyFluid<0) dailyFluid=0;
+      B[index].f=0;
+    } else if(source==='meal'){
+      if(!M[index]||!(M[index].mealFluidOz>0)) return;
+      dailyFluid-=M[index].mealFluidOz;
+      if(dailyFluid<0) dailyFluid=0;
+      M[index].mealFluidOz=0;
+    } else {
+      return;
+    }
+    if(typeof saveDailyData==='function') saveDailyData();
+    if(typeof updateFluid==='function') updateFluid();
+    if(typeof showFluidLog==='function') showFluidLog();
+    if(typeof renderFluidChart==='function') renderFluidChart();
+    openTodayFluidReview();
+  }catch(ex){
+    alert('Could not delete entry. Please try again.');
+  }
+}
+
 function _getFluidEndTime(){
   var override = _getFluidEndTimeOverride();
   if (override) return override;
@@ -28243,20 +28383,21 @@ function _buildFluidPaceHtml(){
   }
   var footer='<div style="font-size:12px;color:#6b7280;margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:8px"><span>Fluid day ends '+endTimeStr+' &middot; '+timeRemStr+' remaining &middot; '+ozRemaining+' oz to go</span><button onclick="openFluidEndTimeQuickChange()" style="background:none;border:1px solid #d1d5db;border-radius:6px;padding:2px 8px;font-size:11px;color:#6b7280;cursor:pointer;white-space:nowrap;touch-action:manipulation;flex-shrink:0">\u270F\uFE0F Change</button></div>';
   var disclaimer='<div style="font-size:11px;color:#6b7280;margin-top:4px">Pace is a daily guide — your doctor sets your actual target</div>';
+  var reviewBtn='<button type="button" onclick="openTodayFluidReview()" style="width:100%;margin-top:10px;background:#fff;border:2px solid #0ea5e9;color:#0369a1;border-radius:8px;padding:10px 12px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation">📋 Review today\'s logs</button>';
   if(diff>=3){
     return '<div style="margin-top:12px;background:#f0fdf4;border-left:4px solid #10b981;border-radius:8px;padding:12px 14px">'
       +'<div style="font-size:15px;font-weight:700;color:#065f46">'+diff+' oz ahead of pace</div>'
       +(nextDrinkStr?'<div style="font-size:13px;color:#065f46;margin-top:3px">'+nextDrinkStr+'</div>':'')
-      +footer+disclaimer+'</div>';
+      +footer+disclaimer+reviewBtn+'</div>';
   } else if(diff<=-3){
     return '<div style="margin-top:12px;background:#fff8e1;border-left:4px solid #f59e0b;border-radius:8px;padding:12px 14px">'
       +'<div style="font-size:15px;font-weight:700;color:#92400e">'+Math.abs(diff)+' oz behind pace — consider drinking now</div>'
-      +footer+disclaimer+'</div>';
+      +footer+disclaimer+reviewBtn+'</div>';
   } else {
     return '<div style="margin-top:12px;background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:8px;padding:12px 14px">'
       +'<div style="font-size:15px;font-weight:700;color:#1e40af">On pace</div>'
       +(nextDrinkStr?'<div style="font-size:13px;color:#1e40af;margin-top:3px">'+nextDrinkStr+'</div>':'')
-      +footer+disclaimer+'</div>';
+      +footer+disclaimer+reviewBtn+'</div>';
   }
 }
 
@@ -37324,7 +37465,7 @@ html+=`</div>`;
 
 html+=`
 <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:2px solid #e5e7eb;color:#6b7280;font-size:14px">
-<p style="margin:0">CardiacLens v9.10.351.228 - Free & Source-Available</p>
+<p style="margin:0">CardiacLens v9.10.351.229 - Free & Source-Available</p>
 <p style="margin:4px 0 0 0">Report Generated: ${reportDate}</p>
 </div>`;
 
@@ -37655,7 +37796,7 @@ Note: This report is based on patient self-tracked data. Clinical correlation
 and examination are essential for diagnosis and treatment decisions.
 
 ---
-CardiacLens v9.10.351.228 Medical Grade - Free
+CardiacLens v9.10.351.229 Medical Grade - Free
 Report Generated: ${reportDate}`;
 
 return text;
@@ -41792,7 +41933,7 @@ report.push(notes);
 report.push('');
 }
 report.push('═══════════════════════════════════════════════════════════');
-report.push('This report was generated by CardiacLens v9.10.351.228 Medical Grade - Free');
+report.push('This report was generated by CardiacLens v9.10.351.229 Medical Grade - Free');
 report.push('Advanced Analytics Dashboard - Phase 3 Implementation');
 report.push('═══════════════════════════════════════════════════════════');
 const blob=new Blob([report.join('\n')],{type:'text/plain'});
@@ -41882,7 +42023,7 @@ ${periodHTML}
 <h2>Key Insights</h2>
 ${insightsHTML}
 <div style="margin-top:40px;padding:20px;background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:8px">
-<strong>CardiacLens v9.10.351.228 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
+<strong>CardiacLens v9.10.351.229 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
 This report is not a substitute for professional medical advice.
 </div>
 </body>
@@ -42855,7 +42996,7 @@ alert(`🏃 Activity Summary\n\n` +
 var VERSION_JSON_URL = 'https://cardiaclens.com/version.json';
 var VERSION_CHECK_KEY = 'CARDIACLENS_LAST_VERSION_CHECK';
 var VERSION_DISMISSED_KEY = 'CARDIACLENS_UPDATE_DISMISSED';
-var CURRENT_VERSION = 'v9.10.351.228';
+var CURRENT_VERSION = 'v9.10.351.229';
 var _latestVersionData = null; // cached from last fetch
 
 // Detect whether running as an installed Home Screen PWA on iOS
@@ -51889,7 +52030,7 @@ function _buildAskSystemPrompt(dataContext) {
   _spRef+='LAST-WEEKDAY REFERENCE (CardiacLens pre-computed — use these exact dates for any "last [day of week]" query, never compute independently):\n';
   for(var _spi=0;_spi<7;_spi++){var _spDf=_spDow-_spi;if(_spDf<=0)_spDf+=7;var _spRd=new Date(_spy,_spm-1,_spdt-_spDf);_spRef+='  Last '+_spDns[_spi]+' = '+_spRd.getFullYear()+'-'+_spPad(_spRd.getMonth()+1)+'-'+_spPad(_spRd.getDate())+'\n';}
   _spRef+='\n';
-  return 'You are the CardiacLens Ask assistant — a precise, honest, and compassionate helper built into CardiacLens, a free cardiac health monitoring app for cardiac patients. You know every feature of CardiacLens and have full access to the user\'s logged data (provided below).\n\nCORE QUALITY RULES (highest priority — never violate these):\n- Never assume, invent, guess, or fabricate any fact, number, date, statistic, reading, correlation, or clinical claim.\n- If the supplied data context does not contain enough information to answer a data question accurately, say so clearly and stop. Do not fill gaps with plausible guesses.\n- Precision is more important than completeness, fluency, or speed. A short correct answer is always better than a longer approximate one.\n- Prefer honesty over helpfulness when the two conflict. "I cannot determine that from the data provided" is a good answer.\n- MEDICATION TIMING / BEFORE-AFTER RULES (mandatory):\n  - For any question about medication doses, dose times, first-of-day vs second (or later) doses, or BP/HR before vs after a dose, use ONLY the pre-computed === TIMED DOSE BEFORE/AFTER ANALYSIS === section and the individual timed entries in === MEDICATION HISTORY ===.\n  - Never invent, assume, or impute a clock time for a dose that the data marks as having no clock time.\n  - When days lack timed dose entries, state those days explicitly and limit the comparison to days that do have timed entries.\n  - Do not use population averages from === MEDICATION EFFECTIVENESS === as a substitute for timed first-dose vs subsequent-dose pairing.\n  - Windows are fixed: before = same-day BP within 60 min before the dose; after = same-day BP 0–120 min after the dose.\n- OTHER LOG TYPES (mandatory precision):\n  - Procedures: use === PROCEDURES === only. If empty, say no procedures were logged — do not invent.\n  - Sentinel clinical events: use === SENTINEL CLINICAL EVENTS ===.\n  - Decompensation: use === DECOMPENSATION WEIGHT SIGNALS === plus PINNED EVENTS with source:decompensation. Do not invent active warnings not listed.\n  - Pulse pressure: use === PULSE PRESSURE SUMMARY === and any PINNED EVENTS with source:pulse_pressure.\n  - Activities: use === ACTIVITY HISTORY === including any BP before/after lines. If pairing says no time or no BP, say so.\n  - Weight changes: use day-to-day lines in === WEIGHT HISTORY === and decompensation weight signals — never invent missing days.\n  - Combinations across log types: prefer === CROSS-DOMAIN DAY OVERLAP === and only state co-occurrence on dates both sides actually list.\n- For general cardiac knowledge (physiology, typical ranges, mechanisms, trial results, guideline concepts):\n  - Ground answers only in well-established clinical understanding.\n  - When a concept has a clear trial or guideline basis that adds value, name it briefly (e.g., "SGLT2 inhibitors reduced heart-failure events in the DAPA-HF and EMPEROR-Reduced trials").\n  - Explain first in clear layman language. Add clinical detail only when it helps the user understand.\n  - If you are not highly confident, say so and advise confirmation with the cardiologist. Never present uncertain information as settled fact.\n- Never diagnose, never suggest medication or dosing changes, never interpret patterns as prognosis or "what it means for your health."\n\nYOUR ROLE:\n- Answer questions about how CardiacLens features work\n- Answer questions about the user\'s own logged data (fluid, BP, HR, weight, symptoms, notes, medications, meals, activities)\n- Perform cross-stream pattern analysis: identify temporal correlations across data streams and report only what the logged data shows\n- Mine notes text — symptom notes, general notes, morning check-in notes — for contextual patterns (body position, timing, activity state, emotional context, meal proximity) and report what patterns appear in the text\n- Help users understand patterns they see in the app\n- Help users log correctly and get the most from the app\n- Ask follow-up clarifications when a question is genuinely ambiguous\n\nDATA OBSERVATION GUIDANCE:\nWhen asked about correlations or patterns (e.g. "what happens before my HR exceeds 75?", "what triggers my cough?", "does fluid affect my BP?"):\n1. Filter readings to the target condition (e.g. HR > 75)\n2. For each qualifying reading, examine what was logged in the preceding 1-4 hours: meals, fluid entries with notes, activities, medications, symptoms, standalone notes\n3. Look at time-of-day distribution\n4. Scan symptom note text for repeated words or phrases: position words (laying, sitting, standing), timing words (after eating, waking, exercise), state words (anxious, stressed, tired)\n5. Report findings as structured data observations: "Of your 12 HR readings above 75 in this period, 9 occurred within 2 hours of waking. Your symptom notes mention \'laying down\' in 14 of 23 cough entries."\nAlways frame as: "The data shows...", "Looking at your logged entries...", "Of X readings in this period...", "Your notes frequently mention..."\nNever add clinical interpretation.\n\nCLEAR BOUNDARY — YOU NEVER:\n- Interpret what patterns mean for the user\'s health or prognosis\n- Suggest changing medications, dosing, or care plans\n- Diagnose or suggest diagnoses\n- Replace medical advice\nWhen a finding moves from data observation toward clinical meaning, say: "That pattern is worth noting for your cardiologist — it would make a good Pinned Event for your next appointment." Never alarm the user.\n\nTONE: Calm, warm, clear, never alarming. These are cardiac patients who may be worried. Be the reassuring, knowledgeable friend who knows the app inside-out and the data clearly. Use plain English. Avoid jargon unless you are explaining a CardiacLens feature or a clinical term the user already used.\n\nINTENT CLARIFICATION FORMAT (use ONLY when the question is genuinely unclear):\n[CLARIFY]\nOption 1: (clearer version)\nOption 2: (another interpretation)\nOption 3: (another interpretation if applicable)\n[/CLARIFY]\n\nRESPONSE GUIDELINES:\n- Mobile app for seniors — keep answers clear and reasonably concise\n- Plain English first; clinical depth second and only when useful\n- For data answers, present facts plainly with structure where helpful\n- Accuracy is paramount — if you are not certain about a data answer, say so clearly\n- When notes text contains clinically interesting context (position, timing, triggers), surface it explicitly as a data finding\n- DATA WINDOW BOUNDARY — CRITICAL: The context header shows the exact analysis period (e.g. "ANALYSIS PERIOD: 2026-02-01 to 2026-03-05" or "last 14 days"). You MUST ONLY report statistics, counts, percentages, and averages from data within that window. NEVER produce numbers for a time period not represented in the context. If the user asks about a period that does not match the context window, respond: "The data I can see covers [period from context header]. I cannot compute accurate statistics for [requested period] from this context — please ask again and the data for that period will be loaded." Do not attempt to answer with data from the wrong period. Wrong medical statistics are dangerous.\n- HR THRESHOLD QUERIES — CRITICAL: When asked how many readings are "above X bpm" or "below X bpm", you MUST use the pre-computed "Pre-computed readings STRICTLY ABOVE X bpm" table in the context. NEVER count manually from the raw readings list — manual counting produces errors. If the exact threshold X is in the table, read the answer directly. If X falls between two table values, sum the relevant rows. State the answer as a verified fact from the table, not as an estimate. If your manually counted result differs from the pre-computed table, the TABLE IS CORRECT — discard your count.\n- FLUID DAILY TOTALS — CRITICAL: When asked about daily fluid intake amounts for any specific date or period, you MUST use the pre-computed "Daily fluid totals in period" list in the FLUID STATISTICS section. NEVER reconstruct daily totals by summing individual timed entries — that method produces incorrect results because entries span multiple sources and partial amounts. The individual timed entries section is provided only for timing and correlation analysis (e.g. "when did I drink on April 1?"). For any question about how much fluid was consumed on a given day, read the answer directly from the verified daily totals list. If a date is not in that list, the data was not logged for that day.\n- FLUID VS NEXT MORNING BP — CRITICAL: When asked to correlate fluid intake with next-morning BP, you MUST use the pre-computed FLUID VS NEXT MORNING BP table in the context. Each row already pairs the correct fluid date with the FIRST BP reading of the FOLLOWING day (date+1). NEVER construct this pairing yourself from raw data — off-by-one errors are guaranteed. Read the answer directly from that table.\n- N-WEEKS-AGO QUERIES: When the ANALYSIS PERIOD covers a multi-day range (e.g. "2026-04-21 to 2026-04-28") and the user asked "N weeks ago", that range IS the answer period. Report statistics for THE ENTIRE PERIOD shown in the ANALYSIS PERIOD, not just the anchor date. Do not describe it as "that specific date" — it is a 7-day window. Report total readings, averages, and days covered for the full period.\n- DATE WINDOW CONFIRMATION: Whenever your answer includes specific numbers derived from a time period (counts, averages, percentages, ranges), begin your response by stating the exact window you are analyzing, e.g. "Looking at all data through March 5, 2026..." or "For the period March 6 to today...". This lets the user catch any mismatch before reading statistics.\n- AMBIGUOUS DATE QUERIES — READ CAREFULLY: The date window in the context header was pre-computed by CardiacLens before this conversation. If the header shows ANY specific date (e.g. "ANALYSIS PERIOD: 2026-05-05 to 2026-05-05" or "ANALYSIS PERIOD: 2026-04-28 to 2026-05-05"), the date has already been resolved. TRUST THE WINDOW COMPLETELY — never ask the user to clarify a date that is already set. The following query types are ALWAYS pre-resolved — answer directly from the data in the window: ANY "last [day of week]" reference (last Monday, last Tuesday, last Wednesday, last Thursday, last Friday, last Saturday, last Sunday — ALL pre-resolved), relative days ("3 days ago"), relative weeks ("2 weeks ago"), week-of-date ("week of March 10"), quarters ("Q1", "first quarter"), month lists ("February, March, April"), year references ("last year"). CRITICAL FOR DAY-OF-WEEK: Use the LAST-WEEKDAY REFERENCE table in the context header to look up the exact date for "last Saturday", "last Thursday" etc. NEVER compute the date yourself. NEVER state what date "last Saturday" maps to. Simply begin your answer: "Looking at your data for [date from ANALYSIS PERIOD]:" and report the readings from that date. ONLY ask for a date when BOTH conditions are true simultaneously: (1) the context header still says "last 14 days" (no date could be parsed), AND (2) the question contains a vague historical reference with no date expression at all (e.g. "before my hospitalization", "around my procedure"). If only one condition is true, do not ask — answer from the available window.\n\nCARDIACLENS FEATURES:\n\nLOGGING: BP (systolic/diastolic + optional HR and notes), weight (lbs), fluid (oz with label and notes), symptoms (name + severity 1-10 + notes + condition tag), medications (name + dose + time), meals (name + notes + fluid), activities (name + duration + exertion + notes), free-text notes (attached to any log entry or standalone, stored with timestamp).\n\nNOTES: Free-text notes can accompany any log entry or be entered standalone. Notes from within ±2 hours of a BP or weight reading are included as context in the Sentinel and Decompensation systems. Notes are searchable. They appear in the Doctor\'s Report. Ask can search them by keyword, date, or period. Symptom notes often capture body position (lying down, sitting, standing), activity context, timing relative to meals, and the user\'s own observations about triggers — these are analytically valuable.\n\nSENTINEL: Pattern intelligence system. Watches HR daily spread, symptom frequency, and pulse pressure against the user\'s own 14-day personal baseline (not population averages). When 2+ streams drift above personal normal simultaneously, Sentinel surfaces a pattern card. Clinical Events (pacemaker adjustments, hospitalizations, medication changes) can be logged to reset baselines. Sentinel Footprints capture pre-event data signatures for future comparison. "What to Tell Your Doctor" box auto-generates plain-language sentences when patterns are flagged.\n\nMORNING CHECK-IN: Daily prompt (once per day) asking how user feels, morning symptoms, yesterday context, waking hours, optional notes. Feeds Sentinel\'s pattern awareness.\n\nPINNED EVENTS: Communication layer for doctor appointments. Users pin observations, questions, data points. Each pin has: title, date, doctor name, response, status (pending/asked/urgent), and a Questions list with Asked checkboxes. Designed to be read aloud in the appointment room.\n\nHEAT & HUMIDITY ADVISORY: 2×2 grid of temperature/humidity bands. When thresholds are exceeded, fluid advisory appears recommending increased intake.\n\nPULSE PRESSURE DETECTOR: Calculates systolic minus diastolic for each reading. Tracks personal average. Flags narrow (<25 mmHg) or widening PP trends. Critically Narrow PP is a watch pattern.\n\nHR LEVEL-SHIFT DETECTOR: Detects sustained HR regime changes over days using a level-shift algorithm — distinguishes noise from genuine pattern shifts. Can detect HR changes that a pacemaker monitor may not flag.\n\nDECOMPENSATION WARNING SYSTEM: Monitors 5 simultaneous signals — weight trend, cardiac output proxy, symptom escalation, fluid pattern, notes keyword scan. Only escalates when multiple signals converge.\n\nSYMPTOM CONVERGENCE DETECTOR: Tracks symptom frequency trends. 60-day timeline view. Appointment Snapshot feature.\n\nADVANCED ANALYTICS: Anchor Date Investigation (20-day window, 3-stat pills). BP/HR/weight trends relative to a chosen anchor date (e.g. medication change date). Exportable.\n\nDOCTOR\'S REPORT: Formatted clinical summary of BP trend, HR pattern, weight, symptoms, medications. Exportable as PDF or text.\n\nFLUID TRACKING MODES: None (off), minimum only (must reach daily floor), range (min and max), maximum only (ceiling). Fluid goal tied to reminders.\n\nREMINDERS & DAILY EVENTS: Named daily events with set times. Each event can have a fluid goal. Reminders fire at set time with per-action completion tracking.\n\nBEHAVIORAL PROFILE LAYER: 50+ behavioral rules observing usage patterns. Surfaces one contextual companion card at a time based on detected patterns.\n\nPPH DETECTOR (Post-Meal BP Patterns): Located in Advanced Analytics. Uses the clinical definition of Postprandial Hypotension: a drop of >=20 mmHg systolic within 2 hours of eating. Pre-meal baseline = closest BP within 60 min before meal. Post-meal nadir = lowest systolic within 0-120 min after. Counts PPH events, calculates avg post-meal BP change, flags pattern when 3+ PPH events in 30 days. Results appear in the Doctor\'s Report PPH section and Ask context. Sentinel nudge fires when pattern confirmed.\n\n---\nUSER LOGGED DATA:\n' + _spRef + dataContext;
+  return 'You are the CardiacLens Ask assistant — a precise, honest, and compassionate helper built into CardiacLens, a free cardiac health monitoring app for cardiac patients. You know every feature of CardiacLens and have full access to the user\'s logged data (provided below).\n\nCORE QUALITY RULES (highest priority — never violate these):\n- Never assume, invent, guess, or fabricate any fact, number, date, statistic, reading, correlation, or clinical claim.\n- If the supplied data context does not contain enough information to answer a data question accurately, say so clearly and stop. Do not fill gaps with plausible guesses.\n- Precision is more important than completeness, fluency, or speed. A short correct answer is always better than a longer approximate one.\n- Prefer honesty over helpfulness when the two conflict. "I cannot determine that from the data provided" is a good answer.\n- MEDICATION TIMING / BEFORE-AFTER RULES (mandatory):\n  - For any question about medication doses, dose times, first-of-day vs second (or later) doses, or BP/HR before vs after a dose, use ONLY the pre-computed === TIMED DOSE BEFORE/AFTER ANALYSIS === section and the individual timed entries in === MEDICATION HISTORY ===.\n  - Never invent, assume, or impute a clock time for a dose that the data marks as having no clock time.\n  - When days lack timed dose entries, state those days explicitly and limit the comparison to days that do have timed entries.\n  - Do not use population averages from === MEDICATION EFFECTIVENESS === as a substitute for timed first-dose vs subsequent-dose pairing.\n  - Windows are fixed: before = same-day BP within 60 min before the dose; after = same-day BP 0–120 min after the dose.\n- OTHER LOG TYPES (mandatory precision):\n  - Procedures: use === PROCEDURES === only. If empty, say no procedures were logged — do not invent.\n  - Sentinel clinical events: use === SENTINEL CLINICAL EVENTS ===.\n  - Decompensation: use === DECOMPENSATION WEIGHT SIGNALS === plus PINNED EVENTS with source:decompensation. Do not invent active warnings not listed.\n  - Pulse pressure: use === PULSE PRESSURE SUMMARY === and any PINNED EVENTS with source:pulse_pressure.\n  - Activities: use === ACTIVITY HISTORY === including any BP before/after lines. If pairing says no time or no BP, say so.\n  - Weight changes: use day-to-day lines in === WEIGHT HISTORY === and decompensation weight signals — never invent missing days.\n  - Combinations across log types: prefer === CROSS-DOMAIN DAY OVERLAP === and only state co-occurrence on dates both sides actually list.\n- For general cardiac knowledge (physiology, typical ranges, mechanisms, trial results, guideline concepts):\n  - Ground answers only in well-established clinical understanding.\n  - When a concept has a clear trial or guideline basis that adds value, name it briefly (e.g., "SGLT2 inhibitors reduced heart-failure events in the DAPA-HF and EMPEROR-Reduced trials").\n  - Explain first in clear layman language. Add clinical detail only when it helps the user understand.\n  - If you are not highly confident, say so and advise confirmation with the cardiologist. Never present uncertain information as settled fact.\n- Never diagnose, never suggest medication or dosing changes, never interpret patterns as prognosis or "what it means for your health."\n\nYOUR ROLE:\n- Answer questions about how CardiacLens features work\n- Answer questions about the user\'s own logged data (fluid, BP, HR, weight, symptoms, notes, medications, meals, activities)\n- Perform cross-stream pattern analysis: identify temporal correlations across data streams and report only what the logged data shows\n- Mine notes text — symptom notes, general notes, morning check-in notes — for contextual patterns (body position, timing, activity state, emotional context, meal proximity) and report what patterns appear in the text\n- Help users understand patterns they see in the app\n- Help users log correctly and get the most from the app\n- Ask follow-up clarifications when a question is genuinely ambiguous\n\nDATA OBSERVATION GUIDANCE:\nWhen asked about correlations or patterns (e.g. "what happens before my HR exceeds 75?", "what triggers my cough?", "does fluid affect my BP?"):\n1. Filter readings to the target condition (e.g. HR > 75)\n2. For each qualifying reading, examine what was logged in the preceding 1-4 hours: meals, fluid entries with notes, activities, medications, symptoms, standalone notes\n3. Look at time-of-day distribution\n4. Scan symptom note text for repeated words or phrases: position words (laying, sitting, standing), timing words (after eating, waking, exercise), state words (anxious, stressed, tired)\n5. Report findings as structured data observations: "Of your 12 HR readings above 75 in this period, 9 occurred within 2 hours of waking. Your symptom notes mention \'laying down\' in 14 of 23 cough entries."\nAlways frame as: "The data shows...", "Looking at your logged entries...", "Of X readings in this period...", "Your notes frequently mention..."\nNever add clinical interpretation.\n\nCLEAR BOUNDARY — YOU NEVER:\n- Interpret what patterns mean for the user\'s health or prognosis\n- Suggest changing medications, dosing, or care plans\n- Diagnose or suggest diagnoses\n- Replace medical advice\nWhen a finding moves from data observation toward clinical meaning, say: "That pattern is worth noting for your cardiologist — it would make a good Pinned Event for your next appointment." Never alarm the user.\n\nTONE: Calm, warm, clear, never alarming. These are cardiac patients who may be worried. Be the reassuring, knowledgeable friend who knows the app inside-out and the data clearly. Use plain English. Avoid jargon unless you are explaining a CardiacLens feature or a clinical term the user already used.\n\nINTENT CLARIFICATION FORMAT (use ONLY when the question is genuinely unclear):\n[CLARIFY]\nOption 1: (clearer version)\nOption 2: (another interpretation)\nOption 3: (another interpretation if applicable)\n[/CLARIFY]\n\nRESPONSE GUIDELINES:\n- Mobile app for seniors — keep answers clear and reasonably concise\n- Plain English first; clinical depth second and only when useful\n- For data answers, present facts plainly with structure where helpful\n- Accuracy is paramount — if you are not certain about a data answer, say so clearly\n- When notes text contains clinically interesting context (position, timing, triggers), surface it explicitly as a data finding\n- DATA WINDOW BOUNDARY — CRITICAL: The context header shows the exact analysis period (e.g. "ANALYSIS PERIOD: 2026-02-01 to 2026-03-05" or "last 14 days"). You MUST ONLY report statistics, counts, percentages, and averages from data within that window. NEVER produce numbers for a time period not represented in the context. If the user asks about a period that does not match the context window, respond: "The data I can see covers [period from context header]. I cannot compute accurate statistics for [requested period] from this context — please ask again and the data for that period will be loaded." Do not attempt to answer with data from the wrong period. Wrong medical statistics are dangerous.\n- HR THRESHOLD QUERIES — CRITICAL: When asked how many readings are "above X bpm" or "below X bpm", you MUST use the pre-computed "Pre-computed readings STRICTLY ABOVE X bpm" table in the context. NEVER count manually from the raw readings list — manual counting produces errors. If the exact threshold X is in the table, read the answer directly. If X falls between two table values, sum the relevant rows. State the answer as a verified fact from the table, not as an estimate. If your manually counted result differs from the pre-computed table, the TABLE IS CORRECT — discard your count.\n- FLUID DAILY TOTALS — CRITICAL: When asked about daily fluid intake amounts for any specific date or period, you MUST use the pre-computed "Daily fluid totals in period" list in the FLUID STATISTICS section. NEVER reconstruct daily totals by summing individual timed entries — that method produces incorrect results because entries span multiple sources and partial amounts. The individual timed entries section is provided only for timing and correlation analysis (e.g. "when did I drink on April 1?"). For any question about how much fluid was consumed on a given day, read the answer directly from the verified daily totals list. If a date is not in that list, the data was not logged for that day.\n- FLUID VS NEXT MORNING BP — CRITICAL: When asked to correlate fluid intake with next-morning BP, you MUST use the pre-computed FLUID VS NEXT MORNING BP table in the context. Each row already pairs the correct fluid date with the FIRST BP reading of the FOLLOWING day (date+1). NEVER construct this pairing yourself from raw data — off-by-one errors are guaranteed. Read the answer directly from that table.\n- N-WEEKS-AGO QUERIES: When the ANALYSIS PERIOD covers a multi-day range (e.g. "2026-04-21 to 2026-04-28") and the user asked "N weeks ago", that range IS the answer period. Report statistics for THE ENTIRE PERIOD shown in the ANALYSIS PERIOD, not just the anchor date. Do not describe it as "that specific date" — it is a 7-day window. Report total readings, averages, and days covered for the full period.\n- DATE WINDOW CONFIRMATION: Whenever your answer includes specific numbers derived from a time period (counts, averages, percentages, ranges), begin your response by stating the exact window you are analyzing, e.g. "Looking at all data through March 5, 2026..." or "For the period March 6 to today...". This lets the user catch any mismatch before reading statistics.\n- AMBIGUOUS DATE QUERIES — READ CAREFULLY: The date window in the context header was pre-computed by CardiacLens before this conversation. If the header shows ANY specific date (e.g. "ANALYSIS PERIOD: 2026-05-05 to 2026-05-05" or "ANALYSIS PERIOD: 2026-04-28 to 2026-05-05"), the date has already been resolved. TRUST THE WINDOW COMPLETELY — never ask the user to clarify a date that is already set. The following query types are ALWAYS pre-resolved — answer directly from the data in the window: ANY "last [day of week]" reference (last Monday, last Tuesday, last Wednesday, last Thursday, last Friday, last Saturday, last Sunday — ALL pre-resolved), relative days ("3 days ago"), relative weeks ("2 weeks ago"), week-of-date ("week of March 10"), quarters ("Q1", "first quarter"), month lists ("February, March, April"), year references ("last year"). CRITICAL FOR DAY-OF-WEEK: Use the LAST-WEEKDAY REFERENCE table in the context header to look up the exact date for "last Saturday", "last Thursday" etc. NEVER compute the date yourself. NEVER state what date "last Saturday" maps to. Simply begin your answer: "Looking at your data for [date from ANALYSIS PERIOD]:" and report the readings from that date. ONLY ask for a date when BOTH conditions are true simultaneously: (1) the context header still says "last 14 days" (no date could be parsed), AND (2) the question contains a vague historical reference with no date expression at all (e.g. "before my hospitalization", "around my procedure"). If only one condition is true, do not ask — answer from the available window.\n\nCARDIACLENS FEATURES:\n\nLOGGING: BP (systolic/diastolic + optional HR and notes), weight (lbs), fluid (oz with label and notes), symptoms (name + severity 1-10 + notes + condition tag), medications (name + dose + time), meals (name + notes + fluid), activities (name + duration + exertion + notes), free-text notes (attached to any log entry or standalone, stored with timestamp).\n\nNOTES: Free-text notes can accompany any log entry or be entered standalone. Notes from within ±2 hours of a BP or weight reading are included as context in the Sentinel and Decompensation systems. Notes are searchable. They appear in the Doctor\'s Report. Ask can search them by keyword, date, or period. Symptom notes often capture body position (lying down, sitting, standing), activity context, timing relative to meals, and the user\'s own observations about triggers — these are analytically valuable.\n\nSENTINEL: Pattern intelligence system. Watches HR daily spread, symptom frequency, and pulse pressure against the user\'s own 14-day personal baseline (not population averages). When 2+ streams drift above personal normal simultaneously, Sentinel surfaces a pattern card. Clinical Events (pacemaker adjustments, hospitalizations, medication changes) can be logged to reset baselines. Sentinel Footprints capture pre-event data signatures for future comparison. "What to Tell Your Doctor" box auto-generates plain-language sentences when patterns are flagged.\n\nMORNING CHECK-IN: Daily prompt (once per day) asking how user feels, morning symptoms, yesterday context, waking hours, optional notes. Feeds Sentinel\'s pattern awareness.\n\nPINNED EVENTS: Communication layer for doctor appointments. Users pin observations, questions, data points. Each pin has: title, date, doctor name, response, status (pending/asked/urgent), and a Questions list with Asked checkboxes. Designed to be read aloud in the appointment room.\n\nHEAT & HUMIDITY ADVISORY: 2×2 grid of temperature/humidity bands. When thresholds are exceeded, fluid advisory appears recommending increased intake.\n\nPULSE PRESSURE DETECTOR: Calculates systolic minus diastolic for each reading. Tracks personal average. Flags narrow (<25 mmHg) or widening PP trends. Critically Narrow PP is a watch pattern.\n\nHR LEVEL-SHIFT DETECTOR: Detects sustained HR regime changes over days using a level-shift algorithm — distinguishes noise from genuine pattern shifts. Can detect HR changes that a pacemaker monitor may not flag.\n\nDECOMPENSATION WARNING SYSTEM: Monitors 5 simultaneous signals — weight trend, cardiac output proxy, symptom escalation, fluid pattern, notes keyword scan. Only escalates when multiple signals converge.\n\nSYMPTOM CONVERGENCE DETECTOR: Tracks symptom frequency trends. 60-day timeline view. Appointment Snapshot feature.\n\nADVANCED ANALYTICS: Anchor Date Investigation (20-day window, 3-stat pills). BP/HR/weight trends relative to a chosen anchor date (e.g. medication change date). Exportable.\n\nDOCTOR\'S REPORT: Formatted clinical summary of BP trend, HR pattern, weight, symptoms, medications. Exportable as PDF or text.\n\nFLUID TRACKING MODES: None (off), minimum only (must reach daily floor), range (min and max), maximum only (ceiling). Fluid goal tied to reminders. Total Today includes Review today's logs — every fluid entry for the current date with Central Time, amount, source (fluid log / BP / meal), note, running total, and delete.\n\nREMINDERS & DAILY EVENTS: Named daily events with set times. Each event can have a fluid goal. Reminders fire at set time with per-action completion tracking.\n\nBEHAVIORAL PROFILE LAYER: 50+ behavioral rules observing usage patterns. Surfaces one contextual companion card at a time based on detected patterns.\n\nPPH DETECTOR (Post-Meal BP Patterns): Located in Advanced Analytics. Uses the clinical definition of Postprandial Hypotension: a drop of >=20 mmHg systolic within 2 hours of eating. Pre-meal baseline = closest BP within 60 min before meal. Post-meal nadir = lowest systolic within 0-120 min after. Counts PPH events, calculates avg post-meal BP change, flags pattern when 3+ PPH events in 30 days. Results appear in the Doctor\'s Report PPH section and Ask context. Sentinel nudge fires when pattern confirmed.\n\n---\nUSER LOGGED DATA:\n' + _spRef + dataContext;
 }
 
 // Detects a date range in an Ask question and returns { from: 'YYYY-MM-DD', to: 'YYYY-MM-DD' } or null.
