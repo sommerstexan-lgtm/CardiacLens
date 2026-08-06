@@ -1,20 +1,21 @@
 {
-  "version": "9.10.351.226",
-  "date": "2026-08-04",
-  "releaseDate": "August 4, 2026",
-  "build": "HelpAskGrokSeries",
+  "version": "9.10.351.227",
+  "date": "2026-08-06",
+  "releaseDate": "August 6, 2026",
+  "build": "FluidPaceWindowFix",
   "notes": [
-    "Help: Ask tab documents timed dose pairing, procedures, Sentinel, decompensation weight signals, pulse pressure, activities, cross-domain overlap",
-    "Help What's New: accurate notes for Ask precision series (224-226)",
-    "Ask: never invents missing clock times; uses only logged data"
+    "Fluid Intake Pattern & pacing: day window now starts at first logged fluid (not midnight)",
+    "Shared _getFluidPaceMetrics() used by Sentinel signal and Fluid tab projection",
+    "Drill-down shows real fluid-window elapsed time; day-complete respects fluidEndTime"
   ],
   "whatsNew": [
-    "Ask timed medication dose pairing — first-of-day vs later doses using real clock times only",
-    "Ask covers procedures, Sentinel clinical events, decompensation weight signals, and pulse pressure",
-    "Ask activity history includes start/stop times and BP before/after recovery windows",
-    "Help → Ask tab updated with precision capabilities and example questions"
+    "Fluid pace projection uses first-fluid \u2192 bedtime window instead of midnight clock",
+    "Sentinel Fluid Intake Pattern card no longer false-flags late starters",
+    "Consistent pace metrics shared across status cards and reminders"
   ],
   "fixes": [
-    "Help What's New now matches the Ask precision features shipped in this series"
+    "Fluid Intake Pattern signal used midnight-based 24 h projection, producing incorrect % of limit for late day starts",
+    "updateFluid contained duplicated midnight projection lines",
+    "Help text claimed a configurable start time that did not exist; start remains derived from first log"
   ]
 }

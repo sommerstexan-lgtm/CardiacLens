@@ -10,7 +10,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.351.226' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.351.227' }, params || {}));
       }
     } catch(e) {}
   };
@@ -933,7 +933,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.351.226';
+    var GD_VERSION   = 'v9.10.351.227';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1479,7 +1479,7 @@
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.351.226';
+  var CURRENT='v9.10.351.227';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -5498,14 +5498,13 @@ function updateFluid(){
 
   var mode=settings.fluidMode||'range';
 var _paceHtml=_buildFluidPaceHtml();
-var now=new Date();
-var hoursElapsed=now.getHours()+(now.getMinutes()/60);
-var hoursRemaining=Math.max(24-hoursElapsed,0.1);
-var projectedTotal=hoursElapsed>0?Math.round((dailyFluid/hoursElapsed)*24):dailyFluid;
-var now=new Date();
-var hoursElapsed=now.getHours()+(now.getMinutes()/60);
-var hoursRemaining=Math.max(24-hoursElapsed,0.1);
-var projectedTotal=hoursElapsed>0?Math.round((dailyFluid/hoursElapsed)*24):dailyFluid;
+// v9.10.351.227 — prefer real fluid-window projection; fall back to clock only if needed
+var _updPace = (typeof _getFluidPaceMetrics === 'function') ? _getFluidPaceMetrics() : null;
+var projectedTotal = _updPace ? _updPace.projected : (function(){
+  var now=new Date();
+  var hoursElapsed=now.getHours()+(now.getMinutes()/60);
+  return hoursElapsed>0?Math.round((dailyFluid/hoursElapsed)*24):dailyFluid;
+})();
 var html='<div style="font-size:20px;margin-bottom:12px">💧 Total Today: <span style="font-size:32px;font-weight:bold;color:#1e3a5f">'+dailyFluid+' oz</span></div>';
 
 if(mode==='none'){
@@ -20219,7 +20218,7 @@ html+=lbBadge;
 html+='<div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">';
 html+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
 html+='<div>';
-html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.351.226</span></div>';
+html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.351.227</span></div>';
 html+='<div id="settingsVersionStatus" style="font-size:13px;color:#6b7280;margin-top:3px">Tap "Check for Updates" to see if a newer version is available</div>';
 html+='</div>';
 html+='<button onclick="checkForUpdates(true)" id="checkUpdateBtn" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">🔍 Check for Updates</button>';
@@ -23247,6 +23246,89 @@ function saveFluidEndTimeOverride(){
   } catch(e) {}
   hideModal();
   renderFluidChart();
+}
+
+
+// ── Shared fluid-pace metrics (v9.10.351.227) ─────────────────────────────
+// Single source of truth for "what does the fluid day look like right now?"
+// Window = first logged fluid → fluidEndTime (or last fluid-goal event).
+// Falls back to clock-from-midnight ONLY when no usable window exists.
+function _getFluidPaceMetrics(){
+  var target = (settings.fluidMode && settings.fluidMode !== 'none') ? (settings.fluidMax || 64) : 80;
+  var firstFluid = _getFirstFluidTimeToday();
+  var endTime = _getFluidEndTime();
+  var now = new Date();
+  var nowMins = now.getHours() * 60 + now.getMinutes();
+  var hoursElapsedClock = now.getHours() + (now.getMinutes() / 60);
+  function toMins(t){
+    if(!t) return null;
+    var p = String(t).split(':');
+    return parseInt(p[0],10) * 60 + parseInt(p[1] || 0,10);
+  }
+  // No usable window → legacy 24 h clock projection (last resort)
+  if(!firstFluid || !endTime){
+    var projected = hoursElapsedClock > 0 ? Math.round((dailyFluid / hoursElapsedClock) * 24) : dailyFluid;
+    return {
+      hasWindow: false,
+      firstFluid: firstFluid || null,
+      endTime: endTime || null,
+      target: target,
+      actual: dailyFluid,
+      expected: null,
+      diff: null,
+      projected: projected,
+      elapsedMins: null,
+      remainingMins: null,
+      windowMins: null,
+      hoursElapsedClock: hoursElapsedClock,
+      dayComplete: hoursElapsedClock >= 12
+    };
+  }
+  var startMins = toMins(firstFluid);
+  var endMins = toMins(endTime);
+  var windowMins = endMins - startMins;
+  if(windowMins <= 0){
+    var projected2 = hoursElapsedClock > 0 ? Math.round((dailyFluid / hoursElapsedClock) * 24) : dailyFluid;
+    return {
+      hasWindow: false,
+      firstFluid: firstFluid,
+      endTime: endTime,
+      target: target,
+      actual: dailyFluid,
+      expected: null,
+      diff: null,
+      projected: projected2,
+      elapsedMins: null,
+      remainingMins: null,
+      windowMins: null,
+      hoursElapsedClock: hoursElapsedClock,
+      dayComplete: nowMins >= endMins
+    };
+  }
+  var elapsedMins = Math.max(0, nowMins - startMins);
+  var remainingMins = Math.max(0, endMins - nowMins);
+  var expected = Math.round((elapsedMins / windowMins) * target);
+  var actual = dailyFluid;
+  var diff = actual - expected;
+  // Project end-of-window total assuming current rate continues inside the real window
+  var projected = (elapsedMins > 0)
+    ? Math.round(actual + (actual / elapsedMins) * remainingMins)
+    : actual;
+  return {
+    hasWindow: true,
+    firstFluid: firstFluid,
+    endTime: endTime,
+    target: target,
+    actual: actual,
+    expected: expected,
+    diff: diff,
+    projected: projected,
+    elapsedMins: elapsedMins,
+    remainingMins: remainingMins,
+    windowMins: windowMins,
+    hoursElapsedClock: hoursElapsedClock,
+    dayComplete: nowMins >= endMins
+  };
 }
 
 function _getFirstFluidTimeToday(){
@@ -26519,10 +26601,11 @@ function analyzeDecompensation(){
     signals.push(signal4);
   } else {
 
-    var _fluidNow=new Date();
-    var _fluidHoursElapsed=_fluidNow.getHours()+(_fluidNow.getMinutes()/60);
-    // Guard 2 — before noon, today is a partial day: keep it out of comparisons
-    var _todayIsComplete=_fluidHoursElapsed>=12;
+    // v9.10.351.227 — use shared pace metrics (first-fluid → endTime window)
+    var _paceM = (typeof _getFluidPaceMetrics === 'function') ? _getFluidPaceMetrics() : null;
+    var _fluidHoursElapsed = _paceM ? _paceM.hoursElapsedClock : (new Date().getHours() + new Date().getMinutes()/60);
+    // Guard 2 — day is complete when fluid end-time has been reached (or noon fallback)
+    var _todayIsComplete = _paceM ? _paceM.dayComplete : (_fluidHoursElapsed >= 12);
     // Only include today in the dataset if the day is far enough along to be meaningful
     if(dailyFluid>0&&_todayIsComplete){
       fluidDays.push({date:todayKey,oz:dailyFluid,partial:false});
@@ -26540,31 +26623,59 @@ function analyzeDecompensation(){
     }
     fluidDays.sort(function(a,b){return a.date.localeCompare(b.date);});
 
-    // Guard 3 — if a limit is prescribed, evaluate pace against the limit
+    // Guard 3 — if a limit is prescribed, evaluate pace against the REAL fluid window
     var _hasLimit=settings.fluidMax&&settings.fluidMax>0;
     if(_hasLimit&&dailyFluid>0&&!_todayIsComplete){
-      // Project today's end-of-day total based on current pace
-      var _projectedToday=_fluidHoursElapsed>0?Math.round((dailyFluid/_fluidHoursElapsed)*24):dailyFluid;
-      var _paceOk=_projectedToday>=(settings.fluidMax*0.70);
-      var _todayStr='Today: '+dailyFluid.toFixed(0)+' oz logged · Projected: ~'+_projectedToday+' oz';
-      if(_paceOk){
-        signal4.status='green';signal4.points=0;
-        signal4.detail=_todayStr+' · On pace for limit ('+settings.fluidMax+' oz) ✓';
+      // v9.10.351.227 — status follows the same "actual vs expected-at-this-point"
+      // model as _buildFluidPaceHtml. Rate-based end-of-window projection is
+      // still shown for transparency but is no longer the sole yellow trigger
+      // (it is unstable when only a few minutes of the fluid window have elapsed).
+      var _projectedToday = _paceM ? _paceM.projected : (_fluidHoursElapsed>0?Math.round((dailyFluid/_fluidHoursElapsed)*24):dailyFluid);
+      var _elapsedLabel = '';
+      if(_paceM && _paceM.hasWindow){
+        var _eh = Math.floor(_paceM.elapsedMins/60), _em = Math.round(_paceM.elapsedMins%60);
+        _elapsedLabel = (_eh>0?_eh+'h ':'') + (_em>0?_em+'m':'') + ' of fluid window';
       } else {
-        // Only flag if pace suggests genuinely low intake relative to target
-        var _pctOfLimit=Math.round((_projectedToday/settings.fluidMax)*100);
-        if(_pctOfLimit<50){
-          signal4.status='yellow';signal4.points=1;
+        _elapsedLabel = _fluidHoursElapsed.toFixed(1)+' hrs elapsed (clock)';
+      }
+      var _todayStr = 'Today: '+dailyFluid.toFixed(0)+' oz logged · Projected: ~'+_projectedToday+' oz';
+      var _pctOfLimit = Math.round((_projectedToday/settings.fluidMax)*100);
+
+      // Prefer expected-at-this-point when we have a real window
+      if(_paceM && _paceM.hasWindow && _paceM.expected !== null){
+        var _diff = _paceM.diff; // actual - expected
+        if(_diff >= -3){
+          // on or ahead of expected for this point in the day
+          signal4.status='green'; signal4.points=0;
+          signal4.detail=_todayStr+' · On pace for limit ('+settings.fluidMax+' oz) ✓';
+        } else if(_pctOfLimit < 50){
+          // meaningfully behind expected AND projected end total is low
+          signal4.status='yellow'; signal4.points=1;
           signal4.detail=_todayStr+' · ⚠️ Pace suggests ~'+_pctOfLimit+'% of '+settings.fluidMax+' oz limit by end of day';
         } else {
-          signal4.status='green';signal4.points=0;
+          signal4.status='green'; signal4.points=0;
+          signal4.detail=_todayStr+' · Intake tracking normally';
+        }
+      } else {
+        // No window yet — fall back to the (now secondary) rate check
+        if(_projectedToday >= (settings.fluidMax * 0.70)){
+          signal4.status='green'; signal4.points=0;
+          signal4.detail=_todayStr+' · On pace for limit ('+settings.fluidMax+' oz) ✓';
+        } else if(_pctOfLimit < 50){
+          signal4.status='yellow'; signal4.points=1;
+          signal4.detail=_todayStr+' · ⚠️ Pace suggests ~'+_pctOfLimit+'% of '+settings.fluidMax+' oz limit by end of day';
+        } else {
+          signal4.status='green'; signal4.points=0;
           signal4.detail=_todayStr+' · Intake tracking normally';
         }
       }
+      var _windowNote = (_paceM && _paceM.hasWindow)
+        ? 'Projection uses first fluid ('+_paceM.firstFluid+') → end time ('+_paceM.endTime+'). Expected at this point: ~'+_paceM.expected+' oz.'
+        : 'Projection uses current pace — actual total depends on when you log fluid.';
       signal4.drilldown='<b>Daily limit:</b> '+settings.fluidMax+' oz<br>'+
-        '<b>Logged so far:</b> '+dailyFluid.toFixed(0)+' oz ('+_fluidHoursElapsed.toFixed(1)+' hrs elapsed)<br>'+
+        '<b>Logged so far:</b> '+dailyFluid.toFixed(0)+' oz ('+_elapsedLabel+')<br>'+
         '<b>Projected total:</b> ~'+_projectedToday+' oz<br>'+
-        '<b>Note:</b> Projection uses current pace — actual total depends on when you log fluid.';
+        '<b>Note:</b> '+_windowNote;
     } else if(fluidDays.length>=3){
       var allFOz=fluidDays.map(function(d){return d.oz;});
       var fluidAvg=allFOz.reduce(function(s,v){return s+v;},0)/allFOz.length;
@@ -32409,7 +32520,7 @@ html+=`</div>`;
 
 html+=`
 <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:2px solid #e5e7eb;color:#6b7280;font-size:14px">
-<p style="margin:0">CardiacLens v9.10.351.226 - Free & Source-Available</p>
+<p style="margin:0">CardiacLens v9.10.351.227 - Free & Source-Available</p>
 <p style="margin:4px 0 0 0">Report Generated: ${reportDate}</p>
 </div>`;
 
@@ -32740,7 +32851,7 @@ Note: This report is based on patient self-tracked data. Clinical correlation
 and examination are essential for diagnosis and treatment decisions.
 
 ---
-CardiacLens v9.10.351.226 Medical Grade - Free
+CardiacLens v9.10.351.227 Medical Grade - Free
 Report Generated: ${reportDate}`;
 
 return text;
@@ -36877,7 +36988,7 @@ report.push(notes);
 report.push('');
 }
 report.push('═══════════════════════════════════════════════════════════');
-report.push('This report was generated by CardiacLens v9.10.351.226 Medical Grade - Free');
+report.push('This report was generated by CardiacLens v9.10.351.227 Medical Grade - Free');
 report.push('Advanced Analytics Dashboard - Phase 3 Implementation');
 report.push('═══════════════════════════════════════════════════════════');
 const blob=new Blob([report.join('\n')],{type:'text/plain'});
@@ -36967,7 +37078,7 @@ ${periodHTML}
 <h2>Key Insights</h2>
 ${insightsHTML}
 <div style="margin-top:40px;padding:20px;background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:8px">
-<strong>CardiacLens v9.10.351.226 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
+<strong>CardiacLens v9.10.351.227 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
 This report is not a substitute for professional medical advice.
 </div>
 </body>
