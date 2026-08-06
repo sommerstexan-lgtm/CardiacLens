@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- CardiacLens versioned archive: v9.10.351.229 - deploy reference copy -->
+<!-- CardiacLens versioned archive: v9.10.351.230 - deploy reference copy -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -28,7 +28,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.351.229' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.351.230' }, params || {}));
       }
     } catch(e) {}
   };
@@ -1118,7 +1118,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.351.229';
+    var GD_VERSION   = 'v9.10.351.230';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1655,7 +1655,7 @@
   // -- End CL_SEC_COLOR migration ---------------------------------------------
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
-<title>CardiacLens v9.10.351.229</title>
+<title>CardiacLens v9.10.351.230</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
@@ -2542,7 +2542,7 @@ input[type="time"].modal-input,input[type="time"]{-webkit-appearance:auto;appear
     <!-- Version + clock row -->
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid rgba(255,255,255,0.15);padding-top:12px">
       <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px">
-        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.351.229 · Medical Grade - Free</span>
+        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.351.230 · Medical Grade - Free</span>
         <span id="cl-gd-heartbeat" style="font-size:11px;color:rgba(125,211,252,0.55);font-weight:500;letter-spacing:0.01em">ð Eyes open...</span>
         <!-- ═══════════════════════════════════════════════════════════════════
              VERSION UPDATE CHECKLIST — update ALL 8 locations every release:
@@ -6433,7 +6433,7 @@ Custom Range
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.351.229';
+  var CURRENT='v9.10.351.230';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -25174,7 +25174,7 @@ html+=lbBadge;
 html+='<div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">';
 html+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
 html+='<div>';
-html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.351.229</span></div>';
+html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.351.230</span></div>';
 html+='<div id="settingsVersionStatus" style="font-size:13px;color:#6b7280;margin-top:3px">Tap "Check for Updates" to see if a newer version is available</div>';
 html+='</div>';
 html+='<button onclick="checkForUpdates(true)" id="checkUpdateBtn" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">🔍 Check for Updates</button>';
@@ -28174,7 +28174,7 @@ function _getFirstFluidTimeToday(){
 }
 
 
-// ── Today fluid review (v9.10.351.229) ─────────────────────────────────────
+// ── Today fluid review (v9.10.351.230) ─────────────────────────────────────
 // Collect every fluid ounce logged today from all three sources, chronological.
 function collectTodayFluidEntries(){
   var entries = [];
@@ -37465,7 +37465,7 @@ html+=`</div>`;
 
 html+=`
 <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:2px solid #e5e7eb;color:#6b7280;font-size:14px">
-<p style="margin:0">CardiacLens v9.10.351.229 - Free & Source-Available</p>
+<p style="margin:0">CardiacLens v9.10.351.230 - Free & Source-Available</p>
 <p style="margin:4px 0 0 0">Report Generated: ${reportDate}</p>
 </div>`;
 
@@ -37796,7 +37796,7 @@ Note: This report is based on patient self-tracked data. Clinical correlation
 and examination are essential for diagnosis and treatment decisions.
 
 ---
-CardiacLens v9.10.351.229 Medical Grade - Free
+CardiacLens v9.10.351.230 Medical Grade - Free
 Report Generated: ${reportDate}`;
 
 return text;
@@ -41933,7 +41933,7 @@ report.push(notes);
 report.push('');
 }
 report.push('═══════════════════════════════════════════════════════════');
-report.push('This report was generated by CardiacLens v9.10.351.229 Medical Grade - Free');
+report.push('This report was generated by CardiacLens v9.10.351.230 Medical Grade - Free');
 report.push('Advanced Analytics Dashboard - Phase 3 Implementation');
 report.push('═══════════════════════════════════════════════════════════');
 const blob=new Blob([report.join('\n')],{type:'text/plain'});
@@ -42023,7 +42023,7 @@ ${periodHTML}
 <h2>Key Insights</h2>
 ${insightsHTML}
 <div style="margin-top:40px;padding:20px;background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:8px">
-<strong>CardiacLens v9.10.351.229 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
+<strong>CardiacLens v9.10.351.230 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
 This report is not a substitute for professional medical advice.
 </div>
 </body>
@@ -42996,7 +42996,50 @@ alert(`🏃 Activity Summary\n\n` +
 var VERSION_JSON_URL = 'https://cardiaclens.com/version.json';
 var VERSION_CHECK_KEY = 'CARDIACLENS_LAST_VERSION_CHECK';
 var VERSION_DISMISSED_KEY = 'CARDIACLENS_UPDATE_DISMISSED';
-var CURRENT_VERSION = 'v9.10.351.229';
+var CURRENT_VERSION = 'v9.10.351.230';
+
+// v9.10.351.230 — hard version enforcement: if deployed version.json is newer, force reload once
+(function(){
+  try {
+    if (navigator.serviceWorker) {
+      navigator.serviceWorker.addEventListener('message', function(ev){
+        if (ev.data && ev.data.type === 'CL_SW_ACTIVATED') {
+          var k = 'CL_SW_RELOAD_' + (ev.data.cache || '');
+          if (!sessionStorage.getItem(k)) {
+            sessionStorage.setItem(k, '1');
+            location.reload(true);
+          }
+        }
+      });
+      navigator.serviceWorker.getRegistration().then(function(reg){
+        if (!reg) return;
+        reg.update();
+        if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }).catch(function(){});
+    }
+    // Bust caches on version.json
+    fetch('version.json?_=' + Date.now(), { cache: 'no-store' }).then(function(r){ return r.json(); }).then(function(v){
+      if (!v || !v.version) return;
+      var remote = String(v.version).replace(/^v/, '');
+      var local = (typeof CURRENT_VERSION !== 'undefined' ? String(CURRENT_VERSION) : '').replace(/^v/, '');
+      if (remote && local && remote !== local) {
+        var rk = 'CL_VER_RELOAD_' + remote;
+        if (!sessionStorage.getItem(rk)) {
+          sessionStorage.setItem(rk, '1');
+          if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.getRegistration().then(function(reg){
+              if (reg && reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+              location.reload(true);
+            });
+          } else {
+            location.reload(true);
+          }
+        }
+      }
+    }).catch(function(){});
+  } catch (e) {}
+})();
+
 var _latestVersionData = null; // cached from last fetch
 
 // Detect whether running as an installed Home Screen PWA on iOS

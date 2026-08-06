@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.351.229-nosecui';
+const CACHE_NAME = 'cardiaclens-v9.10.351.230-nosecui';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
@@ -8,7 +8,13 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => Promise.all(
       keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
-    )).then(() => self.clients.claim())
+    )).then(() => self.clients.claim()).then(() => {
+      return self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
+        clients.forEach(client => {
+          try { client.postMessage({ type: 'CL_SW_ACTIVATED', cache: CACHE_NAME }); } catch (e) {}
+        });
+      });
+    })
   );
 });
 
@@ -19,11 +25,18 @@ self.addEventListener('message', event => {
 self.addEventListener('fetch', event => {
   var req = event.request;
   if (req.method !== 'GET') return;
+  // Always network-first for navigations and same-origin app shell so version bumps are not stuck
   if (req.mode === 'navigate' || req.destination === 'document') {
     event.respondWith(fetch(req, { cache: 'no-store' }).catch(() => caches.match(req)));
     return;
   }
-  if (new URL(req.url).origin === self.location.origin) {
+  var url = new URL(req.url);
+  if (url.origin === self.location.origin) {
+    // version.json and main app files: never serve stale
+    if (/version\.json$/.test(url.pathname) || /index\.html$/.test(url.pathname) || /\/$/.test(url.pathname) || /all\.js$/.test(url.pathname) || /sw\.js$/.test(url.pathname)) {
+      event.respondWith(fetch(req, { cache: 'no-store' }).catch(() => caches.match(req)));
+      return;
+    }
     event.respondWith(fetch(req, { cache: 'no-store' }).catch(() => caches.match(req)));
     return;
   }
@@ -32,27 +45,19 @@ self.addEventListener('fetch', event => {
 
 self.addEventListener('push', function(event) {
   var data = {};
-  try { data = event.data.json(); } catch (e) {}
+  try { data = event.data ? event.data.json() : {}; } catch (e) {}
   var title = data.title || 'CardiacLens';
-  var tag = data.tag || 'cardiaclens-fluid-reminder';
   var options = {
-    body: data.body || '',
-    tag: tag,
-    icon: './icon-192.png',
-    badge: './icon-192.png',
-    // v9.10.347.209: without this, notificationclick has no way to know
-    // what the push was for, since options.tag alone is not exposed on
-    // event.notification.data. This was silently dropping every real
-    // background fluid push's identity, causing tap routing to fall
-    // through to the generic Events queue instead of opening Log Fluid.
-    data: { eventTag: tag }
+    body: data.body || 'Reminder',
+    icon: data.icon || './icon-192.png',
+    badge: data.badge || './icon-192.png',
+    data: data.data || {},
+    tag: (data.data && data.data.eventTag) || data.tag || 'cardiaclens'
   };
   event.waitUntil(self.registration.showNotification(title, options));
 });
 
 self.addEventListener('notificationclick', function(event) {
-  // v9.10.347.209: carry the event tag through so the app can open the
-  // specific event's action card, not just focus the app root.
   var tag = (event.notification && event.notification.data && event.notification.data.eventTag) || null;
   event.notification.close();
   event.waitUntil(

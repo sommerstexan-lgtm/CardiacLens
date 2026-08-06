@@ -1,20 +1,20 @@
 {
-  "version": "9.10.351.229",
+  "version": "9.10.351.230",
   "date": "2026-08-06",
   "releaseDate": "August 6, 2026",
-  "build": "TodayFluidReview",
+  "build": "TodayFluidReview-DeployHardening",
   "notes": [
-    "Total Today card: Review today's logs \u2014 time (Central), amount, source, note, running total, delete",
-    "Catches mistaken double entries that inflate pace/total",
-    "Help updated for fluid pace window + review logs"
+    "Review today's logs on Total Today card (Central time, amount, source, note, running total, delete)",
+    "Deploy hardening: SW network-first for app shell + version.json; client reloads when SW activates or version.json differs",
+    "Both index.html and all.js must be deployed together with matching version"
   ],
   "whatsNew": [
     "Review today's logs on the Total Today / pace card",
-    "Each entry shows Central Time, ounces, source (fluid log / BP / meal), note, running total",
-    "Delete mistaken entries directly from the review list"
+    "Hard version check against version.json forces one reload if the phone still has an older build",
+    "Service worker no longer keeps a stale index.html after a version bump"
   ],
   "fixes": [
-    "No one-tap audit of ounces making up Total Today (double-log could stay hidden)",
-    "Help still implied a configurable fluid start time; start is first logged drink"
+    "Phone could remain on prior build after a version push (SW / dual-file deploy risk)",
+    "No one-tap audit of ounces making up Total Today"
   ]
 }
