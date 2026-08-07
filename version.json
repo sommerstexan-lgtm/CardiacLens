@@ -1,20 +1,19 @@
 {
-  "version": "9.10.351.230",
+  "version": "9.10.351.231",
   "date": "2026-08-06",
   "releaseDate": "August 6, 2026",
-  "build": "TodayFluidReview-DeployHardening",
+  "build": "SavedMealPrepLabelFix",
   "notes": [
-    "Review today's logs on Total Today card (Central time, amount, source, note, running total, delete)",
-    "Deploy hardening: SW network-first for app shell + version.json; client reloads when SW activates or version.json differs",
-    "Both index.html and all.js must be deployed together with matching version"
+    "Fix: unescaped apostrophe in Ask system prompt (today's) caused SyntaxError and blocked later script init",
+    "Fix: applySavedMeal no longer depends on prepLabel from a later script; inline safe prep labels + try/catch",
+    "Saved meal picker also fires on input for iOS reliability"
   ],
   "whatsNew": [
-    "Review today's logs on the Total Today / pace card",
-    "Hard version check against version.json forces one reload if the phone still has an older build",
-    "Service worker no longer keeps a stale index.html after a version bump"
+    "Pick from Saved Meals reliably fills What did you eat?",
+    "Guard Dog SyntaxError / prepLabel ReferenceError from v230 resolved"
   ],
   "fixes": [
-    "Phone could remain on prior build after a version push (SW / dual-file deploy risk)",
-    "No one-tap audit of ounces making up Total Today"
+    "SyntaxError: Unexpected identifier 's' in _buildAskSystemPrompt (unescaped today's)",
+    "ReferenceError: Can't find variable: prepLabel in applySavedMeal"
   ]
 }
