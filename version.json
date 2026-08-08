@@ -1,19 +1,22 @@
 {
-  "version": "9.10.351.231",
-  "date": "2026-08-06",
-  "releaseDate": "August 6, 2026",
-  "build": "SavedMealPrepLabelFix",
+  "version": "9.10.351.232",
+  "date": "2026-08-08",
+  "releaseDate": "August 8, 2026",
+  "build": "FluidPaceEngineFix",
   "notes": [
-    "Fix: unescaped apostrophe in Ask system prompt (today's) caused SyntaxError and blocked later script init",
-    "Fix: applySavedMeal no longer depends on prepLabel from a later script; inline safe prep labels + try/catch",
-    "Saved meal picker also fires on input for iOS reliability"
+    "Fluid Pace: remaining-oz continuous rebalance over true remaining minutes of first-fluid\u2192end-time window",
+    "Logging a drink no longer creates instantaneous ahead/behind spikes (consumption-duration ramp 15\u201345 min)",
+    "Reaching daily fluid target immediately sets _cbFluidDayComplete and cancels Worker + local + scheduled fluid reminders for the rest of the day",
+    "Local multi-channel timer (AudioContext chime + vibrate + SW showNotification + in-app alert) arms for pace next-drink so alerts remain audible/visible even when the tab is on-screen immediately before lock"
   ],
   "whatsNew": [
-    "Pick from Saved Meals reliably fills What did you eat?",
-    "Guard Dog SyntaxError / prepLabel ReferenceError from v230 resolved"
+    "Mathematically correct next-drink time from remaining volume / remaining window",
+    "Atomic cancellation of all fluid reminders once daily target is met",
+    "More reliable fluid notifications via local timer + multi-channel broadcast"
   ],
   "fixes": [
-    "SyntaxError: Unexpected identifier 's' in _buildAskSystemPrompt (unescaped today's)",
-    "ReferenceError: Can't find variable: prepLabel in applySavedMeal"
+    "Pace engine treated each log as zero-duration consumption, producing artificial ahead spikes and wrong next-drink times",
+    "Reminders continued after dailyFluid >= target because only end-time set _cbFluidDayComplete",
+    "Pace-derived reminders relied solely on Cloudflare Worker; local path was missing so alerts could be missed near screen lock"
   ]
 }
