@@ -1,22 +1,23 @@
 {
-  "version": "9.10.351.232",
+  "version": "9.10.351.233",
   "date": "2026-08-08",
   "releaseDate": "August 8, 2026",
-  "build": "FluidPaceEngineFix",
+  "build": "FluidPaceCardTrustUX",
   "notes": [
-    "Fluid Pace: remaining-oz continuous rebalance over true remaining minutes of first-fluid\u2192end-time window",
-    "Logging a drink no longer creates instantaneous ahead/behind spikes (consumption-duration ramp 15\u201345 min)",
-    "Reaching daily fluid target immediately sets _cbFluidDayComplete and cancels Worker + local + scheduled fluid reminders for the rest of the day",
-    "Local multi-channel timer (AudioContext chime + vibrate + SW showNotification + in-app alert) arms for pace next-drink so alerts remain audible/visible even when the tab is on-screen immediately before lock"
+    "Total Today / Pace card UX: explicit target + progress (16 / 72 oz + thin bar), last-drink absorbing note, projected finish, window-start timestamp, and relationship language that reconciles pace next-drink with named fluid events",
+    "Softened 'ahead of pace' copy while consumption-duration ramp is still active so the lead never feels instantaneous",
+    "Removed duplicate 'Review today's logs' button from inside the pace card (kept the outer row only)",
+    "Core remaining-oz rebalance, consumption-duration ramp, and end-time arithmetic unchanged and still precise"
   ],
   "whatsNew": [
-    "Mathematically correct next-drink time from remaining volume / remaining window",
-    "Atomic cancellation of all fluid reminders once daily target is met",
-    "More reliable fluid notifications via local timer + multi-channel broadcast"
+    "Calm, trustworthy Total Today card: target/progress, absorbing context, projected finish, and single clarifying next-drink sentence",
+    "Pace suggestion now explicitly relates to any upcoming named fluid event (e.g. Post Lunch BP)",
+    "Window start time shown in footer for full auditability"
   ],
   "fixes": [
-    "Pace engine treated each log as zero-duration consumption, producing artificial ahead spikes and wrong next-drink times",
-    "Reminders continued after dailyFluid >= target because only end-time set _cbFluidDayComplete",
-    "Pace-derived reminders relied solely on Cloudflare Worker; local path was missing so alerts could be missed near screen lock"
+    "Ahead number could still feel instantaneous after a recent log because the card never disclosed the ramp",
+    "Pace next-drink time and named fluid event sat side-by-side with no relationship language",
+    "No explicit daily target or progress fraction (forced mental math)",
+    "Duplicate Review today's logs buttons created visual noise"
   ]
 }

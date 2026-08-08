@@ -1,5 +1,5 @@
 {
-  "name": "CardiacLens v9.10.351.226",
+  "name": "CardiacLens v9.10.351.233",
   "short_name": "CardiacLens",
   "description": "Cardiac health tracking for patients, by a patient.",
   "start_url": "./index.html",
@@ -18,5 +18,5 @@
       "type": "image/png"
     }
   ],
-  "version": "9.10.351.226"
+  "version": "9.10.351.233"
 }

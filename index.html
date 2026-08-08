@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- CardiacLens versioned archive: v9.10.351.232 - deploy reference copy -->
+<!-- CardiacLens versioned archive: v9.10.351.233 - deploy reference copy -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -28,7 +28,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.351.232' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.351.233' }, params || {}));
       }
     } catch(e) {}
   };
@@ -1118,7 +1118,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.351.232';
+    var GD_VERSION   = 'v9.10.351.233';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1655,7 +1655,7 @@
   // -- End CL_SEC_COLOR migration ---------------------------------------------
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
-<title>CardiacLens v9.10.351.232</title>
+<title>CardiacLens v9.10.351.233</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
@@ -2542,7 +2542,7 @@ input[type="time"].modal-input,input[type="time"]{-webkit-appearance:auto;appear
     <!-- Version + clock row -->
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid rgba(255,255,255,0.15);padding-top:12px">
       <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px">
-        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.351.232 · Medical Grade - Free</span>
+        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.351.233 · Medical Grade - Free</span>
         <span id="cl-gd-heartbeat" style="font-size:11px;color:rgba(125,211,252,0.55);font-weight:500;letter-spacing:0.01em">ð Eyes open...</span>
         <!-- ═══════════════════════════════════════════════════════════════════
              VERSION UPDATE CHECKLIST — update ALL 8 locations every release:
@@ -6433,7 +6433,7 @@ Custom Range
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.351.232';
+  var CURRENT='v9.10.351.233';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -25227,7 +25227,7 @@ html+=lbBadge;
 html+='<div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">';
 html+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
 html+='<div>';
-html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.351.232</span></div>';
+html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.351.233</span></div>';
 html+='<div id="settingsVersionStatus" style="font-size:13px;color:#6b7280;margin-top:3px">Tap "Check for Updates" to see if a newer version is available</div>';
 html+='</div>';
 html+='<button onclick="checkForUpdates(true)" id="checkUpdateBtn" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">🔍 Check for Updates</button>';
@@ -28451,11 +28451,14 @@ function _buildFluidPaceHtml(){
   // Typical drinking duration: ~3 min per oz, clamped 15–45 min (covers 8 oz sip ~24 min, larger bottles longer)
   var consumeMins = lastAmount>0 ? Math.max(15, Math.min(45, Math.round(lastAmount*3))) : 20;
   var effectiveActual = actual;
+  var sinceLast = 0;
+  var isAbsorbing = false;
   if(lastFluidTime){
     var lastMins = toMins(lastFluidTime);
-    var since = nowMins - lastMins;
-    if(since >= 0 && since < consumeMins){
-      var creditFrac = since / consumeMins;
+    sinceLast = nowMins - lastMins;
+    if(sinceLast >= 0 && sinceLast < consumeMins){
+      isAbsorbing = true;
+      var creditFrac = sinceLast / consumeMins;
       effectiveActual = actual - lastAmount * (1 - creditFrac);
       if(effectiveActual < 0) effectiveActual = 0;
     }
@@ -28488,27 +28491,110 @@ function _buildFluidPaceHtml(){
     nextDrinkStr = 'Next drink around '+fmtTime(ndMins);
     window._cbPaceNextDrinkMins = ndMins;
   }
-  var footer='<div style="font-size:12px;color:#6b7280;margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:8px"><span>Fluid day ends '+endTimeStr+' &middot; '+timeRemStr+' remaining &middot; '+ozRemaining+' oz to go</span><button onclick="openFluidEndTimeQuickChange()" style="background:none;border:1px solid #d1d5db;border-radius:6px;padding:2px 8px;font-size:11px;color:#6b7280;cursor:pointer;white-space:nowrap;touch-action:manipulation;flex-shrink:0">\u270F\uFE0F Change</button></div>';
-  var disclaimer='<div style="font-size:11px;color:#6b7280;margin-top:4px">Pace is a daily guide — your doctor sets your actual target</div>';
-  var reviewBtn='<button type="button" onclick="openTodayFluidReview()" style="width:100%;margin-top:10px;background:#fff;border:2px solid #0ea5e9;color:#0369a1;border-radius:8px;padding:10px 12px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation">📋 Review today\'s logs</button>';
-  if(diff>=3){
-    return '<div style="margin-top:12px;background:#f0fdf4;border-left:4px solid #10b981;border-radius:8px;padding:12px 14px">'
-      +'<div style="font-size:15px;font-weight:700;color:#065f46">'+diff+' oz ahead of pace</div>'
-      +(nextDrinkStr?'<div style="font-size:13px;color:#065f46;margin-top:3px">'+nextDrinkStr+'</div>':'')
-      +footer+disclaimer+reviewBtn+'</div>';
-  } else if(diff<=-3){
-    return '<div style="margin-top:12px;background:#fff8e1;border-left:4px solid #f59e0b;border-radius:8px;padding:12px 14px">'
-      +'<div style="font-size:15px;font-weight:700;color:#92400e">'+Math.abs(diff)+' oz behind pace — consider drinking now</div>'
-      +(nextDrinkStr?'<div style="font-size:13px;color:#92400e;margin-top:3px">'+nextDrinkStr+'</div>':'')
-      +footer+disclaimer+reviewBtn+'</div>';
-  } else {
-    return '<div style="margin-top:12px;background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:8px;padding:12px 14px">'
-      +'<div style="font-size:15px;font-weight:700;color:#1e40af">On pace</div>'
-      +(nextDrinkStr?'<div style="font-size:13px;color:#1e40af;margin-top:3px">'+nextDrinkStr+'</div>':'')
-      +footer+disclaimer+reviewBtn+'</div>';
-  }
-}
 
+  // ===== v9.10.351.233 UX layer — calm, trustworthy card =====
+  // Explicit target + progress
+  var pct = target > 0 ? Math.min(100, Math.round((actual / target) * 100)) : 0;
+  var progressHtml = '<div style="margin-top:8px;margin-bottom:2px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:#374151">'
+    +'<span><strong>'+actual+'</strong> / '+target+' oz <span style="color:#6b7280">('+pct+'%)</span></span>'
+    +'</div>'
+    +'<div style="margin-top:4px;height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden">'
+    +'<div style="height:100%;width:'+pct+'%;background:#10b981;border-radius:3px;transition:width 0.3s"></div>'
+    +'</div></div>';
+
+  // Projected finish (quiet)
+  var projHtml = '';
+  if(elapsedMins > 5 && actual > 0 && ozRemaining > 0){
+    var rate = actual / elapsedMins;
+    var minsToFinish = Math.round(ozRemaining / Math.max(0.001, rate));
+    var finishMins = nowMins + minsToFinish;
+    if(finishMins <= endMins + 45){
+      projHtml = '<div style="font-size:12px;color:#6b7280;margin-top:4px">On current rate you finish ≈ '+fmtTime(finishMins)+'</div>';
+    } else {
+      projHtml = '<div style="font-size:12px;color:#6b7280;margin-top:4px">On current rate you finish near end of window</div>';
+    }
+  }
+
+  // Relationship language with next named fluid event
+  var namedEvtNote = '';
+  try {
+    var allFluEvts = [];
+    var _todayDow = now.getDay();
+    if(settings && settings.dailyEvents){
+      settings.dailyEvents.forEach(function(e){
+        if(e && e.fluidGoal > 0 && e.time){
+          if(e.scheduleDays && e.scheduleDays.length > 0 && e.scheduleDays.indexOf(_todayDow) === -1) return;
+          allFluEvts.push(e);
+        }
+      });
+    }
+    if(typeof dailyPlan !== 'undefined' && dailyPlan){
+      dailyPlan.forEach(function(e){
+        if(e && (e.amount||e.fluidGoal||0) > 0 && e.time) allFluEvts.push(e);
+      });
+    }
+    allFluEvts.sort(function(a,b){ return String(a.time).localeCompare(String(b.time)); });
+    for(var _i=0; _i<allFluEvts.length; _i++){
+      var _ep = allFluEvts[_i];
+      var _epMins = toMins(_ep.time);
+      if(_epMins > nowMins + 3){
+        var _oz = _ep.fluidGoal || _ep.amount || 0;
+        var _name = (_ep.name || 'scheduled event').replace(/</g,'');
+        namedEvtNote = ' (or wait for '+_name+' at '+fmtTime(_epMins)+(_oz>0?' · '+_oz+' oz':'')+')';
+        break;
+      }
+    }
+  } catch(_e){}
+
+  if(nextDrinkStr && namedEvtNote){
+    nextDrinkStr = nextDrinkStr + namedEvtNote;
+  }
+
+  // Softened status line
+  var statusLine = '', statusColor = '', bg = '', borderC = '';
+  if(diff >= 3){
+    bg = '#f0fdf4'; borderC = '#10b981'; statusColor = '#065f46';
+    if(isAbsorbing){
+      statusLine = '~'+diff+' oz ahead of pace <span style="font-weight:500;font-size:13px">(recent drink still counting)</span>';
+    } else {
+      statusLine = diff+' oz ahead of pace';
+    }
+  } else if(diff <= -3){
+    bg = '#fff8e1'; borderC = '#f59e0b'; statusColor = '#92400e';
+    statusLine = Math.abs(diff)+' oz behind pace — consider drinking now';
+  } else {
+    bg = '#f0f9ff'; borderC = '#3b82f6'; statusColor = '#1e40af';
+    statusLine = 'On pace';
+  }
+
+  // Last-drink absorbing note
+  var lastNote = '';
+  if(isAbsorbing && lastFluidTime){
+    lastNote = '<div style="font-size:12px;color:#6b7280;margin-top:2px">Last logged ~'+sinceLast+' min ago — still absorbing</div>';
+  }
+
+  // Footer with window start (auditable)
+  var startTimeStr = fmtTime(startMins);
+  var footer = '<div style="font-size:12px;color:#6b7280;margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:8px">'
+    +'<span>Fluid day ends '+endTimeStr+' &middot; '+timeRemStr+' remaining &middot; '+ozRemaining+' oz to go</span>'
+    +'<button onclick="openFluidEndTimeQuickChange()" style="background:none;border:1px solid #d1d5db;border-radius:6px;padding:2px 8px;font-size:11px;color:#6b7280;cursor:pointer;white-space:nowrap;touch-action:manipulation;flex-shrink:0">\u270F\uFE0F Change</button></div>'
+    +'<div style="font-size:11px;color:#9ca3af;margin-top:2px">Window started '+startTimeStr+'</div>';
+
+  var disclaimer = '<div style="font-size:11px;color:#6b7280;margin-top:4px">Pace is a daily guide — your doctor sets your actual target</div>';
+
+  // No internal Review button — the outer row already provides it (eliminates duplicate)
+
+  return '<div style="margin-top:12px;background:'+bg+';border-left:4px solid '+borderC+';border-radius:8px;padding:12px 14px">'
+    +'<div style="font-size:15px;font-weight:700;color:'+statusColor+'">'+statusLine+'</div>'
+    + lastNote
+    +(nextDrinkStr ? '<div style="font-size:13px;color:'+statusColor+';margin-top:3px">'+nextDrinkStr+'</div>' : '')
+    + progressHtml
+    + projHtml
+    + footer
+    + disclaimer
+    +'</div>';
+}
 
 function openSettingsFluidEndTime(){
   openSettings();
@@ -37574,7 +37660,7 @@ html+=`</div>`;
 
 html+=`
 <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:2px solid #e5e7eb;color:#6b7280;font-size:14px">
-<p style="margin:0">CardiacLens v9.10.351.232 - Free & Source-Available</p>
+<p style="margin:0">CardiacLens v9.10.351.233 - Free & Source-Available</p>
 <p style="margin:4px 0 0 0">Report Generated: ${reportDate}</p>
 </div>`;
 
@@ -37905,7 +37991,7 @@ Note: This report is based on patient self-tracked data. Clinical correlation
 and examination are essential for diagnosis and treatment decisions.
 
 ---
-CardiacLens v9.10.351.232 Medical Grade - Free
+CardiacLens v9.10.351.233 Medical Grade - Free
 Report Generated: ${reportDate}`;
 
 return text;
@@ -42042,7 +42128,7 @@ report.push(notes);
 report.push('');
 }
 report.push('═══════════════════════════════════════════════════════════');
-report.push('This report was generated by CardiacLens v9.10.351.232 Medical Grade - Free');
+report.push('This report was generated by CardiacLens v9.10.351.233 Medical Grade - Free');
 report.push('Advanced Analytics Dashboard - Phase 3 Implementation');
 report.push('═══════════════════════════════════════════════════════════');
 const blob=new Blob([report.join('\n')],{type:'text/plain'});
@@ -42132,7 +42218,7 @@ ${periodHTML}
 <h2>Key Insights</h2>
 ${insightsHTML}
 <div style="margin-top:40px;padding:20px;background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:8px">
-<strong>CardiacLens v9.10.351.232 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
+<strong>CardiacLens v9.10.351.233 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
 This report is not a substitute for professional medical advice.
 </div>
 </body>
@@ -43105,7 +43191,7 @@ alert(`🏃 Activity Summary\n\n` +
 var VERSION_JSON_URL = 'https://cardiaclens.com/version.json';
 var VERSION_CHECK_KEY = 'CARDIACLENS_LAST_VERSION_CHECK';
 var VERSION_DISMISSED_KEY = 'CARDIACLENS_UPDATE_DISMISSED';
-var CURRENT_VERSION = 'v9.10.351.232';
+var CURRENT_VERSION = 'v9.10.351.233';
 
 // v9.10.351.230 — hard version enforcement: if deployed version.json is newer, force reload once
 (function(){

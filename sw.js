@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cardiaclens-v9.10.351.232-nosecui';
+const CACHE_NAME = 'cardiaclens-v9.10.351.233-nosecui';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
