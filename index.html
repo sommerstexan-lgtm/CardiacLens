@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- CardiacLens versioned archive: v9.10.351.233 - deploy reference copy -->
+<!-- CardiacLens versioned archive: v9.10.351.234 - deploy reference copy -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -28,7 +28,7 @@
   window.cbTrack = function(eventName, params) {
     try {
       if (typeof gtag === 'function') {
-        gtag('event', eventName, Object.assign({ app_version: 'v9.10.351.233' }, params || {}));
+        gtag('event', eventName, Object.assign({ app_version: 'v9.10.351.234' }, params || {}));
       }
     } catch(e) {}
   };
@@ -1118,7 +1118,7 @@
     var GD_BEAT_KEY  = 'CL_GD_HEARTBEAT';
     var GD_BANNER_ID = 'cl-guard-dog-banner';
     var GD_MAX_QUEUE = 10;
-    var GD_VERSION   = 'v9.10.351.233';
+    var GD_VERSION   = 'v9.10.351.234';
     var GD_EMAIL     = 'robert@cardiaclens.com';
     var _gdErrCount  = 0;
     var MAX_SESSION  = 10;
@@ -1655,7 +1655,7 @@
   // -- End CL_SEC_COLOR migration ---------------------------------------------
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0">
-<title>CardiacLens v9.10.351.233</title>
+<title>CardiacLens v9.10.351.234</title>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
@@ -2542,7 +2542,7 @@ input[type="time"].modal-input,input[type="time"]{-webkit-appearance:auto;appear
     <!-- Version + clock row -->
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid rgba(255,255,255,0.15);padding-top:12px">
       <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px">
-        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.351.233 · Medical Grade - Free</span>
+        <span style="font-size:13px;font-weight:700;color:#7dd3fc" id="cl-ver-tap" onclick="window._gdDevTap&&window._gdDevTap()">v9.10.351.234 · Medical Grade - Free</span>
         <span id="cl-gd-heartbeat" style="font-size:11px;color:rgba(125,211,252,0.55);font-weight:500;letter-spacing:0.01em">ð Eyes open...</span>
         <!-- ═══════════════════════════════════════════════════════════════════
              VERSION UPDATE CHECKLIST — update ALL 8 locations every release:
@@ -6433,7 +6433,7 @@ Custom Range
 // hard reload from the server so users always get the latest.
 // ============================================================
 (function(){
-  var CURRENT='v9.10.351.233';
+  var CURRENT='v9.10.351.234';
   var VKEY='CARDIACLENS_APP_VERSION';
   try{
     var stored=localStorage.getItem(VKEY);
@@ -25227,7 +25227,7 @@ html+=lbBadge;
 html+='<div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px">';
 html+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
 html+='<div>';
-html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.351.233</span></div>';
+html+='<div style="font-size:16px;font-weight:700;color:#1e293b">CardiacLens <span id="settingsVersionCurrent">v9.10.351.234</span></div>';
 html+='<div id="settingsVersionStatus" style="font-size:13px;color:#6b7280;margin-top:3px">Tap "Check for Updates" to see if a newer version is available</div>';
 html+='</div>';
 html+='<button onclick="checkForUpdates(true)" id="checkUpdateBtn" style="background:#1d4ed8;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap">🔍 Check for Updates</button>';
@@ -28492,7 +28492,7 @@ function _buildFluidPaceHtml(){
     window._cbPaceNextDrinkMins = ndMins;
   }
 
-  // ===== v9.10.351.233 UX layer — calm, trustworthy card =====
+  // ===== v9.10.351.234 UX layer — calm, trustworthy card =====
   // Explicit target + progress
   var pct = target > 0 ? Math.min(100, Math.round((actual / target) * 100)) : 0;
   var progressHtml = '<div style="margin-top:8px;margin-bottom:2px">'
@@ -30090,6 +30090,85 @@ function _pinPPHPattern(eventCount, avgDrop) {
   }
 }
 // ── End _pinPPHPattern ────────────────────────────────────────────────────
+
+// ── Pin individual PPH event (episodic) ───────────────────────────────────
+// Called from Advanced Analytics Post-Meal BP Patterns table rows.
+// Source 'pph_event' is episodic (not in LIVING_CARD_SOURCES).
+function _pinPPHEvent(date, mealName, mealTime, preSys, postSys, drop, nadirMins) {
+  try {
+    date = String(date || '');
+    mealName = String(mealName || 'Meal');
+    mealTime = String(mealTime || '');
+    preSys = parseInt(preSys, 10) || 0;
+    postSys = parseInt(postSys, 10) || 0;
+    drop = parseInt(drop, 10) || 0;
+    nadirMins = parseInt(nadirMins, 10);
+    if (isNaN(nadirMins)) nadirMins = 0;
+
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var dParts = date.split('-');
+    var dateDisp = (dParts.length === 3)
+      ? (months[parseInt(dParts[1],10)-1] + ' ' + parseInt(dParts[2],10) + ', ' + dParts[0])
+      : date;
+    if (typeof fmtPinDate === 'function') {
+      try { dateDisp = fmtPinDate(date); } catch(e) {}
+    }
+
+    var title = 'PPH Event — ' + mealName + ' (' + dateDisp + ')';
+    var summary = 'Postprandial hypotension event: systolic BP dropped from ' + preSys +
+                  ' to ' + postSys + ' mmHg (\u2212' + drop + ' mmHg) within 2 hours after ' +
+                  mealName + (mealTime ? ' at ' + mealTime : '') +
+                  '. Nadir occurred ' + nadirMins + ' minutes post-meal.\n\n' +
+                  'What to tell your doctor: “On ' + dateDisp + ' my blood pressure dropped from ' +
+                  preSys + ' to ' + postSys + ' mmHg (\u2212' + drop + ' mmHg) within 2 hours after ' +
+                  mealName + '. CardiacLens flagged this as a Postprandial Hypotension event.”';
+
+    var severity = drop >= 30 ? 'red' : 'warning';
+    var detectorData = {
+      type: 'pph_event',
+      date: date,
+      mealName: mealName,
+      mealTime: mealTime,
+      preSys: preSys,
+      postSys: postSys,
+      sysDrop: drop,
+      nadirMins: nadirMins
+    };
+
+    if (typeof pinEvent === 'function') {
+      pinEvent('pph_event', 'Post-Meal BP Event', date, title, summary, severity, detectorData);
+    } else {
+      var list = (typeof getPinnedEvents === 'function') ? getPinnedEvents() : [];
+      var now = new Date();
+      var pin = {
+        id: 'pin_' + Date.now() + '_pph_evt',
+        pinnedAt: now.toISOString(),
+        pinnedAtDisplay: now.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}),
+        source: 'pph_event',
+        sourceLabel: 'Post-Meal BP Event',
+        eventDate: date,
+        eventDateDisplay: dateDisp,
+        title: title,
+        summary: summary,
+        severity: severity,
+        detectorData: detectorData
+      };
+      var idx = list.findIndex(function(p){ return p.source === 'pph_event' && p.eventDate === date && (p.detectorData && p.detectorData.mealTime === mealTime); });
+      if (idx >= 0) { list[idx] = pin; } else { list.unshift(pin); }
+      localStorage.setItem('cardiaclens_pinned_events', JSON.stringify(list));
+    }
+
+    if (typeof updatePinsBadge === 'function') updatePinsBadge();
+    if (typeof openPinnedEvents === 'function') {
+      setTimeout(function(){ openPinnedEvents(); }, 150);
+    } else {
+      alert('Pinned: ' + title);
+    }
+  } catch(e) {
+    alert('Could not pin PPH event: ' + (e.message || e));
+  }
+}
+// ── End _pinPPHEvent ──────────────────────────────────────────────────────
 
 // ── PPH Pattern Section builder (v9.10.85) ───────────────────────────────
 // Returns an HTML string to append to Sentinel. Empty string if no confirmed
@@ -37645,12 +37724,14 @@ html+=`<div class="report-section" style="background:${pphBg};border:1px solid $
 </table>`;
 if(pphCount>=3){
 html+=`<div style="font-size:13px;color:${pphColor};line-height:1.6;margin-bottom:8px"><strong>Pattern confirmed:</strong> ${pphCount} of ${pphEvts.length} analyzed meals produced a ≥20 mmHg systolic drop within 2 hours. This meets the clinical definition of Postprandial Hypotension. Recommend clinical review — autonomic dysfunction, medication timing, and meal composition are common contributing factors.</div>`;
-var recentPPH=pphEvts.filter(function(e){return e.sysDrop>=20;}).sort(function(a,b){return b.date.localeCompare(a.date);}).slice(0,5);
-html+=`<div style="font-size:13px;color:#374151;margin-bottom:4px"><strong>Most recent PPH events:</strong></div>`;
+}
+var recentPPH=pphEvts.filter(function(e){return e.sysDrop>=20;}).sort(function(a,b){return b.date.localeCompare(a.date);}).slice(0,8);
+if(recentPPH.length>0){
+html+=`<div style="font-size:13px;color:#374151;margin:10px 0 4px 0"><strong>Recent individual PPH events</strong> (newest first — exact pre → post numbers for clinical discussion):</div>`;
 recentPPH.forEach(function(e){
 var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-var dp=e.date.split('-');var ds=months[parseInt(dp[1])-1]+' '+parseInt(dp[2]);
-html+=`<div style="font-size:13px;padding:3px 0;border-bottom:1px solid #fed7aa">${ds} · ${e.mealName.substring(0,22)} · ${e.preSys}→${e.postSys} sys (−${e.sysDrop} mmHg)</div>`;
+var dp=e.date.split('-');var ds=months[parseInt(dp[1])-1]+' '+parseInt(dp[2])+(dp[0]?(' '+dp[0]):'');
+html+=`<div style="font-size:13px;padding:5px 0;border-bottom:1px solid #fed7aa;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><span><strong>${ds}</strong> · ${e.mealName.substring(0,24)}</span><span style="font-weight:700;color:#c2410c">${e.preSys} → ${e.postSys} sys (−${e.sysDrop} mmHg)</span></div>`;
 });
 }
 html+=`</div>`;
@@ -37660,7 +37741,7 @@ html+=`</div>`;
 
 html+=`
 <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:2px solid #e5e7eb;color:#6b7280;font-size:14px">
-<p style="margin:0">CardiacLens v9.10.351.233 - Free & Source-Available</p>
+<p style="margin:0">CardiacLens v9.10.351.234 - Free & Source-Available</p>
 <p style="margin:4px 0 0 0">Report Generated: ${reportDate}</p>
 </div>`;
 
@@ -37979,7 +38060,10 @@ Pre-meal baseline = closest BP within 60 min before meal. Nadir = lowest systoli
 if(pphCountT>=3){
 text+=`*** PPH PATTERN CONFIRMED: ${pphCountT} of ${pphEvtsT.length} meals produced a clinically significant drop.
 Recommend clinical review — autonomic dysfunction, medication timing, and meal composition are common contributing factors.\n`;
-var recentT=pphEvtsT.filter(function(e){return e.sysDrop>=20;}).sort(function(a,b){return b.date.localeCompare(a.date);}).slice(0,5);
+}
+var recentT=pphEvtsT.filter(function(e){return e.sysDrop>=20;}).sort(function(a,b){return b.date.localeCompare(a.date);}).slice(0,8);
+if(recentT.length>0){
+text+=`Recent individual PPH events (newest first):\n`;
 recentT.forEach(function(e){text+=`  ${e.date} | ${e.mealName.substring(0,22)} | ${e.preSys}->${e.postSys} sys (-${e.sysDrop} mmHg)\n`;});
 }
 }
@@ -37991,7 +38075,7 @@ Note: This report is based on patient self-tracked data. Clinical correlation
 and examination are essential for diagnosis and treatment decisions.
 
 ---
-CardiacLens v9.10.351.233 Medical Grade - Free
+CardiacLens v9.10.351.234 Medical Grade - Free
 Report Generated: ${reportDate}`;
 
 return text;
@@ -40910,7 +40994,7 @@ var _tableLabel=_pphRows.length>0
   :'Recent meal events (newest first):';
 html+='<div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:8px">'+_tableLabel+'</div>';
 html+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">';
-html+='<tr style="background:#f9fafb"><th style="padding:8px;text-align:left;border-bottom:2px solid #e5e7eb;white-space:nowrap">Date</th><th style="padding:8px;text-align:left;border-bottom:2px solid #e5e7eb">Meal</th><th style="padding:8px;text-align:center;border-bottom:2px solid #e5e7eb;white-space:nowrap">Pre-meal</th><th style="padding:8px;text-align:center;border-bottom:2px solid #e5e7eb;white-space:nowrap">Nadir BP</th><th style="padding:8px;text-align:center;border-bottom:2px solid #e5e7eb">Drop</th><th style="padding:8px;text-align:center;border-bottom:2px solid #e5e7eb">Min</th></tr>';
+html+='<tr style="background:#f9fafb"><th style="padding:8px;text-align:left;border-bottom:2px solid #e5e7eb;white-space:nowrap">Date</th><th style="padding:8px;text-align:left;border-bottom:2px solid #e5e7eb">Meal</th><th style="padding:8px;text-align:center;border-bottom:2px solid #e5e7eb;white-space:nowrap">Pre-meal</th><th style="padding:8px;text-align:center;border-bottom:2px solid #e5e7eb;white-space:nowrap">Nadir BP</th><th style="padding:8px;text-align:center;border-bottom:2px solid #e5e7eb">Drop</th><th style="padding:8px;text-align:center;border-bottom:2px solid #e5e7eb">Min</th><th style="padding:8px;text-align:center;border-bottom:2px solid #e5e7eb;white-space:nowrap">Pin</th></tr>';
 recent.forEach(function(e){
 var d=e.date.split('-');var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 var dateStr=months[parseInt(d[1])-1]+' '+parseInt(d[2]);
@@ -40924,10 +41008,17 @@ html+='<td style="padding:8px;text-align:center;font-weight:600">'+e.preSys+'/'+
 html+='<td style="padding:8px;text-align:center;font-weight:600">'+e.postSys+'/'+e.postDia+'</td>';
 html+='<td style="padding:8px;text-align:center;font-weight:700;color:'+dropColor+'">'+dropSign+' sys'+(isPPH?' ⚑':'')+'</td>';
 html+='<td style="padding:8px;text-align:center;color:#6b7280">'+e.nadirMins+'</td>';
+if(isPPH){
+  var _safeMeal=(e.mealName||'Meal').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  var _safeTime=(e.mealTime||'').replace(/'/g,"\\'");
+  html+='<td style="padding:6px;text-align:center"><button type="button" onclick="_pinPPHEvent(\''+e.date+'\',\''+_safeMeal+'\',\''+_safeTime+'\','+e.preSys+','+e.postSys+','+e.sysDrop+','+e.nadirMins+')" style="background:#f97316;color:white;border:none;border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap" title="Pin this PPH event for your doctor">📌 Pin</button></td>';
+}else{
+  html+='<td style="padding:8px;text-align:center;color:#d1d5db">—</td>';
+}
 html+='</tr>';
 });
 html+='</table></div>';
-html+='<div style="font-size:12px;color:#6b7280;margin-top:8px;line-height:1.5">⚑ = PPH event (≥20 mmHg systolic drop). Pre-meal = closest BP within 60 min before. Nadir = lowest systolic within 2 hours after. Min = minutes post-meal when nadir occurred. Clinical standard: Postprandial Hypotension defined as ≥20 mmHg systolic drop within 2 hours of eating. For informational tracking only — discuss patterns with your care team.</div>';
+html+='<div style="font-size:12px;color:#6b7280;margin-top:8px;line-height:1.5">⚑ = PPH event (≥20 mmHg systolic drop). Pre-meal = closest BP within 60 min before. Nadir = lowest systolic within 2 hours after. Min = minutes post-meal when nadir occurred. Use <strong>📌 Pin</strong> on any ⚑ row to save that exact event for your doctor. Clinical standard: Postprandial Hypotension defined as ≥20 mmHg systolic drop within 2 hours of eating. For informational tracking only — discuss patterns with your care team.</div>';
 
 el.innerHTML=html;
 }
@@ -42128,7 +42219,7 @@ report.push(notes);
 report.push('');
 }
 report.push('═══════════════════════════════════════════════════════════');
-report.push('This report was generated by CardiacLens v9.10.351.233 Medical Grade - Free');
+report.push('This report was generated by CardiacLens v9.10.351.234 Medical Grade - Free');
 report.push('Advanced Analytics Dashboard - Phase 3 Implementation');
 report.push('═══════════════════════════════════════════════════════════');
 const blob=new Blob([report.join('\n')],{type:'text/plain'});
@@ -42218,7 +42309,7 @@ ${periodHTML}
 <h2>Key Insights</h2>
 ${insightsHTML}
 <div style="margin-top:40px;padding:20px;background:#f0f9ff;border-left:4px solid #3b82f6;border-radius:8px">
-<strong>CardiacLens v9.10.351.233 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
+<strong>CardiacLens v9.10.351.234 Medical Grade - Free</strong> - Advanced Analytics Dashboard<br>
 This report is not a substitute for professional medical advice.
 </div>
 </body>
@@ -43191,7 +43282,7 @@ alert(`🏃 Activity Summary\n\n` +
 var VERSION_JSON_URL = 'https://cardiaclens.com/version.json';
 var VERSION_CHECK_KEY = 'CARDIACLENS_LAST_VERSION_CHECK';
 var VERSION_DISMISSED_KEY = 'CARDIACLENS_UPDATE_DISMISSED';
-var CURRENT_VERSION = 'v9.10.351.233';
+var CURRENT_VERSION = 'v9.10.351.234';
 
 // v9.10.351.230 — hard version enforcement: if deployed version.json is newer, force reload once
 (function(){

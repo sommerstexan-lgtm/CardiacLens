@@ -1,23 +1,21 @@
 {
-  "version": "9.10.351.233",
-  "date": "2026-08-08",
-  "releaseDate": "August 8, 2026",
-  "build": "FluidPaceCardTrustUX",
+  "version": "9.10.351.234",
+  "date": "2026-09-02",
+  "releaseDate": "September 2, 2026",
+  "build": "PPHIndividualEvents",
   "notes": [
-    "Total Today / Pace card UX: explicit target + progress (16 / 72 oz + thin bar), last-drink absorbing note, projected finish, window-start timestamp, and relationship language that reconciles pace next-drink with named fluid events",
-    "Softened 'ahead of pace' copy while consumption-duration ramp is still active so the lead never feels instantaneous",
-    "Removed duplicate 'Review today's logs' button from inside the pace card (kept the outer row only)",
-    "Core remaining-oz rebalance, consumption-duration ramp, and end-time arithmetic unchanged and still precise"
+    "Post-Meal BP Patterns (Advanced Analytics): every clinically qualifying individual PPH event is now listed with date, meal, pre-meal BP, post-meal nadir, systolic drop, minutes to nadir, and a one-action Pin this event control",
+    "Individual PPH events pin as episodic cards (source pph_event) via the existing pinEvent system — they appear in Pinned Events, survive archive, and flow into the Doctor's Report",
+    "Doctor's Report PPH section improved: clean chronological list of recent individual qualifying events with exact pre → post numbers and drops, suitable for reading aloud or handing to a cardiologist",
+    "Existing 30-day Sentinel PPH pattern card and its pattern pin (source pph_sentinel) remain unchanged and fully functional"
   ],
   "whatsNew": [
-    "Calm, trustworthy Total Today card: target/progress, absorbing context, projected finish, and single clarifying next-drink sentence",
-    "Pace suggestion now explicitly relates to any upcoming named fluid event (e.g. Post Lunch BP)",
-    "Window start time shown in footer for full auditability"
+    "Pin any individual PPH event (≥20 mmHg systolic drop within 2 hrs of a meal) directly from Advanced Analytics → Post-Meal BP Patterns",
+    "Doctor's Report now lists recent individual PPH events with exact numbers a cardiologist can use",
+    "Episodic PPH event pins appear alongside other detector pins in Pinned Events and the report"
   ],
   "fixes": [
-    "Ahead number could still feel instantaneous after a recent log because the card never disclosed the ramp",
-    "Pace next-drink time and named fluid event sat side-by-side with no relationship language",
-    "No explicit daily target or progress fraction (forced mental math)",
-    "Duplicate Review today's logs buttons created visual noise"
+    "Individual qualifying PPH events were detected and shown in a table but could not be pinned as first-class episodic events the way HR detector events can",
+    "Doctor's Report PPH section only listed events when the 3+ pattern threshold was met; now lists recent qualifying events whenever they exist"
   ]
 }
